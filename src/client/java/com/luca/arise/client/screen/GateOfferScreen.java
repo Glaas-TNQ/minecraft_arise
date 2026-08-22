@@ -2,6 +2,8 @@ package com.luca.arise.client.screen;
 
 import java.util.stream.Collectors;
 
+import com.luca.arise.client.ui.AriseScreen;
+import com.luca.arise.client.ui.AriseTheme;
 import com.luca.arise.gate.GateOffer;
 import com.luca.arise.network.GateActionPayload;
 
@@ -9,7 +11,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -23,19 +24,14 @@ import net.minecraft.world.entity.EntityType;
  * calcolata dal client — arrivano tutte nel pacchetto che risponde al click sul varco, e il
  * bottone "Entra" rimanda indietro soltanto "quel varco lì".
  */
-public class GateOfferScreen extends Screen {
+public class GateOfferScreen extends AriseScreen {
 
-	private static final int PANEL_WIDTH = 300;
-
-	private static final int COLOR_TITLE = 0xFF4FC3F7;
-	private static final int COLOR_TEXT = 0xFFE8F2FF;
-	private static final int COLOR_DIM = 0xFF9BA8B8;
-	private static final int COLOR_SOULS = 0xFFFFD54F;
-	private static final int COLOR_LINE = 0xFF1F2C42;
+	private static final int PANEL_W = 320;
+	private static final int PANEL_H = 250;
+	private static final int LABEL_W = 92;
 
 	/** Sotto questa soglia il tempo residuo passa in rosso: il varco sta per chiudersi. */
 	private static final int URGENT_TICKS = 600;
-	private static final int COLOR_URGENT = 0xFFE86A6A;
 
 	private final int entityId;
 	private final GateOffer offer;
@@ -43,35 +39,32 @@ public class GateOfferScreen extends Screen {
 	private int remainingTicks;
 
 	public GateOfferScreen(int entityId, GateOffer offer, int remainingTicks) {
-		super(Component.translatable("arise.screen.gate.title"));
+		super(Component.translatable("arise.screen.gate.title"), PANEL_W, PANEL_H);
 		this.entityId = entityId;
 		this.offer = offer;
 		this.remainingTicks = remainingTicks;
 	}
 
 	@Override
-	public boolean isPauseScreen() {
-		return false;
-	}
-
-	@Override
-	protected void init() {
-		int left = (width - PANEL_WIDTH) / 2;
-		int buttonsTop = height / 2 + 74;
+	protected void layout() {
+		int left = bodyLeft();
+		int full = bodyRight() - left;
+		int half = (full - 4) / 2;
+		int buttonsTop = bodyBottom() - 46;
 
 		addRenderableWidget(Button.builder(Component.translatable("arise.screen.gate.enter"),
 						button -> send(GateActionPayload.Action.ENTER))
-				.bounds(left, buttonsTop, 146, 20)
+				.bounds(left, buttonsTop, half, 20)
 				.build());
 
 		addRenderableWidget(Button.builder(Component.translatable("arise.screen.gate.later"),
 						button -> onClose())
-				.bounds(left + PANEL_WIDTH - 146, buttonsTop, 146, 20)
+				.bounds(left + half + 4, buttonsTop, half, 20)
 				.build());
 
 		addRenderableWidget(Button.builder(Component.translatable("arise.screen.gate.dismiss"),
 						button -> send(GateActionPayload.Action.DISMISS))
-				.bounds(left + PANEL_WIDTH / 2 - 73, buttonsTop + 24, 146, 20)
+				.bounds(left, buttonsTop + 24, full, 20)
 				.build());
 	}
 
@@ -103,36 +96,45 @@ public class GateOfferScreen extends Screen {
 		}
 	}
 
+	/** L'accento del pannello e' il colore del rango: il varco si riconosce prima di leggerlo. */
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+	protected int accent() {
+		return offer.rank().color();
+	}
 
-		int left = (width - PANEL_WIDTH) / 2;
-		int top = height / 2 - 96;
+	@Override
+	protected Component status() {
+		int seconds = Math.max(0, remainingTicks / 20);
+		return Component.translatable("arise.screen.gate.closes_value", seconds / 60, seconds % 60);
+	}
 
-		graphics.centeredText(font, title, width / 2, top, COLOR_TITLE);
-		graphics.horizontalLine(left, left + PANEL_WIDTH, top + 12, COLOR_LINE);
+	@Override
+	protected Component hint() {
+		return Component.translatable("arise.screen.gate.hint");
+	}
 
-		int y = top + 22;
+	@Override
+	protected void content(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		int left = bodyLeft();
+		int right = bodyRight();
+		int available = right - left;
+		int y = bodyTop() + 6;
 
-		graphics.text(font, Component.translatable("arise.screen.gate.rank"), left, y, COLOR_DIM);
-		graphics.text(font, offer.rank().label(), left + 90, y, offer.rank().color());
-		y += 14;
+		row(graphics, "arise.screen.gate.rank", offer.rank().label(), left, y, offer.rank().color());
+		y += 13;
+		row(graphics, "arise.screen.gate.theme", offer.theme().label(), left, y,
+				0xFF000000 | offer.theme().color());
+		y += 13;
+		row(graphics, "arise.screen.gate.layout", Component.translatable("arise.screen.gate.layout_value",
+				offer.mainRooms(), offer.halls(), offer.branches()), left, y, AriseTheme.TEXT);
+		y += 13;
+		row(graphics, "arise.screen.gate.boss", describe(offer.boss()), left, y, offer.rank().color());
+		y += 18;
 
-		graphics.text(font, Component.translatable("arise.screen.gate.theme"), left, y, COLOR_DIM);
-		graphics.text(font, offer.theme().label(), left + 90, y, 0xFF000000 | offer.theme().color());
-		y += 14;
+		divider(graphics, left, right, y);
+		y += 7;
 
-		graphics.text(font, Component.translatable("arise.screen.gate.layout"), left, y, COLOR_DIM);
-		graphics.text(font, Component.translatable("arise.screen.gate.layout_value",
-				offer.mainRooms(), offer.halls(), offer.branches()), left + 90, y, COLOR_TEXT);
-		y += 20;
-
-		graphics.text(font, Component.translatable("arise.screen.gate.boss"), left, y, COLOR_DIM);
-		graphics.text(font, describe(offer.boss()), left + 90, y, offer.rank().color());
-		y += 20;
-
-		graphics.text(font, Component.translatable("arise.screen.gate.inhabitants"), left, y, COLOR_DIM);
+		sectionLabel(graphics, Component.translatable("arise.screen.gate.inhabitants"), left, y);
 		y += 12;
 
 		// A ranghi alti la tabella dei mob è lunga: mandarla a capo è l'unico modo perché resti
@@ -140,21 +142,26 @@ public class GateOfferScreen extends Screen {
 		Component mobs = Component.literal(offer.mobs().stream()
 				.map(id -> describe(id).getString())
 				.collect(Collectors.joining(", ")));
-		graphics.textWithWordWrap(font, mobs, left + 8, y, PANEL_WIDTH - 8, COLOR_TEXT);
-		y += 12 * (1 + font.split(mobs, PANEL_WIDTH - 8).size());
+		graphics.textWithWordWrap(font, mobs, left, y, available, AriseTheme.TEXT);
+		y += 11 * font.split(mobs, available).size() + 6;
 
-		graphics.horizontalLine(left, left + PANEL_WIDTH, y, COLOR_LINE);
-		y += 8;
+		divider(graphics, left, right, y);
+		y += 7;
 
-		graphics.text(font, Component.translatable("arise.screen.gate.reward"), left, y, COLOR_DIM);
-		graphics.text(font, Component.translatable("arise.screen.gate.reward_value",
-				offer.xp(), offer.souls()), left + 90, y, COLOR_SOULS);
-		y += 14;
+		row(graphics, "arise.screen.gate.reward", Component.translatable("arise.screen.gate.reward_value",
+				offer.xp(), offer.souls()), left, y, AriseTheme.GOLD);
 
-		int seconds = Math.max(0, remainingTicks / 20);
-		graphics.text(font, Component.translatable("arise.screen.gate.closes"), left, y, COLOR_DIM);
-		graphics.text(font, Component.translatable("arise.screen.gate.closes_value", seconds / 60, seconds % 60),
-				left + 90, y, remainingTicks < URGENT_TICKS ? COLOR_URGENT : COLOR_TEXT);
+		// Il tempo residuo e' gia' nella riga di stato in alto; qui si accende solo quando urge.
+		if (remainingTicks < URGENT_TICKS) {
+			y += 16;
+			graphics.text(font, Component.translatable("arise.screen.gate.urgent"), left, y, AriseTheme.BAD);
+		}
+	}
+
+	private void row(GuiGraphicsExtractor graphics, String key, Component value, int left, int y,
+			int color) {
+		graphics.text(font, Component.translatable(key), left, y, AriseTheme.MUTED);
+		graphics.text(font, value, left + LABEL_W, y, color);
 	}
 
 	/** Il nome tradotto di una creatura, o il suo id se quella creatura non esiste da queste parti. */

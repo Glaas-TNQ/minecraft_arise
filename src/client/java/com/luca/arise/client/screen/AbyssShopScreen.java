@@ -1,11 +1,14 @@
 package com.luca.arise.client.screen;
 
-import java.util.List;
+import java.util.UUID;
 
+import com.luca.arise.client.ui.AriseScreen;
+import com.luca.arise.client.ui.AriseTheme;
+import com.luca.arise.client.ui.Glyphs;
+import com.luca.arise.client.ui.ListPanel;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.gear.GearPiece;
 import com.luca.arise.network.ShopActionPayload;
-import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.shop.ShopOffer;
 import com.luca.arise.shop.ShopStock;
@@ -14,56 +17,39 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 
 /**
  * L'Abyss Shop.
  *
- * <p>Sei voci e basta: un negozio con un catalogo infinito e' un catalogo, non una scelta. Le
- * ultime sono <em>sigillate</em> — si compra il rango e il pezzo esce dopo — e costano meno perche'
- * il rischio lo prende chi paga.
+ * <p>Assortimento a sinistra, dettaglio a destra. Le voci sigillate mostrano solo il rango, ed e'
+ * il punto: si compra la promessa, non il pezzo, e per questo costano meno.
  *
- * <p>Il prezzo del ritiro sale a ogni ritiro dentro la stessa rotazione: e' quello che impedisce di
- * trasformare i soul coin in un tiro a ripetizione finche' non esce il pezzo giusto.
+ * <p>Il bottone del ritiro sta in basso a sinistra col suo prezzo scritto sopra, perche' quel
+ * prezzo raddoppia quasi a ogni pressione e va guardato prima, non dopo.
  */
-public class AbyssShopScreen extends Screen {
+public class AbyssShopScreen extends AriseScreen {
 
-	private static final int ROW_HEIGHT = 30;
-	private static final int PANEL_WIDTH = 340;
-	private static final int BUY_WIDTH = 76;
+	private static final int PANEL_W = 420;
+	private static final int PANEL_H = 210;
+	private static final int LIST_W = 200;
 
-	private static final int COLOR_TITLE = 0xFFC77FE8;
-	private static final int COLOR_TEXT = 0xFFE8F2FF;
-	private static final int COLOR_DIM = 0xFF9BA8B8;
-	private static final int COLOR_SOULS = 0xFFFFD54F;
-	private static final int COLOR_ROW = 0x40000000;
-	private static final int COLOR_SEALED = 0xFF8E7CC3;
+	private final ListPanel<ShopOffer> list = new ListPanel<>(AriseTheme.ROW_HEIGHT);
 
-	private int lastFingerprint = Integer.MIN_VALUE;
+	private UUID selectedId;
+	private Button buy;
+	private Button refresh;
 
 	public AbyssShopScreen() {
-		super(Component.translatable("arise.screen.shop.title"));
+		super(Component.translatable("arise.screen.shop.title"), PANEL_W, PANEL_H);
 	}
-
-	@Override
-	public boolean isPauseScreen() {
-		return false;
-	}
-
-	// ---------------------------------------------------------------- stato
 
 	private ShopStock stock() {
 		LocalPlayer player = minecraft != null ? minecraft.player : null;
 		ShopStock stock = player == null ? null : player.getAttached(ModAttachments.SHOP);
 		return stock == null ? ShopStock.EMPTY : stock;
-	}
-
-	private long souls() {
-		LocalPlayer player = minecraft != null ? minecraft.player : null;
-		PlayerProgress progress = player == null ? null : player.getAttached(ModAttachments.PROGRESS);
-		return progress == null ? 0L : progress.souls();
 	}
 
 	private long refreshPrice() {
@@ -73,113 +59,163 @@ public class AbyssShopScreen extends Screen {
 	// ---------------------------------------------------------------- widget
 
 	@Override
-	protected void init() {
-		int left = (width - PANEL_WIDTH) / 2;
-		int top = topOfRows();
-		List<ShopOffer> offers = stock().offers();
-		long souls = souls();
+	protected void layout() {
+		int left = bodyLeft();
+		int top = bodyTop() + 16;
+		int listHeight = bodyBottom() - top - 28;
 
-		int index = 0;
-		for (ShopOffer offer : offers) {
-			Button buy = Button.builder(
-							Component.translatable("arise.screen.shop.buy", offer.price()),
-							button -> ClientPlayNetworking.send(
-									new ShopActionPayload(offer.id(), ShopActionPayload.Action.BUY)))
-					.bounds(left + PANEL_WIDTH - BUY_WIDTH, top + index * ROW_HEIGHT - 2, BUY_WIDTH, 20)
-					.build();
+		list.bounds(left, top, LIST_W, listHeight);
 
-			// Il bottone spento dice da solo perche': non serve un messaggio d'errore per una cosa
-			// che si vede guardando il saldo.
-			buy.active = souls >= offer.price();
-			addRenderableWidget(buy);
+		refresh = addRenderableWidget(Button.builder(Component.empty(), button ->
+						ClientPlayNetworking.send(ShopActionPayload.of(ShopActionPayload.Action.REFRESH)))
+				.bounds(left, bodyBottom() - 24, LIST_W, 20).build());
 
-			index++;
+		int detailLeft = left + LIST_W + 12;
+		buy = addRenderableWidget(Button.builder(Component.empty(), button -> buy())
+				.bounds(detailLeft, bodyBottom() - 24, bodyRight() - detailLeft, 20).build());
+	}
+
+	private void buy() {
+		ShopOffer offer = list.selected();
+		if (offer != null) {
+			ClientPlayNetworking.send(new ShopActionPayload(offer.id(), ShopActionPayload.Action.BUY));
 		}
-
-		long price = refreshPrice();
-		Button refresh = Button.builder(
-						Component.translatable("arise.screen.shop.refresh", price),
-						button -> ClientPlayNetworking.send(
-								ShopActionPayload.of(ShopActionPayload.Action.REFRESH)))
-				.bounds(left + PANEL_WIDTH - 130, top + Math.max(1, offers.size()) * ROW_HEIGHT + 6, 130, 20)
-				.build();
-		refresh.active = souls >= price;
-		addRenderableWidget(refresh);
 	}
 
 	@Override
-	public void tick() {
-		super.tick();
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
 
-		ShopStock stock = stock();
-		int fingerprint = stock.offers().hashCode() * 31 + stock.refreshes() + Long.hashCode(souls());
-
-		if (fingerprint != lastFingerprint) {
-			lastFingerprint = fingerprint;
-			rebuildWidgets();
+		if (list.mouseClicked(mouseX, mouseY)) {
+			ShopOffer offer = list.selected();
+			selectedId = offer == null ? null : offer.id();
+			return true;
 		}
+
+		return super.mouseClicked(event, doubleClick);
 	}
 
-	private int topOfRows() {
-		int rows = Math.max(1, stock().offers().size());
-		return height / 2 - (rows * ROW_HEIGHT) / 2 + 6;
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+		if (list.mouseScrolled(mouseX, mouseY, scrollY)) {
+			return true;
+		}
+
+		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
 	// ---------------------------------------------------------------- disegno
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+	protected int accent() {
+		return AriseTheme.VIOLET;
+	}
 
+	@Override
+	protected Component status() {
+		return Component.translatable("arise.screen.shop.balance", souls());
+	}
+
+	@Override
+	protected Component hint() {
+		return Component.translatable("arise.screen.shop.hint");
+	}
+
+	@Override
+	protected void content(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		ShopStock stock = stock();
-		int left = (width - PANEL_WIDTH) / 2;
-		int top = topOfRows();
 
-		graphics.centeredText(font, title, width / 2, top - 34, COLOR_TITLE);
-		graphics.centeredText(font, Component.translatable("arise.screen.shop.balance", souls()),
-				width / 2, top - 22, COLOR_SOULS);
+		list.items(stock.offers());
+		if (selectedId != null) {
+			list.selectFirst(offer -> offer.id().equals(selectedId));
+		}
 
-		if (stock.offers().isEmpty()) {
-			graphics.centeredText(font, Component.translatable("arise.screen.shop.empty"),
-					width / 2, height / 2, COLOR_DIM);
+		long price = refreshPrice();
+		refresh.setMessage(Component.translatable("arise.screen.shop.refresh", price));
+		refresh.active = souls() >= price;
+
+		sectionLabel(graphics, Component.translatable("arise.screen.shop.stock",
+				stock.offers().size()), bodyLeft(), bodyTop() + 5);
+
+		if (list.isEmpty()) {
+			graphics.text(font, Component.translatable("arise.screen.shop.empty"),
+					bodyLeft(), bodyTop() + 22, AriseTheme.DISABLED);
+		} else {
+			list.render(graphics, mouseX, mouseY, this::drawOffer);
+		}
+
+		drawDetail(graphics);
+	}
+
+	private void drawOffer(GuiGraphicsExtractor graphics, ShopOffer offer, int x, int y, int width,
+			boolean selected, boolean hovered) {
+		GearPiece piece = offer.piece().orElse(null);
+
+		if (piece == null) {
+			Glyphs.rankPip(graphics, x + 7, y + 6, 9, offer.rank().color());
+		} else {
+			Glyphs.slot(graphics, piece.slot(), x + 7, y + 5, offer.rank().color());
+		}
+
+		graphics.text(font, offer.label(), x + 22, y + 4,
+				offer.isSealed() ? AriseTheme.VIOLET : AriseTheme.TEXT);
+
+		Component price = Component.translatable("arise.screen.shop.price", offer.price());
+		int color = souls() >= offer.price() ? AriseTheme.GOLD : AriseTheme.DISABLED;
+		graphics.text(font, price, x + 22, y + 14, color);
+
+		Component rank = offer.rank().label();
+		graphics.text(font, rank, x + width - font.width(rank) - 6, y + 9, offer.rank().color());
+	}
+
+	private void drawDetail(GuiGraphicsExtractor graphics) {
+		int left = bodyLeft() + LIST_W + 12;
+		int right = bodyRight();
+		int y = bodyTop() + 16;
+
+		ShopOffer offer = list.selected();
+		buy.visible = offer != null;
+
+		if (offer == null) {
+			graphics.text(font, Component.translatable("arise.screen.shop.pick"), left, y,
+					AriseTheme.DISABLED);
 			return;
 		}
 
-		int index = 0;
-		for (ShopOffer offer : stock.offers()) {
-			drawOffer(graphics, offer, left, top + index * ROW_HEIGHT);
-			index++;
-		}
-	}
+		buy.setMessage(Component.translatable("arise.screen.shop.buy", offer.price()));
+		buy.active = souls() >= offer.price();
 
-	private void drawOffer(GuiGraphicsExtractor graphics, ShopOffer offer, int left, int y) {
-		graphics.fill(left, y - 3, left + PANEL_WIDTH, y + ROW_HEIGHT - 6, COLOR_ROW);
-		graphics.fill(left + 2, y - 1, left + 5, y + 18, offer.rank().color());
+		graphics.text(font, offer.label(), left, y,
+				offer.isSealed() ? AriseTheme.VIOLET : AriseTheme.TEXT);
+		y += 15;
 
-		graphics.text(font, offer.rank().label(), left + 9, y, offer.rank().color());
-		graphics.text(font, offer.label(), left + 25, y, offer.isSealed() ? COLOR_SEALED : COLOR_TEXT);
+		chip(graphics, offer.rank().label(), left, y, offer.rank().color());
+		y += 20;
+
+		divider(graphics, left, right, y);
+		y += 6;
 
 		GearPiece piece = offer.piece().orElse(null);
 
 		if (piece == null) {
-			graphics.text(font, Component.translatable("arise.screen.shop.sealed_hint"),
-					left + 25, y + 11, COLOR_DIM);
+			graphics.textWithWordWrap(font, Component.translatable("arise.screen.shop.sealed_hint"),
+					left, y, right - left, AriseTheme.MUTED);
 			return;
 		}
 
-		graphics.text(font, piece.slot().label(), left + 25, y + 11, COLOR_DIM);
-
-		int x = left + 25 + font.width(piece.slot().label()) + 10;
-		int limit = left + PANEL_WIDTH - BUY_WIDTH - 8;
+		graphics.text(font, piece.slot().label(), left, y, AriseTheme.MUTED);
+		y += 13;
 
 		for (Component line : piece.statLines()) {
-			if (x + font.width(line) > limit) {
-				graphics.text(font, Component.literal("…"), x, y + 11, COLOR_DIM);
-				return;
-			}
+			graphics.text(font, line, left, y, AriseTheme.MUTED);
+			y += 11;
+		}
 
-			graphics.text(font, line, x, y + 11, COLOR_DIM);
-			x += font.width(line) + 8;
+		if (piece.sockets() > 0) {
+			y += 4;
+			graphics.text(font, Component.translatable("arise.screen.hunter.sockets", 0,
+					piece.sockets()), left, y, AriseTheme.DISABLED);
 		}
 	}
 }

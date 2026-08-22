@@ -2,6 +2,8 @@ package com.luca.arise.client.screen;
 
 import java.util.UUID;
 
+import com.luca.arise.client.ui.AriseScreen;
+import com.luca.arise.client.ui.AriseTheme;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.network.ShadowActionPayload;
@@ -25,7 +27,7 @@ import net.minecraft.network.chat.Component;
  * comandi diventa illeggibile appena le ombre sono più di tre, e il rinominare ha comunque bisogno
  * di un campo di testo che in una lista non ci sta.
  */
-public class ShadowDetailScreen extends Screen {
+public class ShadowDetailScreen extends AriseScreen {
 
 	/** Tavolozza fissa: un selettore libero sarebbe più codice e peggiori risultati a schermo. */
 	private static final int[] PALETTE = {
@@ -33,13 +35,14 @@ public class ShadowDetailScreen extends Screen {
 			0xFFD54F, 0xE86A6A, 0x6A7BE8, 0x9BA8B8,
 	};
 
-	private static final int PANEL_WIDTH = 260;
+	private static final int PANEL_WIDTH = 280;
+	private static final int PANEL_HEIGHT = 210;
 	private static final int SWATCH = 20;
 
-	private static final int COLOR_TITLE = 0xFF4FC3F7;
-	private static final int COLOR_TEXT = 0xFFE8F2FF;
-	private static final int COLOR_DIM = 0xFF9BA8B8;
-	private static final int COLOR_SOULS = 0xFFFFD54F;
+	private static final int COLOR_TITLE = AriseTheme.ACCENT;
+	private static final int COLOR_TEXT = AriseTheme.TEXT;
+	private static final int COLOR_DIM = AriseTheme.MUTED;
+	private static final int COLOR_SOULS = AriseTheme.GOLD;
 
 	private final UUID shadowId;
 	private final Screen parent;
@@ -48,7 +51,7 @@ public class ShadowDetailScreen extends Screen {
 	private int lastFingerprint = Integer.MIN_VALUE;
 
 	public ShadowDetailScreen(UUID shadowId, Screen parent) {
-		super(Component.translatable("arise.screen.detail.title"));
+		super(Component.translatable("arise.screen.detail.title"), PANEL_WIDTH, PANEL_HEIGHT);
 		this.shadowId = shadowId;
 		this.parent = parent;
 	}
@@ -68,14 +71,8 @@ public class ShadowDetailScreen extends Screen {
 		return army == null ? null : army.find(shadowId).orElse(null);
 	}
 
-	private long souls() {
-		LocalPlayer player = minecraft != null ? minecraft.player : null;
-		PlayerProgress progress = player == null ? null : player.getAttached(ModAttachments.PROGRESS);
-		return progress == null ? 0L : progress.souls();
-	}
-
 	@Override
-	protected void init() {
+	protected void layout() {
 		ShadowData shadow = shadow();
 		if (shadow == null) {
 			// L'ombra è stata congedata mentre eravamo qui: non c'è più niente da mostrare.
@@ -84,8 +81,8 @@ public class ShadowDetailScreen extends Screen {
 		}
 
 		ShadowConfig config = AriseConfig.get().shadows();
-		int left = (width - PANEL_WIDTH) / 2;
-		int top = height / 2 - 80;
+		int left = bodyLeft();
+		int top = bodyTop() + 2;
 
 		nameBox = new EditBox(font, left, top + 28, PANEL_WIDTH - 70, 20,
 				Component.translatable("arise.screen.detail.name"));
@@ -178,8 +175,7 @@ public class ShadowDetailScreen extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+	protected void content(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 
 		ShadowData shadow = shadow();
 		if (shadow == null) {
@@ -187,10 +183,9 @@ public class ShadowDetailScreen extends Screen {
 		}
 
 		ShadowConfig config = AriseConfig.get().shadows();
-		int left = (width - PANEL_WIDTH) / 2;
-		int top = height / 2 - 80;
+		int left = bodyLeft();
+		int top = bodyTop() + 2;
 
-		graphics.centeredText(font, title, width / 2, top - 16, COLOR_TITLE);
 		graphics.text(font, shadow.rank(config).label(), left, top + 4, shadow.rank(config).color());
 		graphics.text(font, Component.translatable("arise.screen.army.stats",
 				shadow.level(),

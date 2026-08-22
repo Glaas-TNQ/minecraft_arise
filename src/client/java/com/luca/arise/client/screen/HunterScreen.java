@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.luca.arise.client.ui.AriseScreen;
+import com.luca.arise.client.ui.AriseTheme;
+import com.luca.arise.client.ui.Glyphs;
+import com.luca.arise.client.ui.ListPanel;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.GearSlot;
 import com.luca.arise.gear.PlayerGear;
+import com.luca.arise.gem.Gem;
 import com.luca.arise.network.GearActionPayload;
-import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModAttachments;
 
@@ -17,35 +21,29 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 
 /**
- * L'equipaggiamento del Cacciatore: quello che ha addosso e quello che tiene da parte.
+ * L'equipaggiamento del Cacciatore.
  *
- * <p>Due schede invece di due pannelli affiancati. Ventiquattro posizioni piu' uno zaino non
- * entrano in una schermata leggibile a fianco l'una dell'altro, e due liste paginate in
- * contemporanea sarebbero il doppio dei widget per meta' dello spazio ciascuna.
+ * <p>Lista a sinistra, dettaglio a destra. Prima ogni riga doveva contenere nome, rango, slot,
+ * quattro modificatori e due bottoni dentro trecentoquaranta pixel, e finiva troncata con dei
+ * puntini. Adesso la riga dice quel poco che serve a scegliere — icona, nome, rango — e tutto il
+ * resto sta nel pannello a fianco, che ha lo spazio per scriverlo per esteso.
  *
- * <p>Come le altre schermate della mod, non conosce lo stato vero: legge l'attachment
- * sincronizzato e manda intenzioni. Chi decide se un pezzo si puo' indossare e' il server.
+ * <p>I bottoni sono due in tutto e stanno sotto il dettaglio, invece di due per ogni riga: agiscono
+ * sempre sul pezzo selezionato, che e' anche l'unico che si sta guardando.
  */
-public class HunterScreen extends Screen {
+public class HunterScreen extends AriseScreen {
 
-	private static final int ROWS_PER_PAGE = 6;
-	private static final int ROW_HEIGHT = 26;
-	private static final int PANEL_WIDTH = 340;
-	private static final int ACTION_WIDTH = 58;
-	private static final int SMALL_WIDTH = 20;
+	private static final int PANEL_W = 440;
+	private static final int PANEL_H = 230;
+	private static final int LIST_W = 206;
+	private static final int TAB_W = 74;
+	private static final int TABS_H = 18;
 
-	private static final int COLOR_TITLE = 0xFF4FC3F7;
-	private static final int COLOR_TEXT = 0xFFE8F2FF;
-	private static final int COLOR_DIM = 0xFF9BA8B8;
-	private static final int COLOR_LOCKED = 0xFF6B7684;
-	private static final int COLOR_ROW = 0x40000000;
-
-	/** Che cosa si sta guardando. */
 	private enum Tab {
 		WORN("worn"),
 		STASH("stash");
@@ -64,9 +62,8 @@ public class HunterScreen extends Screen {
 	/**
 	 * Una riga della lista.
 	 *
-	 * <p>Un solo tipo di riga per tre casi diversi — un pezzo indossato, delle posizioni ancora
-	 * libere, uno slot chiuso — perche' la lista deve poterli alternare mantenendo l'ordine degli
-	 * slot. Tre liste separate avrebbero rimescolato tutto.
+	 * <p>Un solo tipo per tre casi — un pezzo, delle posizioni ancora libere, uno slot chiuso —
+	 * perche' devono potersi alternare mantenendo l'ordine degli slot.
 	 */
 	private record Row(GearSlot slot, GearPiece piece, int free, Rank unlock) {
 
@@ -87,18 +84,19 @@ public class HunterScreen extends Screen {
 		}
 	}
 
+	private final ListPanel<Row> list = new ListPanel<>(AriseTheme.ROW_HEIGHT);
+
 	private Tab tab = Tab.WORN;
-	private int page;
+	private UUID selectedId;
 	private UUID pendingDiscard;
-	private int lastFingerprint = Integer.MIN_VALUE;
+
+	private Button wornTab;
+	private Button stashTab;
+	private Button action;
+	private Button discard;
 
 	public HunterScreen() {
-		super(Component.translatable("arise.screen.hunter.title"));
-	}
-
-	@Override
-	public boolean isPauseScreen() {
-		return false;
+		super(Component.translatable("arise.screen.hunter.title"), PANEL_W, PANEL_H);
 	}
 
 	// ---------------------------------------------------------------- stato
@@ -109,16 +107,8 @@ public class HunterScreen extends Screen {
 		return gear == null ? PlayerGear.EMPTY : gear;
 	}
 
-	/**
-	 * Il rango del Cacciatore.
-	 *
-	 * <p>Ricavato dal livello con la config locale, come gia' fa {@code FxConfig} per l'aspetto
-	 * delle ombre. Serve solo a disegnare: chi valida se uno slot e' aperto resta il server.
-	 */
 	private Rank hunterRank() {
-		LocalPlayer player = minecraft != null ? minecraft.player : null;
-		PlayerProgress progress = player == null ? null : player.getAttached(ModAttachments.PROGRESS);
-		return AriseConfig.get().hunterRank(progress == null ? 1 : progress.level());
+		return AriseConfig.get().hunterRank(progress().level());
 	}
 
 	private List<Row> rows() {
@@ -151,98 +141,46 @@ public class HunterScreen extends Screen {
 		return rows;
 	}
 
-	private int pageCount() {
-		return Math.max(1, (rows().size() + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE);
-	}
-
-	private List<Row> currentPage() {
-		List<Row> rows = rows();
-		int from = Math.min(page * ROWS_PER_PAGE, rows.size());
-		int to = Math.min(from + ROWS_PER_PAGE, rows.size());
-		return rows.subList(from, to);
+	private GearPiece selectedPiece() {
+		Row row = list.selected();
+		return row == null ? null : row.piece();
 	}
 
 	// ---------------------------------------------------------------- widget
 
 	@Override
-	protected void init() {
-		page = Math.clamp(page, 0, pageCount() - 1);
+	protected void layout() {
+		int left = bodyLeft();
+		int top = bodyTop() + 6;
 
-		int left = (width - PANEL_WIDTH) / 2;
-		int top = topOfRows();
+		wornTab = addRenderableWidget(Button.builder(Tab.WORN.label(), button -> switchTo(Tab.WORN))
+				.bounds(left, top, TAB_W, TABS_H).build());
+		stashTab = addRenderableWidget(Button.builder(Tab.STASH.label(), button -> switchTo(Tab.STASH))
+				.bounds(left + TAB_W + 4, top, TAB_W, TABS_H).build());
 
-		addRenderableWidget(Button.builder(Tab.WORN.label(), button -> switchTo(Tab.WORN))
-				.bounds(left, top - 26, 80, 20).build()).active = tab != Tab.WORN;
-		addRenderableWidget(Button.builder(Tab.STASH.label(), button -> switchTo(Tab.STASH))
-				.bounds(left + 84, top - 26, 80, 20).build()).active = tab != Tab.STASH;
+		int listTop = top + TABS_H + 6;
+		list.bounds(left, listTop, LIST_W, bodyBottom() - listTop - 4);
+
+		int detailLeft = left + LIST_W + 12;
+		int detailRight = bodyRight();
+		int buttonsY = bodyBottom() - 24;
+		int half = (detailRight - detailLeft - 4) / 2;
+
+		action = addRenderableWidget(Button.builder(Component.empty(), button -> act())
+				.bounds(detailLeft, buttonsY, half, 20).build());
+		discard = addRenderableWidget(Button.builder(Component.empty(), button -> discard())
+				.bounds(detailLeft + half + 4, buttonsY, half, 20).build());
 
 		addRenderableWidget(Button.builder(Component.translatable("arise.screen.hunter.gems"),
 						button -> openGems())
-				.bounds(left + PANEL_WIDTH - 80, top - 26, 80, 20).build());
-
-		int index = 0;
-		for (Row row : currentPage()) {
-			int y = top + index * ROW_HEIGHT - 2;
-
-			if (row.piece() != null) {
-				boolean worn = tab == Tab.WORN;
-
-				addRenderableWidget(Button.builder(
-								Component.translatable(worn
-										? "arise.screen.hunter.unequip"
-										: "arise.screen.hunter.equip"),
-								button -> send(row.piece().id(), worn
-										? GearActionPayload.Action.UNEQUIP
-										: GearActionPayload.Action.EQUIP))
-						.bounds(left + PANEL_WIDTH - ACTION_WIDTH - SMALL_WIDTH - 4, y, ACTION_WIDTH, 20)
-						.build());
-
-				if (!worn) {
-					boolean armed = row.piece().id().equals(pendingDiscard);
-
-					addRenderableWidget(Button.builder(
-									Component.literal(armed ? "!" : "×"),
-									button -> discard(row.piece().id()))
-							.bounds(left + PANEL_WIDTH - SMALL_WIDTH, y, SMALL_WIDTH, 20)
-							.build());
-				}
-			}
-
-			index++;
-		}
-
-		if (pageCount() > 1) {
-			int navY = top + ROWS_PER_PAGE * ROW_HEIGHT + 6;
-
-			Button previous = Button.builder(Component.literal("<"), button -> turnTo(page - 1))
-					.bounds(left, navY, 20, 20).build();
-			previous.active = page > 0;
-			addRenderableWidget(previous);
-
-			Button next = Button.builder(Component.literal(">"), button -> turnTo(page + 1))
-					.bounds(left + 24, navY, 20, 20).build();
-			next.active = page < pageCount() - 1;
-			addRenderableWidget(next);
-		}
+				.bounds(detailRight - 74, top, 74, TABS_H).build());
 	}
 
-	/**
-	 * Lo stato vero arriva dal server con un tick di ritardo: qui si guarda se e' cambiato e si
-	 * ricostruiscono i widget. Nel tick e non nel disegno, o si rifa' la lista mentre la si sta
-	 * percorrendo per renderizzarla.
-	 */
-	@Override
-	public void tick() {
-		super.tick();
-
-		PlayerGear gear = gear();
-		int fingerprint = gear.equipped().hashCode() * 31 + gear.stash().hashCode()
-				+ tab.ordinal() * 7 + (pendingDiscard == null ? 0 : pendingDiscard.hashCode());
-
-		if (fingerprint != lastFingerprint) {
-			lastFingerprint = fingerprint;
-			rebuildWidgets();
-		}
+	private void switchTo(Tab target) {
+		tab = target;
+		selectedId = null;
+		pendingDiscard = null;
+		list.select(-1);
 	}
 
 	private void openGems() {
@@ -251,139 +189,184 @@ public class HunterScreen extends Screen {
 		}
 	}
 
-	private void switchTo(Tab target) {
-		tab = target;
-		page = 0;
-		pendingDiscard = null;
-		rebuildWidgets();
-	}
-
-	private void turnTo(int newPage) {
-		page = Math.clamp(newPage, 0, pageCount() - 1);
-		rebuildWidgets();
-	}
-
-	private void send(UUID id, GearActionPayload.Action action) {
-		pendingDiscard = null;
-		ClientPlayNetworking.send(new GearActionPayload(id, action));
-	}
-
-	/**
-	 * Buttare via un pezzo chiede due click.
-	 *
-	 * <p>Nessuna finestra di conferma: il bottone si arma e basta. Una finestra per un gesto che si
-	 * ripete decine di volte a ogni ritorno da un Gate diventa presto un fastidio, ma un click solo
-	 * su una crocetta larga venti pixel prima o poi cancella il pezzo sbagliato.
-	 */
-	private void discard(UUID id) {
-		if (id.equals(pendingDiscard)) {
-			pendingDiscard = null;
-			ClientPlayNetworking.send(new GearActionPayload(id, GearActionPayload.Action.DISCARD));
+	private void act() {
+		GearPiece piece = selectedPiece();
+		if (piece == null) {
 			return;
 		}
 
-		pendingDiscard = id;
-		rebuildWidgets();
+		pendingDiscard = null;
+		ClientPlayNetworking.send(new GearActionPayload(piece.id(), tab == Tab.WORN
+				? GearActionPayload.Action.UNEQUIP
+				: GearActionPayload.Action.EQUIP));
+	}
+
+	/**
+	 * Buttare via un pezzo chiede due click: il bottone si arma e cambia parola.
+	 *
+	 * <p>Nessuna finestra di conferma. Un gesto che si ripete decine di volte a ogni ritorno da un
+	 * Gate non merita una finestra, ma un click solo su "Butta" prima o poi cancella il pezzo
+	 * sbagliato.
+	 */
+	private void discard() {
+		GearPiece piece = selectedPiece();
+		if (piece == null) {
+			return;
+		}
+
+		if (piece.id().equals(pendingDiscard)) {
+			pendingDiscard = null;
+			ClientPlayNetworking.send(new GearActionPayload(piece.id(), GearActionPayload.Action.DISCARD));
+			return;
+		}
+
+		pendingDiscard = piece.id();
+	}
+
+	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+
+		if (list.mouseClicked(mouseX, mouseY)) {
+			Row row = list.selected();
+			selectedId = row == null || row.piece() == null ? null : row.piece().id();
+			pendingDiscard = null;
+			return true;
+		}
+
+		return super.mouseClicked(event, doubleClick);
 	}
 
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (scrollY != 0 && pageCount() > 1) {
-			turnTo(page + (scrollY > 0 ? -1 : 1));
+		if (list.mouseScrolled(mouseX, mouseY, scrollY)) {
 			return true;
 		}
 
 		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
-	private int topOfRows() {
-		return height / 2 - (ROWS_PER_PAGE * ROW_HEIGHT) / 2 + 10;
-	}
-
 	// ---------------------------------------------------------------- disegno
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
-
+	protected Component status() {
 		PlayerGear gear = gear();
-		Rank rank = hunterRank();
-		int left = (width - PANEL_WIDTH) / 2;
-		int top = topOfRows();
-
-		graphics.centeredText(font, title, width / 2, top - 52, COLOR_TITLE);
-		graphics.centeredText(font, Component.translatable("arise.screen.hunter.header",
-				rank.label(), gear.equipped().size(),
-				gear.stash().size(), AriseConfig.get().gear().stashSize()),
-				width / 2, top - 40, COLOR_DIM);
-
-		List<Row> rows = currentPage();
-
-		if (rows.isEmpty()) {
-			graphics.centeredText(font, Component.translatable("arise.screen.hunter.empty"),
-					width / 2, height / 2, COLOR_DIM);
-			return;
-		}
-
-		int index = 0;
-		for (Row row : rows) {
-			drawRow(graphics, row, left, top + index * ROW_HEIGHT);
-			index++;
-		}
-
-		if (pageCount() > 1) {
-			graphics.text(font, Component.translatable("arise.screen.army.page",
-					page + 1, pageCount()), left + 50, top + ROWS_PER_PAGE * ROW_HEIGHT + 12, COLOR_DIM);
-		}
+		return Component.translatable("arise.screen.hunter.header", hunterRank().label(),
+				gear.equipped().size(), gear.stash().size(), AriseConfig.get().gear().stashSize());
 	}
 
-	private void drawRow(GuiGraphicsExtractor graphics, Row row, int left, int y) {
-		graphics.fill(left, y - 3, left + PANEL_WIDTH, y + ROW_HEIGHT - 6, COLOR_ROW);
+	@Override
+	protected Component hint() {
+		return Component.translatable("arise.screen.hunter.hint");
+	}
 
+	@Override
+	protected void content(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		wornTab.active = tab != Tab.WORN;
+		stashTab.active = tab != Tab.STASH;
+
+		// La lista si ricostruisce a ogni frame dai dati sincronizzati, e la selezione si ritrova
+		// per identita': senza, indossare un pezzo lo farebbe cambiare sotto le dita.
+		list.items(rows());
+		if (selectedId != null) {
+			list.selectFirst(row -> row.piece() != null && row.piece().id().equals(selectedId));
+		}
+
+		list.render(graphics, mouseX, mouseY, this::drawRow);
+		drawDetail(graphics);
+	}
+
+	private void drawRow(GuiGraphicsExtractor graphics, Row row, int x, int y, int width,
+			boolean selected, boolean hovered) {
 		GearPiece piece = row.piece();
+		boolean locked = row.isLocked();
+		int tint = locked ? AriseTheme.DISABLED : piece == null ? AriseTheme.MUTED : piece.rank().color();
+
+		Glyphs.slot(graphics, row.slot(), x + 7, y + 5, tint);
 
 		if (piece == null) {
-			drawPlaceholder(graphics, row, left, y);
+			graphics.text(font, row.slot().label(), x + 22, y + 4,
+					locked ? AriseTheme.DISABLED : AriseTheme.MUTED);
+			graphics.text(font, locked
+							? Component.translatable("arise.screen.hunter.locked",
+									row.unlock() == null ? Rank.S.label() : row.unlock().label())
+							: Component.translatable("arise.screen.hunter.free", row.free()),
+					x + 22, y + 14, AriseTheme.DISABLED);
 			return;
 		}
 
-		// Il rango e' la prima cosa che si guarda: una banda colorata prima del nome.
-		graphics.fill(left + 2, y - 1, left + 5, y + 16, piece.rank().color());
-		graphics.text(font, piece.rank().label(), left + 9, y, piece.rank().color());
-		graphics.text(font, piece.displayName(), left + 25, y, COLOR_TEXT);
-		graphics.text(font, piece.slot().label(), left + PANEL_WIDTH - ACTION_WIDTH - SMALL_WIDTH - 76,
-				y, COLOR_DIM);
+		graphics.text(font, piece.displayName(), x + 22, y + 4, AriseTheme.TEXT);
+		graphics.text(font, piece.slot().label(), x + 22, y + 14, AriseTheme.MUTED);
 
-		// I modificatori su una riga sola, finche' c'e' spazio: un pezzo di rango S ne ha quattro
-		// e il quarto finirebbe sotto i bottoni.
-		int x = left + 25;
-		int limit = left + PANEL_WIDTH - ACTION_WIDTH - SMALL_WIDTH - 12;
+		Component rank = piece.rank().label();
+		graphics.text(font, rank, x + width - font.width(rank) - 6, y + 4, piece.rank().color());
 
-		for (Component line : piece.statLines()) {
-			if (x + font.width(line) > limit) {
-				graphics.text(font, Component.literal("…"), x, y + 11, COLOR_DIM);
-				return;
-			}
-
-			graphics.text(font, line, x, y + 11, COLOR_DIM);
-			x += font.width(line) + 8;
-		}
-
+		// I pallini delle incastonature: pieni quelle occupate, vuote le altre. Si vede a colpo
+		// d'occhio quale pezzo ha ancora posto senza aprirlo.
 		if (piece.sockets() > 0) {
-			graphics.text(font, Component.translatable("arise.screen.hunter.sockets", piece.sockets()),
-					x, y + 11, COLOR_LOCKED);
+			int dotX = x + width - 8 - piece.sockets() * 5;
+			for (int i = 0; i < piece.sockets(); i++) {
+				int color = i < piece.gems().size() ? AriseTheme.VIOLET : AriseTheme.LINE;
+				graphics.fill(dotX + i * 5, y + 16, dotX + i * 5 + 3, y + 19, color);
+			}
 		}
 	}
 
-	/** Le righe senza pezzo: posizioni ancora libere, oppure uno slot che non si e' aperto. */
-	private void drawPlaceholder(GuiGraphicsExtractor graphics, Row row, int left, int y) {
-		graphics.text(font, row.slot().label(), left + 9, y, row.isLocked() ? COLOR_LOCKED : COLOR_DIM);
+	private void drawDetail(GuiGraphicsExtractor graphics) {
+		int left = bodyLeft() + LIST_W + 12;
+		int right = bodyRight();
+		int y = bodyTop() + 6 + TABS_H + 6;
 
-		Component detail = row.isLocked()
-				? Component.translatable("arise.screen.hunter.locked",
-						row.unlock() == null ? Rank.S.label() : row.unlock().label())
-				: Component.translatable("arise.screen.hunter.free", row.free());
+		GearPiece piece = selectedPiece();
 
-		graphics.text(font, detail, left + 9, y + 11, row.isLocked() ? COLOR_LOCKED : COLOR_DIM);
+		action.visible = piece != null;
+		discard.visible = piece != null;
+
+		if (piece == null) {
+			graphics.text(font, Component.translatable("arise.screen.hunter.pick"), left, y,
+					AriseTheme.DISABLED);
+			return;
+		}
+
+		action.setMessage(Component.translatable(tab == Tab.WORN
+				? "arise.screen.hunter.unequip"
+				: "arise.screen.hunter.equip"));
+		discard.setMessage(Component.translatable(piece.id().equals(pendingDiscard)
+				? "arise.screen.hunter.discard_confirm"
+				: "arise.screen.hunter.discard"));
+
+		graphics.text(font, piece.displayName(), left, y, AriseTheme.TEXT);
+		y += 13;
+
+		int chipWidth = chip(graphics, piece.rank().label(), left, y, piece.rank().color());
+		graphics.text(font, piece.slot().label(), left + chipWidth + 6, y + 2, AriseTheme.MUTED);
+		y += 20;
+
+		divider(graphics, left, right, y);
+		y += 6;
+
+		for (Component line : piece.statLines()) {
+			graphics.text(font, line, left, y, AriseTheme.MUTED);
+			y += 11;
+		}
+
+		if (piece.sockets() <= 0) {
+			return;
+		}
+
+		y += 4;
+		divider(graphics, left, right, y);
+		y += 6;
+
+		sectionLabel(graphics, Component.translatable("arise.screen.hunter.sockets",
+				piece.gems().size(), piece.sockets()), left, y);
+		y += 12;
+
+		for (Gem gem : piece.gems()) {
+			Glyphs.gem(graphics, gem.type(), left, y, gem.rank().color());
+			graphics.text(font, gem.displayName(), left + 12, y, AriseTheme.MUTED);
+			y += 11;
+		}
 	}
 }

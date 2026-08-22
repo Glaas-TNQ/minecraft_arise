@@ -3,13 +3,16 @@ package com.luca.arise.client.screen;
 import java.util.List;
 
 import com.luca.arise.city.City;
+import com.luca.arise.client.ui.AriseScreen;
+import com.luca.arise.client.ui.AriseTheme;
+import com.luca.arise.config.AriseConfig;
+import com.luca.arise.config.CityConfig;
 import com.luca.arise.network.CityTravelPayload;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -19,68 +22,70 @@ import net.minecraft.network.chat.Component;
  * ancora sorta è un'informazione: dice che c'è, e che manca. Nascondere le città non ancora
  * costruite farebbe sembrare la mod più piccola di quello che è.
  */
-public class CityHubScreen extends Screen {
+public class CityHubScreen extends AriseScreen {
 
-	private static final int PANEL_WIDTH = 240;
-	private static final int ROW_HEIGHT = 24;
-
-	private static final int COLOR_TITLE = 0xFF4FC3F7;
-	private static final int COLOR_DIM = 0xFF9BA8B8;
+	private static final int PANEL_W = 300;
+	private static final int PANEL_H = 190;
+	private static final int ROW = 26;
 
 	private final List<City> available;
 
 	public CityHubScreen(List<City> available) {
-		super(Component.translatable("arise.screen.hub.title"));
+		super(Component.translatable("arise.screen.hub.title"), PANEL_W, PANEL_H);
 		this.available = available;
 	}
 
 	@Override
-	public boolean isPauseScreen() {
-		return false;
-	}
+	protected void layout() {
+		int left = bodyLeft();
+		int y = bodyTop() + 16;
+		// Il bottone lascia libera la colonna di destra: le coordinate ci vanno accanto, non sopra.
+		int buttonWidth = bodyRight() - left - 96;
 
-	@Override
-	protected void init() {
-		int left = (width - PANEL_WIDTH) / 2;
-		int top = height / 2 - (City.values().length * ROW_HEIGHT) / 2;
-
-		for (int i = 0; i < City.values().length; i++) {
-			City city = City.values()[i];
+		for (City city : City.values()) {
 			boolean ready = available.contains(city);
 
-			Button button = Button.builder(
-							ready
-									? Component.translatable("arise.screen.hub.travel", city.label())
-									: Component.translatable("arise.screen.hub.missing", city.label()),
+			Button button = Button.builder(city.label(),
 							b -> ClientPlayNetworking.send(new CityTravelPayload(city)))
-					.bounds(left, top + i * ROW_HEIGHT, PANEL_WIDTH, 20)
+					.bounds(left, y, buttonWidth, 20)
 					.build();
 
 			button.active = ready;
 			addRenderableWidget(button);
-		}
 
-		addRenderableWidget(Button.builder(Component.translatable("arise.screen.hub.close"),
-						b -> onClose())
-				.bounds(left + PANEL_WIDTH / 2 - 50, top + City.values().length * ROW_HEIGHT + 10, 100, 20)
-				.build());
-	}
-
-	@Override
-	public void onClose() {
-		if (minecraft != null) {
-			minecraft.setScreenAndShow(null);
+			y += ROW;
 		}
 	}
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+	protected Component status() {
+		return Component.translatable("arise.screen.hub.subtitle");
+	}
 
-		int top = height / 2 - (City.values().length * ROW_HEIGHT) / 2;
+	@Override
+	protected Component hint() {
+		return Component.translatable("arise.screen.hub.hint");
+	}
 
-		graphics.centeredText(font, title, width / 2, top - 28, COLOR_TITLE);
-		graphics.centeredText(font, Component.translatable("arise.screen.hub.subtitle"),
-				width / 2, top - 16, COLOR_DIM);
+	@Override
+	protected void content(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		CityConfig config = AriseConfig.get().cities();
+		int right = bodyRight();
+		int y = bodyTop() + 22;
+
+		// Le coordinate accanto al nome: sono l'unico modo di sapere dove si sta andando, e per una
+		// città non ancora sorta sono anche il posto dove andrà a finire.
+		for (City city : City.values()) {
+			boolean ready = available.contains(city);
+			Component where = ready
+					? Component.translatable("arise.screen.hub.at",
+							config.centreX(city), config.centreZ(city))
+					: Component.translatable("arise.screen.hub.missing_short");
+
+			graphics.text(font, where, right - font.width(where), y + 6,
+					ready ? AriseTheme.MUTED : AriseTheme.DISABLED);
+
+			y += ROW;
+		}
 	}
 }

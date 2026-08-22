@@ -2,8 +2,13 @@ package com.luca.arise.client.screen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.luca.arise.city.City;
+import com.luca.arise.client.ui.AriseScreen;
+import com.luca.arise.client.ui.AriseTheme;
+import com.luca.arise.client.ui.Glyphs;
+import com.luca.arise.client.ui.ListPanel;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.CityConfig;
 import com.luca.arise.config.GemConfig;
@@ -11,7 +16,6 @@ import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.PlayerGear;
 import com.luca.arise.gem.Gem;
 import com.luca.arise.network.GemActionPayload;
-import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.registry.ModAttachments;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -19,51 +23,53 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 
 /**
  * Incastonatura ed estrazione.
  *
- * <p>Una schermata sola invece di due: si sceglie il pezzo in alto e si lavora sotto. Separare
- * "scegli il pezzo" da "scegli la gemma" in due passaggi avrebbe voluto dire tenere in testa la
- * prima scelta mentre si fa la seconda, per un gesto che si ripete decine di volte.
+ * <p>Due liste affiancate: a sinistra i pezzi che hanno incastonature, a destra tutto quello che
+ * puo' finirci dentro — prima le gemme gia' montate su quel pezzo, poi le incastonature ancora
+ * vuote, poi la sacca.
  *
- * <p>La riga in alto dice se il banco dell'Associazione e' a portata, e finche' non lo e' il
- * bottone "Estrai" resta spento: scoprire il vincolo dopo aver premuto sarebbe una piccola presa in
- * giro. E' un <em>indizio</em> — il client conosce solo la distanza dal centro pianificato di una
- * citta', non se quella citta' e' stata costruita davvero. La verifica vera resta del server.
+ * <p>I due bottoni in fondo cambiano mestiere in base a cosa e' selezionato a destra: su una gemma
+ * montata dicono "Estrai" e "Rompi", su una gemma della sacca dicono "Incastona" e "Rompi". E'
+ * un bottone in meno da guardare e nessuna ambiguita' su cosa agisce.
+ *
+ * <p>La riga di stato dice sempre se il banco dell'Associazione e' a portata, perche' estrarre una
+ * gemma intatta si puo' solo li'. E' un <em>indizio</em> calcolato sul client, che conosce solo la
+ * distanza dal centro pianificato di una citta': la verifica vera resta del server.
  */
-public class GemScreen extends Screen {
+public class GemScreen extends AriseScreen {
 
-	private static final int ROW_HEIGHT = 24;
-	private static final int PANEL_WIDTH = 340;
-	private static final int ACTION_WIDTH = 56;
-	private static final int SMALL_WIDTH = 42;
-	private static final int POUCH_ROWS = 4;
+	private static final int PANEL_W = 440;
+	private static final int PANEL_H = 230;
+	private static final int LIST_W = 200;
 
-	private static final int COLOR_TITLE = 0xFFC77FE8;
-	private static final int COLOR_TEXT = 0xFFE8F2FF;
-	private static final int COLOR_DIM = 0xFF9BA8B8;
-	private static final int COLOR_EMPTY = 0xFF6B7684;
-	private static final int COLOR_SOULS = 0xFFFFD54F;
-	private static final int COLOR_BENCH = 0xFF7FD97F;
-	private static final int COLOR_ROW = 0x40000000;
+	/** Una voce della colonna di destra: una gemma montata, un posto vuoto, o una gemma in sacca. */
+	private record Slot(Gem gem, boolean socketed) {
+
+		static Slot empty() {
+			return new Slot(null, false);
+		}
+	}
+
+	private final ListPanel<GearPiece> pieces = new ListPanel<>(AriseTheme.ROW_HEIGHT);
+	private final ListPanel<Slot> slots = new ListPanel<>(AriseTheme.ROW_HEIGHT);
 
 	private final Screen parent;
 
-	private int pieceIndex;
-	private int page;
-	private int lastFingerprint = Integer.MIN_VALUE;
+	private UUID selectedPieceId;
+	private UUID selectedGemId;
+
+	private Button primary;
+	private Button secondary;
 
 	public GemScreen(Screen parent) {
-		super(Component.translatable("arise.screen.gem.title"));
+		super(Component.translatable("arise.screen.gem.title"), PANEL_W, PANEL_H);
 		this.parent = parent;
-	}
-
-	@Override
-	public boolean isPauseScreen() {
-		return false;
 	}
 
 	// ---------------------------------------------------------------- stato
@@ -74,10 +80,29 @@ public class GemScreen extends Screen {
 		return gear == null ? PlayerGear.EMPTY : gear;
 	}
 
-	private long souls() {
-		LocalPlayer player = minecraft != null ? minecraft.player : null;
-		PlayerProgress progress = player == null ? null : player.getAttached(ModAttachments.PROGRESS);
-		return progress == null ? 0L : progress.souls();
+	/** I pezzi con almeno un'incastonatura, indossati per primi. */
+	private List<GearPiece> pieceList() {
+		PlayerGear gear = gear();
+		List<GearPiece> result = new ArrayList<>();
+
+		gear.equipped().stream().filter(piece -> piece.sockets() > 0).forEach(result::add);
+		gear.stash().stream().filter(piece -> piece.sockets() > 0).forEach(result::add);
+
+		return result;
+	}
+
+	private List<Slot> slotList(GearPiece piece) {
+		List<Slot> result = new ArrayList<>();
+
+		if (piece != null) {
+			piece.gems().forEach(gem -> result.add(new Slot(gem, true)));
+			for (int i = 0; i < piece.freeSockets(); i++) {
+				result.add(Slot.empty());
+			}
+		}
+
+		gear().pouch().forEach(gem -> result.add(new Slot(gem, false)));
+		return result;
 	}
 
 	/** Vero se il giocatore sembra essere dentro il perimetro di un'Associazione. */
@@ -88,8 +113,8 @@ public class GemScreen extends Screen {
 		}
 
 		CityConfig cities = AriseConfig.get().cities();
-		int radius = AriseConfig.get().gems().benchRadius();
-		double limit = (double) radius * radius;
+		double limit = (double) AriseConfig.get().gems().benchRadius();
+		limit *= limit;
 
 		for (City city : City.values()) {
 			double dx = player.getX() - cities.centreX(city);
@@ -103,152 +128,32 @@ public class GemScreen extends Screen {
 		return false;
 	}
 
-	/** I pezzi che hanno almeno un'incastonatura, indossati per primi. */
-	private List<GearPiece> pieces() {
-		PlayerGear gear = gear();
-		List<GearPiece> result = new ArrayList<>();
-
-		gear.equipped().stream().filter(piece -> piece.sockets() > 0).forEach(result::add);
-		gear.stash().stream().filter(piece -> piece.sockets() > 0).forEach(result::add);
-
-		return result;
-	}
-
-	private GearPiece selected() {
-		List<GearPiece> pieces = pieces();
-		if (pieces.isEmpty()) {
-			return null;
-		}
-
-		return pieces.get(Math.clamp(pieceIndex, 0, pieces.size() - 1));
-	}
-
-	private List<Gem> pouchPage() {
-		List<Gem> pouch = gear().pouch();
-		int from = Math.min(page * POUCH_ROWS, pouch.size());
-		int to = Math.min(from + POUCH_ROWS, pouch.size());
-		return pouch.subList(from, to);
-	}
-
-	private int pageCount() {
-		return Math.max(1, (gear().pouch().size() + POUCH_ROWS - 1) / POUCH_ROWS);
-	}
-
 	// ---------------------------------------------------------------- widget
 
 	@Override
-	protected void init() {
-		List<GearPiece> pieces = pieces();
-		pieceIndex = pieces.isEmpty() ? 0 : Math.clamp(pieceIndex, 0, pieces.size() - 1);
-		page = Math.clamp(page, 0, pageCount() - 1);
+	protected void layout() {
+		int left = bodyLeft();
+		int top = bodyTop() + 16;
+		int listHeight = bodyBottom() - top - 28;
 
-		int left = (width - PANEL_WIDTH) / 2;
-		int top = topOfPanel();
-		GearPiece piece = selected();
+		pieces.bounds(left, top, LIST_W, listHeight);
 
-		if (pieces.size() > 1) {
-			addRenderableWidget(Button.builder(Component.literal("<"), button -> cyclePiece(-1))
-					.bounds(left + PANEL_WIDTH - 48, top - 24, 20, 20).build());
-			addRenderableWidget(Button.builder(Component.literal(">"), button -> cyclePiece(1))
-					.bounds(left + PANEL_WIDTH - 24, top - 24, 20, 20).build());
-		}
+		int rightLeft = left + LIST_W + 12;
+		int rightWidth = bodyRight() - rightLeft;
+		slots.bounds(rightLeft, top, rightWidth, listHeight);
 
-		int row = 0;
-		boolean bench = atBench();
-		long cost = (long) AriseConfig.get().gems().extractCost();
+		int buttonsY = bodyBottom() - 24;
+		int half = (rightWidth - 4) / 2;
 
-		if (piece != null) {
-			for (Gem gem : piece.gems()) {
-				int y = top + row * ROW_HEIGHT - 2;
-
-				Button extract = Button.builder(Component.translatable("arise.screen.gem.extract"),
-								button -> send(GemActionPayload.of(gem.id(), GemActionPayload.Action.EXTRACT)))
-						.bounds(left + PANEL_WIDTH - ACTION_WIDTH - SMALL_WIDTH - 4, y, ACTION_WIDTH, 20)
-						.build();
-				extract.active = bench && souls() >= cost;
-				addRenderableWidget(extract);
-
-				addRenderableWidget(Button.builder(Component.translatable("arise.screen.gem.shatter"),
-								button -> send(GemActionPayload.of(gem.id(), GemActionPayload.Action.SHATTER)))
-						.bounds(left + PANEL_WIDTH - SMALL_WIDTH, y, SMALL_WIDTH, 20)
-						.build());
-
-				row++;
-			}
-
-			row += piece.freeSockets();
-		}
-
-		int pouchTop = top + (row + 1) * ROW_HEIGHT;
-		int index = 0;
-
-		for (Gem gem : pouchPage()) {
-			int y = pouchTop + index * ROW_HEIGHT - 2;
-
-			Button socket = Button.builder(Component.translatable("arise.screen.gem.socket"),
-							button -> send(new GemActionPayload(gem.id(),
-									piece == null ? gem.id() : piece.id(), GemActionPayload.Action.SOCKET)))
-					.bounds(left + PANEL_WIDTH - ACTION_WIDTH - SMALL_WIDTH - 4, y, ACTION_WIDTH, 20)
-					.build();
-			socket.active = piece != null && piece.freeSockets() > 0;
-			addRenderableWidget(socket);
-
-			addRenderableWidget(Button.builder(Component.translatable("arise.screen.gem.shatter"),
-							button -> send(GemActionPayload.of(gem.id(), GemActionPayload.Action.SHATTER)))
-					.bounds(left + PANEL_WIDTH - SMALL_WIDTH, y, SMALL_WIDTH, 20)
-					.build());
-
-			index++;
-		}
-
-		int navY = pouchTop + POUCH_ROWS * ROW_HEIGHT + 4;
-
-		if (pageCount() > 1) {
-			Button previous = Button.builder(Component.literal("<"), button -> turnTo(page - 1))
-					.bounds(left, navY, 20, 20).build();
-			previous.active = page > 0;
-			addRenderableWidget(previous);
-
-			Button next = Button.builder(Component.literal(">"), button -> turnTo(page + 1))
-					.bounds(left + 24, navY, 20, 20).build();
-			next.active = page < pageCount() - 1;
-			addRenderableWidget(next);
-		}
+		primary = addRenderableWidget(Button.builder(Component.empty(), button -> primary())
+				.bounds(rightLeft, buttonsY, half, 20).build());
+		secondary = addRenderableWidget(Button.builder(
+						Component.translatable("arise.screen.gem.shatter"), button -> shatter())
+				.bounds(rightLeft + half + 4, buttonsY, half, 20).build());
 
 		addRenderableWidget(Button.builder(Component.translatable("arise.screen.gem.back"),
 						button -> back())
-				.bounds(left + PANEL_WIDTH - 80, navY, 80, 20).build());
-	}
-
-	@Override
-	public void tick() {
-		super.tick();
-
-		PlayerGear gear = gear();
-		int fingerprint = gear.equipped().hashCode() * 31 + gear.stash().hashCode() * 7
-				+ gear.pouch().hashCode() + pieceIndex * 13 + page;
-
-		if (fingerprint != lastFingerprint) {
-			lastFingerprint = fingerprint;
-			rebuildWidgets();
-		}
-	}
-
-	private void cyclePiece(int delta) {
-		int count = pieces().size();
-		if (count > 0) {
-			pieceIndex = Math.floorMod(pieceIndex + delta, count);
-			rebuildWidgets();
-		}
-	}
-
-	private void turnTo(int newPage) {
-		page = Math.clamp(newPage, 0, pageCount() - 1);
-		rebuildWidgets();
-	}
-
-	private void send(GemActionPayload payload) {
-		ClientPlayNetworking.send(payload);
+				.bounds(left, buttonsY, 74, 20).build());
 	}
 
 	private void back() {
@@ -257,85 +162,173 @@ public class GemScreen extends Screen {
 		}
 	}
 
+	private Slot selectedSlot() {
+		return slots.selected();
+	}
+
+	private void primary() {
+		Slot slot = selectedSlot();
+		GearPiece piece = pieces.selected();
+
+		if (slot == null || slot.gem() == null) {
+			return;
+		}
+
+		if (slot.socketed()) {
+			ClientPlayNetworking.send(GemActionPayload.of(slot.gem().id(),
+					GemActionPayload.Action.EXTRACT));
+			return;
+		}
+
+		if (piece != null) {
+			ClientPlayNetworking.send(new GemActionPayload(slot.gem().id(), piece.id(),
+					GemActionPayload.Action.SOCKET));
+		}
+	}
+
+	private void shatter() {
+		Slot slot = selectedSlot();
+		if (slot != null && slot.gem() != null) {
+			ClientPlayNetworking.send(GemActionPayload.of(slot.gem().id(),
+					GemActionPayload.Action.SHATTER));
+		}
+	}
+
+	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		double mouseX = event.x();
+		double mouseY = event.y();
+
+		if (pieces.mouseClicked(mouseX, mouseY)) {
+			GearPiece piece = pieces.selected();
+			selectedPieceId = piece == null ? null : piece.id();
+			return true;
+		}
+
+		if (slots.mouseClicked(mouseX, mouseY)) {
+			Slot slot = slots.selected();
+			selectedGemId = slot == null || slot.gem() == null ? null : slot.gem().id();
+			return true;
+		}
+
+		return super.mouseClicked(event, doubleClick);
+	}
+
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (scrollY != 0 && pageCount() > 1) {
-			turnTo(page + (scrollY > 0 ? -1 : 1));
+		if (pieces.mouseScrolled(mouseX, mouseY, scrollY) || slots.mouseScrolled(mouseX, mouseY, scrollY)) {
 			return true;
 		}
 
 		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
-	private int topOfPanel() {
-		return height / 2 - 70;
-	}
-
 	// ---------------------------------------------------------------- disegno
 
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+	protected int accent() {
+		return AriseTheme.VIOLET;
+	}
 
+	@Override
+	protected Component status() {
+		return Component.translatable("arise.screen.gem.cost", souls(),
+				(long) AriseConfig.get().gems().extractCost());
+	}
+
+	@Override
+	protected Component hint() {
+		return Component.translatable(atBench()
+				? "arise.screen.gem.bench_here"
+				: "arise.screen.gem.bench_far");
+	}
+
+	@Override
+	protected void content(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		GemConfig config = AriseConfig.get().gems();
-		int left = (width - PANEL_WIDTH) / 2;
-		int top = topOfPanel();
-		GearPiece piece = selected();
 
-		graphics.centeredText(font, title, width / 2, top - 46, COLOR_TITLE);
-		graphics.centeredText(font, Component.translatable("arise.screen.gem.cost",
-				souls(), (long) config.extractCost()), width / 2, top - 34, COLOR_SOULS);
+		pieces.items(pieceList());
+		if (selectedPieceId != null) {
+			pieces.selectFirst(piece -> piece.id().equals(selectedPieceId));
+		}
 
-		boolean bench = atBench();
-		graphics.centeredText(font, Component.translatable(bench
-						? "arise.screen.gem.bench_here"
-						: "arise.screen.gem.bench_far"),
-				width / 2, top - 60, bench ? COLOR_BENCH : COLOR_DIM);
+		GearPiece piece = pieces.selected();
+		slots.items(slotList(piece));
+		if (selectedGemId != null) {
+			slots.selectFirst(slot -> slot.gem() != null && slot.gem().id().equals(selectedGemId));
+		}
 
-		if (piece == null) {
-			graphics.centeredText(font, Component.translatable("arise.screen.gem.no_pieces"),
-					width / 2, top - 20, COLOR_DIM);
+		int left = bodyLeft();
+		int rightLeft = left + LIST_W + 12;
+
+		sectionLabel(graphics, Component.translatable("arise.screen.gem.pieces"), left, bodyTop() + 5);
+		sectionLabel(graphics, Component.translatable("arise.screen.gem.pouch",
+				gear().pouch().size(), config.pouchSize()), rightLeft, bodyTop() + 5);
+
+		if (pieces.isEmpty()) {
+			graphics.text(font, Component.translatable("arise.screen.gem.no_pieces"),
+					left, bodyTop() + 22, AriseTheme.DISABLED);
 		} else {
-			graphics.text(font, piece.displayName(), left, top - 20, COLOR_TEXT);
-			graphics.text(font, Component.translatable("arise.screen.gem.sockets",
-					piece.gems().size(), piece.sockets()), left + 4, top - 8, COLOR_DIM);
+			pieces.render(graphics, mouseX, mouseY, this::drawPiece);
 		}
 
-		int row = 0;
+		slots.render(graphics, mouseX, mouseY, (g, slot, x, y, width, selected, hovered) ->
+				drawSlot(g, config, slot, x, y, width));
 
-		if (piece != null) {
-			for (Gem gem : piece.gems()) {
-				drawRow(graphics, left, top + row * ROW_HEIGHT, gem.displayName(),
-						gem.describe(config), gem.rank().color());
-				row++;
-			}
+		updateButtons(piece);
+	}
 
-			for (int i = 0; i < piece.freeSockets(); i++) {
-				graphics.fill(left, top + row * ROW_HEIGHT - 3,
-						left + PANEL_WIDTH, top + row * ROW_HEIGHT + ROW_HEIGHT - 7, COLOR_ROW);
-				graphics.text(font, Component.translatable("arise.screen.gem.free"),
-						left + 9, top + row * ROW_HEIGHT + 2, COLOR_EMPTY);
-				row++;
-			}
+	private void updateButtons(GearPiece piece) {
+		Slot slot = selectedSlot();
+		boolean hasGem = slot != null && slot.gem() != null;
+
+		primary.visible = hasGem;
+		secondary.visible = hasGem;
+
+		if (!hasGem) {
+			return;
 		}
 
-		int pouchTop = top + (row + 1) * ROW_HEIGHT;
-		graphics.text(font, Component.translatable("arise.screen.gem.pouch",
-				gear().pouch().size(), config.pouchSize()), left, pouchTop - 12, COLOR_DIM);
-
-		int index = 0;
-		for (Gem gem : pouchPage()) {
-			drawRow(graphics, left, pouchTop + index * ROW_HEIGHT, gem.displayName(),
-					gem.describe(config), gem.rank().color());
-			index++;
+		if (slot.socketed()) {
+			primary.setMessage(Component.translatable("arise.screen.gem.extract"));
+			primary.active = atBench() && souls() >= (long) AriseConfig.get().gems().extractCost();
+		} else {
+			primary.setMessage(Component.translatable("arise.screen.gem.socket"));
+			primary.active = piece != null && piece.freeSockets() > 0;
 		}
 	}
 
-	private void drawRow(GuiGraphicsExtractor graphics, int left, int y, Component name,
-			Component detail, int color) {
-		graphics.fill(left, y - 3, left + PANEL_WIDTH, y + ROW_HEIGHT - 7, COLOR_ROW);
-		graphics.fill(left + 2, y - 1, left + 5, y + 14, color);
-		graphics.text(font, name, left + 9, y, COLOR_TEXT);
-		graphics.text(font, detail, left + 9 + font.width(name) + 10, y, COLOR_DIM);
+	private void drawPiece(GuiGraphicsExtractor graphics, GearPiece piece, int x, int y, int width,
+			boolean selected, boolean hovered) {
+		Glyphs.slot(graphics, piece.slot(), x + 7, y + 5, piece.rank().color());
+		graphics.text(font, piece.displayName(), x + 22, y + 4, AriseTheme.TEXT);
+		graphics.text(font, Component.translatable("arise.screen.gem.sockets",
+				piece.gems().size(), piece.sockets()), x + 22, y + 14, AriseTheme.MUTED);
+
+		int dotX = x + width - 8 - piece.sockets() * 5;
+		for (int i = 0; i < piece.sockets(); i++) {
+			int color = i < piece.gems().size() ? AriseTheme.VIOLET : AriseTheme.LINE;
+			graphics.fill(dotX + i * 5, y + 9, dotX + i * 5 + 3, y + 12, color);
+		}
+	}
+
+	private void drawSlot(GuiGraphicsExtractor graphics, GemConfig config, Slot slot,
+			int x, int y, int width) {
+		if (slot.gem() == null) {
+			graphics.outline(x + 6, y + 4, 10, 10, AriseTheme.LINE);
+			graphics.text(font, Component.translatable("arise.screen.gem.free"),
+					x + 22, y + 8, AriseTheme.DISABLED);
+			return;
+		}
+
+		Gem gem = slot.gem();
+		Glyphs.gem(graphics, gem.type(), x + 7, y + 5, gem.rank().color());
+		graphics.text(font, gem.displayName(), x + 22, y + 4, AriseTheme.TEXT);
+		graphics.text(font, gem.describe(config), x + 22, y + 14, AriseTheme.MUTED);
+
+		// Chi e' montata e chi e' in sacca deve vedersi senza leggere: un puntino a destra.
+		if (slot.socketed()) {
+			graphics.fill(x + width - 8, y + 8, x + width - 4, y + 12, AriseTheme.VIOLET);
+		}
 	}
 }
