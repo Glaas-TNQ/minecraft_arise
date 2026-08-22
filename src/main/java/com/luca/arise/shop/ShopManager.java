@@ -15,6 +15,9 @@ import com.luca.arise.gear.GearRoll;
 import com.luca.arise.gear.GearSlot;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.Rank;
+import com.luca.arise.quest.Objective;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModAttachments;
 
 import net.minecraft.network.chat.Component;
@@ -168,6 +171,11 @@ public final class ShopManager {
 
 	/** Compra una voce. */
 	public static Component buy(ServerPlayer player, UUID offerId) {
+		Component locked = QuestManager.require(player, Unlock.SHOP);
+		if (locked != null) {
+			return locked;
+		}
+
 		ShopStock stock = stock(player);
 		Optional<ShopOffer> found = stock.find(offerId);
 
@@ -194,6 +202,7 @@ public final class ShopManager {
 
 		player.setAttached(ModAttachments.SHOP, stock.without(offerId));
 		GearManager.grant(player, piece);
+		QuestManager.advance(player, Objective.BUY);
 
 		if (player.level() instanceof ServerLevel level) {
 			AriseFx.shopDeal(level, player.position(), piece.rank());

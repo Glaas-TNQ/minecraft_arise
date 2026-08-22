@@ -16,6 +16,9 @@ import com.luca.arise.gear.PlayerGear;
 import com.luca.arise.gem.GemManager;
 import com.luca.arise.gem.GemType;
 import com.luca.arise.progress.Rank;
+import com.luca.arise.quest.PlayerQuests;
+import com.luca.arise.quest.Quest;
+import com.luca.arise.quest.QuestManager;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.progress.PlayerProgress;
@@ -215,6 +218,26 @@ public final class AriseCommands {
 
 			gem.then(gemGive);
 			root.then(gem);
+
+			root.then(Commands.literal("quest")
+					.executes(context -> playerAction(context.getSource(), player -> {
+						PlayerQuests quests = QuestManager.get(player);
+						Quest quest = quests.current();
+
+						return quest == null
+								? Component.translatable("arise.msg.quest.chain_done")
+								: Component.translatable("arise.msg.quest.status", quest.title(),
+										quest.description(), quests.progress(), quest.amount());
+					}))
+					.then(Commands.literal("skip")
+							.requires(AriseCommands::canCheat)
+							.executes(context -> playerAction(context.getSource(), QuestManager::skip)))
+					.then(Commands.literal("all")
+							.requires(AriseCommands::canCheat)
+							.executes(context -> playerAction(context.getSource(), QuestManager::grantAll)))
+					.then(Commands.literal("reset")
+							.requires(AriseCommands::canCheat)
+							.executes(context -> playerAction(context.getSource(), QuestManager::reset))));
 
 			root.then(Commands.literal("shop")
 					.executes(context -> listShop(context.getSource()))

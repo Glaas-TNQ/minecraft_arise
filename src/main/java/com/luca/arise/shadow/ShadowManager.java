@@ -14,6 +14,9 @@ import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.quest.Objective;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.registry.ModEntities;
@@ -92,6 +95,11 @@ public final class ShadowManager {
 
 	/** Tenta l'estrazione dal cadavere più vicino. Restituisce il messaggio da mostrare. */
 	public static Component extract(ServerPlayer player) {
+		Component locked = QuestManager.require(player, Unlock.ARMY);
+		if (locked != null) {
+			return locked;
+		}
+
 		ShadowConfig config = AriseConfig.get().shadows();
 		ServerLevel level = player.level();
 		long now = level.getGameTime();
@@ -128,6 +136,7 @@ public final class ShadowManager {
 		setArmy(player, army.with(shadow));
 
 		AriseFx.extractionSuccess(level, best.position(), shadow.rank(config));
+		QuestManager.advance(player, Objective.EXTRACT);
 
 		return Component.translatable("arise.msg.shadow.extracted", shadow.displayName(),
 				shadow.rank(config).label(), army.size() + 1, capacity);

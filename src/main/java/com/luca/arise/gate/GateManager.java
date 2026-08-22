@@ -11,6 +11,9 @@ import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.GateConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.quest.Objective;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.registry.ModEntities;
@@ -88,6 +91,11 @@ public final class GateManager {
 	 * ricostruito dallo stesso seme.
 	 */
 	public static Component offer(ServerPlayer player, Rank rank) {
+		Component locked = QuestManager.require(player, Unlock.GATES);
+		if (locked != null) {
+			return locked;
+		}
+
 		ServerLevel level = player.level();
 		GateConfig config = AriseConfig.get().gates();
 
@@ -299,6 +307,7 @@ public final class GateManager {
 		ProgressManager.addXp(player, xp);
 		ProgressManager.addSouls(player, souls);
 
+		QuestManager.advance(player, Objective.CLEAR_GATE);
 		AriseFx.gateClear(player, instance.rank());
 		player.sendSystemMessage(Component.translatable("arise.msg.gate.cleared",
 				instance.rank().label(), xp, souls));

@@ -44,6 +44,12 @@ public final class ModSounds {
 	/** Un'ombra cambia rango. */
 	public static final SoundEvent SYSTEM_RANK_UP = create("system.rank_up");
 
+	// ---- gli incarichi
+	/** Il Sistema che arriva. Suona una volta sola in tutta la partita. */
+	public static final SoundEvent SYSTEM_AWAKENING = create("system.awakening");
+	/** Un incarico completato. */
+	public static final SoundEvent QUEST_COMPLETED = create("quest.completed");
+
 	// ---- i Gate
 	public static final SoundEvent GATE_OPEN = create("gate.open");
 	/** Battito lontano, mentre si esplora. */

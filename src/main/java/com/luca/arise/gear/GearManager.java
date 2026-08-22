@@ -15,6 +15,9 @@ import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.progress.Stat;
 import com.luca.arise.progress.StatSources;
+import com.luca.arise.quest.Objective;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModAttachments;
 
 import net.minecraft.network.chat.Component;
@@ -81,6 +84,11 @@ public final class GearManager {
 
 	/** Indossa un pezzo che sta nello zaino. */
 	public static Component equip(ServerPlayer player, UUID id) {
+		Component locked = QuestManager.require(player, Unlock.GEAR);
+		if (locked != null) {
+			return locked;
+		}
+
 		PlayerGear gear = get(player);
 		Optional<GearPiece> found = gear.find(id);
 
@@ -108,6 +116,8 @@ public final class GearManager {
 		}
 
 		set(player, gear.withEquipped(piece));
+		QuestManager.advance(player, Objective.EQUIP);
+
 		return Component.translatable("arise.msg.gear.equipped", piece.displayName());
 	}
 

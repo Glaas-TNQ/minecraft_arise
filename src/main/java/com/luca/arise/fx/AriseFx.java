@@ -242,6 +242,34 @@ public final class AriseFx {
 		play(player.level(), player.position(), ModSounds.GATE_OPEN, SoundSource.AMBIENT, 0.35F, 0.6F);
 	}
 
+	// ---------------------------------------------------------------- gli incarichi
+
+	/**
+	 * Il risveglio: il colpo che avrebbe ucciso, e non uccide.
+	 *
+	 * <p>E' l'effetto piu' grosso della mod e suona una volta sola in tutta la partita, quindi puo'
+	 * permettersi di essere sproporzionato: una cupola, una colonna e un anello che si apre.
+	 */
+	public static void awakening(ServerLevel level, Vec3 position) {
+		FxConfig fx = config();
+
+		dome(level, position, 3.0, fx.scaled(120), dust(0x4FC3F7, 1.6F));
+		column(level, position, 6.0, fx.scaled(70), dust(SHADOW_VIOLET, 1.4F));
+		ring(level, position, 2.2, fx.scaled(40), dust(0x4FC3F7, 1.2F), 0.35);
+
+		level.sendParticles(ParticleTypes.END_ROD, position.x(), position.y() + 1.0, position.z(),
+				fx.scaled(50), 0.8, 1.4, 0.8, 0.12);
+
+		play(level, position, ModSounds.SYSTEM_AWAKENING, 1.0F, 1.0F);
+	}
+
+	/** Un incarico completato: piccolo, ma si sente. */
+	public static void questCompleted(ServerLevel level, Vec3 position) {
+		FxConfig fx = config();
+		ring(level, position, 1.2, fx.scaled(18), dust(0x4FC3F7, 1.1F), 0.3);
+		play(level, position, ModSounds.QUEST_COMPLETED, 0.8F, 1.0F);
+	}
+
 	// ---------------------------------------------------------------- gemme
 
 	/** Una gemma entra in un'incastonatura. */

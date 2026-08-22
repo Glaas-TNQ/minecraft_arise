@@ -7,6 +7,9 @@ import com.luca.arise.config.AbilityConfig;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.quest.Objective;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.shadow.ShadowEntity;
 
@@ -52,6 +55,11 @@ public final class AbilityManager {
 	 * @return il messaggio da mostrare al giocatore
 	 */
 	public static Component use(ServerPlayer player, Ability ability) {
+		Component locked = QuestManager.require(player, Unlock.ABILITIES);
+		if (locked != null) {
+			return locked;
+		}
+
 		int level = ProgressManager.get(player).level();
 		if (level < ability.requiredLevel()) {
 			return Component.translatable("arise.msg.ability.locked",
@@ -84,6 +92,7 @@ public final class AbilityManager {
 		if (result != null) {
 			player.setAttached(ModAttachments.COOLDOWNS,
 					cooldowns.with(ability, now + config.cooldownTicks(ability)));
+			QuestManager.advance(player, Objective.USE_ABILITY);
 			return result;
 		}
 

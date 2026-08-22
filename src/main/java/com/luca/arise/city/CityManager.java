@@ -12,6 +12,8 @@ import com.luca.arise.city.CityPlan.Fill;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.CityConfig;
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -333,6 +335,11 @@ public final class CityManager {
 
 	/** Viaggio verso una città: si arriva davanti all'ingresso dell'Associazione. */
 	public static Component travel(ServerPlayer player, City city) {
+		Component locked = QuestManager.require(player, Unlock.CITIES);
+		if (locked != null) {
+			return locked;
+		}
+
 		ServerLevel level = player.level().getServer().overworld();
 
 		if (!exists(level, city)) {

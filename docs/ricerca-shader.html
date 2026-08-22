@@ -1,0 +1,607 @@
+<title>Shader in Arise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(142,107,255,0.08), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst { color: var(--muted); max-width: 62ch; margin: 0; }
+  .status-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+  }
+  .chip.ok { color: var(--good); border-color: rgba(127,217,127,0.35); }
+  .chip.todo { color: var(--warn); border-color: rgba(232,166,79,0.35); }
+
+  section { margin-top: 56px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0 0 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  h2 .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+  }
+
+  h3 { font-family: var(--display); font-weight: 600; font-size: 17px; margin: 28px 0 6px; }
+
+  p { margin: 12px 0; max-width: 68ch; }
+  p.lede { color: var(--muted); }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--muted); font-style: italic; }
+
+  ul { max-width: 68ch; padding-left: 20px; }
+  li { margin: 7px 0; }
+  li::marker { color: var(--accent-deep); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    padding: 1px 5px;
+    color: var(--accent);
+  }
+
+  .commands {
+    margin: 18px 0;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: var(--panel-soft);
+    overflow-x: auto;
+  }
+
+  .commands pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.9;
+    margin: 0;
+    padding: 16px 20px;
+    color: var(--text);
+  }
+  .commands .cmt { color: var(--muted); }
+
+  .verdict {
+    margin-top: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .verdict .row {
+    background: var(--panel-soft);
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    gap: 18px;
+    align-items: start;
+  }
+
+  .verdict .tier {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding-top: 3px;
+  }
+  .verdict .row.yes .tier { color: var(--good); }
+  .verdict .row.maybe .tier { color: var(--warn); }
+  .verdict .row.no .tier { color: var(--bad); }
+
+  .verdict .name { font-family: var(--display); font-weight: 600; font-size: 16px; margin-bottom: 2px; }
+  .verdict .what { font-size: 14.5px; color: var(--muted); line-height: 1.55; }
+
+  .verdict .cost {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+    line-height: 1.9;
+  }
+  .verdict .cost b { color: var(--accent); font-weight: 500; }
+
+  .table-scroll { overflow-x: auto; margin-top: 20px; border: 1px solid var(--line); }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14.5px; }
+
+  thead th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+    text-align: left;
+    padding: 12px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  tbody td { padding: 13px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; background: var(--panel-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.id { font-family: var(--mono); font-size: 12.5px; color: var(--violet); white-space: nowrap; }
+  td.src { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  td.expect { color: var(--muted); }
+
+  .note {
+    margin-top: 22px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .note .title { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--warn); margin-bottom: 4px; }
+  .note p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .note p + p { margin-top: 8px; }
+  .note.find { border-top-color: var(--gold); }
+  .note.find .title { color: var(--gold); }
+
+  .risks { margin-top: 20px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .risk { background: var(--panel-soft); padding: 15px 20px; display: grid; grid-template-columns: 28px 1fr; gap: 14px; }
+  .risk .rank { font-family: var(--mono); color: var(--warn); font-size: 13px; }
+  .risk .body { font-size: 14.5px; color: var(--muted); }
+  .risk .body b { color: var(--text); font-weight: 600; }
+
+  ol.plan { margin: 20px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); counter-reset: step; }
+  ol.plan li { margin: 0; background: var(--panel-soft); padding: 16px 20px; display: grid; grid-template-columns: 34px 1fr; gap: 16px; counter-increment: step; }
+  ol.plan li::before {
+    content: counter(step);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--violet);
+    border: 1px solid var(--violet);
+    background: var(--panel);
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+  }
+  ol.plan .name { font-family: var(--display); font-weight: 600; font-size: 16px; margin-bottom: 2px; }
+  ol.plan .what { font-size: 14.5px; color: var(--muted); line-height: 1.55; }
+
+  .sources { margin-top: 20px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .sources a { display: block; background: var(--panel-soft); padding: 12px 18px; color: var(--text); text-decoration: none; font-size: 14.5px; }
+  .sources a:hover, .sources a:focus-visible { background: var(--panel); color: var(--accent); outline: none; }
+  .sources a span { display: block; font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 36px 16px 72px; }
+    .verdict .row { grid-template-columns: 1fr; gap: 8px; }
+    .verdict .cost { text-align: left; }
+  }
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Ricerca &middot; nessun codice scritto</p>
+  <h1>Shader in Arise</h1>
+  <p class="standfirst">L'idea ha senso, ma quasi nessuno degli effetti che cerchi ha bisogno di uno
+  shader scritto da noi. E la parte che ne avrebbe bisogno davvero &egrave;, in 26.2, la peggiore su
+  cui costruire l'identit&agrave; visiva della mod.</p>
+  <div class="status-row">
+    <span class="chip">Minecraft 26.2</span>
+    <span class="chip ok">verificato sui jar del progetto</span>
+    <span class="chip">6 fonti esterne</span>
+    <span class="chip todo">decisione tua</span>
+  </div>
+</header>
+
+<section>
+  <h2>La risposta corta <span class="tag">tre livelli, non uno</span></h2>
+  <p class="lede">&laquo;Shader custom&raquo; sta per tre cose molto diverse, con tre costi che
+  differiscono di un ordine di grandezza l'uno dall'altro. Confonderle &egrave; il motivo per cui
+  questa domanda sembra difficile.</p>
+
+  <div class="verdict">
+    <div class="row yes">
+      <div class="tier">Livello 0<br>fallo</div>
+      <div>
+        <div class="name">Atmosfera senza GLSL</div>
+        <div class="what">Nebbia, colore del cielo, luce ambientale del Gate, contorno luminoso delle
+        ombre, particellari, rifiniture 2D dell'HUD. In 26.2 quasi tutto questo &egrave;
+        <em>datapack</em>, non codice di rendering. &Egrave; qui che sta il grosso dell'effetto che
+        cerchi.</div>
+      </div>
+      <div class="cost"><b>mezza serata</b> a effetto<br>rischio nullo</div>
+    </div>
+    <div class="row maybe">
+      <div class="tier">Livello 1<br>uno, dopo</div>
+      <div>
+        <div class="name">Un post effect a schermo intero</div>
+        <div class="what">Una catena di post-processing nostra (<code>arise:monarch</code>): vignetta,
+        desaturazione, deriva viola quando entri in un Gate o usi un'abilit&agrave;. L'API c'&egrave;
+        ed &egrave; raggiungibile. Un effetto solo, spento di default, con la via di fuga gi&agrave;
+        pronta.</div>
+      </div>
+      <div class="cost"><b>1&ndash;2 giornate</b> la prima volta<br>poi poche ore</div>
+    </div>
+    <div class="row no">
+      <div class="tier">Livello 2<br>non ora</div>
+      <div>
+        <div class="name">Pipeline di render nostra per le ombre</div>
+        <div class="what">Dissolvenza, bordo di fresnel, fumo: un <code>RenderPipeline</code> con
+        vertex format e shader propri per l'entit&agrave; ombra. &Egrave; la cosa che 26.2 ha appena
+        riscritto e che gli shaderpack spengono. Costo alto, resa che una fetta dei giocatori non
+        vedrebbe.</div>
+      </div>
+      <div class="cost"><b>settimane</b><br>da rifare a ogni release</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Cosa esiste davvero in 26.2 <span class="tag">letto dal jar, non dai tutorial</span></h2>
+  <p>Ho aperto <code>minecraft-client-only.jar</code> nella cache di Loom invece di fidarmi di quello
+  che si trova in rete, perch&eacute; sugli shader la rete parla di 1.20.1. Quello che c'&egrave;:</p>
+
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Cosa</th><th>Dove sta</th><th>Serve a</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="id">shaders/core/*.vsh .fsh</td>
+        <td class="src">assets/&lt;ns&gt;/shaders/core/</td>
+        <td class="expect">I core shader vanilla, in GLSL, con <code>shaders/include/*.glsl</code>
+        importabili. Sovrascriverli &egrave; la strada che <strong>non</strong> va presa.</td>
+      </tr>
+      <tr>
+        <td class="id">post_effect/*.json</td>
+        <td class="src">assets/&lt;ns&gt;/post_effect/</td>
+        <td class="expect">Le catene di post-processing (<code>creeper</code>, <code>spider</code>,
+        <code>entity_outline</code>, <code>transparency</code>): un JSON che concatena passaggi, pi&ugrave;
+        i <code>.fsh</code> in <code>shaders/post/</code>. <strong>Il namespace pu&ograve; essere il
+        nostro.</strong></td>
+      </tr>
+      <tr>
+        <td class="id">ShaderManager</td>
+        <td class="src">net.minecraft.client.renderer</td>
+        <td class="expect"><code>getPostChain(Identifier, Set&lt;Identifier&gt;)</code> &mdash; carica
+        una catena qualsiasi per id, quindi anche <code>arise:monarch</code>.</td>
+      </tr>
+      <tr>
+        <td class="id">PostChain</td>
+        <td class="src">net.minecraft.client.renderer</td>
+        <td class="expect"><code>process(RenderTarget, GraphicsResourceAllocator)</code> e
+        <code>addToFrame(FrameGraphBuilder, &hellip;)</code>: i due modi di farla girare su un frame.</td>
+      </tr>
+      <tr>
+        <td class="id">GameRenderer</td>
+        <td class="src">net.minecraft.client.renderer</td>
+        <td class="expect">Ha gi&agrave; <code>currentPostEffect()</code>, <code>clearPostEffect()</code>,
+        <code>checkEntityPostEffect(Entity)</code>: la meccanica &laquo;un effetto attivo sullo
+        schermo&raquo; esiste, va solo pilotata.</td>
+      </tr>
+      <tr>
+        <td class="id">LevelRenderEvents</td>
+        <td class="src">fabric-rendering-v1</td>
+        <td class="expect">Dodici agganci per frame (<code>START_MAIN</code>,
+        <code>AFTER_TRANSLUCENT_TERRAIN</code>, <code>END_MAIN</code>, &hellip;). Bastano a inserire un
+        effetto senza un mixin.</td>
+      </tr>
+      <tr>
+        <td class="id">RenderPipeline.Builder</td>
+        <td class="src">com.mojang.blaze3d.pipeline</td>
+        <td class="expect">Il Livello 2. <code>withBindGroupLayout</code>, <code>withVertexBinding</code>,
+        <code>withPrimitiveTopology</code>: nomi tutti nuovi <strong>di questa versione</strong>.</td>
+      </tr>
+      <tr>
+        <td class="id">blaze3d.vulkan</td>
+        <td class="src">69 classi, con glsl&rarr;SPIR-V</td>
+        <td class="expect">Il secondo backend. Il nostro GLSL dovrebbe attraversare la traduzione a
+        SPIR-V, ma &egrave; codice nuovo e nessuno l'ha ancora stressato con shader di mod.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="commands">
+    <pre><span class="cmt"># come rifare queste verifiche, dalla radice del progetto</span>
+$env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-25.0.4.7-hotspot"
+$mc = "$env:USERPROFILE\.gradle\caches\fabric-loom\26.2"
+&amp; "$env:JAVA_HOME\bin\javap" -cp "$mc\minecraft-client-only.jar;$mc\minecraft-common.jar" net.minecraft.client.renderer.ShaderManager net.minecraft.client.renderer.PostChain</pre>
+  </div>
+</section>
+
+<section>
+  <h2>Il terreno &egrave; in movimento <span class="tag">e si muove proprio sotto gli shader</span></h2>
+  <p>26.2 &egrave; la versione peggiore degli ultimi anni per iniziare a scrivere shader, e non per
+  caso: &egrave; quella che ha riscritto il livello su cui poggerebbero.</p>
+
+  <ul>
+    <li><strong>Vulkan &egrave; entrato nel gioco base</strong>, come opzione sperimentale accanto a
+    OpenGL (<code>Graphics API</code>: Default / Prefer Vulkan / Prefer OpenGL). &laquo;Default&raquo;
+    oggi vuol dire OpenGL, ma la direzione &egrave; dichiarata. Ogni shader nostro dovr&agrave;
+    funzionare su due backend.</li>
+    <li><strong><code>RenderPipeline</code> &egrave; cambiato in questa release</strong>: uniform e
+    sampler sostituiti da <code>BindGroupLayout</code>, <code>VertexFormat</code> riscritto,
+    <code>MultiBufferSource</code> rimpiazzato da <code>FeatureRenderDispatcher</code> e
+    <code>SubmitNode</code>. Codice di Livello 2 scritto oggi nasce su API vecchie di sei mesi.</li>
+    <li><strong>Il wiki lo dice esplicito</strong>: in 26.2 gli shader custom si rompono &mdash; i sei
+    core shader del testo sono stati fusi in <code>core/text</code> e <code>core/text_background</code>,
+    con le varianti spostate su define. Il buffer di profondit&agrave; &egrave; ora invertito.</li>
+    <li><strong>Formato dei resource pack: 88.</strong> Il numero si muove a ogni versione, e gli
+    shader sono la parte del pack che rompe per prima.</li>
+  </ul>
+
+  <div class="note">
+    <div class="title">La regola numero 2 del progetto vale doppio qui</div>
+    <p>&laquo;Non scrivere codice su un'API a memoria&raquo;: per il rendering non &egrave; nemmeno una
+    questione di memoria. Quasi tutto il materiale reperibile &egrave; per 1.20.1&ndash;1.21.x, dove gli
+    shader erano JSON e <code>GuiGraphics</code> esisteva. Su questo argomento non c'&egrave; nessuno
+    da copiare.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Chi non vedrebbe il risultato <span class="tag">Iris, Sodium, Vulkan</span></h2>
+  <p>&Egrave; il punto che sposta la decisione pi&ugrave; di ogni considerazione tecnica. Iris &mdash;
+  cio&egrave; quasi tutti i giocatori che &laquo;usano gli shader&raquo; &mdash; <strong>sostituisce
+  <code>GameRenderer</code> e <code>LevelRenderer</code></strong> con la propria pipeline. Gli shader
+  aggiunti dalle mod vengono semplicemente ignorati quando &egrave; attivo uno shaderpack: &egrave;
+  un'incompatibilit&agrave; dichiarata irrisolvibile, con Botania e ComputerCraft citati come i casi
+  noti.</p>
+  <p>E l'altra met&agrave;: <strong>Iris non parte affatto sotto il renderer Vulkan nativo</strong> di
+  26.2. Il pubblico si divide cos&igrave;, e il Livello 2 &egrave; visibile solo alla prima riga:</p>
+
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Configurazione</th><th>Livello 0</th><th>Livello 1 (post effect)</th><th>Livello 2 (pipeline)</th></tr></thead>
+    <tbody>
+      <tr><td>Vanilla o Sodium, OpenGL</td><td class="expect">s&igrave;</td><td class="expect">s&igrave;</td><td class="expect">s&igrave;</td></tr>
+      <tr><td>Iris con shaderpack attivo</td><td class="expect">s&igrave;</td><td class="expect">da verificare, probabilmente no</td><td class="expect">no</td></tr>
+      <tr><td>Vulkan nativo (sperimentale)</td><td class="expect">s&igrave;</td><td class="expect">da verificare</td><td class="expect">da verificare</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Il Livello 0 &egrave; l'unica riga che legge &laquo;s&igrave;&raquo; ovunque, e non &egrave; un
+  caso: &egrave; tutto ci&ograve; che passa dai dati e dai materiali vanilla, senza toccare la
+  pipeline che le altre mod si contendono.</p>
+</section>
+
+<section>
+  <h2>Cosa comprerebbe davvero l'effetto <span class="tag">Livello 0, sul codice che hai</span></h2>
+  <p class="lede">Ho guardato cosa disegna Arise adesso. Ci sono tre cose che cambierebbero l'aspetto
+  della mod pi&ugrave; di qualunque shader, e nessuna delle tre &egrave; uno shader.</p>
+
+  <div class="note find">
+    <div class="title">Il Gate ha il cielo azzurro</div>
+    <p><code>src/main/resources/data/arise/dimension/</code> dichiara <code>"type":
+    "minecraft:overworld"</code>. La dimensione dei Gate usa il tipo di dimensione dell'Overworld:
+    sole, nuvole, cielo diurno, nebbia normale. Un dungeon d'ombra illuminato come un prato.</p>
+    <p>In 26.2 <code>DimensionType</code> &egrave; un record con dentro <code>Skybox</code>
+    (<code>NONE</code> / <code>OVERWORLD</code> / <code>END</code>), <code>CardinalLighting</code> e una
+    <code>EnvironmentAttributeMap</code>. Riscrivere quel file &mdash; cielo <code>NONE</code>, nebbia
+    viola stretta, luce ambientale bassa &mdash; &egrave; <strong>una consegna da mezza serata</strong>
+    che fa per l'atmosfera pi&ugrave; di tre settimane di GLSL.</p>
+  </div>
+
+  <p>Gli attributi d'ambiente disponibili come dati, tutti nel registro
+  <code>minecraft:environment_attribute</code>:</p>
+  <div class="commands">
+    <pre>FOG_COLOR            FOG_START_DISTANCE   FOG_END_DISTANCE
+SKY_COLOR            SKY_FOG_END_DISTANCE CLOUD_COLOR / CLOUD_HEIGHT
+SKY_LIGHT_COLOR      SKY_LIGHT_FACTOR     AMBIENT_LIGHT_COLOR
+BLOCK_LIGHT_TINT     NIGHT_VISION_COLOR   STAR_BRIGHTNESS
+SUN_ANGLE            MOON_ANGLE           STAR_ANGLE
+AMBIENT_PARTICLES    BACKGROUND_MUSIC     WATER_FOG_COLOR</pre>
+  </div>
+  <p><code>BLOCK_LIGHT_TINT</code> da solo tinge tutta l'illuminazione di un Gate. &Egrave; l'effetto
+  &laquo;shader&raquo; per eccellenza, ed &egrave; un campo in un JSON.</p>
+
+  <h3>Le altre due</h3>
+  <ul>
+    <li><strong>Il contorno luminoso delle ombre.</strong> <code>entity_outline</code> &egrave; una
+    catena di post-processing <em>vanilla</em>, gi&agrave; compilata e compatibile con tutto: si
+    accende rendendo l'entit&agrave; &laquo;glowing&raquo; e si colora con il team. Le tue ombre hanno
+    gi&agrave; un colore per giocatore in <code>ShadowRenderer.getModelTint</code> &mdash; sarebbe la
+    stessa tinta che le circonda al buio. Costo: poche righe.</li>
+    <li><strong>L'HUD e le finestre del Sistema.</strong> <code>AriseTheme</code> &egrave; gi&agrave;
+    una tavolozza coerente, e il design dice che le notifiche del Sistema &laquo;sono il dettaglio che
+    d&agrave; l'identit&agrave; alla mod ed &egrave; puro rendering 2D, quindi economico&raquo;.
+    Gradiente d'apertura, scansione, bordo che pulsa al level-up: disegno 2D con le pipeline vanilla,
+    immune a Iris e a Vulkan.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Se poi vuoi il post effect <span class="tag">Livello 1, come lo farei</span></h2>
+  <p>Un solo effetto, <code>arise:monarch</code>, acceso nei momenti in cui la mod vuole prendersi lo
+  schermo: ingresso in un Gate, abilit&agrave; del Monarca, morte del boss. La forma sarebbe questa:</p>
+
+  <ul>
+    <li><code>assets/arise/post_effect/monarch.json</code> &mdash; la catena, sul modello di
+    <code>creeper.json</code> di vanilla, che &egrave; il template gi&agrave; in casa;</li>
+    <li><code>assets/arise/shaders/post/monarch.fsh</code> &mdash; il passaggio: desaturazione, deriva
+    verso il viola di <code>AriseTheme.VIOLET</code>, vignetta pulsante;</li>
+    <li>un componente client che chiede la catena a <code>ShaderManager.getPostChain</code>, la fa
+    girare su <code>LevelRenderEvents.END_MAIN</code> e la spegne quando lo stato del giocatore lo
+    dice &mdash; <strong>lo stato arriva dal server</strong>, come ogni altra cosa in questa mod;</li>
+    <li>una voce in <code>FxConfig</code>, <strong>spenta di default</strong>, e un
+    <code>try/catch</code> su <code>ShaderManager.CompilationException</code> che disattiva l'effetto
+    da s&eacute; e scrive nel log invece di far crashare il client di qualcuno.</li>
+  </ul>
+
+  <div class="note">
+    <div class="title">La regola di sicurezza, in una riga</div>
+    <p>Uno shader che non compila non &egrave; un effetto mancante: &egrave; un client che non parte.
+    Ogni effetto di Livello 1 nasce con l'interruttore e con il fallback, o non nasce.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Impatto sullo sviluppo <span class="tag">la parte che pesa davvero</span></h2>
+
+  <div class="risks">
+    <div class="risk"><div class="rank">1</div><div class="body">
+      <b>La matrice di test si moltiplica.</b> Oggi verifichi &laquo;funziona in
+      <code>runClient</code>&raquo;. Con gli shader diventa OpenGL &times; Vulkan &times; Iris &times;
+      tre marche di scheda video. Sei l'unico che pu&ograve; testare e hai una macchina sola: le
+      combinazioni che non provi restano bug che scoprono gli altri, e si presentano come uno schermo
+      nero.
+    </div></div>
+    <div class="risk"><div class="rank">2</div><div class="body">
+      <b>Manutenzione a ogni versione di Minecraft.</b> Il codice di gioco di Arise sopravvive agli
+      aggiornamenti con qualche rinomina. Gli shader no: 26.2 da sola ha fuso i core shader del testo,
+      invertito il depth buffer e riscritto <code>RenderPipeline</code>. Un effetto di Livello 2
+      &egrave; un debito che ripaghi ogni sei mesi.
+    </div></div>
+    <div class="risk"><div class="rank">3</div><div class="body">
+      <b>Il ciclo di verifica &egrave; il pi&ugrave; lento che hai.</b> Il giro &egrave; &laquo;io
+      scrivo e compilo, tu testi&raquo;. Su un dungeon si vede subito se manca una stanza; su uno
+      shader la differenza tra giusto e sbagliato &egrave; una sfumatura, e diagnosticarla a distanza
+      costa dieci volte tanto.
+    </div></div>
+    <div class="risk"><div class="rank">4</div><div class="body">
+      <b>Il costo d'occasione, oggi.</b> <code>CLAUDE.md</code> elenca <b>dodici blocchi</b> da F6 a B5
+      con scritto &laquo;compilato, da verificare&raquo;: abilit&agrave;, citt&agrave;, gemme, bottino,
+      Abyss Shop. &Egrave; gameplay finito che nessuno ha ancora visto funzionare. Aprire un cantiere
+      grafico prima di chiudere quella coda allunga la lista invece di accorciarla.
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Cosa consiglio <span class="tag">in quest'ordine, e l'ordine conta</span></h2>
+
+  <ol class="plan">
+    <li><div>
+      <div class="name">Chiudi la coda di verifica</div>
+      <div class="what">I dodici blocchi da F6 a B5. Niente di grafico prima: un effetto sopra un
+      sistema che non sai se funziona rende pi&ugrave; difficile capire quale dei due &egrave; rotto.</div>
+    </div></li>
+    <li><div>
+      <div class="name">Il Gate smette di sembrare l'Overworld</div>
+      <div class="what">Un <code>DimensionType</code> nostro: cielo <code>NONE</code>, nebbia stretta e
+      viola, <code>BLOCK_LIGHT_TINT</code> freddo, particellari d'ambiente. Datapack, mezza serata, e i
+      temi dei Gate di F8 diventano ognuno la sua atmosfera invece dello stesso posto con mob
+      diversi.</div>
+    </div></li>
+    <li><div>
+      <div class="name">Le ombre si accendono al buio</div>
+      <div class="what">Contorno luminoso vanilla, del colore gi&agrave; scelto dal giocatore.
+      Compatibile con tutto, poche righe, ed &egrave; il momento &laquo;esercito d'ombra&raquo; che
+      oggi manca di sera.</div>
+    </div></li>
+    <li><div>
+      <div class="name">Le finestre del Sistema respirano</div>
+      <div class="what">Rifiniture 2D su HUD e schermate: apertura, pulsazione, scansione. Zero rischio
+      di compatibilit&agrave;, ed &egrave; la finestra azzurra che i giocatori assoceranno alla
+      mod.</div>
+    </div></li>
+    <li><div>
+      <div class="name">Solo allora: un post effect, uno</div>
+      <div class="what"><code>arise:monarch</code>, spento di default, con fallback. Se dopo averlo
+      visto in gioco vale quanto &egrave; costato, si parla di un secondo. Il Livello 2 lo
+      rivaluterei quando Vulkan smetter&agrave; di essere sperimentale, non prima.</div>
+    </div></li>
+  </ol>
+</section>
+
+<section>
+  <h2>Fonti <span class="tag">esterne; il resto viene dai jar</span></h2>
+  <div class="sources">
+    <a href="https://minecraft.wiki/w/Java_Edition_26.2">Java Edition 26.2 &mdash; Minecraft Wiki<span>pack format 88, opzione Graphics API, depth buffer invertito, core shader del testo fusi</span></a>
+    <a href="https://docs.neoforged.net/primer/docs/26.2/">Mod Migration Primer 26.1 &rarr; 26.2 &mdash; NeoForged<span>BindGroupLayout, GpuFormat, VertexFormat riscritto, FeatureRenderDispatcher, GuiGraphicsExtractor</span></a>
+    <a href="https://docs.neoforged.net/primer/docs/1.21.6/">Mod Migration Primer 1.21.6 &mdash; NeoForged<span>gli shader JSON spariscono, sostituiti da RenderPipeline</span></a>
+    <a href="https://deepwiki.com/IrisShaders/Iris/6.1-mod-compatibility">Mod Compatibility &mdash; Iris<span>Iris sostituisce GameRenderer e LevelRenderer; i core shader delle mod vengono ignorati</span></a>
+    <a href="https://deepwiki.com/FabricMC/fabric-docs/9.3-custom-render-pipelines">Custom Render Pipelines &mdash; Fabric Docs<span>registrazione di una RenderPipeline, fase di estrazione e fase di disegno</span></a>
+    <a href="https://syntaxmine.com/articles/minecraft-vulkan-renderer-26-2">Minecraft Vulkan Renderer in 26.2 &mdash; SyntaxMine<span>Iris non parte sotto il renderer Vulkan nativo</span></a>
+  </div>
+</section>
+
+<footer>
+  Ricerca del 22 agosto 2026 &middot; nessun file del progetto &egrave; stato modificato &middot; le
+  firme delle API sono state lette con <code>javap</code> sui jar in
+  <code>~/.gradle/caches/fabric-loom/26.2</code>
+</footer>
+
+</div>

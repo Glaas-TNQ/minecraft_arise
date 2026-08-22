@@ -12,6 +12,8 @@ import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.PlayerGear;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.Rank;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModAttachments;
 
 import net.minecraft.network.chat.Component;
@@ -60,6 +62,11 @@ public final class GemManager {
 
 	/** Incastona una gemma della sacca in un pezzo. Si fa ovunque. */
 	public static Component socket(ServerPlayer player, UUID gemId, UUID pieceId) {
+		Component locked = QuestManager.require(player, Unlock.GEMS);
+		if (locked != null) {
+			return locked;
+		}
+
 		PlayerGear current = gear(player);
 		Optional<Gem> gem = current.findGem(gemId);
 		Optional<GearPiece> piece = current.find(pieceId);

@@ -5,6 +5,9 @@ import com.luca.arise.ability.AbilityCooldowns;
 import com.luca.arise.config.AbilityConfig;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.progress.PlayerProgress;
+import com.luca.arise.quest.PlayerQuests;
+import com.luca.arise.quest.Quest;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.shadow.ShadowStance;
 
@@ -41,6 +44,7 @@ public class SystemHudElement implements HudElement {
 	private static final int COLOR_SOULS = 0xFFFFD54F;
 	private static final int COLOR_STANCE = 0xFF9BA8B8;
 	private static final int COLOR_LOCKED = 0xFF5A6B80;
+	private static final int COLOR_QUEST = 0xFF7FD97F;
 	private static final int COLOR_COOLDOWN = 0xB01B2838;
 
 	private static final int SLOT_SIZE = 18;
@@ -72,9 +76,22 @@ public class SystemHudElement implements HudElement {
 			return;
 		}
 
+		// Prima del risveglio non c'e' nessun Sistema da disegnare: l'HUD e' la prima cosa che
+		// arriva, e vederlo comparire e' meta' della scena.
+		PlayerQuests quests = player.getAttached(ModAttachments.QUESTS);
+		if (quests == null || !quests.has(Unlock.SYSTEM)) {
+			lastLevel = -1;
+			return;
+		}
+
 		detectLevelUp(progress.level());
-		drawPanel(graphics, minecraft.font, progress, player.getAttached(ModAttachments.STANCE));
-		drawAbilities(graphics, minecraft, progress.level(), player.getAttached(ModAttachments.COOLDOWNS));
+		drawPanel(graphics, minecraft.font, progress, player.getAttached(ModAttachments.STANCE), quests);
+
+		if (quests.has(Unlock.ABILITIES)) {
+			drawAbilities(graphics, minecraft, progress.level(),
+					player.getAttached(ModAttachments.COOLDOWNS));
+		}
+
 		drawLevelUpFlash(graphics, minecraft, progress.level());
 	}
 
@@ -86,12 +103,15 @@ public class SystemHudElement implements HudElement {
 	}
 
 	private void drawPanel(GuiGraphicsExtractor graphics, Font font, PlayerProgress progress,
-			ShadowStance stance) {
+			ShadowStance stance, PlayerQuests quests) {
 		long needed = AriseConfig.get().xpForNextLevel(progress.level());
 		float fraction = needed <= 0 ? 1.0F : Math.min(1.0F, (float) progress.xp() / needed);
 
-		// Righe: livello, soul coin, postura, più i punti da spendere solo se ce ne sono.
-		int lines = 3 + (progress.unspentPoints() > 0 ? 1 : 0);
+		Quest quest = quests.current();
+
+		// Righe: livello, soul coin, postura, più i punti da spendere e l'incarico in corso,
+		// ciascuno solo quando c'è.
+		int lines = 3 + (progress.unspentPoints() > 0 ? 1 : 0) + (quest == null ? 0 : 1);
 		int height = PADDING * 2 + font.lineHeight * lines + PADDING + BAR_HEIGHT;
 
 		graphics.fill(MARGIN, MARGIN, MARGIN + PANEL_WIDTH, MARGIN + height, COLOR_PANEL);
@@ -114,6 +134,14 @@ public class SystemHudElement implements HudElement {
 		if (progress.unspentPoints() > 0) {
 			graphics.text(font, Component.translatable("arise.hud.points", progress.unspentPoints()),
 					MARGIN + PADDING, y, COLOR_POINTS);
+			y += font.lineHeight;
+		}
+
+		// L'incarico in corso, col contatore: e' la riga che dice cosa fare adesso, e senza di lei
+		// la catena esisterebbe solo dentro una schermata che nessuno tiene aperta.
+		if (quest != null) {
+			graphics.text(font, Component.translatable("arise.hud.quest", quest.title(),
+					quests.progress(), quest.amount()), MARGIN + PADDING, y, COLOR_QUEST);
 			y += font.lineHeight;
 		}
 

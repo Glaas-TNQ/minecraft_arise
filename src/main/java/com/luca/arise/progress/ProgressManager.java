@@ -4,6 +4,8 @@ import java.util.Map;
 
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModAttachments;
 
 import net.minecraft.network.chat.Component;
@@ -142,6 +144,11 @@ public final class ProgressManager {
 	 * @return {@code null} se l'operazione riesce, altrimenti il messaggio di errore da mostrare.
 	 */
 	public static Component spend(ServerPlayer player, Stat stat, int amount) {
+		Component locked = QuestManager.require(player, Unlock.STATS);
+		if (locked != null) {
+			return locked;
+		}
+
 		if (amount <= 0) {
 			return Component.translatable("arise.msg.spend.invalid_amount");
 		}

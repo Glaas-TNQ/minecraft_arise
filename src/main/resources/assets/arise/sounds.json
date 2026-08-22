@@ -253,5 +253,25 @@
         "pitch": 0.9
       }
     ]
+  },
+  "system.awakening": {
+    "subtitle": "arise.subtitle.system_awakening",
+    "sounds": [
+      {
+        "name": "minecraft:block/end_portal/endportal",
+        "volume": 1.0,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "quest.completed": {
+    "subtitle": "arise.subtitle.quest_completed",
+    "sounds": [
+      {
+        "name": "minecraft:ui/toast/challenge_complete",
+        "volume": 0.7,
+        "pitch": 1.0
+      }
+    ]
   }
 }

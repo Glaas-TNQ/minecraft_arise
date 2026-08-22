@@ -6,6 +6,7 @@ import com.luca.arise.gate.ReturnPoint;
 import com.luca.arise.gear.PlayerGear;
 import com.luca.arise.shop.ShopStock;
 import com.luca.arise.progress.PlayerProgress;
+import com.luca.arise.quest.PlayerQuests;
 import com.luca.arise.shadow.ShadowArmy;
 import com.luca.arise.shadow.ShadowStance;
 import com.luca.arise.shadow.SummonedShadows;
@@ -44,6 +45,20 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.syncWith(ShadowArmy.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(AriseMod.id("army"));
+
+	/**
+	 * A che punto della catena degli incarichi è il giocatore.
+	 *
+	 * <p>Due numeri, ed è da questi due che si ricava quali sistemi della mod sono accesi. Persiste
+	 * e sopravvive alla morte come tutto il resto: perdere il Sistema morendo sarebbe assurdo, dato
+	 * che lo si è ricevuto proprio morendo.
+	 */
+	public static final AttachmentType<PlayerQuests> QUESTS = AttachmentRegistry.<PlayerQuests>builder()
+			.initializer(() -> PlayerQuests.INITIAL)
+			.persistent(PlayerQuests.CODEC)
+			.copyOnDeath()
+			.syncWith(PlayerQuests.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(AriseMod.id("quests"));
 
 	/**
 	 * L'equipaggiamento del Cacciatore: indossato e da parte (design §8.1).

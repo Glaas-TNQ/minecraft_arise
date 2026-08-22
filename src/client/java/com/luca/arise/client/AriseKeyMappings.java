@@ -1,9 +1,12 @@
 package com.luca.arise.client;
 
+import java.util.function.Supplier;
+
 import com.luca.arise.client.screen.AbyssShopScreen;
 import com.luca.arise.client.screen.ArmyScreen;
 import com.luca.arise.client.screen.HunterScreen;
 import com.luca.arise.client.screen.StatusScreen;
+import com.luca.arise.client.screen.QuestScreen;
 import com.luca.arise.network.AriseActionPayload;
 import com.luca.arise.network.ShopActionPayload;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -13,6 +16,13 @@ import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+
+import com.luca.arise.quest.PlayerQuests;
+import com.luca.arise.quest.Unlock;
+import com.luca.arise.registry.ModAttachments;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -31,6 +41,9 @@ public final class AriseKeyMappings {
 
 	/** Apre l'equipaggiamento del Cacciatore. N: libero in vanilla e vicino a J e K. */
 	public static final KeyMapping OPEN_GEAR = register("gear", GLFW.GLFW_KEY_N);
+
+	/** Apre gli incarichi del Sistema. */
+	public static final KeyMapping OPEN_QUESTS = register("quests", GLFW.GLFW_KEY_P);
 
 	/** Apre l'Abyss Shop. Il negozio è una finestra del Sistema: si apre ovunque. */
 	public static final KeyMapping OPEN_SHOP = register("shop", GLFW.GLFW_KEY_O);
@@ -71,22 +84,29 @@ public final class AriseKeyMappings {
 			// while, non if: se il tasto e' stato premuto piu' volte in un tick vanno consumate
 			// tutte, altrimenti la pressione resta in coda e riparte al tick successivo.
 			while (OPEN_STATUS.consumeClick()) {
-				client.setScreenAndShow(new StatusScreen());
+				open(client, Unlock.STATS, StatusScreen::new);
+			}
+
+			while (OPEN_QUESTS.consumeClick()) {
+				open(client, Unlock.SYSTEM, QuestScreen::new);
 			}
 
 			while (OPEN_ARMY.consumeClick()) {
-				client.setScreenAndShow(new ArmyScreen());
+				open(client, Unlock.ARMY, ArmyScreen::new);
 			}
 
 			while (OPEN_GEAR.consumeClick()) {
-				client.setScreenAndShow(new HunterScreen());
+				open(client, Unlock.GEAR, HunterScreen::new);
 			}
 
 			while (OPEN_SHOP.consumeClick()) {
 				// Il colpetto al server prima della schermata: il negozio si rigenera pigramente,
 				// e senza questo si vedrebbe l'assortimento della rotazione scorsa.
-				ClientPlayNetworking.send(ShopActionPayload.of(ShopActionPayload.Action.OPEN));
-				client.setScreenAndShow(new AbyssShopScreen());
+				if (unlocked(client, Unlock.SHOP)) {
+					ClientPlayNetworking.send(ShopActionPayload.of(ShopActionPayload.Action.OPEN));
+				}
+
+				open(client, Unlock.SHOP, AbyssShopScreen::new);
 			}
 
 			sendOnPress(EXTRACT, AriseActionPayload.Action.EXTRACT);
@@ -98,6 +118,32 @@ public final class AriseKeyMappings {
 			sendOnPress(ABILITY_3, AriseActionPayload.Action.ABILITY_3);
 			sendOnPress(ABILITY_4, AriseActionPayload.Action.ABILITY_4);
 		});
+	}
+
+	/**
+	 * Apre una schermata solo se il Sistema ha gia' concesso quel sistema.
+	 *
+	 * <p>Il rifiuto e' una cortesia, non una difesa: un client modificato potrebbe aprire la
+	 * schermata comunque, e non servirebbe a niente perche' ogni azione dentro passa dal server.
+	 * Serve a non mostrare una finestra vuota di cui non si capisce il perche'.
+	 */
+	private static void open(Minecraft client, Unlock unlock, Supplier<Screen> screen) {
+		if (unlocked(client, unlock)) {
+			client.setScreenAndShow(screen.get());
+			return;
+		}
+
+		if (client.player != null) {
+			client.player.sendSystemMessage(unlock.refusal());
+		}
+	}
+
+	private static boolean unlocked(Minecraft client, Unlock unlock) {
+		PlayerQuests quests = client.player == null
+				? null
+				: client.player.getAttached(ModAttachments.QUESTS);
+
+		return quests != null && quests.has(unlock);
 	}
 
 	/** Il client manda solo l'intenzione: chi decide se si può fare è il server. */

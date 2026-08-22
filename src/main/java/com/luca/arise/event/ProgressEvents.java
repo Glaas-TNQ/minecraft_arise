@@ -9,6 +9,9 @@ import com.luca.arise.gem.GemManager;
 import com.luca.arise.gem.GemType;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.quest.Objective;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.shadow.ShadowEntity;
 import com.luca.arise.shadow.ShadowManager;
 
@@ -51,6 +54,15 @@ public final class ProgressEvents {
 			ServerPlayer player = resolveOwner(killer);
 
 			if (player != null) {
+				// L'uccisione conta per gli incarichi anche prima del risveglio: e' cosi' che si
+				// arriva al Sistema, non un premio che il Sistema concede.
+				QuestManager.advance(player, Objective.KILL);
+
+				// Prima del risveglio non si guadagna niente: non c'e' nessun Sistema che misuri.
+				if (!QuestManager.has(player, Unlock.SYSTEM)) {
+					return;
+				}
+
 				// Le gemme moltiplicano il bottino della singola uccisione: ametista l'XP, zaffiro
 				// i soul coin. Il tetto lo ha gia' applicato GemManager, qui si legge e basta.
 				long xp = Math.round(ProgressManager.xpFor(victim)

@@ -8,6 +8,8 @@ import com.luca.arise.config.SpawnConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.progress.Rank;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModEntities;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -107,6 +109,12 @@ public final class GateSpawner {
 	/** Un giocatore idoneo: nell'Overworld, vivo, e senza gia' troppi varchi attorno. */
 	private static boolean isEligible(ServerLevel level, ServerPlayer player) {
 		if (!level.dimension().equals(Level.OVERWORLD) || player.isSpectator() || player.isDeadOrDying()) {
+			return false;
+		}
+
+		// Chi non ha ancora ricevuto i Gate non deve vederne comparire: sarebbe una porta chiusa
+		// piantata in mezzo a un prato, e la prima cosa che si impara sarebbe un rifiuto.
+		if (!QuestManager.has(player, Unlock.GATES)) {
 			return false;
 		}
 
