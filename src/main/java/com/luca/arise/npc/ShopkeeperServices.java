@@ -44,8 +44,6 @@ public final class ShopkeeperServices {
 		MarketConfig market = AriseConfig.get().market();
 		boolean reverse = player.isShiftKeyDown();
 
-		QuestManager.advance(player, Objective.VISIT_MARKET);
-
 		switch (role) {
 			case BANKER -> bank(player, npc, market, reverse);
 			case GATE_BROKER -> broker(player, npc, market);

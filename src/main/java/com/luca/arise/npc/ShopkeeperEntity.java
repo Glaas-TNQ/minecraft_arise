@@ -1,6 +1,8 @@
 package com.luca.arise.npc;
 
 import com.luca.arise.fx.ModSounds;
+import com.luca.arise.quest.Objective;
+import com.luca.arise.quest.QuestManager;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -121,6 +123,12 @@ public class ShopkeeperEntity extends PathfinderMob implements Merchant {
 		}
 
 		Shopkeeper role = role();
+
+		// L'incarico del mercato avanza qui e non dentro i servizi: chi arriva in piazza clicca
+		// per prima cosa una bottega che vende, ed e' quella la cosa che gli e' stata chiesta.
+		// Contarlo solo per i quattro servizi voleva dire un compito che non si completa facendo
+		// esattamente quello che dice.
+		QuestManager.advance(server, Objective.VISIT_MARKET);
 
 		if (!role.merchant()) {
 			ShopkeeperServices.open(role, server, this);
