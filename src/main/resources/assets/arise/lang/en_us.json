@@ -266,5 +266,16 @@
   "arise.msg.shop.bought": "Bought: %1$s for %2$s soul coins.",
   "arise.msg.shop.refreshed": "Stock rerolled for %s soul coins.",
   "arise.msg.shop.header": "Abyss Shop: %1$s entries, reroll at %2$s soul coins, turns over in ~%3$s minutes.",
-  "arise.msg.shop.line": "%1$s — %2$s soul coins"
+  "arise.msg.shop.line": "%1$s — %2$s soul coins",
+  "arise.direction.n": "the north",
+  "arise.direction.ne": "the north-east",
+  "arise.direction.e": "the east",
+  "arise.direction.se": "the south-east",
+  "arise.direction.s": "the south",
+  "arise.direction.sw": "the south-west",
+  "arise.direction.w": "the west",
+  "arise.direction.nw": "the north-west",
+  "arise.msg.gate.spawned": "A rank %1$s gate opened about %2$s blocks to %3$s.",
+  "arise.msg.gate.spawn_forced": "Gate opened.",
+  "arise.msg.gate.spawn_failed": "No suitable spot nearby: try moving."
 }

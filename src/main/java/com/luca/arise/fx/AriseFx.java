@@ -231,6 +231,17 @@ public final class AriseFx {
 		play(level, position, ModSounds.GATE_OPEN, 0.7F, 1.3F);
 	}
 
+	/**
+	 * Il richiamo di un varco che si e' aperto lontano.
+	 *
+	 * <p>Suonato alla posizione di chi riceve l'avviso, non a quella del varco: a centocinquanta
+	 * blocchi non lo sentirebbe nessuno, e il punto e' proprio far alzare la testa. Chi passa di
+	 * li' lo sente insieme a lui, il che va benissimo — il varco e' li' per tutti.
+	 */
+	public static void gateVarcoDistant(ServerPlayer player) {
+		play(player.level(), player.position(), ModSounds.GATE_OPEN, SoundSource.AMBIENT, 0.35F, 0.6F);
+	}
+
 	// ---------------------------------------------------------------- l'Abyss Shop
 
 	/** La finestra del Sistema che si apre. Un tintinnio e nient'altro: non e' un evento del mondo. */

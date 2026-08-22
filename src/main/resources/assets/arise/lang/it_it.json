@@ -266,5 +266,16 @@
   "arise.msg.shop.bought": "Comprato: %1$s per %2$s soul coin.",
   "arise.msg.shop.refreshed": "Assortimento ritirato per %s soul coin.",
   "arise.msg.shop.header": "Abyss Shop: %1$s voci, ritiro a %2$s soul coin, cambia fra ~%3$s minuti.",
-  "arise.msg.shop.line": "%1$s — %2$s soul coin"
+  "arise.msg.shop.line": "%1$s — %2$s soul coin",
+  "arise.direction.n": "nord",
+  "arise.direction.ne": "nord-est",
+  "arise.direction.e": "est",
+  "arise.direction.se": "sud-est",
+  "arise.direction.s": "sud",
+  "arise.direction.sw": "sud-ovest",
+  "arise.direction.w": "ovest",
+  "arise.direction.nw": "nord-ovest",
+  "arise.msg.gate.spawned": "Un varco di rango %1$s si e' aperto a circa %2$s blocchi a %3$s.",
+  "arise.msg.gate.spawn_forced": "Varco aperto.",
+  "arise.msg.gate.spawn_failed": "Nessun posto adatto qui attorno: prova a spostarti."
 }

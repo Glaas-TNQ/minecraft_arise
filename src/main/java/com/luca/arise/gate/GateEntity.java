@@ -60,8 +60,18 @@ public class GateEntity extends Entity {
 	}
 
 	public void configure(GateOffer offer) {
+		configure(offer, AriseConfig.get().gates().offerLifetimeTicks());
+	}
+
+	/**
+	 * Come sopra, ma con una durata decisa da fuori.
+	 *
+	 * <p>Serve ai varchi spontanei: uno che si apre a centocinquanta blocchi deve dare il tempo di
+	 * arrivarci, mentre uno evocato davanti ai piedi con un comando no.
+	 */
+	public void configure(GateOffer offer, int lifetimeTicks) {
 		this.offer = offer;
-		this.remainingTicks = AriseConfig.get().gates().offerLifetimeTicks();
+		this.remainingTicks = lifetimeTicks;
 		this.setCustomName(Component.translatable("arise.gate.varco_name",
 				offer.rank().label(), offer.theme().label()));
 		this.setCustomNameVisible(true);

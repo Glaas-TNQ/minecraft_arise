@@ -7,6 +7,7 @@ import com.luca.arise.city.CityManager;
 import com.luca.arise.event.CityEvents;
 import com.luca.arise.config.GearConfig;
 import com.luca.arise.gate.GateManager;
+import com.luca.arise.gate.GateSpawner;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.GearRoll;
@@ -124,6 +125,9 @@ public final class AriseCommands {
 			}
 			gate.executes(context -> playerAction(context.getSource(),
 					player -> GateManager.offer(player, Rank.E)));
+			gate.then(Commands.literal("spawn")
+					.requires(AriseCommands::canCheat)
+					.executes(context -> playerAction(context.getSource(), GateSpawner::spawnNow)));
 			root.then(gate);
 
 			LiteralArgumentBuilder<CommandSourceStack> city = Commands.literal("city");

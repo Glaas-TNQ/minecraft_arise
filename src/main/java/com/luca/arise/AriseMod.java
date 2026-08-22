@@ -5,6 +5,7 @@ import com.luca.arise.config.AriseConfig;
 import com.luca.arise.event.CityEvents;
 import com.luca.arise.event.ProgressEvents;
 import com.luca.arise.fx.ModSounds;
+import com.luca.arise.gate.GateSpawner;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.network.ModPayloads;
 import com.luca.arise.registry.ModAttachments;
@@ -33,6 +34,7 @@ public class AriseMod implements ModInitializer {
 		ModPayloads.register();
 		ProgressEvents.register();
 		CityEvents.register();
+		GateSpawner.register();
 		AriseCommands.register();
 
 		LOGGER.info("Sistema inizializzato.");
