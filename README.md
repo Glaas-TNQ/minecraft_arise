@@ -31,6 +31,8 @@ esplorarli, viaggiare fra le città e le loro Associazioni dei Cacciatori.
 
 ## Come si costruisce
 
+**Windows** (PowerShell):
+
 ```powershell
 $env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-25.0.4.7-hotspot"
 .\gradlew.bat build        # compila e remappa il jar in build/libs/
@@ -38,7 +40,27 @@ $env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-25.0.4.7-hotspot"
 .\gradlew.bat runServer    # server di sviluppo
 ```
 
-Su Windows ci sono anche `avvia-client.bat` e `avvia-server.bat`, da doppio clic.
+**macOS e Linux**:
+
+```sh
+export JAVA_HOME=$(/usr/libexec/java_home -v 25)   # su macOS; altrove indica il tuo JDK 25
+./gradlew build
+./gradlew runClient
+./gradlew runServer
+```
+
+### Da doppio clic
+
+| | |
+|---|---|
+| Windows | `avvia-client.bat` · `avvia-server.bat` |
+| macOS | `avvia-client.command` · `avvia-server.command` |
+
+Su Linux gli stessi `.command` si lanciano da terminale con `./avvia-server.command`:
+dentro sono `sh` normale, l'estensione serve solo al Finder di macOS.
+
+Gli avviatori trovano Java da soli, e quello del server chiede una volta se accetti
+l'[EULA di Mojang](https://aka.ms/MinecraftEULA) — senza, un server non parte.
 
 ## Documentazione
 

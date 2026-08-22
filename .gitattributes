@@ -7,3 +7,9 @@
 # These are Windows script files and should use crlf
 *.bat           text eol=crlf
 
+# Gli avviatori di macOS e Linux sono script sh, e con i fine riga di Windows
+# lo shebang si porta dietro un ritorno a capo: il sistema cerca un interprete
+# che non esiste e risponde "bad interpreter". Qui si chiude la porta una volta
+# per tutte, qualunque sia la macchina su cui si scrive.
+*.command       text eol=lf
+*.sh            text eol=lf

@@ -33,6 +33,11 @@ $env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-25.0.4.7-hotspot"
 .\gradlew.bat --stop       # ferma il daemon se il build si comporta in modo strano
 ```
 
+Su macOS e Linux gli stessi comandi sono `./gradlew ...`, con
+`export JAVA_HOME=$(/usr/libexec/java_home -v 25)`. Gli avviatori da doppio clic sono
+`avvia-*.bat` su Windows e `avvia-*.command` altrove: fanno la stessa cosa e vanno
+tenuti allineati fra loro.
+
 Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con suffisso `-dev`).
 
 ---
