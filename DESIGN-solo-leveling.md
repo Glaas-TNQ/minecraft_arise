@@ -352,6 +352,62 @@ per viaggiare.
 
 ---
 
+## 9. Il risveglio e la catena degli incarichi
+
+Fino a qui si nasceva con tutto acceso. Il problema non era che fosse troppo: era che non c'era
+**nessun momento in cui qualcosa arrivava**. Una mod con nove sistemi e zero consegne.
+
+### 9.1 Il primo incarico non si può cercare
+
+Si comincia da persona qualunque: niente HUD, niente XP, niente soul coin. Prima del risveglio non
+esiste nessun Sistema che misuri, quindi uccidere non dà niente — ma **conta lo stesso** per la
+catena, perché è così che ci si arriva.
+
+Il risveglio si completa arrivando a un passo dalla morte. Si intercetta in `ALLOW_DEATH`, che è
+l'unico evento capace di dire *no, questa morte non avviene*: rianimare dopo il fatto sarebbe stato
+visibile — schermata di morte, inventario a terra, punto di respawn.
+
+### 9.2 Lo stato è un numero
+
+A che punto della lista si è arrivati, e quanto si è fatto dell'incarico corrente. Gli incarichi
+completati sono quelli prima dell'indice; i sistemi sbloccati sono quelli che quegli incarichi
+concedono. Nessun elenco di cose fatte, nessun insieme di permessi salvato a parte: **un solo numero
+non può entrare in contraddizione con se stesso**.
+
+Ne consegue che l'ordine di dichiarazione dell'enum *è* la catena, e che aggiungere un incarico in
+mezzo sposta tutti quelli dopo — accettabile, e molto meglio di un grafo di prerequisiti da tenere
+coerente.
+
+### 9.3 Ogni incarico apre un sistema
+
+| # | Incarico | Chiede | Apre |
+|---|---|---|---|
+| 1 | Il risveglio | arrivare a un passo dalla morte | il Sistema |
+| 2 | Primi passi | livello 3 | le statistiche |
+| 3 | Il conto dei caduti | 15 creature | l'esercito d'ombra |
+| 4 | La prima ombra | estrarne 1 | le abilità |
+| 5 | Il potere si usa | 3 abilità | l'equipaggiamento *(+ un pezzo di rango E)* |
+| 6 | Qualcosa addosso | indossarne 1 | i Gate |
+| 7 | Il primo varco | chiudere 1 Gate | l'Abyss Shop |
+| 8 | Il primo affare | comprare 1 voce | il viaggio fra Associazioni |
+| 9 | L'Associazione | metterci piede | le gemme *(+ un pezzo di rango D)* |
+
+L'incarico successivo parla quasi sempre del sistema appena concesso. È il modo più economico di
+insegnare una mod senza scrivere un tutorial.
+
+### 9.4 Chi sa cosa
+
+`QuestManager.advance` viene chiamato **da dentro il sistema che sa se l'azione è riuscita davvero**
+— estrarre lo dice `ShadowManager`, comprare lo dice `ShopManager`. `QuestManager.require` sta in
+cima a ogni gestore come guardiano. Nessun sistema sa quali incarichi esistono, e gli incarichi non
+sanno come funzionano i sistemi.
+
+Il rifiuto lato client, quando si preme un tasto per qualcosa che non si ha ancora, è una cortesia e
+non una difesa: un client modificato aprirebbe la schermata comunque, e non servirebbe a niente
+perché ogni azione dentro passa dal server.
+
+---
+
 ## Fonti
 
 - [Solo Leveling: Reawakening — CurseForge](https://www.curseforge.com/minecraft/mc-mods/solo-craft-reawakening) · [Modrinth](https://modrinth.com/project/YdsLXFph)

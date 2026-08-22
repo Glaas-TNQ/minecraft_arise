@@ -106,6 +106,12 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
    - **`String.format` usa la lingua di sistema**: su una macchina italiana `%.2f` scrive la
      virgola, quindi ogni trucco del tipo `.replace(".00", "")` non trova mai niente da tagliare.
      I decimali si tolgono guardando il numero, non la stringa.
+   - **`Screen.mouseClicked` è cambiato**: prende `(MouseButtonEvent, boolean doppioClick)`, non
+     più tre argomenti. Le coordinate stanno in `event.x()` e `event.y()`. `mouseScrolled` invece
+     ha ancora quattro `double`;
+   - `LocalPlayer` non ha `displayClientMessage`: sul client si usa `sendSystemMessage(Component)`;
+   - `GuiGraphicsExtractor` ha `enableScissor/disableScissor`, `outline`, `fillGradient` e
+     `setComponentTooltipForNextFrame`: liste che scorrono e riquadri si disegnano senza texture.
 3. **La compilazione non è una verifica.** Un sistema è "fatto" quando lo si è visto
    funzionare in `runClient`. Vale soprattutto per AI delle ombre, generazione dungeon e HUD.
 
@@ -182,5 +188,12 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
 - [ ] **B4** — Gemme e incastonature: cinque effetti passivi, estrazione al banco dell'Associazione
       — *compilato, da verificare*
 - [ ] **B5** — Bottino: i Gate lasciano pezzi, gemme e pergamene — *compilato, da verificare*
+- [ ] **C1** — Mondo già pronto: le Associazioni si tirano su alla prima entrata — *compilato, da
+      verificare*
+- [ ] **C2** — Bottino dai mob dentro i Gate — *compilato, da verificare*
+- [ ] **C3** — Telaio comune per le otto schermate: liste che scorrono, dettaglio a fianco, icone
+      disegnate nel codice — *compilato, da verificare*
+- [ ] **C4** — Il risveglio e la catena di nove incarichi che apre i sistemi uno alla volta —
+      *compilato, da verificare*
 
 Aggiorna questa lista quando una fase è **verificata in gioco**, non quando compila.
