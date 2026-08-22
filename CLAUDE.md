@@ -171,7 +171,25 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
      `textures/entity/player/wide/` (alex, ari, efe, kai, makena, noor, steve, sunny, zuri). Il
      modello e' `HumanoidModel` su un layer proprio, e il renderer `HumanoidMobRenderer`;
    - imbardata di Minecraft: **0 e' sud**, 90 ovest, 180 nord, 270 est. Vale per `snapTo` e per
-     `setYHeadRot`/`setYBodyRot`, che vanno impostati entrambi o l'entita' nasce col collo storto.
+     `setYHeadRot`/`setYBodyRot`, che vanno impostati entrambi o l'entita' nasce col collo storto;
+   - **costruire lontano dallo spawn: il costo sono i chunk, non i blocchi.** Un `setBlock` in un
+     chunk mai generato lo fa generare *sul thread del server*, e costa fra un decimo e mezzo
+     secondo. Un budget contato in blocchi non ne sa niente. Le tre regole, ognuna pagata con un
+     difetto vero:
+     1. **iterare per chunk**, non per colonne: per colonne si attraversano 32 chunk a passata, e
+        un solo tick ne toccava 190 — sessanta secondi, e il watchdog spegne il server;
+     2. **chiedere i chunk in anticipo** con
+        `ServerChunkCache.addTicketAndLoadWithRadius(TicketType, ChunkPos, raggio)` e saltare il
+        battito finche' `getChunkNow` risponde `null`. **`TicketType.UNKNOWN` non va**: ha un
+        timeout, e la chiamata lancia *"can expire before it loads, cannot fetch asynchronously"*.
+        `TicketType` e' un record con costruttore pubblico —
+        `new TicketType(TicketType.NO_TIMEOUT, TicketType.FLAG_LOADING)` carica senza simulare e
+        senza persistere. **I ticket vanno rimossi**, o si tiene in memoria mezzo mondo;
+     3. **fermarsi da soli** quando `server.getAverageTickTimeNanos()` e' gia' sopra il battito.
+   - **leggere l'altezza del terreno senza generarlo**: `level.getHeight(...)` pretende il chunk;
+     `level.getChunkSource().getGenerator().getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG,
+     level, randomState())` interroga il rumore e risponde subito. Venticinque campioni sparsi su
+     mezzo chilometro erano tredici secondi di server fermo.
 3. **La compilazione non è una verifica.** Un sistema è "fatto" quando lo si è visto
    funzionare in `runClient`. Vale soprattutto per AI delle ombre, generazione dungeon e HUD.
 

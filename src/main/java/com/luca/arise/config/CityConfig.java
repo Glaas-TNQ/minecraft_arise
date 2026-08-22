@@ -41,6 +41,18 @@ public record CityConfig(
 		/** Quanti blocchi si piazzano per battito del server. */
 		int blocksPerTick,
 		/**
+		 * Quanti millisecondi al massimo può durare un battito di costruzione.
+		 *
+		 * <p>È questo, e non {@code blocksPerTick}, la voce che tiene in piedi il server. Un blocco
+		 * che cade in un chunk mai generato non costa un blocco: costa un <em>chunk</em>, cioè fra
+		 * un decimo e mezzo secondo. Contare i blocchi non dice niente sul tempo, e un solo battito
+		 * da sessanta secondi fa dichiarare il server bloccato dal watchdog.
+		 *
+		 * <p>Otto millisecondi su cinquanta: la costruzione si prende un sesto del battito e lascia
+		 * il resto al gioco. Alzarlo velocizza le città e fa scattare tutto il resto.
+		 */
+		int msPerTick,
+		/**
 		 * Se le città si tirano su da sole la prima volta che qualcuno entra in un mondo.
 		 *
 		 * <p>Acceso di default: un mondo dove le cinque Associazioni non esistono è un mondo dove
@@ -52,7 +64,7 @@ public record CityConfig(
 		MarketConfig market) {
 
 	public static final CityConfig DEFAULT =
-			new CityConfig(200000, 200000, 15000, 512, 32, 6, 60000, true, MarketConfig.DEFAULT);
+			new CityConfig(200000, 200000, 15000, 512, 32, 6, 60000, 8, true, MarketConfig.DEFAULT);
 
 	public static final Codec<CityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.INT.fieldOf("origin_x").forGetter(CityConfig::originX),
@@ -62,6 +74,7 @@ public record CityConfig(
 			Codec.INT.fieldOf("block_size").forGetter(CityConfig::blockSize),
 			Codec.INT.fieldOf("road_width").forGetter(CityConfig::roadWidth),
 			Codec.INT.fieldOf("blocks_per_tick").forGetter(CityConfig::blocksPerTick),
+			Codec.INT.fieldOf("ms_per_tick").forGetter(CityConfig::msPerTick),
 			Codec.BOOL.fieldOf("auto_build").forGetter(CityConfig::autoBuild),
 			MarketConfig.CODEC.fieldOf("market").forGetter(CityConfig::market)
 	).apply(instance, CityConfig::new));

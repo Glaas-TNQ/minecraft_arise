@@ -389,9 +389,19 @@
   </div>
 
   <div class="notice">
+    <span class="tag">Verificato: le città nascono davvero da sole</span>
+    <p>Provato su cinque mondi nuovi con un server dedicato e <strong>nessun giocatore
+      collegato</strong>. Nove secondi dopo l'avvio: <span class="mono">Mondo nuovo: 5 città da
+      costruire</span>, poi <span class="mono">Costruzione di new_york avviata</span> e
+      l'avanzamento che sale da solo. Una città in circa quattro minuti in sottofondo.</p>
+    <p>La prima versione di questo blocco però <strong>uccideva il server</strong>: un tick da
+      sessanta secondi e il watchdog che dichiara la partita bloccata. La sezione 7 racconta cosa
+      c'era che non andava e cos'è cambiato.</p>
+  </div>
+
+  <div class="notice">
     <span class="tag">Non ancora verificato in gioco</span>
-    <p>Compila, il server di sviluppo si avvia senza un solo errore e la config si riscrive con le
-      voci nuove. Ma nessuno ha ancora <strong>cliccato una persona dietro un bancone</strong>: la
+    <p>Il mercato sì: nessuno ha ancora <strong>cliccato una persona dietro un bancone</strong>. La
       finestra di scambio, le nove skin e la catena degli incarichi si guardano solo con il client
       aperto. La sezione 6 è la lista di cosa controllare.</p>
   </div>
@@ -702,10 +712,76 @@
     </div>
   </section>
 
+  <section>
+    <h2><span class="step">7</span> Il difetto che si vedeva solo eseguendolo</h2>
+    <p class="kicker">Compilava, il server partiva, la config era giusta. E moriva al primo mondo
+      nuovo.</p>
+
+    <p>Costruire una città significa scrivere blocchi a <strong>duecentomila blocchi dallo
+      spawn</strong>, dove il mondo non esiste ancora. Ogni <code>setBlock</code> che cade in un
+      chunk mai visto lo fa <em>generare da zero</em> — rumore, superficie, caverne, strutture — e
+      quello costa fra un decimo e mezzo secondo. Contro un battito che ne dura cinquanta
+      millesimi.</p>
+
+    <p>Il costruttore contava i blocchi: sessantamila per battito. Ma sessantamila blocchi percorsi
+      per colonne attraversano <strong>centonovanta chunk vergini</strong>, e un budget contato in
+      blocchi non sa niente di quanto costa un chunk.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Sintomo misurato</th><th>Causa</th><th>Cosa è cambiato</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Server ucciso dal watchdog</b><br><span class="mono">un tick da 60 secondi</span></td>
+            <td>Il cursore percorreva i volumi per colonne, attraversando 32 chunk a passata</td>
+            <td>Si itera <b>per chunk</b>: finito tutto quello che cade in un 16×16, si passa al
+              successivo. E c'è una <b>scadenza in millisecondi</b>, non solo un budget di blocchi</td>
+          </tr>
+          <tr>
+            <td><b>«Can't keep up! 20-30 secondi indietro»</b><br><span class="mono">per tutti i primi minuti</span></td>
+            <td>I chunk venivano generati sul thread del server, uno sbarramento alla volta</td>
+            <td>Si <b>chiedono in anticipo</b> con un ticket e si salta il battito finché non
+              arrivano: il generatore lavora sul suo pool</td>
+          </tr>
+          <tr>
+            <td><b>Niente si muoveva</b><br><span class="mono">eccezione nel log</span></td>
+            <td><code>TicketType.UNKNOWN</code> ha un timeout, e il gioco rifiuta la richiesta
+              asincrona: <em>«can expire before it loads»</em></td>
+            <td>Un ticket nostro: <b>senza scadenza, che carica, che non simula e non
+              persiste</b></td>
+          </tr>
+          <tr>
+            <td><b>13 secondi fermi all'avvio</b></td>
+            <td>La quota della città si campionava con <code>level.getHeight</code>, che pretende
+              venticinque chunk generati</td>
+            <td><code>getBaseHeight</code>: si interroga il <b>rumore del generatore</b>, che
+              risponde senza costruire niente</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Cosa resta</span>
+      <p>Il server segnala ancora di essere in affanno a tratti mentre una città sale, e non è un
+        difetto che si possa togliere: mille chunk di generazione vanilla costano quello che
+        costano, e buona parte di quel lavoro Minecraft lo fa comunque sul thread principale. Il
+        cantiere adesso <strong>si ferma da solo</strong> quando il battito medio supera i quaranta
+        millesimi, quindi il server oscilla e recupera invece di annegare.</p>
+      <p>Le leve stanno in <code>cities</code>: <code>ms_per_tick</code> (8) è quanto tempo si
+        prende il cantiere a ogni battito, <code>size</code> (512) quanto è grande il lavoro, e
+        <code>auto_build</code> lo spegne del tutto.</p>
+    </div>
+  </section>
+
   <div class="verify">
     <span class="tag">Da verificare in gioco</span>
     <ul class="check">
-      <li>Un mondo nuovo comincia a costruire le cinque città da solo, senza che nessuno entri</li>
+      <li><s>Un mondo nuovo comincia a costruire le cinque città da solo, senza che nessuno
+        entri</s> — <b>verificato</b>: cinque città in coda nove secondi dopo l'avvio, ~4 minuti
+        l'una</li>
       <li>Le città sono visibilmente più grandi, e la piazza contiene nove edifici</li>
       <li>Dietro ogni bancone c'è una persona, con la sua skin e il suo nome sopra la testa</li>
       <li>Cliccare un mercante apre la finestra di scambio vanilla con i prezzi in monete</li>

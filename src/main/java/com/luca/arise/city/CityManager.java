@@ -23,7 +23,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -66,6 +68,20 @@ public final class CityManager {
 
 	/** Ogni quanti punti percentuali si dà notizia. */
 	private static final int ANNOUNCE_STEP = 10;
+
+	/**
+	 * Sopra quanti nanosecondi di battito medio il cantiere si ferma per un giro.
+	 *
+	 * <p>Quaranta millesimi su cinquanta. Non è bilanciamento, è una valvola: costruire una città
+	 * significa far generare mille chunk vergini, e buona parte di quel lavoro Minecraft la fa
+	 * comunque sul thread principale, per quanto lo si chieda in anticipo. Senza questa riga il
+	 * server passa i primi minuti di un mondo nuovo a dichiararsi sovraccarico.
+	 *
+	 * <p>L'effetto è un ciclo: si costruisce finché il server regge, ci si ferma quando arranca, e
+	 * la media si assesta appena sotto la soglia. La città ci mette un po' di più e il gioco resta
+	 * giocabile — che è il baratto giusto per qualcosa che succede in sottofondo.
+	 */
+	private static final long TICK_BUDGET_NANOS = 40_000_000L;
 
 	/**
 	 * Se il controllo di "mondo già pronto" è già stato fatto in questa sessione.
@@ -194,8 +210,14 @@ public final class CityManager {
 	 *
 	 * <p>Si campiona il terreno su una griglia di venticinque punti e si prende la media. Il solo
 	 * centro basterebbe se il mondo fosse piatto; con quattro angoli soli una collina in mezzo
-	 * sposta la media di parecchio. Su trecento blocchi di lato la differenza fra una città posata
-	 * bene e una mezza sepolta sta tutta qui.
+	 * sposta la media di parecchio. Su cinquecento blocchi di lato la differenza fra una città
+	 * posata bene e una mezza sepolta sta tutta qui.
+	 *
+	 * <p><strong>Si chiede al generatore, non al mondo.</strong> {@code level.getHeight} legge la
+	 * mappa delle altezze di un chunk, e per leggerla il chunk deve <em>esistere</em>: venticinque
+	 * campioni sparsi su mezzo chilometro erano venticinque chunk generati di colpo, cioè tredici
+	 * secondi di server fermo prima ancora di posare un blocco. {@code getBaseHeight} interroga il
+	 * rumore del generatore e risponde senza costruire niente.
 	 */
 	private static int groundLevel(ServerLevel level, CityConfig config, City city) {
 		int x0 = config.cityX(city);
@@ -204,9 +226,13 @@ public final class CityManager {
 		int sum = 0;
 		int samples = 0;
 
+		ChunkGenerator generator = level.getChunkSource().getGenerator();
+		RandomState randomState = level.getChunkSource().randomState();
+
 		for (int dx = 0; dx <= 4; dx++) {
 			for (int dz = 0; dz <= 4; dz++) {
-				sum += level.getHeight(Heightmap.Types.WORLD_SURFACE, x0 + dx * step, z0 + dz * step);
+				sum += generator.getBaseHeight(x0 + dx * step, z0 + dz * step,
+						Heightmap.Types.WORLD_SURFACE_WG, level, randomState);
 				samples++;
 			}
 		}
@@ -225,11 +251,21 @@ public final class CityManager {
 			start(server, QUEUE.poll());
 		}
 
-		int budget = AriseConfig.get().cities().blocksPerTick();
+		// Il server è già in affanno: questo giro si salta. Vedi TICK_BUDGET_NANOS.
+		if (server.getAverageTickTimeNanos() > TICK_BUDGET_NANOS) {
+			return;
+		}
+
+		CityConfig config = AriseConfig.get().cities();
+		int budget = config.blocksPerTick();
+
+		// La scadenza si calcola qui e vale per il battito intero: se un giorno si costruissero due
+		// città insieme, si spartirebbero la stessa fetta invece di prendersene una a testa.
+		long deadline = System.nanoTime() + Math.max(1, config.msPerTick()) * 1_000_000L;
 
 		for (City city : List.copyOf(RUNNING.keySet())) {
 			CityBuild build = RUNNING.get(city);
-			boolean finished = build.advance(budget);
+			boolean finished = build.advance(budget, deadline);
 
 			if (finished) {
 				complete(server, build);
