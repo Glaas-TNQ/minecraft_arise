@@ -1,0 +1,499 @@
+<title>Comando dell'Esercito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  /* ---------- intestazione ---------- */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(79,195,247,0.06), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst {
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  .status-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+  }
+
+  .chip.ok { color: var(--good); border-color: rgba(127,217,127,0.35); }
+  .chip.todo { color: var(--warn); border-color: rgba(232,166,79,0.35); }
+
+  /* ---------- sezioni ---------- */
+
+  section { margin-top: 56px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 24px;
+    letter-spacing: 0.01em;
+    margin: 0 0 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  h2 .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 17px;
+    margin: 28px 0 6px;
+    color: var(--text);
+  }
+
+  p { margin: 12px 0; max-width: 68ch; }
+  p.lede { color: var(--muted); }
+
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--muted); font-style: italic; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    padding: 1px 5px;
+    color: var(--accent);
+  }
+
+  /* ---------- blocchi comando ---------- */
+
+  /* Filo superiore, come il riquadro del Sistema in gioco: è il segno di questa mod. */
+  .commands {
+    margin: 18px 0;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: var(--panel-soft);
+    overflow-x: auto;
+  }
+
+  .commands pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.9;
+    margin: 0;
+    padding: 16px 20px;
+    color: var(--text);
+  }
+
+  .commands .cmt { color: var(--muted); }
+  .commands .key { color: var(--gold); }
+
+  /* ---------- griglia funzioni ---------- */
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-top: 20px;
+  }
+
+  .feature {
+    background: var(--panel-soft);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .feature .name {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .feature .cost {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gold);
+  }
+
+  .feature .what {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* ---------- posture ---------- */
+
+  .stances { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 20px; }
+  .stance { background: var(--panel-soft); padding: 16px 20px; display: grid; grid-template-columns: 120px 1fr; gap: 16px; align-items: baseline; }
+  .stance .label { font-family: var(--display); font-weight: 600; font-size: 15px; }
+  .stance .desc { color: var(--muted); font-size: 14px; }
+  .stance.aggr .label { color: var(--bad); }
+  .stance.def .label { color: var(--accent); }
+  .stance.pas .label { color: var(--muted); }
+
+  /* ---------- tabella test ---------- */
+
+  .table-scroll { overflow-x: auto; margin-top: 20px; border: 1px solid var(--line); }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 640px;
+    font-size: 14.5px;
+  }
+
+  thead th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+    text-align: left;
+    padding: 12px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+    background: var(--panel-soft);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  td.num {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    width: 44px;
+    white-space: nowrap;
+  }
+
+  td.expect { color: var(--muted); }
+
+  tr.critical td { background: rgba(79,195,247,0.05); }
+  tr.critical td.num { color: var(--gold); }
+
+  /* ---------- avvisi ---------- */
+
+  .note {
+    margin-top: 22px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+
+  .note .title {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--warn);
+    margin-bottom: 4px;
+  }
+
+  .note p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .note p + p { margin-top: 8px; }
+
+  .risks { margin-top: 20px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .risk { background: var(--panel-soft); padding: 15px 20px; display: grid; grid-template-columns: 28px 1fr; gap: 14px; }
+  .risk .rank { font-family: var(--mono); color: var(--warn); font-size: 13px; }
+  .risk .body { font-size: 14.5px; color: var(--muted); }
+  .risk .body b { color: var(--text); font-weight: 600; }
+
+  /* ---------- config ---------- */
+
+  dl.config { margin: 20px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  dl.config dt { font-family: var(--mono); font-size: 13px; color: var(--accent); background: var(--panel); padding: 11px 16px; white-space: nowrap; }
+  dl.config dd { margin: 0; padding: 11px 16px; background: var(--panel-soft); color: var(--muted); font-size: 14px; }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+
+  @media (max-width: 620px) {
+    .stance { grid-template-columns: 1fr; gap: 4px; }
+    .wrap { padding: 36px 16px 72px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocco 5</p>
+    <h1>Comando dell'Esercito</h1>
+    <p class="standfirst">Le ombre ora combattono davvero, obbediscono a una postura, e si possono rinominare, colorare, potenziare o congedare pagando in soul coin. Più un'arena istantanea per provarle.</p>
+    <div class="status-row">
+      <span class="chip ok">F1 · F2 · F3 verificate</span>
+      <span class="chip todo">F4 da verificare</span>
+      <span class="chip todo">Blocco 5 da verificare</span>
+      <span class="chip">build verde</span>
+      <span class="chip">F5 Gate rimandata</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Il bug delle ombre <span class="tag">correzione</span></h2>
+    <p>Avevi ragione, e non è un dettaglio: era il difetto peggiore possibile in una mod il cui punto è avere un esercito.</p>
+    <p><strong>Non ho la certezza della causa originale</strong>, e preferisco dirtelo invece di raccontarti una diagnosi che non ho fatto. I goal vanilla che usavo — <code>OwnerHurtByTargetGoal</code> e <code>OwnerHurtTargetGoal</code> — reagiscono <em>solo nell'istante del colpo</em>: se il mob ti sta puntando ma non ti ha ancora toccato, o se cambia bersaglio, le ombre restano ferme a guardare. Sono goal pensati per i lupi, che stanno addosso al padrone in un mondo dove i combattimenti durano due secondi.</p>
+    <p>La correzione non è una toppa su quei goal: ho aggiunto un <strong>bersagliamento attivo</strong> che decide da sé chi ingaggiare, in base alla postura. Funziona a prescindere da quale fosse la causa esatta di prima, ed è anche il modo giusto di darti il controllo che chiedevi.</p>
+
+    <div class="stances">
+      <div class="stance aggr">
+        <div class="label">Aggressiva</div>
+        <div class="desc">Attaccano ogni ostile nel raggio, senza aspettare che tu faccia niente.</div>
+      </div>
+      <div class="stance def">
+        <div class="label">Difensiva</div>
+        <div class="desc">Ingaggiano chiunque <em>ti stia prendendo di mira</em> — anche prima che il colpo arrivi — oltre a chi ti colpisce e a chi colpisci tu. È il default, ed è la lettura corretta di "attaccano quando vengo attaccato".</div>
+      </div>
+      <div class="stance pas">
+        <div class="label">Passiva</div>
+        <div class="desc">Non attaccano nessuno, ti seguono e basta. Passando a passiva mollano subito il bersaglio che avevano, invece di finire lo scontro in corso.</div>
+      </div>
+    </div>
+
+    <p>Si cicla con <code>B</code> oppure con <code>/arise stance aggressive|defensive|passive</code>. La postura corrente è nell'HUD e vale per tutto l'esercito: nel mezzo di uno scontro serve un comando solo, non un pannello.</p>
+  </section>
+
+  <section>
+    <h2>Soul coin <span class="tag">valuta</span></h2>
+    <p>Ogni nemico ucciso lascia soul coin, in proporzione alla sua vita massima: <strong>1 fisso + 0,25 per punto di vita</strong>. Un pollo ne vale 2, uno zombie 6, un golem di ferro 26. Il saldo è nell'HUD e con <code>/arise souls</code>.</p>
+    <p class="lede">Si spendono sulle singole ombre, dalla schermata di dettaglio (<code>J</code>, poi il bottone <code>…</code> sulla riga).</p>
+
+    <div class="features">
+      <div class="feature">
+        <div class="name">Rinomina</div>
+        <div class="cost">20 soul coin</div>
+        <div class="what">Il nome sostituisce "Ombra di Zombie" ovunque: lista, targhetta sopra la testa, messaggi. Massimo 32 caratteri.</div>
+      </div>
+      <div class="feature">
+        <div class="name">Ricolora</div>
+        <div class="cost">30 soul coin</div>
+        <div class="what">Otto colori. La tinta moltiplica la texture, che è quasi nera: l'ombra resta un'ombra, ma riconoscibile in mezzo alle altre.</div>
+      </div>
+      <div class="feature">
+        <div class="name">Potenzia</div>
+        <div class="cost">50 + 25 per livello</div>
+        <div class="what">Un livello subito, senza combattere. Se l'ombra è già evocata, i suoi attributi si aggiornano all'istante.</div>
+      </div>
+      <div class="feature">
+        <div class="name">Congeda</div>
+        <div class="cost">rimborso 25%</div>
+        <div class="what">La rimuove dall'esercito e restituisce un quarto del valore, potenziamenti pagati inclusi. Libera un posto.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Arena <span class="tag">strumento</span></h2>
+    <p><code>/arise arena</code> costruisce un quadrato di 50×50 attorno a te, ovunque tu sia: pavimento in deepslate levigato, muri alti 8 con lanterne, e venti blocchi di aria puliti sopra. <code>/arise arena 80</code> per un lato diverso (da 8 a 128).</p>
+    <p>Sostituisce il terreno senza chiedere conferma, come <code>/fill</code>. È un comando da gamemaster, ma se lo lanci in mezzo a una tua costruzione te la mangia — <strong>non c'è annulla</strong>.</p>
+  </section>
+
+  <section>
+    <h2>Da testare <span class="tag">checklist</span></h2>
+    <p>Preparazione, da incollare in chat:</p>
+
+    <div class="commands">
+<pre><span class="cmt"># azzera l'esercito vecchio: le ombre di F3 hanno livelli incoerenti</span>
+/arise shadows clear
+/arise level 20
+/arise souls add 500
+/arise gear
+/gamemode survival
+/arise arena
+/arise spawn zombie 6</pre>
+    </div>
+
+    <p class="lede">I tasti: <code>K</code> stato · <code>J</code> esercito · <code>R</code> arise · <code>G</code> evoca · <code>H</code> richiama · <code>B</code> postura.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Cosa fare</th><th>Cosa deve succedere</th></tr>
+        </thead>
+        <tbody>
+          <tr class="critical">
+            <td class="num">1</td>
+            <td>Con postura <strong>difensiva</strong>, evoca ed esci allo scoperto: lascia che uno zombie ti punti</td>
+            <td class="expect">Le ombre gli vanno addosso <em>prima</em> che ti colpisca. È il test del bug: se falliscono qui, tutto il resto conta poco</td>
+          </tr>
+          <tr class="critical">
+            <td class="num">2</td>
+            <td>Premi <code>B</code> fino ad <strong>aggressiva</strong>, poi spawna mob a distanza</td>
+            <td class="expect">Partono all'attacco da sole, senza che tu faccia nulla</td>
+          </tr>
+          <tr class="critical">
+            <td class="num">3</td>
+            <td>Premi <code>B</code> fino a <strong>passiva</strong> durante uno scontro</td>
+            <td class="expect">Mollano il bersaglio subito e tornano a seguirti, anche se erano già ingaggiate</td>
+          </tr>
+          <tr><td class="num">4</td><td>Uccidi qualche mob e guarda l'HUD</td><td class="expect">Il contatore dei soul coin sale; il riquadro mostra anche la postura</td></tr>
+          <tr><td class="num">5</td><td><code>J</code>, poi <code>…</code> su una riga</td><td class="expect">Si apre il dettaglio: rango, statistiche, campo nome, otto colori, potenzia, congeda</td></tr>
+          <tr><td class="num">6</td><td>Scrivi un nome e premi <strong>Rinomina</strong></td><td class="expect">−20 soul coin; il nuovo nome compare nella lista e sopra la testa dell'ombra evocata</td></tr>
+          <tr><td class="num">7</td><td>Scegli un colore</td><td class="expect">−30 soul coin; l'ombra <em>già evocata</em> cambia tinta senza bisogno di richiamarla, e la pastiglia a inizio riga si aggiorna</td></tr>
+          <tr><td class="num">8</td><td><strong>Potenzia</strong> due o tre volte</td><td class="expect">Il livello sale, HP e danno crescono dell'8% ciascuno, il costo aumenta di 25 ogni volta</td></tr>
+          <tr><td class="num">9</td><td>Svuota il portafogli e riprova</td><td class="expect">Il bottone Potenzia è grigio; se forzi, il messaggio dice quanto serve e quanto hai</td></tr>
+          <tr><td class="num">10</td><td><strong>Congeda</strong> un'ombra potenziata</td><td class="expect">Sparisce dall'esercito, torna un quarto del valore, e se era evocata viene richiamata prima</td></tr>
+          <tr><td class="num">11</td><td>Congeda l'ombra mentre ne hai aperto il dettaglio</td><td class="expect">La schermata si chiude da sola invece di mostrare dati fantasma</td></tr>
+          <tr><td class="num">12</td><td><code>/arise arena 30</code> in un posto qualsiasi</td><td class="expect">Arena più piccola, muri e lanterne, nessun blocco a mezz'aria dentro</td></tr>
+          <tr><td class="num">13</td><td>Esci dal mondo e rientra</td><td class="expect">Soul coin, nomi, colori e livelli comprati sono tutti intatti; la postura pure</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <div class="title">Il blocco <code>shadows</code> nella config, finalmente</div>
+      <p>La correzione di ieri entra in vigore adesso: al primo avvio <code>run/config/arise.json</code> si riscrive completo, con <code>shadows</code>, <code>leveling</code>, <code>costs</code> e le soglie dei ranghi. I valori che avessi già cambiato sopravvivono.</p>
+      <p>Se durante il test qualcosa è tarato male — ranghi troppo bassi, crescita troppo lenta, costi fuori scala — stavolta puoi toccarli tu senza ricompilare.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Dove mi aspetto problemi <span class="tag">in ordine</span></h2>
+    <div class="risks">
+      <div class="risk">
+        <span class="rank">01</span>
+        <span class="body"><b>Il bersagliamento in difensiva.</b> Riconosco un mob che ti punta leggendo il suo bersaglio corrente. Alcuni mob scelgono il bersaglio in modo diverso — i creeper, i ragni di giorno — e potrebbero non risultare mai "ostili verso di te". Se in difensiva restano passive con qualche mob specifico, è questo.</span>
+      </div>
+      <div class="risk">
+        <span class="rank">02</span>
+        <span class="body"><b>La tinta del modello.</b> È la prima volta che tocco <code>getModelTint</code> con uno stato di render mio. Se le ombre diventano invisibili, bianche o non cambiano affatto colore, è lì.</span>
+      </div>
+      <div class="risk">
+        <span class="rank">03</span>
+        <span class="body"><b>Il campo di testo.</b> Ogni volta che i dati cambiano ricostruisco i widget, e conservo a mano quello che stavi scrivendo. Se il nome si cancella da solo mentre digiti, quella conservazione non basta.</span>
+      </div>
+      <div class="risk">
+        <span class="rank">04</span>
+        <span class="body"><b>L'arena su terreno molto irregolare.</b> Scavo verso l'alto dai tuoi piedi: su un fianco di montagna una parte resterà dentro la roccia.</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Riferimento <span class="tag">comandi e config</span></h2>
+
+    <h3>Comandi nuovi</h3>
+    <dl class="config">
+      <dt>/arise arena [lato]</dt><dd>Arena quadrata attorno a te. Default 50, da 8 a 128</dd>
+      <dt>/arise stance [postura]</dt><dd>Senza argomento cicla; con argomento imposta aggressive, defensive o passive</dd>
+      <dt>/arise souls</dt><dd>Mostra il saldo</dd>
+      <dt>/arise souls add &lt;n&gt;</dt><dd>Accredita soul coin — gamemaster</dd>
+      <dt>/arise gear [tier]</dt><dd>iron, diamond o netherite. Include cibo e mele d'oro</dd>
+      <dt>/arise spawn &lt;tipo&gt; [n]</dt><dd>Mob in cerchio attorno a te, fino a 64</dd>
+    </dl>
+
+    <h3>Nuovi parametri in <code>config/arise.json</code></h3>
+    <dl class="config">
+      <dt>souls_flat_per_kill</dt><dd>Soul coin fissi per uccisione — default 1</dd>
+      <dt>souls_per_mob_max_health</dt><dd>Soul coin per punto di vita del nemico — default 0,25</dd>
+      <dt>shadows.costs.upgrade_base</dt><dd>Costo del primo potenziamento — default 50</dd>
+      <dt>shadows.costs.upgrade_per_level</dt><dd>Quanto cresce a ogni livello — default 25</dd>
+      <dt>shadows.costs.rename</dt><dd>Default 20</dd>
+      <dt>shadows.costs.recolor</dt><dd>Default 30</dd>
+      <dt>shadows.costs.dismiss_refund</dt><dd>Quota restituita congedando — default 0,25</dd>
+    </dl>
+  </section>
+
+  <footer>
+    <p><strong>I Gate (F5) sono rimandati al prossimo blocco.</strong> Avevo iniziato: dimensione custom, generazione procedurale delle stanze, boss. Ho messo tutto da parte quando è arrivata la segnalazione del bug — costruire i dungeon sopra un esercito che non combatte non aveva senso. La ricerca fatta resta valida: in 26.2 <code>DimensionType</code> ha campi nuovi (skybox, timeline, attributi ambientali) e il suo JSON non si scrive a memoria, quindi la dimensione riuserà un tipo vanilla.</p>
+  </footer>
+
+</div>

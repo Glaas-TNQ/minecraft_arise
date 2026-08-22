@@ -1,0 +1,462 @@
+<title>Ombre vere</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(142,107,255,0.08), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst { color: var(--muted); max-width: 62ch; margin: 0; }
+  .status-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+  }
+  .chip.ok { color: var(--good); border-color: rgba(127,217,127,0.35); }
+  .chip.todo { color: var(--warn); border-color: rgba(232,166,79,0.35); }
+
+  section { margin-top: 56px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0 0 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  h2 .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+  }
+
+  h3 { font-family: var(--display); font-weight: 600; font-size: 17px; margin: 28px 0 6px; }
+
+  p { margin: 12px 0; max-width: 68ch; }
+  p.lede { color: var(--muted); }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--muted); font-style: italic; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    padding: 1px 5px;
+    color: var(--accent);
+  }
+
+  .commands {
+    margin: 18px 0;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: var(--panel-soft);
+    overflow-x: auto;
+  }
+
+  .commands pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.9;
+    margin: 0;
+    padding: 16px 20px;
+    color: var(--text);
+  }
+  .commands .cmt { color: var(--muted); }
+
+  /* ---- i quattro strati dell'aspetto ---- */
+
+  .layers { margin-top: 22px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+
+  .layer {
+    background: var(--panel-soft);
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    gap: 18px;
+    align-items: start;
+  }
+
+  .layer .slot {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--violet);
+    background: var(--panel);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--violet);
+  }
+
+  .layer .name { font-family: var(--display); font-weight: 600; font-size: 16px; margin-bottom: 2px; }
+  .layer .what { font-size: 14.5px; color: var(--muted); line-height: 1.55; }
+
+  .layer .meta {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+    line-height: 1.9;
+  }
+  .layer .meta .key { color: var(--accent); }
+
+  .table-scroll { overflow-x: auto; margin-top: 20px; border: 1px solid var(--line); }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14.5px; }
+
+  thead th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+    text-align: left;
+    padding: 12px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  tbody td { padding: 13px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; background: var(--panel-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--accent); width: 44px; }
+  td.expect { color: var(--muted); }
+  td.id { font-family: var(--mono); font-size: 12.5px; color: var(--violet); white-space: nowrap; }
+  td.src { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+  tr.critical td { background: rgba(79,195,247,0.05); }
+  tr.critical td.num { color: var(--gold); }
+
+  .note {
+    margin-top: 22px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .note .title { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--warn); margin-bottom: 4px; }
+  .note p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .note p + p { margin-top: 8px; }
+
+  .risks { margin-top: 20px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .risk { background: var(--panel-soft); padding: 15px 20px; display: grid; grid-template-columns: 28px 1fr; gap: 14px; }
+  .risk .rank { font-family: var(--mono); color: var(--warn); font-size: 13px; }
+  .risk .body { font-size: 14.5px; color: var(--muted); }
+  .risk .body b { color: var(--text); font-weight: 600; }
+
+  dl.config { margin: 20px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  dl.config dt { font-family: var(--mono); font-size: 13px; color: var(--accent); background: var(--panel); padding: 11px 16px; white-space: nowrap; }
+  dl.config dd { margin: 0; padding: 11px 16px; background: var(--panel-soft); color: var(--muted); font-size: 14px; }
+
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 36px 16px 72px; }
+    .layer { grid-template-columns: 40px 1fr; }
+    .layer .meta { grid-column: 2; text-align: left; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · F7 rifinitura</p>
+    <h1>Ombre vere</h1>
+    <p class="standfirst">Fino a ieri l'esercito era uno zombie ridipinto di nero e ogni momento della mod suonava come un altro. Ora l'ombra è translucida, incurvata e circondata dalla sua aura, e la mod ha sedici suoni suoi con i sottotitoli tradotti.</p>
+    <div class="status-row">
+      <span class="chip ok">F1–F5 verificate</span>
+      <span class="chip todo">F6 da verificare</span>
+      <span class="chip todo">F7 da verificare</span>
+      <span class="chip">build verde</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>L'aspetto <span class="tag">quattro strati</span></h2>
+    <p class="lede">Nessuno dei quattro, da solo, basterebbe. È la somma che smette di sembrare un mob colorato.</p>
+
+    <div class="layers">
+      <div class="layer">
+        <div class="slot">01</div>
+        <div>
+          <div class="name">Materiale translucido</div>
+          <div class="what">È il cambiamento che si nota per primo: attraverso l'ombra si vede quello che c'è dietro. Non era possibile prima perché riusavo il modello dello zombie, che arriva già legato al suo materiale opaco. Ora il modello è nostro e dichiara il materiale translucido, così il canale alfa della tinta diventa trasparenza vera.</div>
+        </div>
+        <div class="meta"><span class="key">72%</span><br>opaca</div>
+      </div>
+
+      <div class="layer">
+        <div class="slot">02</div>
+        <div>
+          <div class="name">Proporzione</div>
+          <div class="what">Più alta dell'8% e più stretta del 12% di una persona. È la cosa che si legge da lontano, prima del colore: una figura che non ha le proporzioni giuste mette a disagio anche quando non si sa dire perché. Tocca solo il disegno — l'ingombro fisico resta quello di prima, quindi passa esattamente dove passava.</div>
+        </div>
+        <div class="meta"><span class="key">×1.08</span><br>in altezza</div>
+      </div>
+
+      <div class="layer">
+        <div class="slot">03</div>
+        <div>
+          <div class="name">Postura</div>
+          <div class="what">Curva in avanti sulle spalle, con la testa che compensa e resta dritta a guardarti — e un respiro lento che la fa oscillare da ferma. Poco, di proposito: di più sembra ferita invece che minacciosa.</div>
+        </div>
+        <div class="meta"><span class="key">7°</span><br>di curvatura</div>
+      </div>
+
+      <div class="layer">
+        <div class="slot">04</div>
+        <div>
+          <div class="name">Aura</div>
+          <div class="what">Polvere del <em>suo</em> colore che le sale attorno di continuo. È il motivo per cui rinominare e ricolorare le ombre ha finalmente senso: in mezzo alla mischia distingui la tua veterana rossa dalle altre senza leggere niente.</div>
+        </div>
+        <div class="meta"><span class="key">1 ogni 3</span><br>tick</div>
+      </div>
+    </div>
+
+    <p>Le proporzioni restano umanoidi e la texture resta una skin <strong>64×64 standard</strong>. Non è pigrizia: significa che chiunque può dare un aspetto diverso al proprio esercito disegnandola come una skin qualsiasi, senza sapere niente di modelli 3D.</p>
+
+    <div class="note">
+      <div class="title">L'aura la disegna il client, non il server</div>
+      <p>Con l'esercito fuori e una particella ogni tre tick, farla generare al server sarebbero decine di pacchetti al secondo per delle particelle puramente decorative. Sono l'unico effetto della mod che il server non sa nemmeno che esiste — e l'unico motivo per cui le voci <code>fx</code> della config valgono sul <em>tuo</em> client e non su chi ospita la partita.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>La voce <span class="tag">16 suoni</span></h2>
+    <p>La mod ora registra i suoi eventi sonori nel namespace <code>arise</code>. Tre cose che prima non si potevano fare: il <strong>sottotitolo è tradotto</strong> (chi gioca coi sottotitoli legge "Un'ombra si leva", non "Il Warden emerge"), ogni suono si prova con <code>/playsound</code>, e i volumi e i toni stanno tutti in un file solo invece che sparsi nei gestori.</p>
+    <p>I file <code>.ogg</code> veri non ci sono ancora, quindi le voci puntano a quelli di Minecraft. <strong>Non è una scorciatoia da nascondere:</strong> nessun asset generato, nessun file binario aggiunto al progetto, e il giorno in cui ci sarà un suono registrato davvero si mette in <code>assets/arise/sounds/</code> e si cambia <em>una riga</em> — nessuna riga di codice da toccare.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Evento</th><th>Quando</th><th>Sorgente vanilla</th></tr></thead>
+        <tbody>
+          <tr><td class="id">shadow.arise</td><td>L'estrazione riesce</td><td class="src">warden/emerge</td></tr>
+          <tr><td class="id">shadow.refused</td><td>L'estrazione fallisce</td><td class="src">warden/listening</td></tr>
+          <tr><td class="id">shadow.summon</td><td>Evocazione</td><td class="src">evoker/prepare_summon</td></tr>
+          <tr><td class="id">shadow.recall</td><td>Richiamo</td><td class="src">respawn_anchor/deplete</td></tr>
+          <tr><td class="id">shadow.ambient</td><td>Respiro, ogni 12 s circa</td><td class="src">warden/tendril_clicks</td></tr>
+          <tr><td class="id">shadow.hurt</td><td>L'ombra incassa</td><td class="src">allay/hurt</td></tr>
+          <tr><td class="id">shadow.death</td><td>L'ombra cade</td><td class="src">vex/death</td></tr>
+          <tr><td class="id">system.level_up</td><td>Sali di livello</td><td class="src">beacon/activate</td></tr>
+          <tr><td class="id">system.rank_up</td><td>Un'ombra cambia rango</td><td class="src">vault/activate</td></tr>
+          <tr><td class="id">gate.open</td><td>Entri in un Gate</td><td class="src">portal/trigger</td></tr>
+          <tr><td class="id">gate.ambience</td><td>Battito lontano, esplorando</td><td class="src">warden/heartbeat</td></tr>
+          <tr><td class="id">gate.boss</td><td>Arrivi alla stanza del boss</td><td class="src">wither/spawn</td></tr>
+          <tr><td class="id">gate.clear</td><td>Gate completato</td><td class="src">totem/use_totem</td></tr>
+          <tr><td class="id">ability.cast</td><td>Passo e Scambio d'ombra</td><td class="src">evoker/cast</td></tr>
+          <tr><td class="id">ability.domain</td><td>Dominio del Monarca</td><td class="src">conduit/activate</td></tr>
+          <tr><td class="id">ability.authority</td><td>Autorità del Sovrano</td><td class="src">warden/sonic_boom</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Gli effetti <span class="tag">forme, non nuvole</span></h2>
+    <p>Prima ogni particellare della mod era una nuvola casuale: cambiava il tipo di particella, non la forma. Ora ci sono quattro primitive — <strong>anello, colonna, spirale e cupola</strong> — e ogni momento del gioco ne compone una sua.</p>
+    <p class="lede">Il trucco che le rende possibili: chiedendo al server <em>zero</em> particelle, i tre numeri che di solito sono la dispersione diventano il vettore velocità di una singola particella. Si passa dal "spargine venti a caso in quel cubo" al "mettine una qui, che vada in quella direzione".</p>
+
+    <h3>Cosa si vede, adesso</h3>
+    <p>L'estrazione è diventata un rituale in due tempi: una spirale che si stringe salendo mentre tendi la mano, e <em>poi</em> l'esito — colonna nel colore del rango se riesce, fumo che si spegne se no. L'evocazione ha un anello che si chiude verso il centro; il richiamo lo stesso anello che implode. Un'ombra che cade si sfalda verso l'alto invece di sparire, perché non muore davvero: torna nell'esercito.</p>
+    <p>La salita di livello ha la sua colonna dorata con l'anello azzurro del Sistema. Il Dominio disegna una <strong>cupola</strong> vera attorno a te, con i punti distribuiti in modo uniforme sulla semisfera. L'Autorità è un'onda che si allarga a terra in quattro passaggi fino ai 12 blocchi esatti che dichiara — così vedi il raggio invece di indovinarlo.</p>
+
+    <h3>Una fanfara solo quando serve</h3>
+    <p>Un'ombra sale di livello spesso, di rango raramente. Se i due momenti suonassero uguali, il secondo — che è quello che conta — passerebbe inosservato. Il livello ha uno scintillio breve; il <strong>cambio di rango</strong> ha l'anello del colore nuovo e la sua fanfara. Vale anche quando potenzi a pagamento dalla schermata dell'esercito.</p>
+  </section>
+
+  <section>
+    <h2>Il Gate respira <span class="tag">nuovo</span></h2>
+    <p>Due cose che non si potevano fare al momento della generazione, perché succedono nel tempo e non nello spazio.</p>
+    <p><strong>L'entrata in scena del boss</strong> ora scatta quando ci arrivi tu, non quando il Gate viene costruito: avvicinandoti alla stanza finale senti il verso e vedi la colonna del colore del rango, e ricevi il messaggio. Costruire il dungeon e suonarla subito significava sprecarla su stanze vuote a migliaia di blocchi da te.</p>
+    <p><strong>Il battito d'ambiente</strong> arriva ogni tanto mentre esplori, con un tono leggermente diverso ogni volta perché non diventi un metronomo. Un dungeon silenzioso sembra una stanza vuota.</p>
+  </section>
+
+  <section>
+    <h2>Da testare <span class="tag">checklist</span></h2>
+
+    <p>Il comando nuovo è <code>/arise fx &lt;effetto&gt;</code>: spara qualunque effetto addosso a te, subito, senza cercare il mob giusto e sperare che l'estrazione riesca. Serve a guardare, correggere un numero in config e riguardare.</p>
+
+    <div class="commands">
+<pre><span class="cmt"># preparazione</span>
+/arise level 30
+/arise souls add 1000
+/arise arena
+/arise spawn zombie 8
+
+<span class="cmt"># tutti gli effetti, uno per uno</span>
+/arise fx arise        <span class="cmt"># rituale + estrazione riuscita</span>
+/arise fx arise_fail
+/arise fx summon
+/arise fx recall
+/arise fx fallen
+/arise fx level_up
+/arise fx rank_up
+/arise fx gate_open
+/arise fx gate_ambience
+/arise fx gate_boss
+/arise fx gate_clear
+/arise fx dash
+/arise fx exchange
+/arise fx domain
+/arise fx authority
+
+<span class="cmt"># i suoni da soli, senza gli effetti</span>
+/playsound arise:shadow.arise player @s
+/playsound arise:gate.boss player @s</pre>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>Cosa fare</th><th>Cosa deve succedere</th></tr></thead>
+        <tbody>
+          <tr class="critical">
+            <td class="num">1</td>
+            <td>Evoca un'ombra e guardala da vicino, poi da dieci blocchi</td>
+            <td class="expect">Si vede <strong>attraverso</strong>, è curva in avanti, oscilla piano da ferma e ha la polvere del suo colore attorno. È il cuore del blocco: se qui è ancora un blocco nero opaco, non funziona</td>
+          </tr>
+          <tr class="critical">
+            <td class="num">2</td>
+            <td>Ricolora un'ombra dalla sua schermata</td>
+            <td class="expect">Cambia il corpo <strong>e</strong> l'aura, subito, senza richiamarla</td>
+          </tr>
+          <tr class="critical">
+            <td class="num">3</td>
+            <td><code>/arise fx arise</code> e ascolta con i sottotitoli accesi</td>
+            <td class="expect">Si legge "Un'ombra si leva", non un sottotitolo vanilla. Se leggi il nome di un mob, i sottotitoli non sono agganciati</td>
+          </tr>
+          <tr><td class="num">4</td><td>Prova tutti i quindici <code>/arise fx</code> in fila</td><td class="expect">Ognuno ha una forma riconoscibile e un suono diverso dagli altri. Nessuno resta muto</td></tr>
+          <tr><td class="num">5</td><td>Uccidi un mob e premi <code>R</code> guardandolo</td><td class="expect">Prima la spirale che sale, poi l'esito: colonna colorata se riesce, fumo se no</td></tr>
+          <tr><td class="num">6</td><td>Fai salire di livello un'ombra combattendo, finché cambia rango</td><td class="expect">Scintillio ai livelli normali, anello colorato + fanfara solo al cambio di rango</td></tr>
+          <tr><td class="num">7</td><td>Lascia morire un'ombra</td><td class="expect">Si sfalda verso l'alto con un suono solo — non due sovrapposti</td></tr>
+          <tr><td class="num">8</td><td>Apri un Gate e cammina fino alla stanza del boss</td><td class="expect">Arrivando: verso, colonna e messaggio. Una volta sola — tornando indietro e riavvicinandoti non si ripete</td></tr>
+          <tr><td class="num">9</td><td>Resta un paio di minuti dentro un Gate</td><td class="expect">Un battito lontano ogni tanto, con tono variabile</td></tr>
+          <tr><td class="num">10</td><td>Premi <code>C</code> (Dominio)</td><td class="expect">Una cupola di punti, non una nuvola. Il bordo si distingue</td></tr>
+          <tr><td class="num">11</td><td>Premi <code>V</code> (Autorità) in campo aperto</td><td class="expect">Quattro onde che si allargano fino a 12 blocchi: dove finisce l'ultima è il raggio vero</td></tr>
+          <tr><td class="num">12</td><td>Metti <code>effect_scale</code> a <code>0.3</code> in config e riavvia</td><td class="expect">Gli stessi effetti con molte meno particelle. È la leva se il gioco arranca</td></tr>
+          <tr><td class="num">13</td><td>Metti <code>shadow_opacity</code> a <code>1.0</code> e <code>shadow_aura</code> a <code>false</code></td><td class="expect">Ombra solida e senza aura: serve a capire quanto stanno lavorando i due effetti</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <div class="title">Cosa ho già verificato io, e cosa no</div>
+      <p><strong>Verificato:</strong> il client dev si avvia pulito, i sedici eventi sonori trovano tutti il loro file (Minecraft avverte a voce alta quando non lo trova, e non c'è un solo avviso), il layer del modello nuovo si cuoce senza errori all'avvio, e la config ha generato il blocco <code>fx</code> senza toccare il resto.</p>
+      <p><strong>Non verificato:</strong> tutto ciò che si vede solo in partita. Come rende davvero la trasparenza, se la scala tiene i piedi a terra, se le forme dei particellari si leggono. Sono le tredici righe qui sopra.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Dove mi aspetto problemi <span class="tag">in ordine</span></h2>
+    <div class="risks">
+      <div class="risk"><span class="rank">01</span><span class="body"><b>L'ordinamento della trasparenza.</b> Con un modello translucido può capitare di vedere un braccio attraverso il busto, o le facce interne. Su una silhouette d'ombra ci sta anche bene, ma se risultasse fastidioso la leva è <code>shadow_opacity</code> — oltre 0,9 il problema sparisce.</span></div>
+      <div class="risk"><span class="rank">02</span><span class="body"><b>La scala verticale e i piedi.</b> L'allungamento si applica attorno ai piedi, quindi in teoria l'ombra resta appoggiata. Se la vedi sprofondare di qualche centimetro o levitare, è questo, e si corregge con una traslazione.</span></div>
+      <div class="risk"><span class="rank">03</span><span class="body"><b>Il costo dell'aura con l'esercito fuori.</b> Cinque ombre a una particella ogni tre tick sono un centinaio di particelle al secondo. Non dovrebbe sentirsi, ma è il primo posto da guardare se i fotogrammi calano con l'esercito evocato: <code>aura_interval_ticks</code> a 6 dimezza tutto.</span></div>
+      <div class="risk"><span class="rank">04</span><span class="body"><b>La curvatura e le animazioni.</b> Curvo busto e braccia sopra l'animazione di camminata di Minecraft. Da fermi e camminando è giusto; nell'attacco o in acqua le braccia potrebbero finire in una posa strana.</span></div>
+      <div class="risk"><span class="rank">05</span><span class="body"><b>Il battito del Gate.</b> Lo suono alla tua posizione invece di spedirlo solo a te, perché dentro un Gate sei da solo per costruzione. Il giorno in cui i Gate saranno in comitiva, va rifatto per bene.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Riferimento <span class="tag">config</span></h2>
+
+    <h3>Blocco <code>fx</code> in <code>config/arise.json</code></h3>
+    <p class="lede">Sono le uniche voci della config che valgono sul client e non sul server: sono impostazioni di gusto e di prestazioni, e nessuna influenza il gioco.</p>
+    <dl class="config">
+      <dt>shadow_opacity</dt><dd><code>0.72</code> — quanto è solida l'ombra, da 0 a 1</dd>
+      <dt>shadow_stretch</dt><dd><code>1.08</code> — quanto è più alta di un umanoide normale</dd>
+      <dt>shadow_aura</dt><dd><code>true</code> — la polvere del suo colore attorno</dd>
+      <dt>aura_interval_ticks</dt><dd><code>3</code> — una particella d'aura ogni tre tick</dd>
+      <dt>effect_scale</dt><dd><code>1.0</code> — moltiplicatore su tutti i particellari a botta singola</dd>
+    </dl>
+
+    <h3>File nuovi</h3>
+    <dl class="config">
+      <dt>fx/ModSounds</dt><dd>I sedici eventi sonori, registrati all'avvio</dd>
+      <dt>fx/AriseFx</dt><dd>Ogni effetto della mod, con il suo nome. Niente <code>sendParticles</code> sparse</dd>
+      <dt>assets/arise/sounds.json</dt><dd>Dove si cambierà una riga il giorno dei suoni veri</dd>
+      <dt>render/ShadowModel</dt><dd>La sagoma e il materiale translucido</dd>
+    </dl>
+  </section>
+
+  <footer>
+    <p>F7 chiude la roadmap che avevamo scritto. Resta un debito dichiarato dal primo giorno: la texture <code>shadow.png</code> è un segnaposto generato da uno script e <strong>va ridisegnata a mano prima di qualsiasi pubblicazione</strong> — Modrinth vieta le immagini generate. Da qui in avanti si sceglie: pubblicare, o allargare il gioco.</p>
+  </footer>
+
+</div>

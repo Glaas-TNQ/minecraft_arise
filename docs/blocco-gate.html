@@ -1,0 +1,396 @@
+<title>I Gate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(79,195,247,0.06), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst { color: var(--muted); max-width: 62ch; margin: 0; }
+
+  .status-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+  }
+  .chip.ok { color: var(--good); border-color: rgba(127,217,127,0.35); }
+  .chip.todo { color: var(--warn); border-color: rgba(232,166,79,0.35); }
+
+  section { margin-top: 56px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0 0 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  h2 .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+  }
+
+  h3 { font-family: var(--display); font-weight: 600; font-size: 17px; margin: 28px 0 6px; }
+
+  p { margin: 12px 0; max-width: 68ch; }
+  p.lede { color: var(--muted); }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--muted); font-style: italic; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    padding: 1px 5px;
+    color: var(--accent);
+  }
+
+  .commands {
+    margin: 18px 0;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: var(--panel-soft);
+    overflow-x: auto;
+  }
+
+  .commands pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.9;
+    margin: 0;
+    padding: 16px 20px;
+    color: var(--text);
+  }
+  .commands .cmt { color: var(--muted); }
+
+  /* ---- schema del dungeon ---- */
+
+  .schema {
+    margin-top: 22px;
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 22px 20px;
+    overflow-x: auto;
+  }
+
+  .schema figcaption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 14px;
+    text-align: center;
+  }
+
+  .schema svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+  /* ---- passi ---- */
+
+  .flow { margin-top: 20px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .step { background: var(--panel-soft); padding: 15px 20px; display: grid; grid-template-columns: 30px 1fr; gap: 14px; }
+  .step .n { font-family: var(--mono); color: var(--accent); font-size: 13px; }
+  .step .body { font-size: 14.5px; color: var(--muted); }
+  .step .body b { color: var(--text); font-weight: 600; }
+
+  .table-scroll { overflow-x: auto; margin-top: 20px; border: 1px solid var(--line); }
+
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14.5px; }
+
+  thead th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+    text-align: left;
+    padding: 12px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  tbody td { padding: 13px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; background: var(--panel-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--accent); width: 44px; }
+  td.expect { color: var(--muted); }
+  tr.critical td { background: rgba(79,195,247,0.05); }
+  tr.critical td.num { color: var(--gold); }
+
+  .note {
+    margin-top: 22px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--bad);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .note .title { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--bad); margin-bottom: 4px; }
+  .note p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .note p + p { margin-top: 8px; }
+
+  .risks { margin-top: 20px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .risk { background: var(--panel-soft); padding: 15px 20px; display: grid; grid-template-columns: 28px 1fr; gap: 14px; }
+  .risk .rank { font-family: var(--mono); color: var(--warn); font-size: 13px; }
+  .risk .body { font-size: 14.5px; color: var(--muted); }
+  .risk .body b { color: var(--text); font-weight: 600; }
+
+  dl.config { margin: 20px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  dl.config dt { font-family: var(--mono); font-size: 13px; color: var(--accent); background: var(--panel); padding: 11px 16px; white-space: nowrap; }
+  dl.config dd { margin: 0; padding: 11px 16px; background: var(--panel-soft); color: var(--muted); font-size: 14px; }
+
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+
+  @media (max-width: 620px) { .wrap { padding: 36px 16px 72px; } }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · F5</p>
+    <h1>I Gate</h1>
+    <p class="standfirst">Dungeon istanziati in una dimensione dedicata: pianta generata a ogni apertura, stanze popolate per rango, un sovrano in fondo e la via di casa sempre scritta su disco. Più l'arena illuminata e la postura aggressiva che ora non risparmia nessuno.</p>
+    <div class="status-row">
+      <span class="chip ok">F1–F4 e blocco 5 verificate</span>
+      <span class="chip todo">F5 da verificare</span>
+      <span class="chip">build verde</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Le due correzioni <span class="tag">richieste</span></h2>
+
+    <h3>Arena illuminata</h3>
+    <p>Prima le lanterne erano solo quattro sui muri e il centro restava al buio. Ora ci sono <strong>lanterne marine annegate nel pavimento</strong> su una griglia di 8 blocchi, più una fascia a metà muro. Otto è la spaziatura giusta: una lanterna emette luce 15 e cala di uno al blocco, quindi a metà strada fra due si resta sopra 11 — nessun ostile può comparire dentro l'arena mentre provi. A filo del pavimento non intralciano il movimento.</p>
+
+    <h3>Aggressiva significa aggressiva</h3>
+    <p>Prima filtravo i bersagli su <code>Enemy</code>, cioè solo mob ostili: le mucche erano invisibili. Ora in <strong>aggressiva attaccano qualsiasi creatura</strong>. La difensiva resta selettiva — solo ostili che ti stanno puntando — perché lì il senso è proteggerti, non spopolare la fattoria.</p>
+    <p>Quattro cose restano intoccabili in ogni postura: <strong>tu, gli altri giocatori, le altre ombre e gli animali che hai addomesticato</strong>. Un esercito che sbrana il tuo lupo non è una meccanica, è un bug.</p>
+  </section>
+
+  <section>
+    <h2>Come funziona un Gate <span class="tag">architettura</span></h2>
+    <p>Non una dimensione per giocatore — sarebbero decine di mondi da salvare — ma <strong>una sola dimensione</strong> <code>arise:gate</code> spartita in regioni distanti 4096 blocchi. È l'approccio delle mod di dungeon istanziati, ed è quello che avevo indicato nel design.</p>
+
+    <figure class="schema">
+      <svg viewBox="0 0 560 220" role="img" aria-label="Pianta di esempio: cinque stanze collegate in catena, dall'ingresso alla stanza del boss">
+        <defs>
+          <marker id="arrow" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,1 L6,4 L0,7" fill="none" stroke="#3C8BD9" stroke-width="1.4"/>
+          </marker>
+        </defs>
+
+        <!-- corridoi -->
+        <g stroke="#3C8BD9" stroke-width="2" marker-end="url(#arrow)">
+          <line x1="96" y1="110" x2="150" y2="110"/>
+          <line x1="206" y1="110" x2="260" y2="110"/>
+          <line x1="316" y1="96" x2="316" y2="62"/>
+          <line x1="344" y1="48" x2="398" y2="48"/>
+        </g>
+
+        <!-- stanze -->
+        <g>
+          <rect x="40" y="82" width="56" height="56" fill="#121A2A" stroke="#4FC3F7" stroke-width="1.5"/>
+          <text x="68" y="115" fill="#4FC3F7" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">IN</text>
+
+          <rect x="150" y="82" width="56" height="56" fill="#121A2A" stroke="#1F2C42" stroke-width="1.5"/>
+          <text x="178" y="115" fill="#8FA0B5" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">mob</text>
+
+          <rect x="288" y="82" width="56" height="56" fill="#121A2A" stroke="#1F2C42" stroke-width="1.5"/>
+          <text x="316" y="115" fill="#8FA0B5" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">mob</text>
+
+          <rect x="288" y="20" width="56" height="56" fill="#121A2A" stroke="#1F2C42" stroke-width="1.5"/>
+          <text x="316" y="53" fill="#8FA0B5" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">mob</text>
+
+          <rect x="398" y="20" width="56" height="56" fill="#1A1420" stroke="#FFD54F" stroke-width="1.5"/>
+          <text x="426" y="53" fill="#FFD54F" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">BOSS</text>
+        </g>
+
+        <text x="280" y="196" fill="#8FA0B5" font-family="IBM Plex Sans, sans-serif" font-size="12" text-anchor="middle">passeggiata casuale su griglia · celle da 24 blocchi · stanze 15×15</text>
+      </svg>
+      <figcaption>Ogni stanza nuova nasce accanto all'ultima piazzata: il percorso resta lungo e il boss finisce davvero in fondo</figcaption>
+    </figure>
+
+    <p class="lede">Perché una passeggiata casuale e non un algoritmo più sofisticato: garantisce due cose che contano più della varietà — il dungeon è sempre <em>connesso</em>, e l'ultima stanza è sempre la più lontana lungo il percorso.</p>
+
+    <h3>La costruzione, in due passate</h3>
+    <div class="flow">
+      <div class="step"><span class="n">01</span><span class="body"><b>Riempimento.</b> I volumi esterni di stanze e corridoi vengono riempiti di deepslate massiccio.</span></div>
+      <div class="step"><span class="n">02</span><span class="body"><b>Scavo.</b> I volumi interni vengono svuotati. Il corridoio scava da sé la porta nel muro della stanza che tocca — nessun calcolo sulle aperture.</span></div>
+      <div class="step"><span class="n">03</span><span class="body"><b>Popolamento.</b> Mob per rango nelle stanze intermedie; l'ingresso resta sgombro, perché comparire in mezzo a quattro nemici non è una sfida ma un'imboscata. Il sovrano nella stanza terminale, con vita ×6 e danno ×2.</span></div>
+    </div>
+    <p>L'ordine è tutto: in un'unica passata i corridoi già scavati verrebbero murati dalla stanza successiva.</p>
+
+    <h3>Uscire, sempre</h3>
+    <p>Il punto di ingresso viene <strong>salvato su disco prima del teletrasporto</strong>. Da lì tre reti di sicurezza: <code>/arise leave</code> in qualsiasi momento; se muori dentro, l'istanza si smonta al respawn; se il server cade mentre sei dentro, al rientro vieni rispedito indietro perché le istanze non si salvano e la tua non esisterebbe più.</p>
+    <p>All'uscita la geometria viene cancellata e la regione torna disponibile: due Gate aperti in momenti diversi non si accumulano nel salvataggio.</p>
+  </section>
+
+  <section>
+    <h2>Da testare <span class="tag">checklist</span></h2>
+
+    <div class="note">
+      <div class="title">Prima cosa: probabilmente serve un mondo nuovo</div>
+      <p>La dimensione dei Gate è definita da un file di datapack dentro la mod. Nelle versioni recenti dovrebbe comparire anche nei mondi esistenti, ma non ci metterei la mano sul fuoco.</p>
+      <p>Se <code>/arise gate</code> risponde <em>"La dimensione dei Gate non è disponibile in questo mondo"</em>, non è un bug del codice: crea un mondo nuovo e riprova. Se succede <strong>anche</strong> in un mondo nuovo, allora il JSON non è stato accettato e il log lo dirà — mandamelo.</p>
+    </div>
+
+    <div class="commands">
+<pre><span class="cmt"># preparazione</span>
+/arise level 25
+/arise gear
+/gamemode survival
+
+<span class="cmt"># apri un Gate di rango E, poi sali</span>
+/arise gate e
+/arise gate c
+/arise leave</pre>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>Cosa fare</th><th>Cosa deve succedere</th></tr></thead>
+        <tbody>
+          <tr class="critical">
+            <td class="num">1</td>
+            <td><code>/arise gate e</code></td>
+            <td class="expect">Suono di portale, ti ritrovi in una stanza chiusa e illuminata; il messaggio dice rango e numero di stanze</td>
+          </tr>
+          <tr class="critical">
+            <td class="num">2</td>
+            <td>Esplora tutte le stanze</td>
+            <td class="expect">Corridoi percorribili, nessun muro cieco, <strong>nessun buco sul vuoto</strong>; le stanze intermedie hanno mob, l'ingresso no</td>
+          </tr>
+          <tr class="critical">
+            <td class="num">3</td>
+            <td>Arriva in fondo e uccidi il sovrano</td>
+            <td class="expect">Ha nome visibile e molta più vita; alla morte suono di traguardo, XP e soul coin</td>
+          </tr>
+          <tr><td class="num">4</td><td>Riconosci la stanza del boss prima di entrarci</td><td class="expect">Ha luci di ossidiana piangente invece delle lanterne</td></tr>
+          <tr><td class="num">5</td><td><code>/arise leave</code></td><td class="expect">Torni esattamente dove eri prima di aprire il Gate</td></tr>
+          <tr><td class="num">6</td><td>Riapri un Gate e guarda la pianta</td><td class="expect">Layout diverso dal precedente</td></tr>
+          <tr><td class="num">7</td><td>Prova <code>/arise gate</code> mentre sei già dentro</td><td class="expect">"Hai già un Gate aperto"</td></tr>
+          <tr><td class="num">8</td><td>Apri un Gate di rango <code>a</code> o <code>s</code></td><td class="expect">Mob più duri e più numerosi, ricompense molto più alte</td></tr>
+          <tr><td class="num">9</td><td>Evoca l'esercito dentro il Gate e combatti</td><td class="expect">Le ombre funzionano come fuori; i mob uccisi danno XP, soul coin e sono estraibili</td></tr>
+          <tr class="critical"><td class="num">10</td><td><strong>Muori</strong> dentro un Gate</td><td class="expect">Rinasci normalmente fuori, e un <code>/arise gate</code> successivo apre un'istanza nuova senza lamentarsi</td></tr>
+          <tr><td class="num">11</td><td>Esci dal mondo mentre sei dentro, poi rientra</td><td class="expect">Ti ritrovi fuori con il messaggio "Il Gate in cui eri non esiste più"</td></tr>
+          <tr><td class="num">12</td><td>Dopo qualche Gate, torna dove eri</td><td class="expect">Nessun rallentamento accumulato: le istanze chiuse vengono cancellate</td></tr>
+          <tr><td class="num">13</td><td><code>/arise arena</code></td><td class="expect">Pavimento a lanterne, tutto illuminato, nessun mob che spawna dentro</td></tr>
+          <tr><td class="num">14</td><td>Postura aggressiva vicino a delle mucche</td><td class="expect">Le attaccano. Il tuo lupo addomesticato no</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Dove mi aspetto problemi <span class="tag">in ordine</span></h2>
+    <div class="risks">
+      <div class="risk"><span class="rank">01</span><span class="body"><b>La dimensione che non compare.</b> Vedi l'avviso sopra. È il punto più probabile di fallimento e ha poco a che vedere col codice.</span></div>
+      <div class="risk"><span class="rank">02</span><span class="body"><b>La geometria dei corridoi.</b> Faccio partire il volume del corridoio dentro la parete di entrambe le stanze per aprire la porta. Se i conti sono sbagliati di un blocco, il risultato è o una porta murata o un buco che dà sul vuoto — nel secondo caso ci si cade dentro.</span></div>
+      <div class="risk"><span class="rank">03</span><span class="body"><b>Il riconoscimento del boss.</b> Confronto l'UUID della vittima con quello registrato all'apertura. Se il sovrano muore per una caduta o per un altro mob invece che per te, il completamento non scatta — l'evento passa dal tuo uccisore.</span></div>
+      <div class="risk"><span class="rank">04</span><span class="body"><b>Il costo della costruzione.</b> Cinque stanze più corridoi sono circa 60.000 blocchi piazzati in un colpo. Se all'apertura il gioco si blocca per qualche secondo, va spezzato su più tick.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Riferimento <span class="tag">comandi e config</span></h2>
+
+    <h3>Comandi nuovi</h3>
+    <dl class="config">
+      <dt>/arise gate [e|d|c|b|a|s]</dt><dd>Apre ed entra. Senza argomento, rango E</dd>
+      <dt>/arise leave</dt><dd>Esce e smonta l'istanza</dd>
+    </dl>
+
+    <h3>Blocco <code>gates</code> in <code>config/arise.json</code></h3>
+    <dl class="config">
+      <dt>min_rooms / max_rooms</dt><dd>Da 4 a 6 stanze, boss inclusa</dd>
+      <dt>room_size / room_height</dt><dd>15×15 interni, alte 6</dd>
+      <dt>cell_size</dt><dd>24 — passo della griglia, deve superare <code>room_size</code></dd>
+      <dt>mobs_per_room</dt><dd>3 al rango E, +1,5 per rango</dd>
+      <dt>boss_health_multiplier</dt><dd>×6 vita, ×2 danno</dd>
+      <dt>clear_xp_base</dt><dd>120 XP al rango E, ×1,8 per rango</dd>
+      <dt>clear_souls_base</dt><dd>60 soul coin al rango E, stessa progressione</dd>
+      <dt>gates.mobs / gates.bosses</dt><dd>Chi compare, per rango. Accetta i mob di altre mod</dd>
+    </dl>
+  </section>
+
+  <footer>
+    <p>Restano <strong>F6</strong> (abilità con cooldown) e <strong>F7</strong> (rifinitura: suoni, particellari, e la vera silhouette d'ombra al posto del modello zombie riusato). Il segnaposto della texture va comunque ridisegnato a mano prima di qualsiasi pubblicazione — Modrinth vieta le immagini generate.</p>
+  </footer>
+
+</div>

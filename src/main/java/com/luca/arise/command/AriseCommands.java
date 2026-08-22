@@ -1,0 +1,318 @@
+package com.luca.arise.command;
+
+import java.util.function.Function;
+
+import com.luca.arise.city.City;
+import com.luca.arise.city.CityManager;
+import com.luca.arise.event.CityEvents;
+import com.luca.arise.gate.GateManager;
+import com.luca.arise.progress.Rank;
+import com.luca.arise.config.AriseConfig;
+import com.luca.arise.config.ShadowConfig;
+import com.luca.arise.progress.PlayerProgress;
+import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.progress.Stat;
+import com.luca.arise.shadow.ShadowArmy;
+import com.luca.arise.shadow.ShadowData;
+import com.luca.arise.shadow.ShadowManager;
+import com.luca.arise.shadow.ShadowStance;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.permissions.PermissionCheck;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+
+/**
+ * Comandi di debug e di gioco.
+ *
+ * <p>Esistono dal primo giorno perche' senza, testare la progressione significa uccidere mob per
+ * mezz'ora a ogni modifica.
+ */
+public final class AriseCommands {
+
+	/**
+	 * Permesso richiesto dai comandi che alterano la progressione.
+	 *
+	 * <p>In 26.2 i livelli di permesso numerici non esistono piu': {@code hasPermission(2)} e'
+	 * diventato un {@link net.minecraft.server.permissions.PermissionCheck} da valutare contro il
+	 * {@code PermissionSet} della sorgente. {@code LEVEL_GAMEMASTERS} e' l'equivalente del vecchio
+	 * livello 2, quello dei comandi che barano.
+	 */
+	private static final PermissionCheck CHEATS = Commands.LEVEL_GAMEMASTERS;
+
+	private AriseCommands() {
+	}
+
+	static boolean canCheat(CommandSourceStack source) {
+		return CHEATS.check(source.permissions());
+	}
+
+	public static void register() {
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("arise");
+
+			root.then(Commands.literal("info").executes(context -> info(context.getSource())));
+
+			LiteralArgumentBuilder<CommandSourceStack> spend = Commands.literal("spend");
+			for (Stat stat : Stat.values()) {
+				spend.then(Commands.literal(stat.getSerializedName())
+						.then(Commands.argument("punti", IntegerArgumentType.integer(1))
+								.executes(context -> spend(context.getSource(), stat,
+										IntegerArgumentType.getInteger(context, "punti")))));
+			}
+			root.then(spend);
+
+			root.then(Commands.literal("xp")
+					.requires(AriseCommands::canCheat)
+					.then(Commands.argument("quantita", IntegerArgumentType.integer(1))
+							.executes(context -> addXp(context.getSource(),
+									IntegerArgumentType.getInteger(context, "quantita")))));
+
+			root.then(Commands.literal("level")
+					.requires(AriseCommands::canCheat)
+					.then(Commands.argument("livello", IntegerArgumentType.integer(1))
+							.executes(context -> setLevel(context.getSource(),
+									IntegerArgumentType.getInteger(context, "livello")))));
+
+			root.then(Commands.literal("reset")
+					.requires(AriseCommands::canCheat)
+					.executes(context -> reset(context.getSource())));
+
+			root.then(Commands.literal("arise").executes(context -> shadowAction(context.getSource(),
+					ShadowManager::extract)));
+			root.then(Commands.literal("summon").executes(context -> shadowAction(context.getSource(),
+					ShadowManager::summon)));
+			root.then(Commands.literal("recall").executes(context -> shadowAction(context.getSource(),
+					ShadowManager::recall)));
+
+			LiteralArgumentBuilder<CommandSourceStack> stance = Commands.literal("stance")
+					.executes(context -> shadowAction(context.getSource(), ShadowManager::cycleStance));
+			for (ShadowStance value : ShadowStance.values()) {
+				stance.then(Commands.literal(value.getSerializedName())
+						.executes(context -> shadowAction(context.getSource(),
+								player -> ShadowManager.setStance(player, value))));
+			}
+			root.then(stance);
+
+			root.then(Commands.literal("souls")
+					.executes(context -> showSouls(context.getSource()))
+					.then(Commands.literal("add")
+							.requires(AriseCommands::canCheat)
+							.then(Commands.argument("quantita", IntegerArgumentType.integer(1))
+									.executes(context -> addSouls(context.getSource(),
+											IntegerArgumentType.getInteger(context, "quantita"))))));
+
+			LiteralArgumentBuilder<CommandSourceStack> gate = Commands.literal("gate");
+			for (Rank rank : Rank.values()) {
+				gate.then(Commands.literal(rank.getSerializedName())
+						.executes(context -> gateAction(context.getSource(),
+								player -> GateManager.offer(player, rank))));
+			}
+			gate.executes(context -> gateAction(context.getSource(),
+					player -> GateManager.offer(player, Rank.E)));
+			root.then(gate);
+
+			LiteralArgumentBuilder<CommandSourceStack> city = Commands.literal("city");
+
+			LiteralArgumentBuilder<CommandSourceStack> cityBuild = Commands.literal("build")
+					.requires(AriseCommands::canCheat);
+			LiteralArgumentBuilder<CommandSourceStack> cityGo = Commands.literal("go")
+					.requires(AriseCommands::canCheat);
+
+			for (City target : City.values()) {
+				cityBuild.then(Commands.literal(target.getSerializedName())
+						.executes(context -> buildCity(context.getSource(), target)));
+				cityGo.then(Commands.literal(target.getSerializedName())
+						.executes(context -> gateAction(context.getSource(),
+								player -> CityManager.travel(player, target))));
+			}
+
+			cityBuild.then(Commands.literal("all")
+					.executes(context -> buildAll(context.getSource())));
+
+			city.then(cityBuild);
+			city.then(cityGo);
+			root.then(city);
+
+			root.then(Commands.literal("hub")
+					.requires(AriseCommands::canCheat)
+					.executes(context -> openHub(context.getSource())));
+
+			root.then(Commands.literal("leave")
+					.executes(context -> gateAction(context.getSource(), GateManager::leave)));
+
+			root.then(Commands.literal("shadows")
+					.executes(context -> listShadows(context.getSource()))
+					.then(Commands.literal("clear")
+							.requires(AriseCommands::canCheat)
+							.executes(context -> clearShadows(context.getSource()))));
+
+			DebugCommands.addTo(root, registryAccess);
+
+			dispatcher.register(root);
+		});
+	}
+
+	private static int info(CommandSourceStack source) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		PlayerProgress progress = ProgressManager.get(player);
+		AriseConfig config = AriseConfig.get();
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.info.header"), false);
+		source.sendSuccess(() -> Component.translatable("arise.msg.info.level",
+				progress.level(), progress.xp(), config.xpForNextLevel(progress.level())), false);
+		source.sendSuccess(() -> Component.translatable("arise.msg.info.points",
+				progress.unspentPoints()), false);
+
+		for (Stat stat : Stat.values()) {
+			source.sendSuccess(() -> Component.translatable("arise.msg.info.stat",
+					Component.translatable(stat.translationKey()),
+					progress.stat(stat),
+					config.cap(stat),
+					String.format("%.2f", player.getAttributeValue(stat.attribute()))), false);
+		}
+
+		return progress.level();
+	}
+
+	private static int spend(CommandSourceStack source, Stat stat, int amount)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		Component error = ProgressManager.spend(player, stat, amount);
+
+		if (error != null) {
+			source.sendFailure(error);
+			return 0;
+		}
+
+		int total = ProgressManager.get(player).stat(stat);
+		source.sendSuccess(() -> Component.translatable("arise.msg.spend.ok",
+				amount, Component.translatable(stat.translationKey()), total), false);
+		return total;
+	}
+
+	private static int addXp(CommandSourceStack source, int amount)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		ProgressManager.addXp(player, amount);
+		PlayerProgress progress = ProgressManager.get(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.xp.added", amount, progress.level()), true);
+		return amount;
+	}
+
+	private static int setLevel(CommandSourceStack source, int level)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		ProgressManager.setLevel(player, level);
+		PlayerProgress progress = ProgressManager.get(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.level.set",
+				progress.level(), progress.unspentPoints()), true);
+		return progress.level();
+	}
+
+	private static int reset(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		ProgressManager.reset(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.reset"), true);
+		return 1;
+	}
+
+	/** Le azioni sulle ombre restituiscono già il messaggio giusto: qui si inoltra e basta. */
+	private static int shadowAction(CommandSourceStack source, Function<ServerPlayer, Component> action)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		Component feedback = action.apply(player);
+		source.sendSuccess(() -> feedback, false);
+		return 1;
+	}
+
+	private static int showSouls(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		long souls = ProgressManager.souls(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.souls.balance", souls), false);
+		return (int) Math.min(Integer.MAX_VALUE, souls);
+	}
+
+	private static int addSouls(CommandSourceStack source, int amount)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		ProgressManager.addSouls(player, amount);
+		long souls = ProgressManager.souls(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.souls.added", amount, souls), true);
+		return amount;
+	}
+
+	/**
+	 * Avvia un cantiere. Funziona anche dalla console, dove non c'è un giocatore che lo chiede.
+	 */
+	private static int buildCity(CommandSourceStack source, City target) {
+		Component feedback = CityManager.build(source.getServer(), source.getPlayer(), target);
+		source.sendSuccess(() -> feedback, true);
+		return 1;
+	}
+
+	/**
+	 * Mette in coda tutte le città.
+	 *
+	 * <p>Partono insieme e si costruiscono in parallelo, ognuna con il suo budget di blocchi per
+	 * battito. Con cinque cantieri aperti il server piazza cinque volte i blocchi di uno: se il
+	 * gioco scatta, si costruiscono una per volta oppure si abbassa {@code blocks_per_tick}.
+	 */
+	private static int buildAll(CommandSourceStack source) {
+		for (City target : City.values()) {
+			buildCity(source, target);
+		}
+
+		return City.values().length;
+	}
+
+	private static int openHub(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		CityEvents.openHub(source.getPlayerOrException());
+		return 1;
+	}
+
+	/** I Gate restituiscono già il messaggio giusto: qui si inoltra e basta. */
+	private static int gateAction(CommandSourceStack source, Function<ServerPlayer, Component> action)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		Component feedback = action.apply(player);
+		source.sendSuccess(() -> feedback, false);
+		return 1;
+	}
+
+	private static int listShadows(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		ShadowArmy army = ShadowManager.army(player);
+		int capacity = ShadowManager.capacity(player);
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.shadow.list_header",
+				army.size(), capacity, ShadowManager.summonedCount(player)), false);
+
+		ShadowConfig shadowConfig = AriseConfig.get().shadows();
+		for (ShadowData shadow : army.shadows()) {
+			source.sendSuccess(() -> Component.translatable("arise.msg.shadow.list_entry",
+					shadow.rank(shadowConfig).label(), shadow.displayName(), shadow.level(),
+					String.format("%.0f", shadow.maxHealth(shadowConfig)),
+					String.format("%.1f", shadow.attackDamage(shadowConfig))), false);
+		}
+
+		return army.size();
+	}
+
+	private static int clearShadows(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		ShadowManager.clear(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.shadow.cleared"), true);
+		return 1;
+	}
+}

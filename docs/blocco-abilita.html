@@ -1,0 +1,410 @@
+<title>Abilità del Monarca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(79,195,247,0.06), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst { color: var(--muted); max-width: 62ch; margin: 0; }
+  .status-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+  }
+  .chip.ok { color: var(--good); border-color: rgba(127,217,127,0.35); }
+  .chip.todo { color: var(--warn); border-color: rgba(232,166,79,0.35); }
+
+  section { margin-top: 56px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0 0 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  h2 .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+  }
+
+  h3 { font-family: var(--display); font-weight: 600; font-size: 17px; margin: 28px 0 6px; }
+
+  p { margin: 12px 0; max-width: 68ch; }
+  p.lede { color: var(--muted); }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--muted); font-style: italic; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    padding: 1px 5px;
+    color: var(--accent);
+  }
+
+  .commands {
+    margin: 18px 0;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: var(--panel-soft);
+    overflow-x: auto;
+  }
+
+  .commands pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.9;
+    margin: 0;
+    padding: 16px 20px;
+    color: var(--text);
+  }
+  .commands .cmt { color: var(--muted); }
+
+  /* ---- abilità ---- */
+
+  .abilities { margin-top: 22px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+
+  .ability {
+    background: var(--panel-soft);
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    gap: 18px;
+    align-items: start;
+  }
+
+  .ability .slot {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--accent-deep);
+    background: var(--panel);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--accent);
+  }
+
+  .ability .name { font-family: var(--display); font-weight: 600; font-size: 16px; margin-bottom: 2px; }
+  .ability .what { font-size: 14.5px; color: var(--muted); line-height: 1.55; }
+
+  .ability .meta {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+    line-height: 1.9;
+  }
+  .ability .meta .lv { color: var(--accent); }
+  .ability .meta .cd { color: var(--text); }
+  .ability .meta .cost { color: var(--gold); }
+
+  .table-scroll { overflow-x: auto; margin-top: 20px; border: 1px solid var(--line); }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14.5px; }
+
+  thead th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+    text-align: left;
+    padding: 12px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  tbody td { padding: 13px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; background: var(--panel-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--accent); width: 44px; }
+  td.expect { color: var(--muted); }
+  tr.critical td { background: rgba(79,195,247,0.05); }
+  tr.critical td.num { color: var(--gold); }
+
+  .note {
+    margin-top: 22px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .note .title { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--warn); margin-bottom: 4px; }
+  .note p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .note p + p { margin-top: 8px; }
+
+  .risks { margin-top: 20px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .risk { background: var(--panel-soft); padding: 15px 20px; display: grid; grid-template-columns: 28px 1fr; gap: 14px; }
+  .risk .rank { font-family: var(--mono); color: var(--warn); font-size: 13px; }
+  .risk .body { font-size: 14.5px; color: var(--muted); }
+  .risk .body b { color: var(--text); font-weight: 600; }
+
+  dl.config { margin: 20px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  dl.config dt { font-family: var(--mono); font-size: 13px; color: var(--accent); background: var(--panel); padding: 11px 16px; white-space: nowrap; }
+  dl.config dd { margin: 0; padding: 11px 16px; background: var(--panel-soft); color: var(--muted); font-size: 14px; }
+
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 36px 16px 72px; }
+    .ability { grid-template-columns: 40px 1fr; }
+    .ability .meta { grid-column: 2; text-align: left; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · F6 + correzioni</p>
+    <h1>Abilità del Monarca</h1>
+    <p class="standfirst">Quattro poteri attivi con tempi di ricarica e barra dedicata. Più le due cose che hai segnalato: le statistiche che sparivano dopo il respawn, e i Gate che si aprivano sul vuoto a colpi di creeper.</p>
+    <div class="status-row">
+      <span class="chip ok">F1–F5 verificate</span>
+      <span class="chip todo">F6 da verificare</span>
+      <span class="chip todo">2 correzioni da verificare</span>
+      <span class="chip">build verde</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Le statistiche dopo il respawn <span class="tag">correzione a</span></h2>
+    <p>Il registro dell'evento c'era ed era corretto: alla morte <code>AFTER_RESPAWN</code> riapplicava i modificatori. Eppure sparivano. Vuol dire che <strong>qualcosa a valle rifà la mappa degli attributi</strong> dopo il nostro intervento — e non sono riuscito a individuare cosa.</p>
+    <p>Invece di continuare a rincorrere il momento esatto, ho cambiato approccio: <strong>una volta al secondo si verifica che lo stato reale corrisponda ai dati, e se non corrisponde si corregge</strong>. Costa quattro ricerche in una mappa per giocatore al secondo, e nel caso normale non scrive nulla.</p>
+    <p class="lede">Perché questa è la scelta giusta e non una pezza: questa classe di bug — un evento che arriva troppo presto rispetto a qualcosa dentro Minecraft — riappare a ogni aggiornamento del gioco. Un sistema che converge da solo sopravvive alla prossima versione; un evento azzeccato per fortuna, no.</p>
+  </section>
+
+  <section>
+    <h2>Gate a prova di creeper <span class="tag">correzione b</span></h2>
+    <p>Il guscio ora è di <strong>deepslate rinforzato</strong>: resistenza alle esplosioni 1200, quindi nessun creeper apre buchi. E scende <strong>due blocchi sotto il pavimento</strong> invece di uno — un solo strato lasciava il pavimento come unica difesa fra te e il vuoto.</p>
+    <p>Inoltre nella dimensione dei Gate <strong>non si può rompere nulla</strong>, nemmeno con gli attrezzi giusti: la strada verso il vuoto si chiude del tutto.</p>
+
+    <h3>E sono meno piccoli e meno semplici</h3>
+    <p>Da catena lineare a <strong>spina dorsale con diramazioni</strong>. Ora un Gate ha da 5 a 8 stanze sul percorso principale più 1–3 stanze laterali senza uscita: deviare è una scelta, non un corridoio obbligato.</p>
+    <p>E le stanze non sono più tutte uguali: quelle normali sono passate da 15 a <strong>17×17</strong>, una su tre è una <strong>sala ampia da 25×25 alta 10, con quattro pilastri</strong> da usare come copertura, e la stanza del boss usa lo stesso formato ampio. Le sale ospitano due nemici in più, le stanze laterali uno in meno.</p>
+  </section>
+
+  <section>
+    <h2>Le quattro abilità <span class="tag">F6</span></h2>
+    <p class="lede">Tasti <code>Z</code> <code>X</code> <code>C</code> <code>V</code>. Il client manda solo "ho premuto il tasto n": livello, ricarica e soul coin li verifica il server — un teletrasporto validato dal client è un invito a barare.</p>
+
+    <div class="abilities">
+      <div class="ability">
+        <div class="slot">S</div>
+        <div>
+          <div class="name">Passo d'ombra</div>
+          <div class="what">Scatto istantaneo di 8 blocchi nella direzione dello sguardo. Avanza mezzo blocco alla volta verificando che ci stai: si ferma prima del muro invece di attraversarlo, altrimenti ogni dungeon diventerebbe opzionale.</div>
+        </div>
+        <div class="meta"><span class="lv">Lv. 5</span><br><span class="cd">3 s</span></div>
+      </div>
+
+      <div class="ability">
+        <div class="slot">X</div>
+        <div>
+          <div class="name">Scambio d'ombra</div>
+          <div class="what">Prendi il posto della tua ombra evocata più lontana, e lei il tuo. Una via di fuga o un modo per aprirsi la strada — è la firma del materiale di partenza.</div>
+        </div>
+        <div class="meta"><span class="lv">Lv. 10</span><br><span class="cd">10 s</span></div>
+      </div>
+
+      <div class="ability">
+        <div class="slot">D</div>
+        <div>
+          <div class="name">Dominio del Monarca</div>
+          <div class="what">Velocità II e Forza per 20 secondi a te <em>e a tutto l'esercito evocato</em>. È l'abilità che premia chi ha molte ombre fuori.</div>
+        </div>
+        <div class="meta"><span class="lv">Lv. 20</span><br><span class="cd">30 s</span><br><span class="cost">40 soul</span></div>
+      </div>
+
+      <div class="ability">
+        <div class="slot">A</div>
+        <div>
+          <div class="name">Autorità del Sovrano</div>
+          <div class="what">Tutti gli ostili entro 12 blocchi vengono rallentati (Lentezza III), indeboliti e resi visibili attraverso i muri per 10 secondi.</div>
+        </div>
+        <div class="meta"><span class="lv">Lv. 30</span><br><span class="cd">45 s</span><br><span class="cost">60 soul</span></div>
+      </div>
+    </div>
+
+    <p>La barra sta sopra la hotbar. Le abilità non ancora sbloccate restano visibili ma spente, con il livello richiesto al posto dell'iniziale: sapere che esistono è metà del motivo per salire di livello. Durante la ricarica lo slot si riempie e si svuota dall'alto.</p>
+    <p><strong>Un dettaglio che conta:</strong> la ricarica parte solo se l'abilità ha davvero fatto qualcosa. Uno scambio senza ombre da scambiare, o un'autorità senza nemici intorno, non costa nulla e restituisce i soul coin.</p>
+  </section>
+
+  <section>
+    <h2>Da testare <span class="tag">checklist</span></h2>
+
+    <div class="commands">
+<pre><span class="cmt"># il livello 30 sblocca tutto</span>
+/arise level 30
+/arise souls add 1000
+/arise gear
+/gamemode survival
+
+<span class="cmt"># qualche ombra da usare con lo scambio e il dominio</span>
+/arise arena
+/arise spawn zombie 8</pre>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>Cosa fare</th><th>Cosa deve succedere</th></tr></thead>
+        <tbody>
+          <tr class="critical">
+            <td class="num">1</td>
+            <td>Spendi punti in agilità, poi <code>/kill</code> e rinasci</td>
+            <td class="expect">Entro un secondo dal respawn <strong>senti</strong> di nuovo la velocità. È la correzione (a): se fallisce qui, non funziona</td>
+          </tr>
+          <tr class="critical">
+            <td class="num">2</td>
+            <td>In un Gate, fatti esplodere un creeper addosso vicino al pavimento</td>
+            <td class="expect">Nessun buco. Il pavimento regge e sotto ci sono due strati</td>
+          </tr>
+          <tr class="critical">
+            <td class="num">3</td>
+            <td>Prova a rompere un blocco dentro un Gate</td>
+            <td class="expect">Non si rompe, nemmeno col piccone</td>
+          </tr>
+          <tr><td class="num">4</td><td>Apri un Gate e girala tutta</td><td class="expect">5–8 stanze principali, 1–3 laterali senza uscita; almeno una sala ampia con quattro pilastri</td></tr>
+          <tr><td class="num">5</td><td>Premi <code>Z</code> guardando un muro a due blocchi</td><td class="expect">Ti fermi davanti al muro, non lo attraversi</td></tr>
+          <tr><td class="num">6</td><td>Premi <code>Z</code> due volte di fila</td><td class="expect">La seconda dice "non è pronta"; lo slot S nella barra si svuota in 3 secondi</td></tr>
+          <tr><td class="num">7</td><td>Evoca, allontana un'ombra, premi <code>X</code></td><td class="expect">Vi scambiate di posto</td></tr>
+          <tr><td class="num">8</td><td>Premi <code>X</code> senza ombre evocate</td><td class="expect">"non ha avuto effetto", <strong>nessuna ricarica avviata</strong></td></tr>
+          <tr><td class="num">9</td><td>Premi <code>C</code> con l'esercito fuori</td><td class="expect">−40 soul coin, particelle, e velocità e forza a te e a tutte le ombre</td></tr>
+          <tr><td class="num">10</td><td>Premi <code>V</code> in mezzo ai mob</td><td class="expect">−60 soul coin, i nemici rallentano e brillano attraverso i muri</td></tr>
+          <tr><td class="num">11</td><td>Premi <code>V</code> senza nemici vicino</td><td class="expect">Nessun effetto e <strong>i 60 soul coin tornano indietro</strong></td></tr>
+          <tr><td class="num">12</td><td><code>/arise level 1</code> e guarda la barra</td><td class="expect">Tutti e quattro gli slot spenti, con 5 / 10 / 20 / 30 al posto delle lettere</td></tr>
+          <tr><td class="num">13</td><td>Esci e rientra nel mondo</td><td class="expect">Le ricariche ripartono azzerate — è voluto: contano tick assoluti che dopo un riavvio non significano più lo stesso</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <div class="title">Il blocco <code>gates</code> nella config cambia struttura</div>
+      <p>La geometria è finita in un sotto-blocco <code>gates.shape</code>, perché con le nuove voci i campi erano venti contro un tetto di sedici del codec.</p>
+      <p>Il tuo file esistente si carica lo stesso: le chiavi mancanti vengono riempite dai default prima del parsing, e alla riscrittura le vecchie voci sparse spariscono. Se avevi già ritoccato dei numeri dentro <code>gates</code>, però, <strong>quelli sì che vanno rimessi</strong> nella nuova posizione.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Dove mi aspetto problemi <span class="tag">in ordine</span></h2>
+    <div class="risks">
+      <div class="risk"><span class="rank">01</span><span class="body"><b>La riconciliazione degli attributi.</b> Converge in un secondo, ma è un secondo in cui i bonus non ci sono. Se dopo il respawn senti un attimo di lentezza prima che tutto torni, è quello — si accorcia l'intervallo, al costo di controllare più spesso.</span></div>
+      <div class="risk"><span class="rank">02</span><span class="body"><b>I corridoi con stanze di dimensioni diverse.</b> Ora una sala da 25 può collegarsi a una stanza da 17, e ogni lato contribuisce il proprio raggio al calcolo della porta. È il punto dove è più facile che il conto sia sbagliato di un blocco.</span></div>
+      <div class="risk"><span class="rank">03</span><span class="body"><b>Il costo di costruzione.</b> Con sale da 25×25×10 i blocchi piazzati in un colpo sono saliti parecchio. Se all'apertura senti un blocco di più di un secondo, va spezzata su più tick.</span></div>
+      <div class="risk"><span class="rank">04</span><span class="body"><b>Lo scambio d'ombra dentro i muri.</b> Non verifico che la posizione dell'ombra sia sicura per te: se lei è incastrata in un angolo stretto, ci finisci tu.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Riferimento <span class="tag">tasti e config</span></h2>
+
+    <h3>Tasti</h3>
+    <dl class="config">
+      <dt>Z X C V</dt><dd>Le quattro abilità</dd>
+      <dt>K / J</dt><dd>Stato / Esercito</dd>
+      <dt>R / G / H</dt><dd>Arise / Evoca / Richiama</dd>
+      <dt>B</dt><dd>Cicla la postura</dd>
+    </dl>
+
+    <h3>Blocco <code>abilities</code> in <code>config/arise.json</code></h3>
+    <dl class="config">
+      <dt>cooldowns</dt><dd>Tick di ricarica per abilità: 60 / 200 / 600 / 900</dd>
+      <dt>dash_distance</dt><dd>8 blocchi</dd>
+      <dt>domain_duration_ticks</dt><dd>400 = 20 secondi</dd>
+      <dt>authority_radius</dt><dd>12 blocchi</dd>
+      <dt>authority_duration_ticks</dt><dd>200 = 10 secondi</dd>
+    </dl>
+
+    <h3>Nuove voci in <code>gates.shape</code></h3>
+    <dl class="config">
+      <dt>hall_size / hall_height</dt><dd>25×25, alta 10</dd>
+      <dt>min_branches / max_branches</dt><dd>Da 1 a 3 stanze laterali</dd>
+      <dt>cell_size</dt><dd>36 — deve superare <code>hall_size</code> di almeno tre blocchi</dd>
+    </dl>
+  </section>
+
+  <footer>
+    <p>Resta <strong>F7</strong>: la rifinitura. Suoni e particellari dedicati, e soprattutto la vera silhouette d'ombra al posto del modello zombie riusato. La texture segnaposto va comunque ridisegnata a mano prima di qualsiasi pubblicazione — Modrinth vieta le immagini generate, e questa lo è.</p>
+  </footer>
+
+</div>

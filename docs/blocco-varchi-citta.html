@@ -1,0 +1,449 @@
+<title>Varchi e città</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(142,107,255,0.08), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst { color: var(--muted); max-width: 62ch; margin: 0; }
+  .status-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+  }
+  .chip.ok { color: var(--good); border-color: rgba(127,217,127,0.35); }
+  .chip.todo { color: var(--warn); border-color: rgba(232,166,79,0.35); }
+
+  section { margin-top: 56px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0 0 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  h2 .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+  }
+
+  h3 { font-family: var(--display); font-weight: 600; font-size: 17px; margin: 28px 0 6px; }
+
+  p { margin: 12px 0; max-width: 68ch; }
+  p.lede { color: var(--muted); }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--muted); font-style: italic; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    padding: 1px 5px;
+    color: var(--accent);
+  }
+
+  .commands {
+    margin: 18px 0;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: var(--panel-soft);
+    overflow-x: auto;
+  }
+
+  .commands pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.9;
+    margin: 0;
+    padding: 16px 20px;
+    color: var(--text);
+  }
+  .commands .cmt { color: var(--muted); }
+
+  /* ---- i quattro strati dell'aspetto ---- */
+
+  .layers { margin-top: 22px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+
+  .layer {
+    background: var(--panel-soft);
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    gap: 18px;
+    align-items: start;
+  }
+
+  .layer .slot {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--violet);
+    background: var(--panel);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--violet);
+  }
+
+  .layer .name { font-family: var(--display); font-weight: 600; font-size: 16px; margin-bottom: 2px; }
+  .layer .what { font-size: 14.5px; color: var(--muted); line-height: 1.55; }
+
+  .layer .meta {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+    line-height: 1.9;
+  }
+  .layer .meta .key { color: var(--accent); }
+
+  .table-scroll { overflow-x: auto; margin-top: 20px; border: 1px solid var(--line); }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14.5px; }
+
+  thead th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    font-weight: 500;
+    text-align: left;
+    padding: 12px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  tbody td { padding: 13px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; background: var(--panel-soft); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--accent); width: 44px; }
+  td.expect { color: var(--muted); }
+  td.id { font-family: var(--mono); font-size: 12.5px; color: var(--violet); white-space: nowrap; }
+  td.src { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+  tr.critical td { background: rgba(79,195,247,0.05); }
+  tr.critical td.num { color: var(--gold); }
+
+  .note {
+    margin-top: 22px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .note .title { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--warn); margin-bottom: 4px; }
+  .note p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .note p + p { margin-top: 8px; }
+
+  .risks { margin-top: 20px; display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .risk { background: var(--panel-soft); padding: 15px 20px; display: grid; grid-template-columns: 28px 1fr; gap: 14px; }
+  .risk .rank { font-family: var(--mono); color: var(--warn); font-size: 13px; }
+  .risk .body { font-size: 14.5px; color: var(--muted); }
+  .risk .body b { color: var(--text); font-weight: 600; }
+
+  dl.config { margin: 20px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  dl.config dt { font-family: var(--mono); font-size: 13px; color: var(--accent); background: var(--panel); padding: 11px 16px; white-space: nowrap; }
+  dl.config dd { margin: 0; padding: 11px 16px; background: var(--panel-soft); color: var(--muted); font-size: 14px; }
+
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 36px 16px 72px; }
+    .layer { grid-template-columns: 40px 1fr; }
+    .layer .meta { grid-column: 2; text-align: left; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · varchi e hub</p>
+    <h1>Varchi e città</h1>
+    <p class="standfirst">I Gate non ti catapultano più dentro: compaiono nel mondo, si esaminano e si decide. E il mondo ora ha cinque città con un'Associazione dei Cacciatori, collegate fra loro.</p>
+    <div class="status-row">
+      <span class="chip ok">F1–F5 verificate</span>
+      <span class="chip todo">F6–F7 da verificare</span>
+      <span class="chip todo">varco da verificare</span>
+      <span class="chip todo">città da verificare</span>
+      <span class="chip">build verde</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Il varco <span class="tag">prima si guarda</span></h2>
+    <p><code>/arise gate b</code> non apre più un dungeon: fa <strong>comparire un varco</strong> tre blocchi davanti a te. Un anello di particelle del colore del rango, un nome che fluttua, e un conto alla rovescia. Cliccalo col destro e si apre l'analisi.</p>
+
+    <div class="layers">
+      <div class="layer">
+        <div class="slot">01</div>
+        <div>
+          <div class="name">Rango e composizione</div>
+          <div class="what">Il colore dell'anello è il rango: si legge da lontano, prima di avvicinarsi. La composizione è nuova ed è il motivo per cui due varchi dello stesso rango non sono più la stessa cosa.</div>
+        </div>
+        <div class="meta"><span class="key">6</span><br>composizioni</div>
+      </div>
+
+      <div class="layer">
+        <div class="slot">02</div>
+        <div>
+          <div class="name">Pianta</div>
+          <div class="what">Quante stanze, quante sale ampie, quante diramazioni senza uscita. Serve a distinguere un Gate che si attraversa in tre minuti da uno che è un progetto della serata.</div>
+        </div>
+        <div class="meta"><span class="key">5–8</span><br>stanze</div>
+      </div>
+
+      <div class="layer">
+        <div class="slot">03</div>
+        <div>
+          <div class="name">Chi ci abita e chi lo custodisce</div>
+          <div class="what">L'elenco dei mob che possono popolarlo, e il nome esatto del boss in fondo. Il guardiano è <em>deciso adesso</em>, non estratto quando entri: chi accetta lo fa sapendo cosa lo aspetta.</div>
+        </div>
+        <div class="meta"><span class="key">1</span><br>guardiano</div>
+      </div>
+
+      <div class="layer">
+        <div class="slot">04</div>
+        <div>
+          <div class="name">Ricompensa e scadenza</div>
+          <div class="what">XP e soul coin del completamento, e quanto manca alla chiusura. Cinque minuti: abbastanza per pensarci, non tanto da poterne accumulare dieci in attesa.</div>
+        </div>
+        <div class="meta"><span class="key">5 min</span><br>di vita</div>
+      </div>
+    </div>
+
+    <h3>Perché quei numeri sono un impegno, non una stima</h3>
+    <p>Un pannello che annuncia sette stanze e poi ne fa trovare quattro è peggio che non avere nessun pannello: la decisione si baserebbe su niente. La garanzia è il <strong>seme</strong>. Alla comparsa del varco la pianta viene generata per essere contata, e all'ingresso viene <em>ricostruita dallo stesso seme</em> — quindi è la stessa pianta, blocco per blocco.</p>
+    <p class="lede">Il corollario che mi piace di più: finché nessuno attraversa, <strong>non viene piazzato un solo blocco</strong>. Un varco ignorato scade senza essere costato niente al mondo. Prima ogni richiesta costruiva un dungeon intero, che tu ci volessi entrare o no.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Composizione</th><th>Pavimento</th><th>Pilastri</th><th>Luce</th></tr></thead>
+        <tbody>
+          <tr><td class="id">Profondità</td><td class="src">deepslate tiles</td><td class="src">polished deepslate</td><td class="src">sea lantern</td></tr>
+          <tr><td class="id">Cenere</td><td class="src">polished basalt</td><td class="src">basalt</td><td class="src">shroomlight</td></tr>
+          <tr><td class="id">Gelo</td><td class="src">packed ice</td><td class="src">blue ice</td><td class="src">sea lantern</td></tr>
+          <tr><td class="id">Rovina</td><td class="src">polished blackstone bricks</td><td class="src">blackstone</td><td class="src">glowstone</td></tr>
+          <tr><td class="id">Sculk</td><td class="src">sculk</td><td class="src">deepslate tiles</td><td class="src">verdant froglight</td></tr>
+          <tr><td class="id">Vuoto</td><td class="src">end stone bricks</td><td class="src">purpur pillar</td><td class="src">pearlescent froglight</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <div class="title">Il guscio resta deepslate rinforzato in ogni composizione</div>
+      <p>Il tema cambia quello che si calpesta, i pilastri e la luce — non le pareti. Quel guscio è la contromisura ai creeper che ti facevano cadere nel vuoto, ed è una garanzia di sicurezza: non va messa in mano all'estetica.</p>
+      <p>La stanza del boss ha sempre la stessa luce (crying obsidian) in tutti i temi, per lo stesso motivo per cui i cartelli stradali hanno sempre la stessa forma: è un segnale, e un segnale che cambia aspetto smette di essere tale.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Le città <span class="tag">cinque hub</span></h2>
+    <p>New York, Tokyo, Roma, Madrid, Berlino. Ognuna è un quartiere di <strong>112×112 blocchi</strong> con griglia stradale, lampioni, sedici isolati di edifici, una piazza centrale e in mezzo l'<strong>Associazione dei Cacciatori</strong>: l'unico edificio in cui si entra davvero, vuoto, illuminato, con il terminale di viaggio al centro.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Città</th><th>Materiali</th><th>Altezze</th><th>Coordinate</th></tr></thead>
+        <tbody>
+          <tr><td class="id">New York</td><td class="src">cemento chiaro · vetro azzurro · asfalto</td><td>4–11 piani</td><td class="src">200056, 200056</td></tr>
+          <tr><td class="id">Tokyo</td><td class="src">cemento bianco e rosso · tetti scuri</td><td>3–7 piani</td><td class="src">215056, 200056</td></tr>
+          <tr><td class="id">Roma</td><td class="src">travertino · cotto · sanpietrini</td><td>2–4 piani</td><td class="src">230056, 200056</td></tr>
+          <tr><td class="id">Madrid</td><td class="src">intonaco chiaro · tetti di coccio</td><td>2–5 piani</td><td class="src">245056, 200056</td></tr>
+          <tr><td class="id">Berlino</td><td class="src">pietra · mattoni scuri</td><td>3–6 piani</td><td class="src">260056, 200056</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Come si costruisce senza uccidere il server</h3>
+    <p>Una città sono <strong>circa due milioni di blocchi</strong>. Piazzarli dentro un comando significherebbe un server fermo per minuti, un client che dichiara la partita bloccata e — in multiplayer — tutti espulsi per timeout.</p>
+    <p>Quindi la pianta non è un elenco di blocchi ma un <strong>elenco di volumi</strong>: qualche centinaio di parallelepipedi, generati in un istante e contati in anticipo. L'esecutore tiene un cursore dentro quell'elenco e ne piazza <strong>24 000 per battito</strong>, poi riprende esattamente da dove era. Il prezzo è che la città cresce sotto gli occhi invece di apparire — che poi è anche meglio.</p>
+    <p class="lede">Il tempo vero non lo domina il piazzamento dei blocchi (una manciata di secondi) ma la generazione del terreno: le città stanno a duecentomila blocchi dallo spawn, dove nessuno ha mai messo piede e ogni chunk va creato da zero.</p>
+
+    <h3>Nessun file di salvataggio delle città</h3>
+    <p>La prova che una città esiste è <strong>la città stessa</strong>: si guarda se al centro della sua Associazione c'è la pietra segnaposto. Un elenco tenuto a parte finirebbe prima o poi in disaccordo col mondo — un backup ripristinato, un mondo copiato, un <code>/fill</code> di troppo — e il disaccordo sarebbe silenzioso.</p>
+  </section>
+
+  <section>
+    <h2>La rete di viaggio <span class="tag">terminale</span></h2>
+    <p>Al centro di ogni Associazione c'è la pietra. Cliccala e si apre la rete: le cinque città, con quelle non ancora costruite in grigio e non cliccabili. Vederle elencate anche quando mancano è un'informazione — dice che ci sono, e che vanno costruite.</p>
+    <p>Il terminale non è né un blocco nostro né un'entità: è il segnaposto stesso, riconosciuto dalle sue coordinate. Un blocco in meno da registrare, e niente che possa sparire quando il chunk si scarica.</p>
+  </section>
+
+  <section>
+    <h2>Da testare <span class="tag">checklist</span></h2>
+
+    <div class="commands">
+<pre><span class="cmt"># il varco</span>
+/arise gate b            <span class="cmt"># compare davanti a te, poi click destro</span>
+/arise gate s            <span class="cmt"># rango alto: elenco mob più lungo</span>
+
+<span class="cmt"># le città — una per volta la prima volta</span>
+/arise city build rome
+/arise city build all    <span class="cmt"># cinque cantieri insieme: guarda se scatta</span>
+
+<span class="cmt"># viaggio</span>
+/arise city go rome
+/arise hub               <span class="cmt"># apre la rete ovunque tu sia (debug)</span></pre>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>Cosa fare</th><th>Cosa deve succedere</th></tr></thead>
+        <tbody>
+          <tr class="critical">
+            <td class="num">1</td>
+            <td><code>/arise gate b</code>, poi click destro sul varco</td>
+            <td class="expect">Si apre l'analisi con rango, composizione, pianta, guardiano, abitanti, ricompensa e conto alla rovescia. È il cuore del blocco</td>
+          </tr>
+          <tr class="critical">
+            <td class="num">2</td>
+            <td>Premi <strong>Entra</strong> e conta le stanze</td>
+            <td class="expect">Devono essere <strong>esattamente</strong> quelle annunciate, e il boss in fondo deve essere quello nominato dal pannello. Se non torna, il seme non sta funzionando</td>
+          </tr>
+          <tr class="critical">
+            <td class="num">3</td>
+            <td><code>/arise city build rome</code> e aspetta</td>
+            <td class="expect">Avanzamento in chat ogni 10%, poi il messaggio con le coordinate. Il gioco non deve mai bloccarsi</td>
+          </tr>
+          <tr><td class="num">4</td><td>Apri più varchi e lasciali scadere</td><td class="expect">Dopo cinque minuti si richiudono da soli, con un anello che implode</td></tr>
+          <tr><td class="num">5</td><td>Apri un varco, allontanati di 30 blocchi e premi Entra dal pannello ancora aperto</td><td class="expect">"Quel gate non c'è più": oltre 16 blocchi l'ingresso non è accettato</td></tr>
+          <tr><td class="num">6</td><td>Apri tre o quattro varchi di composizioni diverse</td><td class="expect">Entrandoci, pavimenti e luci sono davvero diversi fra loro, ma le pareti sono sempre deepslate rinforzato</td></tr>
+          <tr><td class="num">7</td><td><code>/arise city go rome</code></td><td class="expect">Arrivi davanti al portone dell'Associazione, rivolto verso l'ingresso</td></tr>
+          <tr><td class="num">8</td><td>Entra e clicca la pietra al centro</td><td class="expect">Si apre la rete di viaggio. Le città non costruite sono grigie e non cliccabili</td></tr>
+          <tr><td class="num">9</td><td>Costruisci una seconda città e viaggia fra le due</td><td class="expect">Andata e ritorno funzionano da entrambi i terminali</td></tr>
+          <tr><td class="num">10</td><td>Guarda le città dall'alto, in creativa</td><td class="expect">Griglia stradale regolare, nessun blocco di asfalto o lampione fuori dal perimetro spianato</td></tr>
+          <tr><td class="num">11</td><td>Entra in un edificio qualsiasi dalla porta a sud</td><td class="expect">Muri interi al piano terra, pavimento dentro, vetrate a fasce</td></tr>
+          <tr><td class="num">12</td><td><code>/arise city build rome</code> una seconda volta</td><td class="expect">"Roma esiste già" — non ricostruisce</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <div class="title">Cosa ho verificato io, e cosa no</div>
+      <p><strong>Verificato:</strong> il client si avvia pulito, tutte le registrazioni nuove (entità del varco, pacchetti, eventi) passano, e la config ha generato <code>cities</code> e <code>gates.offer_lifetime_ticks</code> senza toccare il resto.</p>
+      <p><strong>Non verificato in gioco:</strong> tutto il resto. Per provare la costruzione di una città senza di te servirebbe il server di sviluppo, che chiede di accettare l'EULA di Mojang scrivendo <code>eula=true</code> in <code>run/eula.txt</code> — è una firma, e non la metto io al posto tuo. Se crei quel file, dai prossimi blocchi in poi posso lanciare comandi e leggere i risultati da solo, senza disturbarti.</p>
+      <p>Rileggendo i conti ho trovato e corretto due errori prima ancora di compilare: strade e lampioni dei bordi finivano fuori dall'area spianata, e il pavimento degli edifici cancellava i muri al piano terra lasciandoli aperti sui quattro lati.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Dove mi aspetto problemi <span class="tag">in ordine</span></h2>
+    <div class="risks">
+      <div class="risk"><span class="rank">01</span><span class="body"><b>Il terreno sotto le città.</b> La quota si sceglie facendo la media di cinque punti — centro e quattro angoli. Su un pendio ripido o a cavallo di un oceano una città può restare mezza sospesa su un plinto o mezza sepolta. Il plinto scende venti blocchi: se non basta, si vede subito.</span></div>
+      <div class="risk"><span class="rank">02</span><span class="body"><b>Cinque cantieri insieme.</b> <code>/arise city build all</code> spende cinque volte il budget per battito e genera terreno in cinque punti lontanissimi. È il comando più a rischio di far scattare il gioco: se succede, si costruiscono una per volta o si abbassa <code>blocks_per_tick</code>.</span></div>
+      <div class="risk"><span class="rank">03</span><span class="body"><b>La prima apertura della rete di viaggio.</b> Per sapere quali città esistono il server legge il segnaposto di tutte e cinque, e quei chunk vanno generati. La prima volta può esserci un blocco di qualche secondo. Dalla seconda è istantaneo, perché la risposta resta in memoria.</span></div>
+      <div class="risk"><span class="rank">04</span><span class="body"><b>Varchi sovrapposti.</b> Niente impedisce di aprirne cinque nello stesso punto: si sovrappongono e diventano illeggibili. Non ho messo un limite perché non so ancora quale sia quello giusto.</span></div>
+      <div class="risk"><span class="rank">05</span><span class="body"><b>Il varco davanti a un muro.</b> Se non c'è spazio tre blocchi avanti, il varco compare addosso a te. È brutto ma è meglio che murarlo dentro la roccia, dove non si potrebbe cliccare.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Riferimento <span class="tag">config e comandi</span></h2>
+
+    <h3>Blocco <code>cities</code> in <code>config/arise.json</code></h3>
+    <dl class="config">
+      <dt>origin_x / origin_z</dt><dd><code>200000</code> — dove sta la prima città. Lontano perché nessuno costruisce laggiù</dd>
+      <dt>spacing</dt><dd><code>15000</code> — distanza fra una città e la successiva</dd>
+      <dt>size</dt><dd><code>112</code> — lato del quartiere</dd>
+      <dt>block_size / road_width</dt><dd><code>28</code> / <code>6</code> — isolato più strada, e larghezza della carreggiata</dd>
+      <dt>blocks_per_tick</dt><dd><code>24000</code> — la leva se il gioco scatta durante una costruzione</dd>
+    </dl>
+
+    <h3>Nuovo in <code>gates</code></h3>
+    <dl class="config">
+      <dt>offer_lifetime_ticks</dt><dd><code>6000</code> = cinque minuti di vita di un varco</dd>
+    </dl>
+
+    <h3>Comandi nuovi</h3>
+    <dl class="config">
+      <dt>/arise gate &lt;rango&gt;</dt><dd>Ora fa comparire un varco invece di teletrasportarti</dd>
+      <dt>/arise city build &lt;nome|all&gt;</dt><dd>Avvia un cantiere. Funziona anche dalla console del server</dd>
+      <dt>/arise city go &lt;nome&gt;</dt><dd>Viaggio diretto, senza terminale</dd>
+      <dt>/arise hub</dt><dd>Apre la rete di viaggio ovunque</dd>
+    </dl>
+  </section>
+
+  <footer>
+    <p>Il passo successivo naturale è che i varchi <strong>compaiano da soli</strong> nel mondo, invece che a comando: è la stessa meccanica, con in più le regole su quando e dove — e quelle vanno decise, non indovinate. Resta anche il debito di sempre: la texture <code>shadow.png</code> è un segnaposto generato da uno script e va ridisegnata a mano prima di qualsiasi pubblicazione.</p>
+  </footer>
+
+</div>

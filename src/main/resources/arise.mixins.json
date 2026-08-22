@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "com.luca.arise.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"mixins": [
+		"ServerStartMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

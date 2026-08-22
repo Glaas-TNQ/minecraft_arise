@@ -1,0 +1,121 @@
+package com.luca.arise.network;
+
+import com.luca.arise.ability.AbilityManager;
+import com.luca.arise.city.CityManager;
+import com.luca.arise.gate.GateEntity;
+import com.luca.arise.gate.GateManager;
+import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.shadow.ShadowManager;
+
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+
+public final class ModPayloads {
+
+	private ModPayloads() {
+	}
+
+	/** Registrazione dei tipi: deve girare su entrambi i lati, quindi sta nell'init comune. */
+	public static void register() {
+		PayloadTypeRegistry.serverboundPlay().register(SpendPointPayload.TYPE, SpendPointPayload.STREAM_CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(AriseActionPayload.TYPE, AriseActionPayload.STREAM_CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(ShadowActionPayload.TYPE, ShadowActionPayload.STREAM_CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(GateActionPayload.TYPE, GateActionPayload.STREAM_CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(CityTravelPayload.TYPE, CityTravelPayload.STREAM_CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(GateOfferPayload.TYPE, GateOfferPayload.STREAM_CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(CityListPayload.TYPE, CityListPayload.STREAM_CODEC);
+
+		ServerPlayNetworking.registerGlobalReceiver(SpendPointPayload.TYPE, (payload, context) -> {
+			// Esecuzione esplicita sul thread del server: tocchiamo attributi e attachment, che
+			// non sono thread-safe. Costa al massimo un tick di ritardo.
+			context.server().execute(() -> {
+				ServerPlayer player = context.player();
+				Component error = ProgressManager.spend(player, payload.stat(), payload.amount());
+
+				if (error != null) {
+					player.sendSystemMessage(error);
+				}
+			});
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(AriseActionPayload.TYPE, (payload, context) -> {
+			context.server().execute(() -> {
+				ServerPlayer player = context.player();
+
+				Component feedback = switch (payload.action()) {
+					case EXTRACT -> ShadowManager.extract(player);
+					case SUMMON -> ShadowManager.summon(player);
+					case RECALL -> ShadowManager.recall(player);
+					case STANCE -> ShadowManager.cycleStance(player);
+					case ABILITY_1, ABILITY_2, ABILITY_3, ABILITY_4 ->
+							AbilityManager.use(player, payload.action().ability());
+				};
+
+				player.sendSystemMessage(feedback);
+			});
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(ShadowActionPayload.TYPE, (payload, context) -> {
+			context.server().execute(() -> {
+				ServerPlayer player = context.player();
+
+				Component feedback = switch (payload.action()) {
+					case SUMMON -> ShadowManager.summonOne(player, payload.shadowId());
+					case RECALL -> ShadowManager.recallOne(player, payload.shadowId());
+					case DISMISS -> ShadowManager.dismiss(player, payload.shadowId());
+					case RENAME -> ShadowManager.rename(player, payload.shadowId(), payload.name());
+					case RECOLOR -> ShadowManager.recolor(player, payload.shadowId(), payload.color());
+					case UPGRADE -> ShadowManager.upgrade(player, payload.shadowId());
+				};
+
+				player.sendSystemMessage(feedback);
+			});
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(GateActionPayload.TYPE, (payload, context) -> {
+			context.server().execute(() -> {
+				ServerPlayer player = context.player();
+
+				// L'id arriva dal client, quindi vale zero finché non si dimostra che indica un
+				// varco vero, ancora vivo e a portata di mano. Senza questi tre controlli
+				// basterebbe un pacchetto costruito a mano per entrare in un Gate di rango S.
+				if (!(player.level().getEntity(payload.entityId()) instanceof GateEntity varco)
+						|| varco.offer() == null
+						|| varco.distanceToSqr(player) > MAX_GATE_REACH * MAX_GATE_REACH) {
+					player.sendSystemMessage(Component.translatable("arise.msg.gate.varco_gone"));
+					return;
+				}
+
+				switch (payload.action()) {
+					case ENTER -> {
+						Component feedback = GateManager.enter(player, varco.offer());
+						player.sendSystemMessage(feedback);
+						varco.discard();
+					}
+					case DISMISS -> {
+						varco.discard();
+						player.sendSystemMessage(Component.translatable("arise.msg.gate.varco_dismissed"));
+					}
+				}
+			});
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(CityTravelPayload.TYPE, (payload, context) ->
+				context.server().execute(() -> {
+					ServerPlayer player = context.player();
+					player.sendSystemMessage(CityManager.travel(player, payload.city()));
+				}));
+	}
+
+	/**
+	 * Distanza massima fra giocatore e varco perché l'azione sia accettata.
+	 *
+	 * <p>Generosa di proposito: il pannello resta aperto mentre si pensa, e nessuno deve perdere
+	 * l'ingresso per aver fatto due passi indietro. Serve a impedire di entrare in un varco
+	 * dall'altra parte del mondo, non a misurare la buona fede.
+	 */
+	private static final double MAX_GATE_REACH = 16.0;
+}

@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "arise",
+	"version": "${version}",
+	"name": "Arise",
+	"description": "Sistema di progressione, Gate procedurali ed esercito d'ombra.",
+	"authors": [
+		"Luca"
+	],
+	"contact": {
+		"homepage": "",
+		"sources": ""
+	},
+	"license": "MIT",
+	"icon": "assets/arise/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.luca.arise.AriseMod"
+		],
+		"client": [
+			"com.luca.arise.client.AriseModClient"
+		]
+	},
+	"mixins": [
+		"arise.mixins.json",
+		{
+			"config": "arise.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
