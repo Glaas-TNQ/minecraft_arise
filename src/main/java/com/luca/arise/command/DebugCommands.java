@@ -171,8 +171,11 @@ public final class DebugCommands {
 
 	// ---------------------------------------------------------------- arena
 
-	private static final int ARENA_HEIGHT = 20;
-	private static final int WALL_HEIGHT = 8;
+	/** Altezza interna: quanto spazio libero c'e' dal pavimento al soffitto. */
+	private static final int ARENA_HEIGHT = 12;
+
+	/** A che altezza corre la fascia di lanterne nei muri. */
+	private static final int LAMP_BAND = ARENA_HEIGHT / 3;
 
 	/**
 	 * Passo della griglia di lanterne nel pavimento.
@@ -184,10 +187,16 @@ public final class DebugCommands {
 	private static final int LAMP_SPACING = 8;
 
 	/**
-	 * Costruisce un'arena quadrata attorno al giocatore, ovunque si trovi.
+	 * Costruisce un'arena quadrata <em>chiusa</em> attorno al giocatore, ovunque si trovi.
 	 *
 	 * <p>Serve a provare evocazioni e combattimenti senza cercare un posto piatto. Sostituisce il
 	 * terreno: è un comando da gamemaster e non chiede conferma, come {@code /fill}.
+	 *
+	 * <p><strong>Il tetto non è una rifinitura.</strong> Un'arena a cielo aperto dà fuoco a
+	 * qualunque non-morto ci si evochi dentro, perché quel che li brucia non è la luce ma il vedere
+	 * il cielo: Minecraft lo decide guardando se sopra la loro testa c'è un blocco, non quanto è
+	 * illuminata la stanza. Metà delle prove sulle ombre estratte da zombie e scheletri finivano in
+	 * fumo prima ancora di cominciare.
 	 */
 	private static int arena(CommandSourceStack source, int side) throws CommandSyntaxException {
 		ServerPlayer player = source.getPlayerOrException();
@@ -226,10 +235,12 @@ public final class DebugCommands {
 				for (int dy = 0; dy < ARENA_HEIGHT; dy++) {
 					cursor.set(center.getX() + dx, floorY + 1 + dy, center.getZ() + dz);
 
-					if (edge && dy < WALL_HEIGHT) {
-						// Fascia di lanterne a metà muro, per illuminare anche i bordi dove il
-						// pavimento non ne ha.
-						boolean wallLamp = dy == WALL_HEIGHT / 2
+					if (edge) {
+						// Muri per tutta l'altezza, non piu' solo per i primi otto blocchi: con il
+						// tetto sopra, un muro basso lascerebbe una fessura che gira intorno.
+						// Fascia di lanterne a un terzo d'altezza, per illuminare i bordi dove il
+						// pavimento non arriva.
+						boolean wallLamp = dy == LAMP_BAND
 								&& (Math.floorMod(dx, LAMP_SPACING) == 0 || Math.floorMod(dz, LAMP_SPACING) == 0);
 						level.setBlock(cursor, wallLamp ? lamp : wall, flags);
 					} else {
@@ -238,6 +249,11 @@ public final class DebugCommands {
 
 					placed++;
 				}
+
+				// Il tetto. Chiude anche sopra i muri, cosi' il bordo non resta scoperto.
+				cursor.set(center.getX() + dx, floorY + 1 + ARENA_HEIGHT, center.getZ() + dz);
+				level.setBlock(cursor, wall, flags);
+				placed++;
 			}
 		}
 

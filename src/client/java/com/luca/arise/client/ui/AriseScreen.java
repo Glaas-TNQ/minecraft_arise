@@ -97,9 +97,17 @@ public abstract class AriseScreen extends Screen {
 
 	// ---------------------------------------------------------------- disegno
 
+	/**
+	 * Il telaio e il corpo si disegnano nello <em>sfondo</em>, non nel disegno principale.
+	 *
+	 * <p>E' l'ordine che conta: {@code extractRenderState} disegna prima lo sfondo e poi i widget.
+	 * Un pannello dipinto li' dentro finisce <strong>sopra i bottoni</strong> e li nasconde — i
+	 * bottoni restano cliccabili, ma invisibili, che e' il modo peggiore di rompere una schermata.
+	 * Disegnando qui, l'ordine diventa quello giusto: sfondo, telaio, corpo, e i widget sopra tutto.
+	 */
 	@Override
-	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+		super.extractBackground(graphics, mouseX, mouseY, partialTick);
 
 		graphics.fill(0, 0, width, height, AriseTheme.SCRIM);
 		graphics.fill(panelX, panelY, panelX + panelWidth, panelY + panelHeight, AriseTheme.PANEL);
