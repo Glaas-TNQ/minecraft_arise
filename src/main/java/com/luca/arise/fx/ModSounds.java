@@ -65,6 +65,10 @@ public final class ModSounds {
 	/** L'assortimento che cambia. */
 	public static final SoundEvent SHOP_REFRESH = create("shop.refresh");
 
+	// ---- l'equipaggiamento
+	/** Un pezzo cade da un nemico o da un varco appena chiuso. */
+	public static final SoundEvent GEAR_DROP = create("gear.drop");
+
 	// ---- le abilità
 	/** Lancio generico, per le abilità che non ne hanno uno proprio. */
 	public static final SoundEvent ABILITY_CAST = create("ability.cast");
@@ -72,6 +76,16 @@ public final class ModSounds {
 	public static final SoundEvent ABILITY_DOMAIN = create("ability.domain");
 	/** Autorità del Sovrano. */
 	public static final SoundEvent ABILITY_AUTHORITY = create("ability.authority");
+
+	// ---- l'Officina delle Anime
+	/** Un macchinario che lavora: si sente da fuori, sommesso. */
+	public static final SoundEvent MACHINE_WORK = create("machine.work");
+	/** Un giro di lavoro finito. */
+	public static final SoundEvent MACHINE_DONE = create("machine.done");
+	/** La fusione nel Crogiolo. */
+	public static final SoundEvent SOUL_FUSE = create("soul.fuse");
+	/** Un'anima che entra nell'esercito. */
+	public static final SoundEvent SOUL_ENLIST = create("soul.enlist");
 
 	private ModSounds() {
 	}

@@ -114,9 +114,50 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
    - **`Screen.mouseClicked` è cambiato**: prende `(MouseButtonEvent, boolean doppioClick)`, non
      più tre argomenti. Le coordinate stanno in `event.x()` e `event.y()`. `mouseScrolled` invece
      ha ancora quattro `double`;
+   - **componenti dati**: le costanti vanilla stanno in `net.minecraft.core.component.DataComponents`,
+     e un componente proprio si registra con
+     `Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, id, DataComponentType.builder()...)`.
+     Se il tipo implementa `TooltipProvider`, le sue righe compaiono nel tooltip solo dopo averlo
+     dichiarato a `ItemComponentTooltipProviderRegistry` (modulo `fabric-item-api-v1`);
+   - **menu e caselle**: il modulo Fabric si chiama ora `fabric-menu-api-v1` (`ExtendedMenuType`,
+     `ExtendedMenuProvider`) — `fabric-screen-handler-api-v1` non esiste piu'. Lato client la
+     registrazione e' `MenuScreens.register(tipo, Schermata::new)`, accessibile grazie al
+     classtweaker di quel modulo;
+   - **`Button` e' astratto** in 26.2: una sottoclasse deve implementare
+     `extractContents(GuiGraphicsExtractor, int, int, float)` (`extractWidgetRenderState` e'
+     `final`). Lo sfondo di un widget si disegna con `extractDefaultSprite(...)`;
+   - **`AbstractContainerScreen` non ha piu' `renderBg`**: il fondo si dipinge in
+     `extractBackground(...)`, come per le nostre schermate;
+   - vanilla ha **rame** fra i materiali di armi e armature: la scala completa e' cuoio → rame →
+     maglia → ferro → oro → diamante → netherite, che sono sei gradini utili per sei ranghi;
+   - `ItemStack.OPTIONAL_CODEC` per le caselle vuote, e `ByteBufCodecs.fromCodecWithRegistries`
+     per mandarne una lista in rete. Gli `ItemStack` si possono salvare in un attachment perche'
+     l'API passa da `ValueOutput.store(nome, codec, valore)`, che i registri ce li ha;
    - `LocalPlayer` non ha `displayClientMessage`: sul client si usa `sendSystemMessage(Component)`;
    - `GuiGraphicsExtractor` ha `enableScissor/disableScissor`, `outline`, `fillGradient` e
-     `setComponentTooltipForNextFrame`: liste che scorrono e riquadri si disegnano senza texture.
+     `setComponentTooltipForNextFrame`: liste che scorrono e riquadri si disegnano senza texture;
+   - **registrare un blocco**: `BlockBehaviour.Properties.setId(ResourceKey<Block>)` e' obbligatorio
+     — senza, il costruttore lancia invece di registrarsi col nome sbagliato. Idem per l'oggetto:
+     `new BlockItem(block, new Item.Properties().useBlockDescriptionPrefix().setId(itemKey))`.
+     `BlockEntityType` non ha piu' il `Builder`: `new BlockEntityType<>(fabbrica, Set.of(blocchi))`;
+   - **`BaseEntityBlock.getRenderShape` risponde `INVISIBLE`**. Un macchinario che non sia un
+     forziere deve riscriverlo a `MODEL`, altrimenti esiste, si apre, funziona — e non si vede;
+   - `BaseContainerBlockEntity` da' Container, MenuProvider e Nameable in un colpo solo, ma
+     `getContainerSize()` resta da implementare. Gli oggetti si salvano con
+     `ContainerHelper.saveAllItems/loadAllItems(ValueOutput|ValueInput, NonNullList)`;
+   - **automazione con le tramogge**: serve `WorldlyContainer` (tre metodi) — un `Container` e
+     basta accetta da ogni lato e lascia portare via tutto, comprese le caselle che non si devono
+     toccare. La barra di avanzamento passa da `ContainerData` + `addDataSlots`, non da un
+     pacchetto proprio: e' l'unico canale che il gioco aggiorna da solo e solo a chi guarda;
+   - **ricette dal codice**: `serverLevel.recipeAccess().getRecipeFor(RecipeType.SMELTING,
+     new SingleRecipeInput(stack), level)`, e `Recipe.assemble(input)` prende **un solo**
+     argomento in 26.2;
+   - **percorsi degli asset**: `assets/<ns>/blockstates/`, `assets/<ns>/models/block/`, e il
+     modello dell'oggetto in **`assets/<ns>/items/`** (`{"model":{"type":"minecraft:model",
+     "model":"..."}}`), non piu' in `models/item/`. Dati: `data/<ns>/recipe/` e
+     `data/<ns>/loot_table/blocks/` (singolare). **Senza loot table il blocco non lascia niente**;
+   - le costanti di `CreativeModeTabs` sono **private** in 26.2: la chiave di una scheda vanilla
+     si ricostruisce con `ResourceKey.create(Registries.CREATIVE_MODE_TAB, ...)`.
 3. **La compilazione non è una verifica.** Un sistema è "fatto" quando lo si è visto
    funzionare in `runClient`. Vale soprattutto per AI delle ombre, generazione dungeon e HUD.
 
@@ -200,5 +241,14 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       disegnate nel codice — *compilato, da verificare*
 - [ ] **C4** — Il risveglio e la catena di nove incarichi che apre i sistemi uno alla volta —
       *compilato, da verificare*
+- [ ] **C5** — Città grandi e diverse: cinque piante stradali, cinque tavolozze, cinque forme di
+      isolato e un monumento riconoscibile per città — *compilato, da verificare*
+- [ ] **D1** — L'equipaggiamento è un oggetto: componente `arise:gear_piece` su item vanilla, armi
+      e armature vere nelle caselle del gioco, menu del Cacciatore con spazio dimensionale, bottino
+      che cade per terra, vincolo all'anima — *compilato, da verificare*
+- [ ] **D2** — L'Officina delle Anime: le anime in esubero diventano operai, quattro macchinari
+      (Richiamo, Crogiolo, Fucina, Pozzo), catalizzatori e tratti, ombre cadute con un minuto di
+      recupero, `/arise arena` diventata laboratorio — *compilato, server verde, da verificare in
+      gioco*
 
 Aggiorna questa lista quando una fase è **verificata in gioco**, non quando compila.

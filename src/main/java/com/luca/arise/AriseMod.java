@@ -3,14 +3,19 @@ package com.luca.arise;
 import com.luca.arise.command.AriseCommands;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.event.CityEvents;
+import com.luca.arise.event.GearEvents;
 import com.luca.arise.event.GemEvents;
 import com.luca.arise.event.ProgressEvents;
 import com.luca.arise.event.QuestEvents;
+import com.luca.arise.event.WorkshopEvents;
 import com.luca.arise.fx.ModSounds;
 import com.luca.arise.gate.GateSpawner;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.network.ModPayloads;
 import com.luca.arise.registry.ModAttachments;
+import com.luca.arise.registry.ModBlocks;
+import com.luca.arise.registry.ModComponents;
+import com.luca.arise.registry.ModMenus;
 import com.luca.arise.registry.ModEntities;
 
 import net.fabricmc.api.ModInitializer;
@@ -29,6 +34,10 @@ public class AriseMod implements ModInitializer {
 	public void onInitialize() {
 		AriseConfig.load();
 		ModAttachments.init();
+		ModComponents.init();
+		// Prima dei menu: il tipo di block entity elenca i blocchi, quindi i blocchi devono esserci.
+		ModBlocks.init();
+		ModMenus.init();
 		ModEntities.init();
 		ModSounds.init();
 		// Prima dei giocatori: registra l'equipaggiamento fra le sorgenti di statistica.
@@ -36,8 +45,10 @@ public class AriseMod implements ModInitializer {
 		ModPayloads.register();
 		ProgressEvents.register();
 		CityEvents.register();
+		GearEvents.register();
 		GemEvents.register();
 		QuestEvents.register();
+		WorkshopEvents.register();
 		GateSpawner.register();
 		AriseCommands.register();
 

@@ -11,7 +11,6 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceArgument;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -27,8 +26,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import com.luca.arise.fx.AriseFx;
@@ -154,12 +151,16 @@ public final class DebugCommands {
 
 		root.then(fx);
 
-		root.then(Commands.literal("arena")
-				.requires(AriseCommands::canCheat)
-				.executes(context -> arena(context.getSource(), 50))
-				.then(Commands.argument("lato", IntegerArgumentType.integer(8, 128))
-						.executes(context -> arena(context.getSource(),
-								IntegerArgumentType.getInteger(context, "lato")))));
+		// Due nomi per lo stesso comando: "arena" perche' e' quello che le dita digitano da mesi,
+		// "lab" perche' e' quello che la stanza e' diventata.
+		for (String name : new String[] {"arena", "lab"}) {
+			root.then(Commands.literal(name)
+					.requires(AriseCommands::canCheat)
+					.executes(context -> laboratory(context.getSource(), 50))
+					.then(Commands.argument("lato", IntegerArgumentType.integer(8, 128))
+							.executes(context -> laboratory(context.getSource(),
+									IntegerArgumentType.getInteger(context, "lato")))));
+		}
 	}
 
 	private static int playEffect(CommandSourceStack source, Effect effect) throws CommandSyntaxException {
@@ -169,96 +170,22 @@ public final class DebugCommands {
 		return 1;
 	}
 
-	// ---------------------------------------------------------------- arena
-
-	/** Altezza interna: quanto spazio libero c'e' dal pavimento al soffitto. */
-	private static final int ARENA_HEIGHT = 12;
-
-	/** A che altezza corre la fascia di lanterne nei muri. */
-	private static final int LAMP_BAND = ARENA_HEIGHT / 3;
+	// ---------------------------------------------------------------- laboratorio
 
 	/**
-	 * Passo della griglia di lanterne nel pavimento.
+	 * Costruisce il laboratorio attorno al giocatore.
 	 *
-	 * <p>Otto blocchi: una lanterna marina emette luce 15, che scende di uno al blocco, quindi a
-	 * metà strada fra due lanterne si resta sopra 11. Gli ostili spawnano solo a luce zero, così
-	 * l'arena resta vuota mentre si prova.
+	 * <p>La geometria e gli arredi stanno in {@link LabBuilder}: qui resta solo il comando. La
+	 * separazione non e' cosmetica — il laboratorio e' cresciuto da quattro muri a sei varchi,
+	 * quattro macchinari e tre barili, e tenerlo dentro un file di comandi lo avrebbe reso
+	 * illeggibile per entrambi.
 	 */
-	private static final int LAMP_SPACING = 8;
-
-	/**
-	 * Costruisce un'arena quadrata <em>chiusa</em> attorno al giocatore, ovunque si trovi.
-	 *
-	 * <p>Serve a provare evocazioni e combattimenti senza cercare un posto piatto. Sostituisce il
-	 * terreno: è un comando da gamemaster e non chiede conferma, come {@code /fill}.
-	 *
-	 * <p><strong>Il tetto non è una rifinitura.</strong> Un'arena a cielo aperto dà fuoco a
-	 * qualunque non-morto ci si evochi dentro, perché quel che li brucia non è la luce ma il vedere
-	 * il cielo: Minecraft lo decide guardando se sopra la loro testa c'è un blocco, non quanto è
-	 * illuminata la stanza. Metà delle prove sulle ombre estratte da zombie e scheletri finivano in
-	 * fumo prima ancora di cominciare.
-	 */
-	private static int arena(CommandSourceStack source, int side) throws CommandSyntaxException {
+	private static int laboratory(CommandSourceStack source, int side) throws CommandSyntaxException {
 		ServerPlayer player = source.getPlayerOrException();
-		ServerLevel level = player.level();
+		int placed = LabBuilder.build(player, side);
 
-		BlockPos center = player.blockPosition();
-		int half = side / 2;
-		int floorY = center.getY() - 1;
-
-		BlockState floor = Blocks.POLISHED_DEEPSLATE.defaultBlockState();
-		BlockState wall = Blocks.DEEPSLATE_BRICKS.defaultBlockState();
-		BlockState lamp = Blocks.SEA_LANTERN.defaultBlockState();
-		BlockState air = Blocks.AIR.defaultBlockState();
-
-		// Flag 2 = avvisa i client senza propagare aggiornamenti ai blocchi vicini. Su decine di
-		// migliaia di blocchi la differenza fra questo e un aggiornamento completo è fra un attimo
-		// e diversi secondi di server bloccato.
-		int flags = 2;
-		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
-		int placed = 0;
-
-		for (int dx = -half; dx <= half; dx++) {
-			for (int dz = -half; dz <= half; dz++) {
-				boolean edge = Math.abs(dx) == half || Math.abs(dz) == half;
-
-				// Lanterne annegate nel pavimento invece che appese: illuminano tutta l'area senza
-				// ostacoli in mezzo al campo, e restano a filo per non intralciare il movimento.
-				boolean floorLamp = !edge
-						&& Math.floorMod(dx, LAMP_SPACING) == 0
-						&& Math.floorMod(dz, LAMP_SPACING) == 0;
-
-				cursor.set(center.getX() + dx, floorY, center.getZ() + dz);
-				level.setBlock(cursor, floorLamp ? lamp : floor, flags);
-				placed++;
-
-				for (int dy = 0; dy < ARENA_HEIGHT; dy++) {
-					cursor.set(center.getX() + dx, floorY + 1 + dy, center.getZ() + dz);
-
-					if (edge) {
-						// Muri per tutta l'altezza, non piu' solo per i primi otto blocchi: con il
-						// tetto sopra, un muro basso lascerebbe una fessura che gira intorno.
-						// Fascia di lanterne a un terzo d'altezza, per illuminare i bordi dove il
-						// pavimento non arriva.
-						boolean wallLamp = dy == LAMP_BAND
-								&& (Math.floorMod(dx, LAMP_SPACING) == 0 || Math.floorMod(dz, LAMP_SPACING) == 0);
-						level.setBlock(cursor, wallLamp ? lamp : wall, flags);
-					} else {
-						level.setBlock(cursor, air, flags);
-					}
-
-					placed++;
-				}
-
-				// Il tetto. Chiude anche sopra i muri, cosi' il bordo non resta scoperto.
-				cursor.set(center.getX() + dx, floorY + 1 + ARENA_HEIGHT, center.getZ() + dz);
-				level.setBlock(cursor, wall, flags);
-				placed++;
-			}
-		}
-
-		int total = placed;
-		source.sendSuccess(() -> Component.translatable("arise.msg.debug.arena", side, total), true);
+		source.sendSuccess(() -> Component.translatable("arise.msg.debug.lab", placed), true);
+		source.sendSuccess(LabBuilder::map, false);
 		return side;
 	}
 

@@ -41,7 +41,12 @@ public enum GearBase implements StringRepresentable {
 	PENDANT("pendant", GearSlot.NECKLACE, Stat.VITALITY, Stat.FORTUNE),
 	TALISMAN("talisman", GearSlot.TALISMAN, Stat.ABSORPTION, Stat.REACH),
 	EARRING("earring", GearSlot.EARRING, Stat.HASTE, Stat.FORTUNE),
-	RING("ring", GearSlot.RING, Stat.STRENGTH, Stat.REACH);
+	RING("ring", GearSlot.RING, Stat.STRENGTH, Stat.REACH),
+
+	// Le armi: la mano e' uno slot come gli altri, e la lama vanilla che le rappresenta porta
+	// con se' il proprio danno base. I nostri modificatori ci si sommano sopra.
+	SWORD("sword", GearSlot.WEAPON, Stat.STRENGTH, Stat.HASTE),
+	AXE("axe", GearSlot.WEAPON, Stat.STRENGTH, Stat.IMPACT);
 
 	public static final Codec<GearBase> CODEC = StringRepresentable.fromEnum(GearBase::values);
 

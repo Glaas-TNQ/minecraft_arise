@@ -1,7 +1,7 @@
 package com.luca.arise.gear;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,151 +10,147 @@ import com.luca.arise.gem.Gem;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import io.netty.buffer.ByteBuf;
-
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
 
 /**
- * L'equipaggiamento di un giocatore: quello indossato e quello tenuto da parte.
+ * Quello che il Sistema tiene per il giocatore, oltre a quello che ha addosso.
  *
- * <p>Immutabile come ogni valore in un attachment (CLAUDE.md §5): ogni operazione restituisce una
- * nuova istanza.
+ * <p>Due contenitori e una sacca.
  *
- * <p>Lo slot di un pezzo non e' scritto qui, e' nel pezzo. Una mappa slot → pezzi sarebbe
- * ridondante e potrebbe entrare in contraddizione con se stessa; una lista non puo'. La posizione
- * dentro lo slot e' l'ordine nella lista, ed e' cio' che rende "il terzo anello" una cosa stabile.
+ * <ul>
+ *   <li>{@code hunter} — le caselle che vanilla non ha: guanti, cintura, spalline, mantello,
+ *       collana, talismano, quattro orecchini e dieci anelli. Elmo, corazza, gambali, stivali e
+ *       arma <strong>non stanno qui</strong>: quelli si indossano nelle caselle del gioco, dove si
+ *       vedono addosso al personaggio.
+ *   <li>{@code dimensional} — lo spazio dimensionale, dove i pezzi trovati finiscono da soli. Non
+ *       e' uno zaino generico: accetta solo equipaggiamento del Sistema, ed e' proprio il filtro a
+ *       dargli un'identita' invece di renderlo una cassa in piu'.
+ *   <li>{@code pouch} — le gemme, che restano un dato: si consumano incastonandole, e un oggetto
+ *       che esiste solo per essere speso non guadagna niente a diventare un {@code ItemStack}.
+ * </ul>
+ *
+ * <p>Le due liste hanno <strong>misura fissa</strong>, riempita di {@code ItemStack.EMPTY}: un
+ * contenitore con dei buchi in mezzo e' la sola forma che un menu sappia disegnare, e la posizione
+ * dentro la lista <em>e'</em> la casella. Gli indici li decide {@link GearSlot#HUNTER}, e per
+ * questo quell'ordine non si tocca.
+ *
+ * <p>Il record e' immutabile ma gli {@code ItemStack} dentro non lo sono — e' il compromesso che
+ * il gioco impone. Chi li modifica sul posto deve passare da {@link GearInventory}, che rifa'
+ * l'attachment a ogni cambiamento: senza quel passaggio la persistenza e la sincronizzazione
+ * fallirebbero in silenzio (CLAUDE.md §5).
  */
-public record PlayerGear(List<GearPiece> equipped, List<GearPiece> stash, List<Gem> pouch) {
+public record PlayerGear(List<ItemStack> hunter, List<ItemStack> dimensional, List<Gem> pouch,
+		List<ItemStack> recovered) {
+
+	/**
+	 * Quanto e' grande lo spazio dimensionale: una cassa singola.
+	 *
+	 * <p>Numero nel codice e non in config, come le posizioni degli slot e per la stessa ragione:
+	 * e' struttura. La misura decide quante righe disegna il menu, e una config che la cambiasse
+	 * lascerebbe pezzi in caselle che non esistono piu'. Chi ne vuole di piu' ha i bauli — adesso
+	 * che i pezzi sono oggetti veri, ci stanno dentro.
+	 */
+	public static final int DIMENSIONAL_SIZE = 27;
 
 	public static final Codec<PlayerGear> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			GearPiece.CODEC.listOf().fieldOf("equipped").forGetter(PlayerGear::equipped),
-			GearPiece.CODEC.listOf().fieldOf("stash").forGetter(PlayerGear::stash),
-			// Opzionale: i salvataggi fatti prima delle gemme si caricano con la sacca vuota.
-			Gem.CODEC.listOf().optionalFieldOf("pouch", List.of()).forGetter(PlayerGear::pouch)
+			ItemStack.OPTIONAL_CODEC.listOf().optionalFieldOf("hunter", List.of())
+					.forGetter(PlayerGear::hunter),
+			ItemStack.OPTIONAL_CODEC.listOf().optionalFieldOf("dimensional", List.of())
+					.forGetter(PlayerGear::dimensional),
+			Gem.CODEC.listOf().optionalFieldOf("pouch", List.of()).forGetter(PlayerGear::pouch),
+			ItemStack.OPTIONAL_CODEC.listOf().optionalFieldOf("recovered", List.of())
+					.forGetter(PlayerGear::recovered)
 	).apply(instance, PlayerGear::new));
 
-	public static final StreamCodec<ByteBuf, PlayerGear> STREAM_CODEC = ByteBufCodecs.fromCodec(CODEC);
+	/** Con i registri: dentro ci sono {@code ItemStack}, che senza registri non si sanno scrivere. */
+	public static final StreamCodec<RegistryFriendlyByteBuf, PlayerGear> STREAM_CODEC =
+			ByteBufCodecs.fromCodecWithRegistries(CODEC);
 
-	public static final PlayerGear EMPTY = new PlayerGear(List.of(), List.of(), List.of());
+	public static final PlayerGear EMPTY =
+			new PlayerGear(List.of(), List.of(), List.of(), List.of());
 
 	public PlayerGear {
-		equipped = List.copyOf(equipped);
-		stash = List.copyOf(stash);
+		hunter = sized(hunter, GearSlot.HUNTER_POSITIONS);
+		dimensional = sized(dimensional, DIMENSIONAL_SIZE);
 		pouch = List.copyOf(pouch);
+		recovered = List.copyOf(recovered);
+	}
+
+	/** Una lista della misura giusta: quel che c'e' si tiene, il resto sono caselle vuote. */
+	private static List<ItemStack> sized(List<ItemStack> source, int size) {
+		List<ItemStack> result = new ArrayList<>(size);
+
+		for (int i = 0; i < size; i++) {
+			result.add(i < source.size() ? source.get(i) : ItemStack.EMPTY);
+		}
+
+		return Collections.unmodifiableList(result);
 	}
 
 	public boolean isEmpty() {
-		return equipped.isEmpty() && stash.isEmpty() && pouch.isEmpty();
+		return hunter.stream().allMatch(ItemStack::isEmpty)
+				&& dimensional.stream().allMatch(ItemStack::isEmpty)
+				&& pouch.isEmpty() && recovered.isEmpty();
 	}
 
-	/** I pezzi indossati in questo slot, nell'ordine delle posizioni. */
-	public List<GearPiece> equippedIn(GearSlot slot) {
-		return equipped.stream().filter(piece -> piece.slot() == slot).toList();
+	public PlayerGear withHunter(List<ItemStack> items) {
+		return new PlayerGear(items, dimensional, pouch, recovered);
 	}
 
-	public Optional<GearPiece> find(UUID id) {
-		return java.util.stream.Stream.concat(equipped.stream(), stash.stream())
-				.filter(piece -> piece.id().equals(id))
-				.findFirst();
+	public PlayerGear withDimensional(List<ItemStack> items) {
+		return new PlayerGear(hunter, items, pouch, recovered);
 	}
 
-	public boolean isEquipped(UUID id) {
-		return equipped.stream().anyMatch(piece -> piece.id().equals(id));
+	/**
+	 * Quello che il Sistema ha ritirato al momento della morte, in attesa di essere restituito.
+	 *
+	 * <p>Quasi sempre vuota, e per un solo respiro: si riempie quando il giocatore muore e si
+	 * svuota quando riappare. Sta qui e non in un attachment a parte perche' deve sopravvivere
+	 * alla morte esattamente come il resto, e questo attachment lo fa gia'.
+	 */
+	public PlayerGear withRecovered(List<ItemStack> items) {
+		return new PlayerGear(hunter, dimensional, pouch, items);
 	}
 
-	/** Lo zaino ordinato dal pezzo piu' forte in giu', a parita' di rango. */
-	public List<GearPiece> sortedStash() {
-		return stash.stream()
-				.sorted(Comparator.comparingInt((GearPiece piece) -> piece.rank().ordinal()).reversed()
-						.thenComparing(Comparator.comparingDouble(GearPiece::weight).reversed()))
-				.toList();
+	/** I pezzi indossati nelle nostre caselle, in ordine di posizione. */
+	public List<GearPiece> hunterPieces(GearSlot slot) {
+		List<GearPiece> pieces = new ArrayList<>();
+		int first = slot.firstIndex();
+
+		for (int i = 0; i < slot.positions(); i++) {
+			GearPiece piece = GearItems.piece(hunter.get(first + i));
+			if (piece != null) {
+				pieces.add(piece);
+			}
+		}
+
+		return pieces;
+	}
+
+	/** Ogni oggetto conservato qui dentro, indossato o messo da parte. */
+	public List<ItemStack> stacks() {
+		List<ItemStack> all = new ArrayList<>(hunter.size() + dimensional.size());
+		all.addAll(hunter);
+		all.addAll(dimensional);
+		return all;
 	}
 
 	public Optional<Gem> findGem(UUID id) {
 		return pouch.stream().filter(gem -> gem.id().equals(id)).findFirst();
 	}
 
-	/** Tutti i pezzi che hanno almeno un'incastonatura libera, indossati o no. */
-	public List<GearPiece> socketable() {
-		return java.util.stream.Stream.concat(equipped.stream(), stash.stream())
-				.filter(piece -> piece.freeSockets() > 0)
-				.toList();
-	}
-
-	/**
-	 * Rimpiazza un pezzo con una sua versione modificata, ovunque si trovi.
-	 *
-	 * <p>Serve all'incastonatura: un pezzo con una gemma in piu' e' un record nuovo, e va messo
-	 * esattamente dov'era il vecchio — spostarlo fra indossato e zaino cambierebbe in silenzio
-	 * quello che il giocatore ha addosso.
-	 */
-	public PlayerGear withReplaced(GearPiece piece) {
-		List<GearPiece> worn = replace(equipped, piece);
-		List<GearPiece> stashed = replace(stash, piece);
-		return new PlayerGear(worn, stashed, pouch);
-	}
-
-	private static List<GearPiece> replace(List<GearPiece> source, GearPiece piece) {
-		List<GearPiece> updated = new ArrayList<>(source);
-
-		for (int i = 0; i < updated.size(); i++) {
-			if (updated.get(i).id().equals(piece.id())) {
-				updated.set(i, piece);
-			}
-		}
-
-		return updated;
-	}
-
 	public PlayerGear withGem(Gem gem) {
 		List<Gem> updated = new ArrayList<>(pouch);
 		updated.add(gem);
-		return new PlayerGear(equipped, stash, updated);
+		return new PlayerGear(hunter, dimensional, updated, recovered);
 	}
 
 	public PlayerGear withoutGem(UUID gemId) {
 		List<Gem> updated = new ArrayList<>(pouch);
 		updated.removeIf(gem -> gem.id().equals(gemId));
-		return new PlayerGear(equipped, stash, updated);
-	}
-
-	public PlayerGear withStashed(GearPiece piece) {
-		List<GearPiece> updated = new ArrayList<>(stash);
-		updated.add(piece);
-		return new PlayerGear(equipped, updated, pouch);
-	}
-
-	/** Sposta un pezzo dallo zaino agli slot indossati. Nessun controllo: li fa il gestore. */
-	public PlayerGear withEquipped(GearPiece piece) {
-		List<GearPiece> stashed = new ArrayList<>(stash);
-		stashed.removeIf(other -> other.id().equals(piece.id()));
-
-		List<GearPiece> worn = new ArrayList<>(equipped);
-		worn.add(piece);
-
-		return new PlayerGear(worn, stashed, pouch);
-	}
-
-	/** Il contrario. */
-	public PlayerGear withUnequipped(GearPiece piece) {
-		List<GearPiece> worn = new ArrayList<>(equipped);
-		worn.removeIf(other -> other.id().equals(piece.id()));
-
-		List<GearPiece> stashed = new ArrayList<>(stash);
-		stashed.add(piece);
-
-		return new PlayerGear(worn, stashed, pouch);
-	}
-
-	/** Toglie di mezzo un pezzo, ovunque si trovi. */
-	public PlayerGear without(UUID id) {
-		List<GearPiece> worn = new ArrayList<>(equipped);
-		worn.removeIf(piece -> piece.id().equals(id));
-
-		List<GearPiece> stashed = new ArrayList<>(stash);
-		stashed.removeIf(piece -> piece.id().equals(id));
-
-		return new PlayerGear(worn, stashed, pouch);
+		return new PlayerGear(hunter, dimensional, updated, recovered);
 	}
 }

@@ -40,6 +40,15 @@ public record ShadowConfig(
 		double movementSpeed,
 		/** Raggio entro cui l'ombra cerca bersagli. */
 		double followRange,
+		/**
+		 * Quanto resta a terra un'ombra caduta prima di poter essere rievocata.
+		 *
+		 * <p>Mille duecento tick, cioe' un minuto. Non e' una punizione: e' l'unica conseguenza di
+		 * una morte in questa mod che costi qualcosa senza togliere niente per sempre. Senza,
+		 * mandare l'esercito a morire e rievocarlo subito sarebbe sempre la mossa migliore, e la
+		 * postura aggressiva non sarebbe una scelta.
+		 */
+		int downtimeTicks,
 		/** Punteggio minimo per ciascun rango, da E a S. */
 		List<Double> rankThresholds,
 		/** Crescita delle ombre con l'esperienza. */
@@ -112,7 +121,7 @@ public record ShadowConfig(
 	}
 
 	public static final ShadowConfig DEFAULT = new ShadowConfig(
-			0.25, 0.005, 300, 8.0, 6, 0.25, 4, 1.5, 1.2, 0.32, 32.0,
+			0.25, 0.005, 300, 8.0, 6, 0.25, 4, 1.5, 1.2, 0.32, 32.0, 1200,
 			List.of(0.0, 30.0, 60.0, 110.0, 180.0, 280.0), Leveling.DEFAULT, Costs.DEFAULT);
 
 	public static final Codec<ShadowConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -138,6 +147,8 @@ public record ShadowConfig(
 					.forGetter(ShadowConfig::movementSpeed),
 			Codec.DOUBLE.fieldOf("follow_range")
 					.forGetter(ShadowConfig::followRange),
+			Codec.INT.fieldOf("downtime_ticks")
+					.forGetter(ShadowConfig::downtimeTicks),
 			Codec.DOUBLE.listOf().fieldOf("rank_thresholds")
 					.forGetter(ShadowConfig::rankThresholds),
 			Leveling.CODEC.fieldOf("leveling")

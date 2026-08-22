@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import com.luca.arise.gem.Gem;
 import com.luca.arise.progress.Rank;
@@ -13,17 +14,28 @@ import com.luca.arise.progress.Stat;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import io.netty.buffer.ByteBuf;
+
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 
 /**
- * Un pezzo di equipaggiamento: un record, non un {@code ItemStack}.
+ * Un pezzo di equipaggiamento: il dato che viaggia <em>dentro</em> un {@code ItemStack}.
  *
- * <p>Vedi design §8.1 per il perche'. In due righe: venti slot per sei ranghi per le varianti
- * fanno centinaia di texture da disegnare a mano, e quelle immagini non si possono generare. Come
- * per le ombre a riposo (§3.5), il pezzo posseduto e' un dato; a disegnarlo ci pensa la nostra
- * schermata.
+ * <p>Il design §8.1 diceva l'opposto — l'equipaggiamento e' un dato e basta, disegnato da una
+ * schermata nostra — e la sua premessa era che "oggetto" volesse dire "texture da disegnare a
+ * mano". Non e' vero: il corpo dell'oggetto lo prestano gli item vanilla (vedi {@link GearItems}),
+ * e il pezzo resta esattamente il record che era. Si guadagna tutto quello che un oggetto sa gia'
+ * fare e che una lista non sapra' mai — cadere per terra, stare in un baule, finire nella mano
+ * destra, comparire in un tooltip.
  *
  * <p>Le statistiche sono <em>congelate</em> al momento dell'estrazione invece di essere ricavate
  * da base e rango a ogni lettura. E' la scelta opposta a quella fatta per le ombre, e di
@@ -34,7 +46,7 @@ import net.minecraft.network.chat.MutableComponent;
  * @param gems    le gemme incastonate, al piu' {@code sockets}
  */
 public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
-		Map<Stat, Double> stats, int sockets, List<Gem> gems) {
+		Map<Stat, Double> stats, int sockets, List<Gem> gems) implements TooltipProvider {
 
 	public static final Codec<GearPiece> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			UUIDUtil.CODEC.fieldOf("id").forGetter(GearPiece::id),
@@ -46,6 +58,9 @@ public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
 			// Opzionale: i pezzi tirati prima che le gemme esistessero si caricano senza migrazioni.
 			Gem.CODEC.listOf().optionalFieldOf("gems", List.of()).forGetter(GearPiece::gems)
 	).apply(instance, GearPiece::new));
+
+	/** Per il componente dell'oggetto: niente registri di mezzo, solo enum, numeri e UUID. */
+	public static final StreamCodec<ByteBuf, GearPiece> STREAM_CODEC = ByteBufCodecs.fromCodec(CODEC);
 
 	/** Un pezzo appena tirato: incastonature vuote. */
 	public static GearPiece of(UUID id, GearBase base, Rank rank, GearAffix affix,
@@ -112,6 +127,53 @@ public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
 				result.append(", ");
 			}
 			result.append(line);
+			first = false;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Le righe che il gioco disegna sotto il nome dell'oggetto.
+	 *
+	 * <p>Le scrive il componente, non un {@code lore} riempito al momento del tiro: cosi' la
+	 * descrizione si traduce nella lingua di chi guarda e resta d'accordo con il dato anche dopo
+	 * che una gemma e' stata incastonata.
+	 *
+	 * <p>Niente config qui dentro: il tooltip si disegna sul client, che su un server dedicato ha
+	 * la <em>sua</em> copia dei numeri di bilanciamento. Tutto quello che si legge e' congelato nel
+	 * pezzo e nelle sue gemme.
+	 */
+	@Override
+	public void addToTooltip(Item.TooltipContext context, Consumer<Component> out, TooltipFlag flag,
+			DataComponentGetter components) {
+		out.accept(Component.translatable("arise.gear.tooltip.rank", rank.label())
+				.withStyle(ChatFormatting.DARK_GRAY));
+
+		statLines().forEach(out);
+
+		for (Gem gem : gems) {
+			out.accept(Component.translatable("arise.gear.tooltip.gem",
+					gem.displayName(), gemStats(gem)));
+		}
+
+		int free = freeSockets();
+		if (free > 0) {
+			out.accept(Component.translatable("arise.gear.tooltip.sockets", free)
+					.withStyle(ChatFormatting.DARK_GRAY));
+		}
+	}
+
+	/** Le statistiche di una gemma su una riga sola, per il tooltip del pezzo che la porta. */
+	private static Component gemStats(Gem gem) {
+		MutableComponent result = Component.empty();
+		boolean first = true;
+
+		for (Map.Entry<Stat, Double> entry : gem.stats().entrySet()) {
+			if (!first) {
+				result.append(", ");
+			}
+			result.append(entry.getKey().format(entry.getValue()));
 			first = false;
 		}
 

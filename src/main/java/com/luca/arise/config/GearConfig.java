@@ -37,9 +37,7 @@ public record GearConfig(
 		/** Di quanto puo' scostarsi un singolo modificatore dalla sua quota (0,25 = ±25%). */
 		double affixVariance,
 		/** Quante volte e' piu' probabile che esca una statistica affine alla base. */
-		double affinityWeight,
-		/** Quanti pezzi non equipaggiati si possono tenere da parte. */
-		int stashSize) {
+		double affinityWeight) {
 
 	public static final Codec<GearConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.DOUBLE.fieldOf("base_power").forGetter(GearConfig::basePower),
@@ -51,8 +49,7 @@ public record GearConfig(
 			Codec.unboundedMap(GearSlot.CODEC, Codec.DOUBLE).fieldOf("slot_power")
 					.forGetter(GearConfig::slotPower),
 			Codec.DOUBLE.fieldOf("affix_variance").forGetter(GearConfig::affixVariance),
-			Codec.DOUBLE.fieldOf("affinity_weight").forGetter(GearConfig::affinityWeight),
-			Codec.INT.fieldOf("stash_size").forGetter(GearConfig::stashSize)
+			Codec.DOUBLE.fieldOf("affinity_weight").forGetter(GearConfig::affinityWeight)
 	).apply(instance, GearConfig::new));
 
 	public static final GearConfig DEFAULT = createDefault();
@@ -82,6 +79,9 @@ public record GearConfig(
 		step.put(Stat.IMPACT, 0.02);
 
 		Map<GearSlot, Double> slots = new EnumMap<>(GearSlot.class);
+		// L'arma porta gia' il danno base della lama vanilla: i nostri modificatori le si sommano
+		// sopra, quindi il budget non deve essere il piu' grosso della lista.
+		slots.put(GearSlot.WEAPON, 1.2);
 		slots.put(GearSlot.HEAD, 1.0);
 		slots.put(GearSlot.CHEST, 1.2);
 		slots.put(GearSlot.LEGS, 1.0);
@@ -100,7 +100,7 @@ public record GearConfig(
 				List.of(1.0, 1.4, 2.0, 2.8, 4.0, 5.6),
 				List.of(1, 1, 2, 3, 3, 4),
 				List.of(0, 0, 1, 2, 3, 4),
-				step, slots, 0.25, 3.0, 80);
+				step, slots, 0.25, 3.0);
 	}
 
 	/** Il budget di potenza di un pezzo. */

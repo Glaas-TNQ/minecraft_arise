@@ -307,6 +307,18 @@ public final class AriseFx {
 		play(level, position, ModSounds.SHOP_REFRESH, 0.7F, 0.9F);
 	}
 
+	/**
+	 * Un pezzo che cade: un anello di polvere del colore del rango, attorno all'oggetto.
+	 *
+	 * <p>Serve a farlo <em>notare</em>. Un oggetto per terra in mezzo alla roba lasciata da un mob
+	 * si confonde con il resto, e un pezzo di rango A che passa inosservato e' un premio sprecato.
+	 */
+	public static void gearDropped(ServerLevel level, Vec3 position, Rank rank) {
+		FxConfig fx = config();
+		ring(level, position, 0.5, fx.scaled(10), dust(rank.color() & 0xFFFFFF, 1.0F), 0.2);
+		play(level, position, ModSounds.GEAR_DROP, 0.7F, 0.8F + rank.ordinal() * 0.08F);
+	}
+
 	// ---------------------------------------------------------------- abilità
 
 	/** Scatto d'ombra: una scia fra le due posizioni, così si legge la direzione. */
@@ -354,6 +366,51 @@ public final class AriseFx {
 		}
 
 		play(level, centre, ModSounds.ABILITY_AUTHORITY, 0.9F, 1.0F);
+	}
+
+	// ---------------------------------------------------------------- l'Officina delle Anime
+
+	/**
+	 * Un macchinario a meta' del suo giro di lavoro.
+	 *
+	 * <p>Poche particelle e un suono sottovoce, di proposito: questo effetto puo' ripetersi ogni
+	 * secondo per ogni macchina accesa, e un'officina di dodici blocchi non deve suonare come una
+	 * fanfara. Serve solo a dire "sta andando" a chi ci passa davanti.
+	 */
+	public static void machineWorking(ServerLevel level, Vec3 centre, int color) {
+		FxConfig fx = config();
+		level.sendParticles(dust(color, 0.7F), centre.x(), centre.y() + 0.45, centre.z(),
+				fx.scaled(3), 0.28, 0.22, 0.28, 0.01);
+		play(level, centre, ModSounds.MACHINE_WORK, SoundSource.BLOCKS, 0.22F, 1.4F);
+	}
+
+	/** Un giro finito: l'anello dice che c'e' qualcosa da prendere. */
+	public static void machineDone(ServerLevel level, Vec3 centre, int color) {
+		FxConfig fx = config();
+		ring(level, centre, 0.55, fx.scaled(10), dust(color, 0.9F), 0.18);
+		play(level, centre, ModSounds.MACHINE_DONE, SoundSource.BLOCKS, 0.5F, 1.0F);
+	}
+
+	/**
+	 * La fusione riuscita nel Crogiolo.
+	 *
+	 * <p>Questo si', invece, e' rumoroso: fondere quattro anime e un catalizzatore e' un evento
+	 * raro e costoso, e deve sentirsi diverso dal ronzio di una macchina che macina ferro.
+	 */
+	public static void soulFused(ServerLevel level, Vec3 centre, Rank rank) {
+		FxConfig fx = config();
+		column(level, centre, 1.8, fx.scaled(22), dust(rank.color(), 1.2F));
+		ring(level, centre, 0.9, fx.scaled(16), dust(rank.color(), 1.0F), 0.3);
+		level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, centre.x(), centre.y() + 0.7, centre.z(),
+				fx.scaled(8), 0.2, 0.3, 0.2, 0.02);
+		play(level, centre, ModSounds.SOUL_FUSE, 0.9F, 0.8F + rank.ordinal() * 0.07F);
+	}
+
+	/** Un'anima arruolata: l'esercito ha un membro in piu'. */
+	public static void soulEnlisted(ServerLevel level, Vec3 position, Rank rank) {
+		FxConfig fx = config();
+		spiral(level, position, 0.7, 1.6, fx.scaled(20), dust(rank.color(), 1.1F));
+		play(level, position, ModSounds.SOUL_ENLIST, 0.8F, 1.0F);
 	}
 
 	// ---------------------------------------------------------------- primitive

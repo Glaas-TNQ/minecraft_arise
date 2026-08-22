@@ -1,0 +1,685 @@
+<title>Lo spazio dimensionale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(142,107,255,0.08), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; }
+
+  /* ---------------------------------------------------------------- avviso */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 460px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 14px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td code { white-space: nowrap; }
+
+  .rank-e { color: #9BA8B8; }
+  .rank-d { color: #E8F2FF; }
+  .rank-c { color: #7FD97F; }
+  .rank-b { color: #4FC3F7; }
+  .rank-a { color: #C77FE8; }
+  .rank-s { color: #FFD54F; }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 52px 0 0;
+  }
+
+  footer {
+    margin-top: 26px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocco D1</p>
+    <h1>Lo spazio dimensionale</h1>
+    <p class="lede">
+      L'equipaggiamento era un <strong>dato in una lista</strong>, con una schermata tutta sua. Adesso
+      è un <strong>oggetto vero</strong>: cade dai nemici, si raccoglie da terra, si indossa nelle
+      caselle del gioco. Le uniche caselle che restano nostre sono le otto che vanilla non ha — e
+      dietro all'inventario c'è uno spazio dimensionale che si prende da solo tutto quello che trovi.
+    </p>
+
+    <div class="facts">
+      <span><b>11</b> file nuovi</span>
+      <span><b>29</b> modificati</span>
+      <span><b>2</b> rimossi</span>
+      <span><b>0</b> texture disegnate</span>
+      <span>build <b>verde</b></span>
+    </div>
+  </header>
+
+  <div class="notice">
+    <p><span class="tag">Da verificare in gioco</span>
+      Server e client si avviano senza errori e senza avvisi, ma nessuno ha ancora indossato niente.
+      La sezione <a href="#prova">Come si prova</a> è la lista da seguire prima di segnare D1 come
+      fatto. Restano inoltre dieci blocchi (F6→C5) mai verificati sotto a questo lavoro.</p>
+  </div>
+
+  <!-- ============================================================== -->
+
+  <section>
+    <h2><span class="step">1</span> Il problema</h2>
+    <p class="kicker">Progressione senza possesso.</p>
+
+    <p>
+      Tre cose tradivano il vecchio impianto, e nessuna era un difetto di bilanciamento.
+    </p>
+
+    <ul>
+      <li><strong>Il bottino arrivava come una riga di chat.</strong> Venti minuti di Gate si
+        chiudevano con «hai ricevuto Anello del Titano». Nessuno lo vedeva cadere, nessuno lo
+        raccoglieva, nessuno lo teneva in mano.</li>
+      <li><strong>Ventiquattro caselle riproducevano quattro caselle che il gioco ha già.</strong>
+        Testa, busto, gambe e piedi esistono in vanilla, con il loro trascinamento e con il modello
+        che si vede addosso. Rifarli in una lista con due bottoni era costruire una copia peggiore
+        dell'originale.</li>
+      <li><strong>Non esistevano armi.</strong> La statistica <code>STRENGTH</code> c'era, ma il gesto
+        più antico del gioco — trovare una spada migliore — no.</li>
+    </ul>
+
+    <div class="panel why">
+      <span class="tag">La premessa sbagliata</span>
+      <p>
+        Il design §8.1 diceva: <em>l'equipaggiamento è un dato, non un item</em>, perché venti slot per
+        sei ranghi fanno centinaia di texture da disegnare a mano. La decisione era giusta, la premessa
+        no: <strong>«oggetto» non significa «texture nuova»</strong>. Il corpo di un pezzo lo prestano
+        gli item vanilla, e il <code>GearPiece</code> resta esattamente il record che era — viaggia
+        dentro un componente dati invece che dentro una lista.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+
+  <section>
+    <h2><span class="step">2</span> Un pezzo, adesso</h2>
+    <p class="kicker">Un <code>ItemStack</code> vanilla con addosso <code>arise:gear_piece</code>.</p>
+
+    <p>
+      Tre componenti fanno il lavoro che altrove costerebbe una classe di item registrata: il nostro,
+      che porta il pezzo; <code>ITEM_NAME</code>, che rinomina senza il corsivo dei rinominati
+      all'incudine; <code>UNBREAKABLE</code>, perché un pezzo di rango A che si consuma e sparisce è un
+      modo gratuito di far arrabbiare qualcuno.
+    </p>
+
+    <pre><code><span class="c">// il tooltip lo scrive il componente, non un lore riempito al momento del tiro:</span>
+<span class="c">// così si traduce da solo e resta d'accordo col dato dopo un'incastonatura</span>
+<span class="k">public record</span> GearPiece(...) <span class="k">implements</span> TooltipProvider
+
+ItemComponentTooltipProviderRegistry.addBefore(
+        DataComponents.ATTRIBUTE_MODIFIERS, ModComponents.GEAR_PIECE);</code></pre>
+
+    <h3>L'aspetto: due scale che il giocatore legge già</h3>
+    <p>
+      Nessuna texture nuova, e non è una rinuncia. Vanilla ha due ladder di materiali che chiunque sa
+      leggere da anni senza spiegazioni. Sono sei gradini, e i ranghi sono sei.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Rango</th><th>Armatura</th><th>Arma</th><th>In più</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="rank-e">E</td><td>cuoio</td><td>legno</td><td>tinto del grigio di ordinanza</td></tr>
+          <tr><td class="rank-d">D</td><td>rame</td><td>rame</td><td></td></tr>
+          <tr><td class="rank-c">C</td><td>maglia</td><td>pietra</td><td></td></tr>
+          <tr><td class="rank-b">B</td><td>ferro</td><td>ferro</td><td></td></tr>
+          <tr><td class="rank-a">A</td><td>diamante</td><td>diamante</td><td></td></tr>
+          <tr><td class="rank-s">S</td><td>netherite</td><td>netherite</td><td>luccichio dell'incantesimo</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      Per gli accessori vanilla non ha una scala, quindi lo sprite dice <em>cosa</em> è e il colore del
+      nome dice quanto vale: pepita d'oro per l'anello, catena di ferro per il pendaglio, scaglia di
+      phantom per il mantello, guscio di shulker per gli spallacci, cuore del mare per il talismano,
+      scaglia d'ametista per l'orecchino. Sono placeholder, ma sono placeholder che si distinguono in
+      un inventario pieno — che è l'unica cosa che deve fare uno sprite.
+    </p>
+
+    <p>Il giorno in cui ci saranno immagini vere si cambia <code>GearItems</code> e nient'altro.</p>
+  </section>
+
+  <!-- ============================================================== -->
+
+  <section>
+    <h2><span class="step violet">3</span> Dove si indossa</h2>
+    <p class="kicker">Vanilla si tiene quello che sa già fare.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Famiglia</th><th>Caselle</th><th>Chi le gestisce</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Casella vanilla</td>
+            <td>testa, busto, gambe, piedi, mano</td>
+            <td>il gioco — trascinamento, modello addosso, incudine, incantesimi</td>
+          </tr>
+          <tr>
+            <td>Casella del Cacciatore</td>
+            <td>guanti, cintura, spalline, mantello, collana, talismano, 4 orecchini, 10 anelli</td>
+            <td>noi, perché vanilla non ha un posto dove metterli</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      Le venti caselle nostre vivono in un <code>AbstractContainerMenu</code> vero, non in una lista.
+      La differenza non è estetica: trascinare, shift-click, doppio click che raccoglie, tasti 1-9 per
+      scambiare con la barra rapida sono comportamenti che nessuno ha voglia di riscrivere e che tutti
+      si aspettano già di trovare. Nella versione precedente ogni gesto istintivo non funzionava.
+    </p>
+
+    <p>
+      Gli sblocchi per rango del §8.4 valgono ancora, e valgono per queste: una casella chiusa si
+      disegna spenta invece di sparire, e il suggerimento dice a che rango si apre. Il controllo sta
+      nel <code>Slot</code> lato server — un client modificato che spedisse un click su una casella
+      chiusa trova comunque un no.
+    </p>
+
+    <h3>Come ci si arriva</h3>
+    <ul>
+      <li>il tasto <strong>N</strong>, come prima;</li>
+      <li>un bottone accanto al pannello dell'inventario, che si riposiziona a ogni tick perché il
+        pannello si sposta quando si apre il libro delle ricette;</li>
+      <li>il bottone è spento finché il Sistema non ha concesso l'equipaggiamento.</li>
+    </ul>
+  </section>
+
+  <!-- ============================================================== -->
+
+  <section>
+    <h2><span class="step violet">4</span> Lo spazio dimensionale</h2>
+    <p class="kicker">Ventisette caselle che si riempiono da sole.</p>
+
+    <p>
+      Qualunque strada abbia preso un pezzo per arrivare — raccolto da terra, tirato fuori da un baule,
+      dato da un comando, comprato all'Abyss Shop — un quarto di secondo dopo è al suo posto. Lo fa una
+      scansione dell'inventario nel tick che già esisteva: <strong>un solo pezzo di codice copre tutte
+      le strade, e non serve un mixin per nessuna</strong>.
+    </p>
+
+    <div class="panel why">
+      <span class="tag">Due regole che lo tengono onesto</span>
+      <p>
+        <strong>La barra rapida non si tocca.</strong> È dove sta quello che si sta usando, a partire
+        dall'arma in mano — che è letteralmente una di quelle caselle. Uno spazio dimensionale che se la
+        prende mentre combatti sarebbe un sabotaggio, non una comodità.
+      </p>
+      <p style="margin-top:12px">
+        <strong>Accetta solo equipaggiamento del Sistema.</strong> Senza il filtro sarebbe una cassa
+        portatile da ventisette posti: un oggetto di gioco potentissimo e completamente estraneo alla
+        mod. E quello che non entra resta dov'è — uno spazio pieno non è un motivo per far sparire
+        niente.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+
+  <section>
+    <h2><span class="step violet">5</span> Il vincolo all'anima</h2>
+    <p class="kicker">Morire non costa l'equipaggiamento.</p>
+
+    <p>
+      Livello, esercito e gemme sopravvivevano già alla morte per scelta esplicita. Adesso che i pezzi
+      sono oggetti veri cadrebbero per terra, e un pezzo di rango A perso in fondo a un Gate sono ore
+      buttate per una caduta nel vuoto.
+    </p>
+
+    <p>
+      <code>ALLOW_DEATH</code> scatta prima che la morte venga eseguita, quindi prima che l'inventario
+      finisca a terra: è l'unico punto, senza mixin, in cui si può ancora mettere al sicuro qualcosa. I
+      pezzi vengono ritirati, e al respawn <strong>ognuno torna nella casella da cui è partito</strong>
+      — si riappare vestiti come si era.
+    </p>
+
+    <p>
+      C'è una rete di sicurezza: se un'altra mod annullasse la morte dopo di noi, il giocatore
+      resterebbe vivo con il ritiro in sospeso. Il tick se ne accorge e glielo restituisce subito.
+    </p>
+  </section>
+
+  <!-- ============================================================== -->
+
+  <section>
+    <h2><span class="step gold">6</span> Il bottino cade</h2>
+    <p class="kicker">Tre sorgenti, tutte fisiche.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Sorgente</th><th class="num">Probabilità</th><th>Rango</th><th>Dove cade</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Gate completato</td>
+            <td class="num">1,4 + 0,5 per rango</td>
+            <td>quello del Gate, 12% uno sopra</td>
+            <td>ai piedi del giocatore</td>
+          </tr>
+          <tr>
+            <td>Mob dentro un Gate</td>
+            <td class="num">7%</td>
+            <td>60% uno sotto quello del Gate</td>
+            <td>sul cadavere</td>
+          </tr>
+          <tr>
+            <td>Mob del mondo normale</td>
+            <td class="num">1,2%</td>
+            <td>quello del Cacciatore, 60% uno sotto</td>
+            <td>sul cadavere</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      La probabilità fuori dai Gate è un ordine di grandezza sotto quella di dentro, e deve restarci: un
+      mondo in cui ci si veste uccidendo zombi dietro casa è un mondo in cui i Gate non servono. Serve a
+      far capire come funziona il bottino a chi non ha ancora aperto un varco. È in config
+      (<code>world_drop_chance</code>), come tutto il resto.
+    </p>
+
+    <p>
+      Ogni pezzo che cade fa un anello di polvere del colore del rango e un suono, perché un oggetto per
+      terra in mezzo alla roba lasciata da un mob si confonde con il resto — e un pezzo di rango A che
+      passa inosservato è un premio sprecato.
+    </p>
+  </section>
+
+  <!-- ============================================================== -->
+
+  <section>
+    <h2><span class="step">7</span> Cosa è stato tolto</h2>
+    <p class="kicker">Meno codice di prima, non di più.</p>
+
+    <ul>
+      <li><code>HunterScreen</code> — la lista con i tab «Indossato / Zaino»;</li>
+      <li><code>GearActionPayload</code> — indossare non è più un messaggio al server, è trascinare;</li>
+      <li><code>GearManager.equip/unequip/discard</code> e i sette messaggi di errore che servivano;</li>
+      <li>lo <code>stash_size</code> dalla config: adesso i pezzi in eccesso stanno nei bauli, come
+        qualunque oggetto;</li>
+      <li>tredici chiavi di traduzione rimaste orfane.</li>
+    </ul>
+
+    <h3>Un mixin nuovo, con la sua motivazione</h3>
+    <p>
+      <code>ContainerScreenAccessor</code> legge <code>leftPos</code> e <code>topPos</code>. È un
+      accessore e nient'altro: non intercetta niente, non cambia niente, non ha un corpo. Serve perché
+      il bordo del pannello dell'inventario si sposta quando si apre il libro delle ricette, e
+      calcolarlo come <code>(larghezza − 176) / 2</code> darebbe la risposta giusta solo metà delle
+      volte.
+    </p>
+  </section>
+
+  <!-- ============================================================== -->
+
+  <section id="prova">
+    <h2><span class="step gold">8</span> Come si prova</h2>
+    <p class="kicker">Quindici minuti in <code>runClient</code>.</p>
+
+    <pre><code><span class="c"># un pezzo per famiglia, per vedere le due scale e gli accessori</span>
+/arise gear give weapon s        <span class="c"># lama di netherite che luccica</span>
+/arise gear give chest e         <span class="c"># corazza di cuoio tinta di grigio</span>
+/arise gear give ring a
+/arise gear give cloak b
+
+<span class="c"># il tiro alla cieca, come il bottino</span>
+/arise gear roll b 6
+
+<span class="c"># il rango apre le caselle: E ne ha due di anello, S dieci</span>
+/arise level 1
+/arise level 40
+
+<span class="c"># cosa risulta indossato al server</span>
+/arise gear
+/arise gear clear</code></pre>
+
+    <div class="verify">
+      <span class="tag">La lista</span>
+      <ul class="check">
+        <li>il pezzo dato da un comando finisce nello spazio dimensionale <strong>da solo</strong>,
+          senza aprire niente;</li>
+        <li>un pezzo tenuto nella barra rapida <strong>ci resta</strong>;</li>
+        <li>il tooltip mostra rango, modificatori e incastonature, in italiano;</li>
+        <li>la corazza trascinata nella casella vanilla si <strong>vede addosso</strong> e i cuori
+          salgono entro un quarto di secondo;</li>
+        <li>l'anello in una casella nostra cambia le statistiche in <code>/arise info</code>;</li>
+        <li>a <code>/arise level 1</code> gli anelli in eccesso tornano nello spazio dimensionale;</li>
+        <li>le caselle chiuse sono spente e il suggerimento dice a che rango si aprono;</li>
+        <li>shift-click di un anello dall'inventario lo <strong>indossa</strong>, non lo mette via;</li>
+        <li>il bottone accanto all'inventario resta al suo posto aprendo il libro delle ricette;</li>
+        <li>uccidendo mob nel mondo, ogni tanto cade un pezzo con l'anello di polvere;</li>
+        <li>chiudendo un Gate i pezzi <strong>saltano fuori per terra</strong>;</li>
+        <li>morendo con addosso elmo e spada, al respawn sono di nuovo addosso;</li>
+        <li>uscire e rientrare dal mondo non perde niente;</li>
+        <li>il banco delle gemme incastona ancora, e la gemma si legge nel tooltip del pezzo.</li>
+      </ul>
+    </div>
+
+    <div class="notice">
+      <p><span class="tag">Salvataggi vecchi</span>
+        I pezzi salvati con il vecchio formato <strong>non si migrano</strong>: era la scelta presa. Un
+        mondo di prova già usato va ripulito con <code>/arise gear clear</code> o ricreato.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+
+  <section>
+    <h2><span class="step">9</span> Cosa resta aperto</h2>
+
+    <ul>
+      <li><strong>Le gemme sono ancora un dato</strong> in una schermata a parte. Diventeranno oggetti
+        anche loro il giorno in cui incastonare sarà trascinare una gemma su un pezzo — è il seguito
+        naturale, non è questo blocco.</li>
+      <li><strong>Gli sprite degli accessori sono prestiti.</strong> Un anello è una pepita d'oro. Si
+        distinguono, ma non raccontano il rango: quello lo dice solo il colore del nome.</li>
+      <li><strong>Il rango nella finestra è quello dell'apertura.</strong> Se sali di livello con la
+        finestra aperta, le caselle nuove compaiono alla riapertura.</li>
+      <li><strong>Dieci blocchi sotto non sono mai stati verificati</strong> (F6→C5). Quando qualcosa
+        non funzionerà, il primo dubbio è se sia questo lavoro o un blocco vecchio che non ha mai
+        girato.</li>
+    </ul>
+  </section>
+
+  <hr>
+
+  <footer>
+    <p>
+      Arise · blocco D1 · Minecraft 26.2, Fabric Loader 0.19.3, Java 25 · build verde, server e client
+      avviati puliti, gioco da verificare.
+    </p>
+  </footer>
+
+</div>

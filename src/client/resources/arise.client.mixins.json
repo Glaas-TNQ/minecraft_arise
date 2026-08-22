@@ -3,7 +3,8 @@
 	"package": "com.luca.arise.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"ClientStartMixin"
+		"ClientStartMixin",
+		"ContainerScreenAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -6,12 +6,17 @@ import com.luca.arise.client.network.ClientPayloads;
 import com.luca.arise.client.render.MarkerRenderer;
 import com.luca.arise.client.render.ModModelLayers;
 import com.luca.arise.client.render.ShadowRenderer;
+import com.luca.arise.client.screen.HunterMenuScreen;
+import com.luca.arise.client.screen.MachineScreen;
 import com.luca.arise.registry.ModEntities;
+import com.luca.arise.registry.ModMenus;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+
+import net.minecraft.client.gui.screens.MenuScreens;
 
 public class AriseModClient implements ClientModInitializer {
 
@@ -26,7 +31,14 @@ public class AriseModClient implements ClientModInitializer {
 		EntityRendererRegistry.register(ModEntities.SHADOW, ShadowRenderer::new);
 		EntityRendererRegistry.register(ModEntities.GATE, MarkerRenderer::new);
 
+		// Il menu del Cacciatore arriva dal server: qui si dice solo con che schermata disegnarlo.
+		MenuScreens.register(ModMenus.HUNTER, HunterMenuScreen::new);
+
+		// Una schermata sola per tutti e quattro i macchinari: quale sia lo dice il menu.
+		MenuScreens.register(ModMenus.MACHINE, MachineScreen::new);
+
 		AriseKeyMappings.register();
+		HunterButton.register();
 		ClientPayloads.register();
 	}
 }

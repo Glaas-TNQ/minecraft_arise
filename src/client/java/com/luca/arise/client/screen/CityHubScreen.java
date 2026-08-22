@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -51,6 +52,10 @@ public class CityHubScreen extends AriseScreen {
 					.build();
 
 			button.active = ready;
+			// Il monumento sul suggerimento: e' l'unica cosa che distingue una destinazione da
+			// un'altra prima di averci messo piede, e occupa spazio solo quando lo si cerca.
+			button.setTooltip(Tooltip.create(Component.translatable("arise.screen.hub.landmark",
+					city.landmark().label())));
 			addRenderableWidget(button);
 
 			y += ROW;

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "O": "minecraft:obsidian",
+    "C": "minecraft:crying_obsidian",
+    "D": "minecraft:deepslate_bricks"
+  },
+  "pattern": [
+    "OCO",
+    "DCD",
+    "DDD"
+  ],
+  "result": {
+    "id": "arise:soul_crucible"
+  }
+}

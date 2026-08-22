@@ -8,6 +8,7 @@ import com.luca.arise.shop.ShopStock;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.quest.PlayerQuests;
 import com.luca.arise.shadow.ShadowArmy;
+import com.luca.arise.shadow.ShadowDowntime;
 import com.luca.arise.shadow.ShadowStance;
 import com.luca.arise.shadow.SummonedShadows;
 
@@ -99,6 +100,17 @@ public final class ModAttachments {
 			.initializer(() -> SummonedShadows.EMPTY)
 			.syncWith(SummonedShadows.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(AriseMod.id("summoned"));
+
+	/**
+	 * Quali ombre sono ancora a terra dopo essere cadute.
+	 *
+	 * <p>Come {@link #SUMMONED} e {@link #COOLDOWNS}: sincronizzato ma non salvato, perche' conta
+	 * tick di gioco assoluti. Vedi {@link ShadowDowntime} per il perche' non e' persistente.
+	 */
+	public static final AttachmentType<ShadowDowntime> DOWNTIME = AttachmentRegistry.<ShadowDowntime>builder()
+			.initializer(() -> ShadowDowntime.EMPTY)
+			.syncWith(ShadowDowntime.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(AriseMod.id("downtime"));
 
 	/** La postura di combattimento dell'esercito. Persiste e si sincronizza per l'HUD. */
 	public static final AttachmentType<ShadowStance> STANCE = AttachmentRegistry.<ShadowStance>builder()

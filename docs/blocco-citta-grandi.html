@@ -1,0 +1,608 @@
+<title>Cinque città diverse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(255,213,79,0.07), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------------------------------------------------------------- avvisi */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice.hot { border-top-color: var(--bad); }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice p + p { margin-top: 10px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .notice.hot .tag { color: var(--bad); }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+  .step.good { color: var(--good); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .compare > div { background: var(--panel-soft); padding: 16px 18px; }
+  .compare .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .compare .before .tag { color: var(--muted); }
+  .compare .after .tag { color: var(--good); }
+  .compare p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .compare .after p { color: var(--text); }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 620px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td b { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  /* la pianta stampata dal generatore, un carattere ogni due blocchi */
+  .map {
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1.05;
+    letter-spacing: 0.06em;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+    white-space: pre;
+  }
+  .caption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: 52px 0 0; }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocco C5</p>
+    <h1>Cinque città diverse</h1>
+    <p class="lede">Le città erano cinque volte la stessa città ridipinta: stessa griglia, stessi
+      lotti, stessi parallelepipedi, centododici blocchi di lato. Ora ognuna ha <strong>la sua
+      pianta stradale, la sua forma di isolato, il suo profilo di altezze</strong> e — la cosa per
+      cui vale la pena andarci — <strong>un monumento riconoscibile</strong>.</p>
+
+    <p class="facts">
+      <span>lato <b>112 → 320</b></span>
+      <span>superficie <b>× 8,2</b></span>
+      <span>isolati <b>16 → 64…256</b></span>
+      <span>blocchi per città <b>12,5 M</b></span>
+      <span>monumenti <b>5</b></span>
+    </p>
+  </header>
+
+  <div class="notice hot">
+    <span class="tag">Da leggere prima di provare</span>
+    <p>Le città vecchie <strong>non si aggiornano</strong>. La mod riconosce una città dalla pietra
+      segnaposto al centro dell'Associazione: se c'è, la città esiste e non viene ricostruita.
+      Serve un <strong>mondo nuovo</strong>, altrimenti si continua a vedere quella di prima.</p>
+    <p>Chi vuole tenere il mondo può cancellare la vecchia Associazione dal centro
+      (<code>/setblock &lt;centro&gt; air</code> sul lodestone) e poi <code>/arise city setup</code>:
+      la nuova città verrà costruita sopra quella vecchia, con i suoi trecentoventi blocchi di lato.</p>
+  </div>
+
+  <section>
+    <h2><span class="step">1</span> Che cosa distingue le cinque città</h2>
+    <p class="kicker">Tre cose, e servono tutte e tre: il colore si vede per primo, la pianta si
+      sente camminando, il monumento è il motivo per tornarci.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Città</th>
+            <th>Maglia stradale</th>
+            <th>Isolato</th>
+            <th class="num">Piani</th>
+            <th>Monumento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>New York</b><br><span class="mono">gridiron</span></td>
+            <td>Griglia da 32, avenue larghe ogni tre incroci</td>
+            <td>Torre a tre scalini, facciata a nastro di vetro</td>
+            <td class="num">4 → 24<br><span class="mono">verso il centro</span></td>
+            <td><b>Empire State</b><br><span class="mono">128 blocchi con la guglia</span></td>
+          </tr>
+          <tr>
+            <td><b>Tokyo</b><br><span class="mono">shitamachi</span></td>
+            <td>Griglia da 19, strade da 4: vicoli</td>
+            <td>Due o quattro palazzine addossate, alte diverso</td>
+            <td class="num">2 → 10<br><span class="mono">verso il centro</span></td>
+            <td><b>Torre di Tokyo</b><br><span class="mono">traliccio a fasce, due terrazze</span></td>
+          </tr>
+          <tr>
+            <td><b>Roma</b><br><span class="mono">antica</span></td>
+            <td>Griglia da 40 più una circonvallazione circolare</td>
+            <td>Insula bassa con cortile e arcate al piano terra</td>
+            <td class="num">2 – 4<br><span class="mono">cornicione pari</span></td>
+            <td><b>Colosseo</b><br><span class="mono">ellisse 69×57, un pezzo caduto</span></td>
+          </tr>
+          <tr>
+            <td><b>Madrid</b><br><span class="mono">manzana</span></td>
+            <td>Griglia da 34, isolati chiusi su quattro lati</td>
+            <td>Manzana con patio interno e passaggio coperto</td>
+            <td class="num">4 – 6<br><span class="mono">cornicione pari</span></td>
+            <td><b>Puerta de Alcalá</b><br><span class="mono">cinque fornici e la fontana</span></td>
+          </tr>
+          <tr>
+            <td><b>Berlino</b><br><span class="mono">boulevard</span></td>
+            <td>Griglia da 40, strade da 9, un viale che taglia la città</td>
+            <td>Caseggiato profondo con cortile e mansarda</td>
+            <td class="num">4 – 8<br><span class="mono">cornicione pari</span></td>
+            <td><b>Porta di Brandeburgo</b><br><span class="mono">e dietro il Fernsehturm, 141</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Perché così</span>
+      <p>Le misure non sono scritte nel codice città per città: sono <strong>percentuali della
+        griglia di base</strong> che sta in <code>CityConfig</code>. Cambiando un numero solo lì
+        tutte e cinque si adeguano mantenendo le proporzioni fra loro — Tokyo resta fitta e Roma
+        larga anche se domani le città diventano il doppio.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step violet">2</span> Come è fatta la pianta</h2>
+    <p class="kicker">Tre zone non appartengono alla griglia, e sono quelle che danno un centro
+      alla città.</p>
+
+    <ul>
+      <li><b>La piazza dell'Associazione</b>, al centro esatto: 45 blocchi di lato, con
+        l'Associazione su un basamento di tre gradini e il portico davanti all'ingresso.</li>
+      <li><b>L'area del monumento</b>, tre isolati a nord: lastricata, senza strade, e con il cielo
+        sgomberato sopra fin dove arriva la guglia.</li>
+      <li><b>Il viale</b> che collega le due, con i marciapiedi larghi e gli alberi: è la strada da
+        cui si vede il monumento in fondo.</li>
+    </ul>
+
+    <div class="compare">
+      <div class="before">
+        <span class="tag">Prima</span>
+        <p>Ogni isolato che sfiorava la piazza spariva. Risultato: la piazza in mezzo a un campo, e
+          un anello di vuoto largo un isolato attorno a tutto quello che conta.</p>
+      </div>
+      <div class="after">
+        <span class="tag">Adesso</span>
+        <p>L'isolato viene <b>ritagliato</b>: si tiene il pezzo più grande che resta fuori dalla
+          zona. Gli edifici arrivano fino al bordo della piazza, e sono loro a darle una forma.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step gold">3</span> Verificato fuori dal gioco</h2>
+    <p class="kicker">La pianta è calcolo puro: si può guardare senza avviare Minecraft, ed è
+      quello che ho fatto prima di consegnare.</p>
+
+    <p>Ho generato le cinque piante con le classi vere, in un processo a parte, e le ho disegnate
+      livello per livello. È così che ho trovato — e corretto — gli isolati cancellati attorno alla
+      piazza, i lampioni murati dentro le facciate e tre coppie di blocchi identici usati per ruoli
+      diversi. Questo è il Colosseo alla quota <code>+14</code>, un carattere ogni due blocchi:</p>
+
+    <div class="map">                 WWWWWWWWWWW
+              WWWW WWW WWW WWWW
+            WW WWW         WWW WW
+          WWWWWW AAAAAAAAAAA WWWWW
+         WWWWWAAAAAAAAAAAAAAAA WWWW
+        WW W AAAAA         AAAAAW WW
+       WWWWAAAA              AAAAWWWW
+       W WAAAA                 AAAWW W
+      WWW AAA                   AAAWWW
+      WWWAAA                     AA WWW
+     W W AA                      AAAW W
+     WWWAAA                       AA WW
+     WWWAA                        AA WW
+     WWWAA                        AA WW
+     W WAA                        AAAW W
+     WWWAA                        AA WW
+     WWWAA                        AA WW
+     W WAAA                       AAW W
+      WW AA                      AAAWWW
+      WWWAAA                    AAAWWW
+       W WAAA                  AAA W W
+       WWWWAAA                AAAAWWW
+        WWW AAAA            AAAA WWWW
+         W WW AAAAAA     AAAAAA W WW
+          WWWWW AAAAAAAAAAAAA WWWWW
+           WWW WW  AAAAAA  WWW WW
+             WWWWW WWW WWW WWWWW
+               WWWWWWW WWWWWWW</div>
+    <p class="caption">W = muro esterno con le arcate · A = gradinate della cavea · vuoto = arena</p>
+
+    <p>Il numero che conta: <b>12,5 milioni di blocchi</b> a città, <b>~280 battiti</b> di server a
+      45 000 blocchi per battito, cioè una quindicina di secondi l'una. Nessun volume finisce fuori
+      dal perimetro e nessuno è degenere — controllato sulle cinque piante.</p>
+  </section>
+
+  <section>
+    <h2><span class="step violet">4</span> Una alla volta, non tutte insieme</h2>
+    <p class="kicker">Il cambiamento meno visibile e più importante.</p>
+
+    <p>Prima le cinque città partivano insieme, e il budget di blocchi per battito valeva per
+      ognuna: cinque cantieri aperti significavano cinque volte il lavoro a ogni battito. Con
+      città otto volte più grandi sarebbe stata una partita ferma. Adesso c'è una <b>coda</b>: si
+      costruisce un cantiere per volta, e il numero in config vuole dire davvero quello che dice.</p>
+
+    <p>La quota su cui posare la città si campiona ora su <b>venticinque punti</b> invece di
+      cinque: su trecento blocchi di lato quattro angoli e il centro non bastano più a decidere se
+      il terreno è in pendenza.</p>
+  </section>
+
+  <section>
+    <h2><span class="step good">5</span> Da provare in gioco</h2>
+    <p class="kicker">Mondo nuovo, creativo. Le Associazioni si tirano su da sole al primo
+      ingresso: aspetta i messaggi di avanzamento, uno ogni dieci per cento.</p>
+
+    <pre><code><span class="c"># se preferisci lanciarle a mano invece di aspettare l'automatico</span>
+/arise city setup
+
+<span class="c"># una sola città, per guardarla nascere</span>
+/arise city build rome
+
+<span class="c"># viaggio: si arriva davanti al portone, a sud della piazza</span>
+/arise city go rome
+/arise city go new_york
+/arise city go tokyo
+/arise city go madrid
+/arise city go berlin
+
+<span class="c"># per guardare dall'alto e di notte</span>
+/gamemode spectator
+/time set night</code></pre>
+
+    <div class="verify">
+      <span class="tag">Checklist</span>
+      <ul class="check">
+        <li><b>Arrivo.</b> <code>/arise city go rome</code> deve lasciarti <em>davanti</em>
+          all'ingresso, sul selciato, rivolto verso il portone — non dentro un muro e non due
+          blocchi sopra il pavimento. È il punto che ho cambiato: l'Associazione è più larga di
+          prima e la distanza d'arrivo la decide adesso la pianta.</li>
+        <li><b>Il monumento in fondo al viale.</b> Dalla piazza, guardando a nord, il monumento
+          deve essere visibile in fondo alla strada alberata. Vale per tutte e cinque.</li>
+        <li><b>I cinque monumenti.</b> Colosseo con l'anello rotto da un lato, Empire State a
+          scalini con la guglia, traliccio rosso e bianco con le due terrazze, la porta a cinque
+          fornici con la fontana davanti, la Porta di Brandeburgo con dietro la sfera del
+          Fernsehturm.</li>
+        <li><b>Le cinque piante.</b> In spettatore, dall'alto: Tokyo dev'essere un labirinto fitto,
+          Roma un tappeto di cortili con un anello verde attorno al centro, Madrid un nido d'ape,
+          New York l'unica con uno skyline, Berlino il viale che taglia tutto.</li>
+        <li><b>Dentro gli isolati.</b> Entra in un cortile di Madrid o di Berlino: ci si deve
+          arrivare dal passaggio coperto, e dentro c'è erba e un albero.</li>
+        <li><b>Di notte.</b> I lampioni cambiano colore da città a città — luce fredda a New York e
+          Berlino, insegne calde a Tokyo, lanterne a Roma.</li>
+        <li><b>Il terminale di viaggio.</b> Passando il mouse su una città, il suggerimento mostra
+          il suo monumento.</li>
+        <li><b>Il gioco non deve scattare</b> durante la costruzione. Se lo fa, abbassa
+          <code>blocks_per_tick</code> nella config e dimmelo.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">6</span> Dove mi aspetto problemi</h2>
+
+    <ul>
+      <li><b>Città in montagna.</b> La spianata sgombera 96 blocchi sopra il suolo e i monumenti si
+        sgomberano il cielo da soli fin dove arrivano; ma gli edifici normali sono gusci di quattro
+        pareti, non scatole svuotate. Se una città capita addosso a una vetta molto alta, dentro un
+        grattacielo può restare roccia. Se lo vedi, mandami le coordinate.</li>
+      <li><b>L'acqua delle fontane</b> è posata senza aggiornamenti ai vicini, come tutto il resto.
+        Dovrebbe restare nella vasca; se cola sulla piazza è un blocco di bordo mancante.</li>
+      <li><b>Il tempo di costruzione.</b> Cinque città sono ormai una sessantina di secondi di
+        lavoro: al primo ingresso in un mondo nuovo si vede. È voluto, ma se è troppo si scende con
+        <code>blocks_per_tick</code>.</li>
+      <li><b>Le porte al piano terra</b> sono un vuoto largo tre nel muro, non un'anta vera: si
+        entra, ma non si chiude niente.</li>
+    </ul>
+  </section>
+
+  <hr>
+
+  <footer>
+    <p>Toccati: <code>City</code>, <code>CityPlan</code>, <code>CityManager</code>,
+      <code>CityConfig</code>, <code>CityHubScreen</code>, le due lingue. Nuovi:
+      <code>CityStyle</code>, <code>CityPalette</code>, <code>Landmark</code>,
+      <code>CityLandmarks</code>, <code>CityBuildings</code>, <code>Shapes</code>,
+      <code>Rect</code>. Build verde; la fase resta aperta in <code>CLAUDE.md</code> come
+      <b>C5</b> finché non l'hai vista in gioco.</p>
+  </footer>
+
+</div>

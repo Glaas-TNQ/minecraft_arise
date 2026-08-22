@@ -268,6 +268,27 @@ Cosa si perde, detto chiaramente: il pezzo non sta nell'inventario, non si butta
 passa a un amico infilandolo in un baule. Lo scambio fra giocatori, se servirà, diventerà un
 trasferimento fra due schermate — fattibile, ma va scritto.
 
+> **Revisione (blocco D1).** Questa decisione è stata **rovesciata**. La premessa era che
+> «oggetto» significasse «texture nuova»: non è vero. Il corpo di un pezzo lo prestano gli item
+> vanilla — cuoio → rame → maglia → ferro → diamante → netherite per le armature, legno → rame →
+> pietra → ferro → diamante → netherite per le armi: due scale che il giocatore legge già da anni,
+> sei gradini per sei ranghi — e per gli accessori uno sprite riconoscibile per tipo. Il
+> `GearPiece` resta esattamente il record che era, ma viaggia dentro un componente dati
+> (`arise:gear_piece`) invece che dentro una lista.
+>
+> Cosa si guadagna, e che una lista non avrebbe mai dato: il bottino **cade per terra** invece di
+> comparire in chat; testa, torso, gambe, piedi e mano tornano alle caselle di vanilla, dove si
+> vedono addosso al personaggio; trascinamento, shift-click e tasti della barra rapida arrivano
+> gratis; un pezzo si mette in un baule, si ripara all'incudine, si incanta.
+>
+> Cosa si è dovuto costruire in cambio: uno **spazio dimensionale** (27 caselle) che raccoglie da
+> solo l'equipaggiamento che passa dall'inventario, e un **vincolo all'anima** — alla morte i pezzi
+> vengono ritirati e restituiti al respawn — perché adesso sarebbero oggetti veri per terra.
+>
+> Restano nostre solo le otto famiglie di caselle che vanilla non ha: guanti, cintura, spalline,
+> mantello, collana, talismano, orecchini, anelli. Il §8.4 sugli sblocchi vale ancora, ed è per
+> quelle.
+
 ### 8.2 Le sorgenti di statistica si sommano prima di diventare modificatori
 
 Oggi ogni `Stat` ha un modificatore con id fisso, rimpiazzato a ogni ricalcolo (regola §6 di
@@ -408,6 +429,106 @@ perché ogni azione dentro passa dal server.
 
 ---
 
+## 10. L'Officina delle Anime — costruzione di base e automazione
+
+### 10.1 Cosa fanno le altre mod, e cosa prendiamo
+
+Quattro scuole, tutte vive, tutte con una risposta diversa alla stessa domanda: *cosa costringe il
+giocatore a costruire invece che a cliccare?*
+
+| Scuola | Esempio | La valuta | Cosa insegna |
+|---|---|---|---|
+| **Energia astratta** | Thermal Expansion, Mekanism | RF/FE in un cavo | La macchina è una scatola con una barra. Facile da estendere, ma ogni macchina nuova è la stessa scatola con un'altra ricetta. Da Thermal prendiamo i **lati riconfigurabili** e gli **slot di potenziamento**: la macchina è un oggetto che si *regola*, non solo che si accende. |
+| **Meccanica visibile** | Create | Rotazione su alberi e cinghie | Niente barre: il processo si **vede** girare nel mondo. Costa molto più lavoro di rendering, ma è l'unica scuola dove una fabbrica è bella da guardare. Prendiamo il principio, non l'implementazione: **la macchina deve dire da fuori cosa sta facendo** (particellari, luce, suono). |
+| **Vita e decadimento** | Botania | Mana da fiori che consumano qualcosa | I generatori passivi **decadono**; quelli attivi no ma vogliono un input. È il modo migliore che conosco per impedire che l'automazione diventi "piazzo e dimentico". |
+| **Rete e domanda** | Applied Energistics | Canali, richieste su ordinazione | La rete ha un **costo di struttura** oltre che di energia. Troppo per noi adesso, ma è la direzione se un giorno le officine si collegheranno fra loro. |
+
+**La conclusione per Arise.** Non aggiungiamo una valuta energetica: ne abbiamo già una, e ha un
+peso narrativo che nessun RF avrà mai. **L'anima è l'energia.** Ma un'anima non si *brucia*: si
+*mette a lavorare*. È la differenza che tiene insieme automazione e Solo Leveling — il Monarca non
+consuma i suoi morti, li impiega.
+
+### 10.2 Le anime in esubero
+
+L'esercito ha un tetto (`shadows.capacityAt(livello)`). Fino a oggi estrarre a esercito pieno
+significava buttare via il cadavere. Da qui in avanti l'estrazione riuscita che non trova posto
+produce un'**Anima Errante**: un oggetto, con un UUID, un mob d'origine, un livello e un rango.
+Anche il congedo di un'ombra restituisce la sua anima, oltre ai soul coin.
+
+Un'Anima Errante fa esattamente tre cose:
+
+1. **lavora** — infilata in una macchina è un operaio. **Non viene consumata**: si rimette dentro,
+   si toglie, si sposta su un'altra macchina. Il suo *vigore* (potenza del mob × livello) decide
+   quanto va veloce la macchina che la ospita;
+2. **si fonde** — quattro anime più un catalizzatore diventano un'anima sola, più forte e con un
+   **tratto**;
+3. **si arruola** — click destro, e se c'è posto nell'esercito diventa un'ombra vera, con il
+   livello che ha raggiunto nel Crogiolo.
+
+Questo chiude il cerchio: l'automazione non è un ramo laterale della mod, è il modo in cui si
+coltiva l'esercito quando non si sta combattendo.
+
+### 10.3 I quattro macchinari
+
+Quattro blocchi, un anello. Ognuno produce quello che serve al successivo.
+
+| # | Blocco | Cosa fa | Caselle |
+|---|---|---|---|
+| 1 | **Richiamo d'Anime** (`arise:soul_lure`) | Le anime installate attirano l'attenzione dell'Abisso: ogni tanto materializza un'Anima Errante nuova, di rango legato al vigore installato. È l'ingresso dell'anello. | 2 operai → 3 uscite |
+| 2 | **Crogiolo delle Anime** (`arise:soul_crucible`) | **La fusione.** Quattro anime + un catalizzatore → una sola anima, con la somma dei livelli, il rango del pezzo migliore e un **tratto** nuovo. Il catalizzatore decide quanti tratti può reggere il risultato. | 4 anime + 1 catalizzatore → 1 uscita |
+| 3 | **Fucina d'Ombra** (`arise:shadow_forge`) | Gli operai fondono e macinano **senza carburante**: qualunque cosa abbia una ricetta di fusione, più il raddoppio dei minerali. Il collegamento con l'automazione vanilla: tramoggia sopra, tramoggia sotto. | 3 operai + 1 ingresso → 1 uscita |
+| 4 | **Pozzo dell'Abisso** (`arise:abyss_well`) | Gli operai vengono *munti*: soul coin al proprietario e, ogni tanto, un **catalizzatore**. È ciò che rende un'anima scarsa comunque utile, e chiude l'anello alimentando il Crogiolo. | 4 operai → 1 uscita |
+
+**Perché non hanno una barra dell'energia.** Il livello di riempimento di una macchina è il numero
+e la qualità delle anime che ci stanno dentro, e quello si vede aprendo la macchina. Una seconda
+barra racconterebbe la stessa cosa due volte.
+
+**Perché gli operai non si consumano mai.** Perché il gesto interessante è *scegliere dove
+metterli*, non *ricomprarli*. Un'anima di rango S nel Pozzo è sprecata; nella Fucina fa volare la
+produzione. Se le anime bruciassero, la scelta la farebbe la scorta, non il giocatore.
+
+**Il decadimento che ci prendiamo da Botania**, in versione mite: nulla marcisce, ma il Richiamo
+rallenta se lo si lascia con le stesse anime troppo a lungo — no. *Rinunciato*: sarebbe
+manutenzione senza decisione. Al suo posto il limite è il tetto di uscita: il Richiamo si ferma
+quando le sue tre caselle sono piene, quindi un'officina che nessuno svuota si spegne da sola.
+
+### 10.4 I catalizzatori
+
+Consumabili, sei gradi come i ranghi. Il grado decide **quanti tratti** può reggere l'anima che
+esce dal Crogiolo (E–D: uno; C–B: due; A–S: tre) e quanta parte dei livelli sopravvive alla
+fusione. Si ottengono dal Pozzo dell'Abisso, dai boss dei Gate e dall'Abyss Shop.
+
+### 10.5 I tratti
+
+Cinque, esclusivi, uno per fusione. Sono il motivo per cui vale la pena fondere invece che
+accumulare.
+
+| Tratto | Sull'operaio | Sull'ombra arruolata |
+|---|---|---|
+| **Ardore** | +25% velocità della macchina | — |
+| **Avidità** | +50% soul coin dal Pozzo | — |
+| **Tenacia** | 25% di raddoppiare l'uscita | — |
+| **Risonanza** | 30% che il Crogiolo non consumi il catalizzatore | — |
+| **Ferocia** | — | +20% danno |
+
+### 10.6 Il tempo di recupero delle ombre
+
+Regola nuova e indipendente dall'officina, ma della stessa famiglia: **un'ombra caduta non è
+disponibile per sessanta secondi**. Non muore, non si perde — si riprende. Premere il tasto di
+evocazione durante il recupero evoca **le altre**, e il messaggio dice quante sono ancora a terra.
+
+È la prima volta che una morte in questa mod costa qualcosa senza togliere niente per sempre, ed
+è ciò che rende una postura aggressiva una decisione invece che l'unica scelta sensata.
+
+### 10.7 Il Laboratorio
+
+`/arise arena` costruisce ora un **laboratorio**: la stanza chiusa di prima, più sei varchi già
+aperti (uno per rango) su una parete, i quattro macchinari già alimentati sulla parete opposta, e
+una cassa con equipaggiamento, gemme, anime, catalizzatori e i materiali vanilla per costruire
+tutto da zero. Serve a provare ogni sistema della mod in due minuti invece che in mezz'ora.
+
+---
+
 ## Fonti
 
 - [Solo Leveling: Reawakening — CurseForge](https://www.curseforge.com/minecraft/mc-mods/solo-craft-reawakening) · [Modrinth](https://modrinth.com/project/YdsLXFph)
@@ -423,3 +544,8 @@ perché ogni azione dentro passa dal server.
 - [Minecraft Wiki — Attribute](https://minecraft.wiki/w/Attribute)
 - [Fabric for Minecraft 26.2](https://fabricmc.net/2026/06/15/262.html)
 - [Modrinth — Content Rules](https://modrinth.com/legal/rules)
+- [Thermal Expansion — lati riconfigurabili e potenziamenti](https://technicpack.fandom.com/wiki/Thermal_Expansion)
+- [Mekanism — progressione delle macchine](https://www.minecraft-guides.com/mod/mekanism/)
+- [Create — meccanica visibile invece di GUI](https://rocketnode.com/blog/create-mod-101)
+- [Botania — fiori generatori passivi e attivi](https://wiki.gtnewhorizons.com/wiki/Mana_Generating_Flowers)
+- [Fabric — Creating Your First Block](https://docs.fabricmc.net/develop/blocks/first-block)

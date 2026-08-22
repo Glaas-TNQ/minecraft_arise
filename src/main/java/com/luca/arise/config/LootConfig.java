@@ -33,7 +33,15 @@ public record LootConfig(
 		/** Probabilita' che un mob qualunque dentro un Gate lasci un pezzo. */
 		double mobDropChance,
 		/** Probabilita' che quel pezzo sia di un rango sotto quello del Gate. */
-		double mobRankDownChance) {
+		double mobRankDownChance,
+		/**
+		 * Probabilita' che un mob del mondo normale lasci un pezzo.
+		 *
+		 * <p>Molto piu' bassa di quella dentro un Gate, e deve restarlo: il mondo e' pieno di
+		 * creature e nessuno deve poter vestirsi restando a casa a uccidere zombi. Serve a far
+		 * capire come funziona il bottino a chi non ha ancora aperto un varco.
+		 */
+		double worldDropChance) {
 
 	public static final Codec<LootConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.DOUBLE.fieldOf("pieces").forGetter(LootConfig::pieces),
@@ -44,7 +52,9 @@ public record LootConfig(
 			Codec.DOUBLE.fieldOf("scroll_points_per_rank").forGetter(LootConfig::scrollPointsPerRank),
 			Codec.DOUBLE.fieldOf("upgrade_chance").forGetter(LootConfig::upgradeChance),
 			Codec.DOUBLE.fieldOf("mob_drop_chance").forGetter(LootConfig::mobDropChance),
-			Codec.DOUBLE.fieldOf("mob_rank_down_chance").forGetter(LootConfig::mobRankDownChance)
+			Codec.DOUBLE.fieldOf("mob_rank_down_chance").forGetter(LootConfig::mobRankDownChance),
+			Codec.DOUBLE.optionalFieldOf("world_drop_chance", 0.012)
+					.forGetter(LootConfig::worldDropChance)
 	).apply(instance, LootConfig::new));
 
 	/**
@@ -53,7 +63,7 @@ public record LootConfig(
 	 * finale smetta di essere il momento che conta.
 	 */
 	public static final LootConfig DEFAULT =
-			new LootConfig(1.4, 0.5, 0.35, 0.12, 0.6, 0.35, 0.12, 0.07, 0.6);
+			new LootConfig(1.4, 0.5, 0.35, 0.12, 0.6, 0.35, 0.12, 0.07, 0.6, 0.012);
 
 	/** Quanti pezzi, dato il rango. La parte decimale resta come probabilita' del pezzo in piu'. */
 	public double pieceCount(int rankOrdinal) {

@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.luca.arise.ability.AbilityManager;
 import com.luca.arise.config.AriseConfig;
+import com.luca.arise.gate.GateLoot;
 import com.luca.arise.gate.GateManager;
 import com.luca.arise.gem.GemManager;
 import com.luca.arise.gem.GemType;
@@ -26,8 +27,14 @@ import net.minecraft.world.entity.player.Player;
 
 public final class ProgressEvents {
 
-	/** Ogni quanti tick si verifica che gli attributi corrispondano alle statistiche. */
-	private static final int RECONCILE_INTERVAL_TICKS = 20;
+	/**
+	 * Ogni quanti tick si verifica che gli attributi corrispondano alle statistiche.
+	 *
+	 * <p>Un quarto di secondo, non uno intero: da quando l'equipaggiamento sta nelle caselle di
+	 * vanilla, indossare un elmo non passa piu' da nessun codice nostro, e questo controllo e' cio'
+	 * che se ne accorge. Un secondo di ritardo fra il click e i cuori che salgono si vede.
+	 */
+	private static final int RECONCILE_INTERVAL_TICKS = 5;
 
 	private ProgressEvents() {
 	}
@@ -79,6 +86,12 @@ public final class ProgressEvents {
 				ShadowManager.awardXp(player, xp, killerShadow);
 				GateManager.onEntityDied(player, victim);
 
+				// Fuori da un varco il bottino lo assegna nessun altro: GateManager si ferma
+				// subito se il giocatore non e' dentro un'istanza.
+				if (!GateManager.isInGate(player) && QuestManager.has(player, Unlock.GEAR)) {
+					GateLoot.worldDrop(player, victim.position());
+				}
+
 				// Dopo recordKill: l'ossidiana estrae dal cadavere appena registrato.
 				GemEvents.onKill(player);
 			}
@@ -113,7 +126,7 @@ public final class ProgressEvents {
 
 			long now = server.overworld().getGameTime();
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-				GearManager.enforce(player);
+				GearManager.tick(player);
 				ProgressManager.reconcile(player);
 				AbilityManager.prune(player, now);
 				GateManager.tick(player);

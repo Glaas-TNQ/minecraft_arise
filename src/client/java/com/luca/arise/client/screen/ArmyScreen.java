@@ -10,6 +10,7 @@ import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.network.ShadowActionPayload;
 import com.luca.arise.registry.ModAttachments;
+import com.luca.arise.shadow.ShadowDowntime;
 import com.luca.arise.shadow.ShadowArmy;
 import com.luca.arise.shadow.ShadowData;
 import com.luca.arise.shadow.SummonedShadows;
@@ -61,6 +62,29 @@ public class ArmyScreen extends AriseScreen {
 		LocalPlayer player = minecraft != null ? minecraft.player : null;
 		SummonedShadows summoned = player == null ? null : player.getAttached(ModAttachments.SUMMONED);
 		return summoned == null ? SummonedShadows.EMPTY : summoned;
+	}
+
+	/**
+	 * Quali ombre sono ancora a terra.
+	 *
+	 * <p>Arriva sincronizzata dal server, e deve: il client non ha modo di sapere quando un'ombra
+	 * e' caduta fuori dalla sua vista, e senza questo dato la schermata mostrerebbe un bottone
+	 * "evoca" che poi il server rifiuta senza spiegare.
+	 */
+	private ShadowDowntime downtime() {
+		LocalPlayer player = minecraft != null ? minecraft.player : null;
+		ShadowDowntime downtime = player == null ? null : player.getAttached(ModAttachments.DOWNTIME);
+		return downtime == null ? ShadowDowntime.EMPTY : downtime;
+	}
+
+	/** Secondi che mancano perche' quest'ombra torni evocabile. Zero se e' pronta. */
+	private long restingSeconds(java.util.UUID id) {
+		if (minecraft == null || minecraft.level == null) {
+			return 0L;
+		}
+
+		long ticks = downtime().remaining(id, minecraft.level.getGameTime());
+		return ticks <= 0 ? 0L : Math.max(1L, ticks / 20L);
 	}
 
 	// ---------------------------------------------------------------- widget
@@ -163,17 +187,21 @@ public class ArmyScreen extends AriseScreen {
 	private void drawShadow(GuiGraphicsExtractor graphics, ShadowConfig config, ShadowData shadow,
 			int x, int y, int width) {
 		boolean out = summoned().contains(shadow.id());
+		long resting = restingSeconds(shadow.id());
 
 		Glyphs.rankPip(graphics, x + 6, y + 8, 9, 0xFF000000 | shadow.color());
 		graphics.text(font, shadow.displayName(), x + 20, y + 4,
-				out ? AriseTheme.ACCENT : AriseTheme.TEXT);
+				resting > 0 ? AriseTheme.DISABLED : out ? AriseTheme.ACCENT : AriseTheme.TEXT);
 		graphics.text(font, Component.translatable("arise.screen.army.line", shadow.level(),
 				String.format("%.0f", shadow.maxHealth(config)),
 				String.format("%.1f", shadow.attackDamage(config))),
 				x + 20, y + 14, AriseTheme.MUTED);
 
-		Component rank = shadow.rank(config).label();
-		graphics.text(font, rank, x + width - font.width(rank) - 6, y + 4, shadow.rank(config).color());
+		Component rank = resting > 0
+				? Component.translatable("arise.screen.army.resting_short", resting)
+				: shadow.rank(config).label();
+		int rankColor = resting > 0 ? AriseTheme.WARN : shadow.rank(config).color();
+		graphics.text(font, rank, x + width - font.width(rank) - 6, y + 4, rankColor);
 
 		// Il puntino dell'ombra fuori: si cerca a colpo d'occhio, e prima bisognava leggere il
 		// bottone per saperlo.
@@ -199,9 +227,16 @@ public class ArmyScreen extends AriseScreen {
 		}
 
 		boolean out = summoned().contains(shadow.id());
-		toggle.setMessage(Component.translatable(out
-				? "arise.screen.army.recall"
-				: "arise.screen.army.summon"));
+		long resting = restingSeconds(shadow.id());
+
+		// Un'ombra a terra non si evoca, e il bottone lo dice invece di limitarsi a fallire: un
+		// rifiuto senza spiegazione e' il modo piu' sicuro per far credere che sia un bug.
+		toggle.active = out || resting == 0;
+		toggle.setMessage(resting > 0
+				? Component.translatable("arise.screen.army.resting", resting)
+				: Component.translatable(out
+						? "arise.screen.army.recall"
+						: "arise.screen.army.summon"));
 
 		graphics.text(font, shadow.displayName(), left, y, AriseTheme.TEXT);
 		y += 15;

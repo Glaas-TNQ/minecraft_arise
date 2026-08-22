@@ -14,6 +14,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
  * di un record si ferma a sedici campi, e {@link AriseConfig} e' gia' li'. Tutto quello che
  * riguarda il Cacciatore — oggi rango ed equipaggiamento, domani il negozio e le gemme — entra qui
  * dentro invece di allargare la radice.
+ *
+ * <p>L'Officina delle Anime e' arrivata per questa porta: e' un sistema suo, ma la radice non
+ * aveva un campo libero e questo contenitore ne ha in abbondanza. La regola resta quella scritta
+ * sopra — si annida, non si spezza.
  */
 public record HunterConfig(
 		/** Il livello a cui si entra in ciascun rango, da E a S. */
@@ -23,18 +27,22 @@ public record HunterConfig(
 		/** Prezzi e rotazione dell'Abyss Shop. */
 		ShopConfig shop,
 		/** Effetti e tetti delle gemme. */
-		GemConfig gems) {
+		GemConfig gems,
+		/** L'Officina delle Anime: macchinari, tratti, rese. */
+		WorkshopConfig workshop) {
 
 	public static final Codec<HunterConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.INT.listOf().fieldOf("rank_levels").forGetter(HunterConfig::rankLevels),
 			GearConfig.CODEC.fieldOf("gear").forGetter(HunterConfig::gear),
 			ShopConfig.CODEC.fieldOf("shop").forGetter(HunterConfig::shop),
-			GemConfig.CODEC.fieldOf("gems").forGetter(HunterConfig::gems)
+			GemConfig.CODEC.fieldOf("gems").forGetter(HunterConfig::gems),
+			WorkshopConfig.CODEC.fieldOf("workshop").forGetter(HunterConfig::workshop)
 	).apply(instance, HunterConfig::new));
 
 	public static final HunterConfig DEFAULT =
 			new HunterConfig(List.of(1, 10, 20, 35, 55, 80),
-					GearConfig.DEFAULT, ShopConfig.DEFAULT, GemConfig.DEFAULT);
+					GearConfig.DEFAULT, ShopConfig.DEFAULT, GemConfig.DEFAULT,
+					WorkshopConfig.DEFAULT);
 
 	public HunterConfig {
 		rankLevels = List.copyOf(rankLevels);

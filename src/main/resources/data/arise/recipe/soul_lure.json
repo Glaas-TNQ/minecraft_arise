@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "S": "minecraft:soul_sand",
+    "D": "minecraft:deepslate_bricks",
+    "E": "minecraft:echo_shard"
+  },
+  "pattern": [
+    "SDS",
+    "DED",
+    "SDS"
+  ],
+  "result": {
+    "id": "arise:soul_lure"
+  }
+}

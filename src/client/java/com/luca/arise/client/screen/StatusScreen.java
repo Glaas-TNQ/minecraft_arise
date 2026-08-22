@@ -7,7 +7,7 @@ import com.luca.arise.client.ui.AriseScreen;
 import com.luca.arise.client.ui.AriseTheme;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.gear.GearPiece;
-import com.luca.arise.gear.PlayerGear;
+import com.luca.arise.client.ClientGear;
 import com.luca.arise.gem.Gem;
 import com.luca.arise.network.SpendPointPayload;
 import com.luca.arise.progress.PlayerProgress;
@@ -45,17 +45,11 @@ public class StatusScreen extends AriseScreen {
 		super(Component.translatable("arise.screen.status.title"), PANEL_W, PANEL_H);
 	}
 
-	private PlayerGear gear() {
-		LocalPlayer player = minecraft != null ? minecraft.player : null;
-		PlayerGear gear = player == null ? null : player.getAttached(ModAttachments.GEAR);
-		return gear == null ? PlayerGear.EMPTY : gear;
-	}
-
 	/** Quanto una statistica riceve da equipaggiamento e gemme indossate. */
 	private double external(Stat stat) {
 		double total = 0.0;
 
-		for (GearPiece piece : gear().equipped()) {
+		for (GearPiece piece : ClientGear.worn(minecraft == null ? null : minecraft.player)) {
 			total += piece.stats().getOrDefault(stat, 0.0);
 
 			for (Gem gem : piece.gems()) {

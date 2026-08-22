@@ -13,6 +13,7 @@ import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.CityConfig;
 import com.luca.arise.config.GemConfig;
 import com.luca.arise.gear.GearPiece;
+import com.luca.arise.client.ClientGear;
 import com.luca.arise.gear.PlayerGear;
 import com.luca.arise.gem.Gem;
 import com.luca.arise.network.GemActionPayload;
@@ -82,12 +83,10 @@ public class GemScreen extends AriseScreen {
 
 	/** I pezzi con almeno un'incastonatura, indossati per primi. */
 	private List<GearPiece> pieceList() {
-		PlayerGear gear = gear();
+		LocalPlayer player = minecraft == null ? null : minecraft.player;
 		List<GearPiece> result = new ArrayList<>();
 
-		gear.equipped().stream().filter(piece -> piece.sockets() > 0).forEach(result::add);
-		gear.stash().stream().filter(piece -> piece.sockets() > 0).forEach(result::add);
-
+		ClientGear.owned(player).stream().filter(piece -> piece.sockets() > 0).forEach(result::add);
 		return result;
 	}
 
@@ -158,7 +157,7 @@ public class GemScreen extends AriseScreen {
 
 	private void back() {
 		if (minecraft != null) {
-			minecraft.setScreenAndShow(parent == null ? new HunterScreen() : parent);
+			minecraft.setScreenAndShow(parent);
 		}
 	}
 

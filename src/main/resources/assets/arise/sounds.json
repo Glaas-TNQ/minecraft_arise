@@ -273,5 +273,60 @@
         "pitch": 1.0
       }
     ]
+  },
+  "machine.work": {
+    "subtitle": "arise.subtitle.machine_work",
+    "sounds": [
+      {
+        "name": "minecraft:block/vault/insert",
+        "volume": 0.5,
+        "pitch": 1.5
+      }
+    ]
+  },
+  "machine.done": {
+    "subtitle": "arise.subtitle.machine_done",
+    "sounds": [
+      {
+        "name": "minecraft:block/amethyst/shimmer",
+        "volume": 0.7,
+        "pitch": 1.1
+      },
+      {
+        "name": "minecraft:block/vault/activate",
+        "volume": 0.5,
+        "pitch": 1.3
+      }
+    ]
+  },
+  "soul.fuse": {
+    "subtitle": "arise.subtitle.soul_fuse",
+    "sounds": [
+      {
+        "name": "minecraft:block/conduit/activate",
+        "volume": 0.8,
+        "pitch": 0.9
+      },
+      {
+        "name": "minecraft:mob/evocation_illager/prepare_summon",
+        "volume": 0.6,
+        "pitch": 1.2
+      }
+    ]
+  },
+  "soul.enlist": {
+    "subtitle": "arise.subtitle.soul_enlist",
+    "sounds": [
+      {
+        "name": "minecraft:mob/warden/emerge",
+        "volume": 0.5,
+        "pitch": 1.4
+      },
+      {
+        "name": "minecraft:block/beacon/activate",
+        "volume": 0.5,
+        "pitch": 1.3
+      }
+    ]
   }
 }

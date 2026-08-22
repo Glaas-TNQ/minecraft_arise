@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import com.luca.arise.client.screen.AbyssShopScreen;
 import com.luca.arise.client.screen.ArmyScreen;
-import com.luca.arise.client.screen.HunterScreen;
 import com.luca.arise.client.screen.StatusScreen;
 import com.luca.arise.client.screen.QuestScreen;
 import com.luca.arise.network.AriseActionPayload;
@@ -95,9 +94,10 @@ public final class AriseKeyMappings {
 				open(client, Unlock.ARMY, ArmyScreen::new);
 			}
 
-			while (OPEN_GEAR.consumeClick()) {
-				open(client, Unlock.GEAR, HunterScreen::new);
-			}
+			// L'equipaggiamento non e' piu' una schermata nostra ma un menu con delle caselle, e
+			// un menu nasce sul server: il tasto puo' solo chiederlo. Il rifiuto per sistema non
+			// ancora sbloccato arriva da li'.
+			sendOnPress(OPEN_GEAR, AriseActionPayload.Action.OPEN_GEAR);
 
 			while (OPEN_SHOP.consumeClick()) {
 				// Il colpetto al server prima della schermata: il negozio si rigenera pigramente,

@@ -9,10 +9,11 @@ import com.luca.arise.config.GearConfig;
 import com.luca.arise.gate.GateManager;
 import com.luca.arise.gate.GateSpawner;
 import com.luca.arise.gear.GearManager;
+import java.util.List;
+
 import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.GearRoll;
 import com.luca.arise.gear.GearSlot;
-import com.luca.arise.gear.PlayerGear;
 import com.luca.arise.gem.GemManager;
 import com.luca.arise.gem.GemType;
 import com.luca.arise.progress.Rank;
@@ -366,9 +367,9 @@ public final class AriseCommands {
 	/**
 	 * Mette in coda tutte le città.
 	 *
-	 * <p>Partono insieme e si costruiscono in parallelo, ognuna con il suo budget di blocchi per
-	 * battito. Con cinque cantieri aperti il server piazza cinque volte i blocchi di uno: se il
-	 * gioco scatta, si costruiscono una per volta oppure si abbassa {@code blocks_per_tick}.
+	 * <p>Entrano tutte in coda e si costruiscono <em>una per volta</em>: il budget di blocchi per
+	 * battito vale per il cantiere aperto, non per ognuno dei cinque. Se il gioco scatta lo stesso,
+	 * si abbassa {@code blocks_per_tick}.
 	 */
 	/**
 	 * Il mondo pronto: tira su quello che manca e basta.
@@ -407,39 +408,36 @@ public final class AriseCommands {
 			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
 		ServerPlayer player = source.getPlayerOrException();
 		GearConfig config = AriseConfig.get().gear();
-		int before = GearManager.get(player).stash().size();
 
 		for (int i = 0; i < count; i++) {
 			GearManager.grant(player, GearRoll.rollAny(config, rank, player.level().getRandom()));
 		}
 
-		int added = GearManager.get(player).stash().size() - before;
-		source.sendSuccess(() -> Component.translatable("arise.msg.gear.rolled", added, rank.label()), false);
-		return added;
+		source.sendSuccess(() -> Component.translatable("arise.msg.gear.rolled", count, rank.label()), false);
+		return count;
 	}
 
 	private static int listGear(CommandSourceStack source)
 			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
 		ServerPlayer player = source.getPlayerOrException();
-		PlayerGear gear = GearManager.get(player);
 		Rank rank = GearManager.hunterRank(player);
+		List<GearPiece> worn = GearManager.worn(player);
 
 		source.sendSuccess(() -> Component.translatable("arise.msg.gear.header",
-				rank.label(), gear.equipped().size(), gear.stash().size()), false);
+				rank.label(), worn.size(), GearManager.owned(player).size()), false);
 
-		for (GearPiece piece : gear.equipped()) {
+		for (GearPiece piece : worn) {
 			source.sendSuccess(() -> Component.translatable("arise.msg.gear.line",
 					piece.slot().label(), piece.displayName(), piece.statSummary()), false);
 		}
 
-		return gear.equipped().size();
+		return worn.size();
 	}
 
 	private static int clearGear(CommandSourceStack source)
 			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
 		ServerPlayer player = source.getPlayerOrException();
-		PlayerGear gear = GearManager.get(player);
-		int count = gear.equipped().size() + gear.stash().size();
+		int count = GearManager.owned(player).size();
 
 		GearManager.clear(player);
 		source.sendSuccess(() -> Component.translatable("arise.msg.gear.cleared", count), false);

@@ -35,8 +35,18 @@ import net.minecraft.world.phys.Vec3;
  */
 public final class CityManager {
 
-	/** Le costruzioni in corso, una per città. */
+	/** Le costruzioni in corso. Ne parte una sola per volta: vedi {@link #QUEUE}. */
 	private static final Map<City, CityBuild> RUNNING = new EnumMap<>(City.class);
+
+	/**
+	 * Le città in attesa del proprio turno.
+	 *
+	 * <p>Costruirle tutte e cinque insieme moltiplicherebbe per cinque il lavoro di ogni battito, e
+	 * il numero che sta in config — quanti blocchi al colpo — smetterebbe di voler dire qualcosa.
+	 * Una alla volta il costo per battito è sempre quello, che il mondo sia nuovo o che si stia
+	 * ricostruendo una sola città con un comando.
+	 */
+	private static final java.util.Deque<City> QUEUE = new java.util.ArrayDeque<>();
 
 	/** Chi ha chiesto la costruzione, per mandargli l'avanzamento. */
 	private static final Map<City, java.util.UUID> REQUESTERS = new EnumMap<>(City.class);
@@ -99,7 +109,7 @@ public final class CityManager {
 		int started = 0;
 
 		for (City city : City.values()) {
-			if (!exists(level, city) && !RUNNING.containsKey(city)) {
+			if (!exists(level, city) && !RUNNING.containsKey(city) && !QUEUE.contains(city)) {
 				build(server, requester, city);
 				started++;
 			}
@@ -125,57 +135,88 @@ public final class CityManager {
 					city.label(), RUNNING.get(city).percent());
 		}
 
+		if (QUEUE.contains(city)) {
+			return Component.translatable("arise.msg.city.queued", city.label());
+		}
+
 		if (exists(level, city)) {
 			return Component.translatable("arise.msg.city.already_built", city.label());
 		}
 
 		CityConfig config = AriseConfig.get().cities();
-		int baseY = groundLevel(level, config, city);
-		RandomSource random = RandomSource.create(city.index() * 31L + 7L);
+		QUEUE.add(city);
 
-		List<Fill> fills = CityPlan.of(city, config, baseY, random);
-		CityBuild build = new CityBuild(level, city, fills, baseY);
-
-		RUNNING.put(city, build);
 		if (requester != null) {
 			REQUESTERS.put(city, requester.getUUID());
 		}
-		ANNOUNCED.put(city, 0);
 
-		AriseMod.LOGGER.info("Costruzione di {} avviata a {} {} (quota {})",
-				city.getSerializedName(), config.cityX(city), config.cityZ(city), baseY);
+		if (!RUNNING.isEmpty() || QUEUE.size() > 1) {
+			return Component.translatable("arise.msg.city.queued", city.label());
+		}
 
 		return Component.translatable("arise.msg.city.building", city.label(),
 				config.centreX(city), config.centreZ(city));
 	}
 
 	/**
+	 * Prende in carico la prossima città della coda.
+	 *
+	 * <p>La pianta si calcola qui e non quando la città viene messa in coda: leggere il terreno
+	 * costa la generazione di qualche chunk a duecentomila blocchi dallo spawn, e farlo cinque
+	 * volte tutte insieme sarebbe esattamente la scossa che la coda esiste per evitare.
+	 */
+	private static void start(MinecraftServer server, City city) {
+		ServerLevel level = server.overworld();
+		CityConfig config = AriseConfig.get().cities();
+		int baseY = groundLevel(level, config, city);
+		RandomSource random = RandomSource.create(city.index() * 31L + 7L);
+
+		List<Fill> fills = CityPlan.of(city, config, baseY, random);
+
+		RUNNING.put(city, new CityBuild(level, city, fills, baseY));
+		ANNOUNCED.put(city, 0);
+
+		AriseMod.LOGGER.info("Costruzione di {} avviata a {} {} (quota {}, {} volumi)",
+				city.getSerializedName(), config.cityX(city), config.cityZ(city), baseY, fills.size());
+
+		message(server, city, Component.translatable("arise.msg.city.building", city.label(),
+				config.centreX(city), config.centreZ(city)));
+	}
+
+	/**
 	 * La quota su cui posare la città.
 	 *
-	 * <p>Si campiona il terreno in cinque punti — centro e quattro angoli — e si prende la media.
-	 * Il solo centro basterebbe se il mondo fosse piatto: su un pendio darebbe una città metà
-	 * sepolta e metà sospesa su un plinto di venti blocchi.
+	 * <p>Si campiona il terreno su una griglia di venticinque punti e si prende la media. Il solo
+	 * centro basterebbe se il mondo fosse piatto; con quattro angoli soli una collina in mezzo
+	 * sposta la media di parecchio. Su trecento blocchi di lato la differenza fra una città posata
+	 * bene e una mezza sepolta sta tutta qui.
 	 */
 	private static int groundLevel(ServerLevel level, CityConfig config, City city) {
 		int x0 = config.cityX(city);
 		int z0 = config.cityZ(city);
-		int x1 = x0 + config.size() - 1;
-		int z1 = z0 + config.size() - 1;
+		int step = Math.max(1, (config.size() - 1) / 4);
+		int sum = 0;
+		int samples = 0;
 
-		int sum = level.getHeight(Heightmap.Types.WORLD_SURFACE, config.centreX(city), config.centreZ(city))
-				+ level.getHeight(Heightmap.Types.WORLD_SURFACE, x0, z0)
-				+ level.getHeight(Heightmap.Types.WORLD_SURFACE, x1, z0)
-				+ level.getHeight(Heightmap.Types.WORLD_SURFACE, x0, z1)
-				+ level.getHeight(Heightmap.Types.WORLD_SURFACE, x1, z1);
+		for (int dx = 0; dx <= 4; dx++) {
+			for (int dz = 0; dz <= 4; dz++) {
+				sum += level.getHeight(Heightmap.Types.WORLD_SURFACE, x0 + dx * step, z0 + dz * step);
+				samples++;
+			}
+		}
 
 		// Mai sotto il livello del mare: una città sul fondale sarebbe un acquario.
-		return Math.max(level.getSeaLevel() + 1, sum / 5);
+		return Math.max(level.getSeaLevel() + 1, sum / samples);
 	}
 
-	/** Un passo di ogni costruzione in corso. Chiamato dal battito del server. */
+	/** Un passo della costruzione in corso, e il turno della prossima. Chiamato a ogni battito. */
 	public static void tick(MinecraftServer server) {
 		if (RUNNING.isEmpty()) {
-			return;
+			if (QUEUE.isEmpty()) {
+				return;
+			}
+
+			start(server, QUEUE.poll());
 		}
 
 		int budget = AriseConfig.get().cities().blocksPerTick();
@@ -349,10 +390,12 @@ public final class CityManager {
 		CityConfig config = AriseConfig.get().cities();
 		BlockPos marker = markerPos(config, city, level);
 
-		// Davanti all'ingresso, a sud della piazza, rivolto verso il portone.
+		// Davanti all'ingresso, a sud della piazza, rivolto verso il portone. La distanza e la
+		// quota le decide la pianta: l'Associazione può diventare più larga, e chi arriva non deve
+		// per questo ritrovarsi dentro un muro o due blocchi sopra il selciato.
 		double x = marker.getX() + 0.5;
-		double z = marker.getZ() + 14.5;
-		double y = marker.getY();
+		double z = marker.getZ() + CityPlan.entranceOffset() + 0.5;
+		double y = marker.getY() - CityPlan.markerHeight();
 
 		AriseFx.cityTravel(player.level(), player.position(), city.color());
 		player.teleportTo(level, x, y, z, Set.of(), 180.0F, 0.0F, true);
@@ -365,6 +408,7 @@ public final class CityManager {
 	public static void clear() {
 		autoBuildChecked = false;
 		RUNNING.clear();
+		QUEUE.clear();
 		REQUESTERS.clear();
 		ANNOUNCED.clear();
 		KNOWN.clear();

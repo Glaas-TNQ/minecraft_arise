@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "D": "minecraft:deepslate_bricks",
+    "C": "minecraft:cauldron",
+    "E": "minecraft:echo_shard"
+  },
+  "pattern": [
+    "DED",
+    "DCD",
+    "DDD"
+  ],
+  "result": {
+    "id": "arise:abyss_well"
+  }
+}

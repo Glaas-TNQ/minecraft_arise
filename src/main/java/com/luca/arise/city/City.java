@@ -9,9 +9,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Le città che ospitano un'Associazione dei Cacciatori.
@@ -20,44 +18,48 @@ import net.minecraft.world.level.block.state.BlockState;
  * dell'Overworld, lontano dalle altre e lontanissima dallo spawn — costruire una città addosso a
  * quello che qualcuno ha già tirato su sarebbe il modo più veloce di far disinstallare la mod.
  *
- * <p>Quello che le distingue è la <strong>tavolozza</strong> e il profilo di altezza: New York fa
- * grattacieli di vetro, Roma non supera i quattro piani. Non è realismo — è che due città che si
- * assomigliano non varrebbe la pena di visitarle entrambe.
- *
- * <p>Nota su 26.2: i blocchi colorati non hanno più una costante per colore. Il cemento grigio
- * chiaro è {@code Blocks.CONCRETE.lightGray()}, non {@code Blocks.LIGHT_GRAY_CONCRETE}.
+ * <p>Quello che le distingue sono tre cose, e servono tutte e tre. La {@link CityPalette} è il
+ * colore, e si vede per primo. Lo {@link CityStyle} è la pianta — la maglia stradale, l'altezza,
+ * la forma degli isolati — ed è quello che si sente camminando: Tokyo è un labirinto di vicoli,
+ * Berlino un viale che non finisce mai. Il {@link Landmark} è il motivo per andarci: il Colosseo,
+ * la porta di Brandeburgo, il traliccio rosso. Senza il terzo, le prime due restano scenografia.
  */
 public enum City implements StringRepresentable {
 
-	/** Grattacieli, vetro azzurro, asfalto nero. */
-	NEW_YORK("new_york", 0,
-			Blocks.CONCRETE.lightGray(), Blocks.CONCRETE.gray(), Blocks.SMOOTH_STONE,
-			Blocks.CONCRETE.black(), Blocks.POLISHED_ANDESITE, DyeColor.LIGHT_BLUE,
-			4, 11, 0x6FB7E8),
+	/** Grattacieli di vetro azzurro sull'asfalto nero, e la torre a scalini. */
+	NEW_YORK("new_york", 0, CityStyle.GRIDIRON, Landmark.EMPIRE_STATE, 0x6FB7E8,
+			CityPalette.of(Blocks.CONCRETE.lightGray(), Blocks.SMOOTH_QUARTZ, Blocks.POLISHED_BASALT,
+					Blocks.POLISHED_ANDESITE, Blocks.CONCRETE.gray(), Blocks.CONCRETE.black(),
+					Blocks.SMOOTH_STONE, DyeColor.LIGHT_BLUE, Blocks.SEA_LANTERN,
+					Blocks.OAK_LEAVES, Blocks.OAK_LOG)),
 
-	/** Bianco e rosso, tetti scuri, altezze medie fitte. */
-	TOKYO("tokyo", 1,
-			Blocks.CONCRETE.white(), Blocks.CONCRETE.red(), Blocks.DEEPSLATE_TILES,
-			Blocks.CONCRETE.gray(), Blocks.SMOOTH_QUARTZ, DyeColor.WHITE,
-			3, 7, 0xE8607A),
+	/** Bianco, rosso e insegne: fitta, bassa, e il traliccio che si vede da ogni vicolo. */
+	TOKYO("tokyo", 1, CityStyle.SHITAMACHI, Landmark.TOKYO_TOWER, 0xE8607A,
+			CityPalette.of(Blocks.CONCRETE.white(), Blocks.SMOOTH_QUARTZ, Blocks.CONCRETE.red(),
+					Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_TILES, Blocks.CONCRETE.gray(),
+					Blocks.CONCRETE.lightGray(), DyeColor.PINK, Blocks.SHROOMLIGHT,
+					Blocks.CHERRY_LEAVES, Blocks.CHERRY_LOG)),
 
-	/** Travertino e cotto, bassa e larga. */
-	ROME("rome", 2,
-			Blocks.SMOOTH_SANDSTONE, Blocks.TERRACOTTA, Blocks.BRICKS,
-			Blocks.COBBLESTONE, Blocks.SMOOTH_SANDSTONE, DyeColor.BROWN,
-			2, 4, 0xD9A05A),
+	/** Travertino, cotto e sampietrini, e in mezzo l'anfiteatro. */
+	ROME("rome", 2, CityStyle.ANTICA, Landmark.COLOSSEUM, 0xD9A05A,
+			CityPalette.of(Blocks.SMOOTH_SANDSTONE, Blocks.CUT_SANDSTONE, Blocks.TERRACOTTA,
+					Blocks.CHISELED_SANDSTONE, Blocks.BRICKS, Blocks.COBBLESTONE,
+					Blocks.SMOOTH_STONE, DyeColor.BROWN, Blocks.LANTERN,
+					Blocks.SPRUCE_LEAVES, Blocks.SPRUCE_LOG)),
 
-	/** Intonaco chiaro e tetti di coccio. */
-	MADRID("madrid", 3,
-			Blocks.DYED_TERRACOTTA.white(), Blocks.DYED_TERRACOTTA.red(), Blocks.TERRACOTTA,
-			Blocks.ANDESITE, Blocks.SMOOTH_SANDSTONE, DyeColor.YELLOW,
-			2, 5, 0xE8B84F),
+	/** Intonaco chiaro, tetti di coccio, isolati chiusi con il patio dentro. */
+	MADRID("madrid", 3, CityStyle.MANZANA, Landmark.ALCALA, 0xE8B84F,
+			CityPalette.of(Blocks.DYED_TERRACOTTA.white(), Blocks.CALCITE,
+					Blocks.DYED_TERRACOTTA.red(), Blocks.CUT_SANDSTONE, Blocks.TERRACOTTA,
+					Blocks.ANDESITE, Blocks.SMOOTH_SANDSTONE, DyeColor.YELLOW, Blocks.GLOWSTONE,
+					Blocks.OAK_LEAVES, Blocks.OAK_LOG)),
 
-	/** Pietra e mattoni scuri, ordinata. */
-	BERLIN("berlin", 4,
-			Blocks.STONE_BRICKS, Blocks.CONCRETE.gray(), Blocks.DEEPSLATE_BRICKS,
-			Blocks.CONCRETE.gray(), Blocks.STONE, DyeColor.GRAY,
-			3, 6, 0x9BB0C4);
+	/** Pietra e ardesia, viali larghi, e in fondo al viale la porta. */
+	BERLIN("berlin", 4, CityStyle.BOULEVARD, Landmark.BRANDENBURG, 0x9BB0C4,
+			CityPalette.of(Blocks.STONE_BRICKS, Blocks.POLISHED_DIORITE, Blocks.DEEPSLATE_BRICKS,
+					Blocks.CHISELED_STONE_BRICKS, Blocks.DEEPSLATE_TILES, Blocks.CONCRETE.gray(),
+					Blocks.POLISHED_ANDESITE, DyeColor.LIGHT_GRAY, Blocks.SEA_LANTERN,
+					Blocks.OAK_LEAVES, Blocks.OAK_LOG));
 
 	public static final Codec<City> CODEC = StringRepresentable.fromEnum(City::values);
 
@@ -68,29 +70,18 @@ public enum City implements StringRepresentable {
 
 	private final String name;
 	private final int index;
-	private final BlockState wall;
-	private final BlockState accent;
-	private final BlockState roof;
-	private final BlockState road;
-	private final BlockState sidewalk;
-	private final BlockState glass;
-	private final int minFloors;
-	private final int maxFloors;
+	private final CityStyle style;
+	private final Landmark landmark;
 	private final int color;
+	private final CityPalette palette;
 
-	City(String name, int index, Block wall, Block accent, Block roof, Block road, Block sidewalk,
-			DyeColor glass, int minFloors, int maxFloors, int color) {
+	City(String name, int index, CityStyle style, Landmark landmark, int color, CityPalette palette) {
 		this.name = name;
 		this.index = index;
-		this.wall = wall.defaultBlockState();
-		this.accent = accent.defaultBlockState();
-		this.roof = roof.defaultBlockState();
-		this.road = road.defaultBlockState();
-		this.sidewalk = sidewalk.defaultBlockState();
-		this.glass = Blocks.STAINED_GLASS.pick(glass).defaultBlockState();
-		this.minFloors = minFloors;
-		this.maxFloors = maxFloors;
+		this.style = style;
+		this.landmark = landmark;
 		this.color = color;
+		this.palette = palette;
 	}
 
 	@Override
@@ -103,36 +94,16 @@ public enum City implements StringRepresentable {
 		return index;
 	}
 
-	public BlockState wall() {
-		return wall;
+	public CityStyle style() {
+		return style;
 	}
 
-	public BlockState accent() {
-		return accent;
+	public Landmark landmark() {
+		return landmark;
 	}
 
-	public BlockState roof() {
-		return roof;
-	}
-
-	public BlockState road() {
-		return road;
-	}
-
-	public BlockState sidewalk() {
-		return sidewalk;
-	}
-
-	public BlockState glass() {
-		return glass;
-	}
-
-	public int minFloors() {
-		return minFloors;
-	}
-
-	public int maxFloors() {
-		return maxFloors;
+	public CityPalette palette() {
+		return palette;
 	}
 
 	/** Colore per la schermata di viaggio. */

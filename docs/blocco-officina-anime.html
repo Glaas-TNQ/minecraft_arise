@@ -1,0 +1,885 @@
+<title>L'Officina delle Anime</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--violet);
+    background: linear-gradient(180deg, rgba(142,107,255,0.09), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------------------------------------------------------------- avvisi */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice.hot { border-top-color: var(--bad); }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice p + p { margin-top: 10px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .notice.hot .tag { color: var(--bad); }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+  .step.good { color: var(--good); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .compare > div { background: var(--panel-soft); padding: 16px 18px; }
+  .compare .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .compare .before .tag { color: var(--muted); }
+  .compare .after .tag { color: var(--good); }
+  .compare p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .compare .after p { color: var(--text); }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 620px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td b { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  .map {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+    white-space: pre;
+  }
+  .caption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  /* ---------------------------------------------------------------- l'anello */
+
+  .loop { margin-top: 20px; border: 1px solid var(--line); background: var(--panel); padding: 8px; }
+  .loop svg { display: block; width: 100%; height: auto; }
+  .loop text { font-family: "IBM Plex Mono", monospace; }
+  .loop .name { font-family: "Chakra Petch", sans-serif; font-size: 13px; font-weight: 600; fill: #E8F2FF; }
+  .loop .role { font-size: 10px; fill: #8FA0B5; letter-spacing: 0.08em; }
+  .loop .flow { font-size: 10px; fill: #8FA0B5; }
+  .loop .box { fill: #0E1522; stroke: #1F2C42; }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: 52px 0 0; }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocco D2</p>
+    <h1>L'Officina delle Anime</h1>
+    <p class="lede">Il tetto dell'esercito era una parete: estrarre a esercito pieno significava
+      buttare via il cadavere. Adesso è un bivio. Quello che non entra nell'esercito diventa
+      un'<strong>Anima Errante</strong> — un oggetto vero, con un UUID, un livello e un mob
+      d'origine — e le anime errante <strong>lavorano</strong>: si infilano in un macchinario e non
+      si consumano mai. Il Monarca non brucia i suoi morti, li impiega.</p>
+
+    <p class="facts">
+      <span>macchinari <b>4</b></span>
+      <span>tratti <b>5</b></span>
+      <span>gradi di catalizzatore <b>6</b></span>
+      <span>recupero delle ombre <b>60 s</b></span>
+      <span>file nuovi <b>13</b></span>
+      <span>texture nuove <b>0</b></span>
+    </p>
+  </header>
+
+  <div class="notice">
+    <span class="tag">Non ancora verificato in gioco</span>
+    <p>Il codice compila, il server di sviluppo si avvia senza un solo errore e la config si
+      riscrive da sola con le voci nuove. Ma nessuno ha ancora <strong>aperto un Crogiolo con il
+      mouse</strong>: modelli dei blocchi, schermata e barra di avanzamento sono roba da client, e
+      il client va aperto a mano. La sezione 8 è la lista di cosa guardare.</p>
+  </div>
+
+  <section>
+    <h2><span class="step">1</span> Cosa fanno le altre mod</h2>
+    <p class="kicker">Quattro scuole, tutte vive, tutte con una risposta diversa alla stessa
+      domanda: cosa costringe il giocatore a costruire invece che a cliccare?</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Scuola</th>
+            <th>La valuta</th>
+            <th>Cosa ci prendiamo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Energia astratta</b><br><span class="mono">Thermal, Mekanism</span></td>
+            <td>RF/FE in un cavo</td>
+            <td>I <b>lati riconfigurabili</b> e gli slot di potenziamento: la macchina è un oggetto
+              che si <em>regola</em>, non solo che si accende. Scartata la barra: ogni macchina
+              nuova finisce per essere la stessa scatola con un'altra ricetta.</td>
+          </tr>
+          <tr>
+            <td><b>Meccanica visibile</b><br><span class="mono">Create</span></td>
+            <td>Rotazione su alberi e cinghie</td>
+            <td>Il principio, non l'implementazione: <b>la macchina deve dire da fuori cosa sta
+              facendo</b>. Da qui il fumo a metà corsa e l'anello alla fine del giro.</td>
+          </tr>
+          <tr>
+            <td><b>Vita e decadimento</b><br><span class="mono">Botania</span></td>
+            <td>Mana da fiori che consumano qualcosa</td>
+            <td>L'idea che un generatore passivo non debba essere «piazzo e dimentico». Qui in
+              versione mite: nulla marcisce, ma <b>un'officina che nessuno svuota si ferma</b>.</td>
+          </tr>
+          <tr>
+            <td><b>Rete e domanda</b><br><span class="mono">Applied Energistics</span></td>
+            <td>Canali, richieste su ordinazione</td>
+            <td>Niente, per ora. È la direzione se un giorno le officine si collegheranno fra
+              loro.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">La conclusione per Arise</span>
+      <p>Non aggiungiamo una valuta energetica: ne abbiamo già una, e ha un peso narrativo che
+        nessun RF avrà mai. <strong>L'anima è l'energia.</strong> Ma un'anima non si brucia: si
+        <strong>mette a lavorare</strong>. È la differenza che tiene insieme automazione e Solo
+        Leveling, e da lì discende tutto il resto — comprese le due regole che seguono.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step violet">2</span> Le anime in esubero</h2>
+    <p class="kicker">Da dove arrivano, e le tre cose che sanno fare.</p>
+
+    <div class="compare">
+      <div class="before">
+        <span class="tag">Prima</span>
+        <p>Estrazione riuscita a esercito pieno → «Esercito pieno (6)». Il cadavere era già stato
+          consumato dal tentativo. Congedare un'ombra restituiva soul coin e basta: il livello
+          dodici a cui l'avevi portata spariva.</p>
+      </div>
+      <div class="after">
+        <span class="tag">Adesso</span>
+        <p>L'estrazione si tenta lo stesso e quello che ne esce è un'<strong>Anima Errante</strong>
+          in inventario. Congedare restituisce i soul coin <em>e</em> l'anima, col livello che
+          aveva: dall'esercito all'officina, e volendo di nuovo indietro.</p>
+      </div>
+    </div>
+
+    <h3>Le tre cose che un'anima sa fare</h3>
+    <ul>
+      <li><b>Lavora.</b> Infilata in una macchina è un'operaia, e <strong>non viene consumata</strong>:
+        si rimette dentro, si toglie, si sposta su un'altra macchina. Il suo <em>vigore</em>
+        (potenza del mob × livello) decide quanto va veloce la macchina che la ospita.</li>
+      <li><b>Si fonde.</b> Quattro anime più un catalizzatore diventano un'anima sola, più forte e
+        con un tratto.</li>
+      <li><b>Si arruola.</b> Shift + tasto destro, e se c'è posto nell'esercito diventa un'ombra
+        vera — con il livello raggiunto nel Crogiolo, non da capo.</li>
+    </ul>
+
+    <div class="panel">
+      <p><b>Nessuna texture nuova, di nuovo.</b> L'anima è un componente
+        <code>arise:soul</code> su un oggetto vanilla, come l'equipaggiamento. La scala è corta di
+        proposito, tre gradini invece di sei: lacrima di ghast per E–D, frammento d'eco per C–B,
+        stella del Nether per A–S. Il colore del nome dice il rango esatto.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step gold">3</span> I quattro macchinari</h2>
+    <p class="kicker">Un anello. Ognuno produce quello che serve al successivo, e il Pozzo chiude
+      il cerchio alimentando il Crogiolo.</p>
+
+    <div class="loop">
+      <svg viewBox="0 0 860 300" role="img"
+           aria-label="Anello dei quattro macchinari: il Richiamo produce anime, il Crogiolo le fonde, la Fucina e il Pozzo le mettono al lavoro, e il Pozzo produce i catalizzatori che il Crogiolo consuma.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+                  orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#3C8BD9"></path>
+          </marker>
+          <marker id="arrowGold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+                  orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#FFD54F"></path>
+          </marker>
+        </defs>
+
+        <rect class="box" x="12" y="60" width="180" height="76" stroke-width="1"></rect>
+        <rect x="12" y="60" width="180" height="2" fill="#8E6BFF"></rect>
+        <text class="name" x="28" y="92">Richiamo d'Anime</text>
+        <text class="role" x="28" y="112">2 OPERAIE → 3 USCITE</text>
+        <text class="role" x="28" y="126">produce anime nuove</text>
+
+        <rect class="box" x="232" y="60" width="180" height="76" stroke-width="1"></rect>
+        <rect x="232" y="60" width="180" height="2" fill="#FFD54F"></rect>
+        <text class="name" x="248" y="92">Crogiolo</text>
+        <text class="role" x="248" y="112">4 ANIME + 1 CATALIZZ.</text>
+        <text class="role" x="248" y="126">le fonde in una sola</text>
+
+        <rect class="box" x="452" y="60" width="180" height="76" stroke-width="1"></rect>
+        <rect x="452" y="60" width="180" height="2" fill="#4FC3F7"></rect>
+        <text class="name" x="468" y="92">Fucina d'Ombra</text>
+        <text class="role" x="468" y="112">3 OPERAIE + 1 INGRESSO</text>
+        <text class="role" x="468" y="126">fonde senza carburante</text>
+
+        <rect class="box" x="672" y="60" width="176" height="76" stroke-width="1"></rect>
+        <rect x="672" y="60" width="176" height="2" fill="#7FD97F"></rect>
+        <text class="name" x="688" y="92">Pozzo dell'Abisso</text>
+        <text class="role" x="688" y="112">4 OPERAIE → 1 USCITA</text>
+        <text class="role" x="688" y="126">soul coin e catalizzatori</text>
+
+        <line x1="192" y1="98" x2="226" y2="98" stroke="#3C8BD9" stroke-width="1.5"
+              marker-end="url(#arrow)"></line>
+        <line x1="412" y1="98" x2="446" y2="98" stroke="#3C8BD9" stroke-width="1.5"
+              marker-end="url(#arrow)"></line>
+        <line x1="632" y1="98" x2="666" y2="98" stroke="#3C8BD9" stroke-width="1.5"
+              marker-end="url(#arrow)"></line>
+
+        <text class="flow" x="196" y="88">anime</text>
+        <text class="flow" x="416" y="88">anime forti</text>
+        <text class="flow" x="636" y="88">anime</text>
+
+        <path d="M 760 136 L 760 200 L 322 200 L 322 140" fill="none" stroke="#FFD54F"
+              stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrowGold)"></path>
+        <text class="flow" x="470" y="192" fill="#FFD54F">i catalizzatori tornano al Crogiolo</text>
+
+        <path d="M 322 136 L 322 246 L 60 246 L 60 140" fill="none" stroke="#8E6BFF"
+              stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow)"></path>
+        <text class="flow" x="120" y="238" fill="#8E6BFF">un'anima fusa può tornare operaia — o arruolarsi</text>
+      </svg>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Blocco</th>
+            <th>Cosa fa</th>
+            <th class="num">Giro base</th>
+            <th>Ricetta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Richiamo d'Anime</b><br><span class="mono">arise:soul_lure</span></td>
+            <td>Le operaie chiamano altre anime dall'Abisso. Più vigore installato, più in alto si
+              pesca: da un ragno a un Warden.</td>
+            <td class="num">600 t<br><span class="mono">30 s</span></td>
+            <td class="mono">sabbia delle anime,<br>mattoni di ardesia,<br>frammento d'eco</td>
+          </tr>
+          <tr>
+            <td><b>Crogiolo delle Anime</b><br><span class="mono">arise:soul_crucible</span></td>
+            <td>La fusione. Quattro anime + un catalizzatore → una sola, con il livello sommato e
+              un <b>tratto</b> in più.</td>
+            <td class="num">200 t<br><span class="mono">10 s</span></td>
+            <td class="mono">ossidiana,<br>ossidiana piangente,<br>mattoni di ardesia</td>
+          </tr>
+          <tr>
+            <td><b>Fucina d'Ombra</b><br><span class="mono">arise:shadow_forge</span></td>
+            <td>Le operaie fondono <b>senza carburante</b>: qualunque cosa abbia una ricetta di
+              fusione, anche di altre mod. Tramoggia sopra, tramoggia sotto.</td>
+            <td class="num">160 t<br><span class="mono">8 s</span></td>
+            <td class="mono">fornace,<br>bacchetta di blaze,<br>mattoni di ardesia</td>
+          </tr>
+          <tr>
+            <td><b>Pozzo dell'Abisso</b><br><span class="mono">arise:abyss_well</span></td>
+            <td>Le operaie vengono munte: soul coin al proprietario e, all'8%, un catalizzatore del
+              rango dell'anima migliore installata.</td>
+            <td class="num">400 t<br><span class="mono">20 s</span></td>
+            <td class="mono">calderone,<br>frammento d'eco,<br>mattoni di ardesia</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Perché non hanno una barra dell'energia</span>
+      <p>Il livello di riempimento di una macchina <em>è</em> il numero e la qualità delle anime che
+        ci stanno dentro, e quello si vede aprendo la macchina. Una seconda barra racconterebbe la
+        stessa cosa due volte. L'unica barra che c'è è il giro di lavoro in corso, e sparisce quando
+        la macchina è ferma.</p>
+      <p><strong>E perché gli operai non si consumano mai:</strong> il gesto interessante è
+        <em>scegliere dove metterli</em>, non <em>ricomprarli</em>. Un'anima di rango S nel Pozzo è
+        sprecata; nella Fucina fa volare la produzione. Se le anime bruciassero, la scelta la
+        farebbe la scorta, non il giocatore.</p>
+    </div>
+
+    <h3>Un solo numero governa tutte e quattro</h3>
+    <pre><code><span class="c">// WorkshopConfig.workTicks — la promessa che il gioco fa al giocatore</span>
+durata = base × max(<span class="k">min_speed_factor</span>, 1 − <span class="k">speed_per_vigor</span> × vigore − Ardore)
+
+<span class="c">// vigore di un'anima: potenza congelata del mob, moltiplicata dal livello</span>
+vigore = (vita + danno × 4) × (1 + 0,35 × (livello − 1))</code></pre>
+    <p class="caption">Anime migliori dentro, lavoro più veloce fuori — sempre, con la stessa
+      curva ovunque. Il pavimento al 25% impedisce a un'officina avanzata di produrre un oggetto
+      al tick.</p>
+  </section>
+
+  <section>
+    <h2><span class="step gold">4</span> Catalizzatori e tratti</h2>
+    <p class="kicker">L'unica cosa che il Crogiolo consuma, e l'unica ragione per fondere invece
+      che accumulare.</p>
+
+    <p>Il <b>catalizzatore</b> ha un solo campo — il grado, che è il rango — e da quello discendono
+      due numeri: quanti tratti regge l'anima che esce (E–D uno, C–B due, A–S tre) e quanta parte
+      dei livelli sommati sopravvive alla fusione (dal 45% al 90%). Sotto l'uno, sempre: fondere
+      deve costare qualcosa, altrimenti quattro anime di livello cinque ne darebbero una di venti.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Tratto</th>
+            <th>Sull'operaia</th>
+            <th>Sull'ombra arruolata</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Ardore</b></td><td>−25% sul tempo di lavoro</td><td>—</td></tr>
+          <tr><td><b>Avidità</b></td><td>+50% soul coin dal Pozzo</td><td>—</td></tr>
+          <tr><td><b>Tenacia</b></td><td>25% di raddoppiare l'uscita</td><td>—</td></tr>
+          <tr><td><b>Risonanza</b></td><td>30% che il Crogiolo non consumi il catalizzatore</td><td>—</td></tr>
+          <tr><td><b>Ferocia</b></td><td>—</td><td>+20% danno</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Quattro tratti su cinque valgono solo mentre l'anima lavora, uno solo se viene arruolata. È
+      voluto: <b>fondere per l'officina e fondere per l'esercito devono essere due strade
+      diverse</b>, altrimenti ce n'è una sola ed è sempre la migliore.</p>
+
+    <div class="panel">
+      <p><b>L'anima che esce è la più forte delle quattro</b> — stesso mob d'origine, stessa potenza
+        congelata — cresciuta di livello e con un tratto in più. Non è un'anima nuova, e conta:
+        significa che si può <em>scegliere</em> quale delle proprie anime far diventare grande,
+        invece di subire quale esce. I tratti che c'erano già si ereditano tutti prima che se ne
+        tiri uno nuovo: fondere non deve mai far perdere quello che si aveva.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">5</span> Il minuto di recupero</h2>
+    <p class="kicker">Regola nuova e indipendente dall'officina, ma della stessa famiglia.</p>
+
+    <p><strong>Un'ombra caduta non è disponibile per sessanta secondi.</strong> Non muore, non si
+      perde — si riprende. Premere il tasto di evocazione durante il recupero evoca <em>le altre</em>,
+      e il messaggio dice quante sono ancora a terra.</p>
+
+    <div class="compare">
+      <div class="before">
+        <span class="tag">Il rifiuto sbagliato</span>
+        <p>«Impossibile evocare: un'ombra si sta riprendendo.» Un comando che fallisce in blocco
+          perché una su dieci non è pronta.</p>
+      </div>
+      <div class="after">
+        <span class="tag">Quello giusto</span>
+        <p>«7 ombre evocate. 3 si stanno ancora riprendendo.» Il tasto manda in campo quelle che ci
+          sono, e la schermata dell'esercito mostra il conto alla rovescia sulla riga di ognuna.</p>
+      </div>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Perché serviva</span>
+      <p>È la prima volta che una morte in questa mod costa qualcosa senza togliere niente per
+        sempre. Senza, mandare l'esercito a morire e rievocarlo subito sarebbe sempre stata la mossa
+        migliore, e la <strong>postura aggressiva non sarebbe una scelta</strong> ma l'unica opzione
+        sensata.</p>
+    </div>
+
+    <p>Il dato è sincronizzato ma non salvato: conta tick di gioco assoluti, che dopo un riavvio non
+      vogliono più dire la stessa cosa. Un riavvio rimette in piedi tutti — meglio questo che un
+      esercito bloccato per sempre da un contatore che nessuno sa più leggere.</p>
+  </section>
+
+  <section>
+    <h2><span class="step good">6</span> Il Laboratorio</h2>
+    <p class="kicker"><code>/arise arena</code> non costruisce più una stanza vuota. Adesso arriva
+      arredata.</p>
+
+    <div class="map">   ┌─────────────────── parete a nord ───────────────────┐
+   │   ▓   ▓   ▓   ▓   ▓   ▓    sei varchi, uno per rango │
+   │   E   D   C   B   A   S    lastra colorata sotto     │
+   │                                                      │
+   │                                                      │
+   │              ▣ ▣ ▣   ⌗    tre barili + banco         │
+   │              │ │ │        materiali · officina · bottino
+   │                                                      │
+   │                                                      │
+   │     ◆     ◆     ◆     ◆    i quattro macchinari      │
+   │  Richiamo Crogiolo Fucina Pozzo — già alimentati     │
+   └─────────────────── parete a sud ────────────────────┘</div>
+    <p class="caption">Lato 50 di default. Sotto 24 la stanza si costruisce ma resta vuota: meglio
+      una scatola pulita che tre file di arredi incastrate una nell'altra.</p>
+
+    <h3>Tre regole per tutto quello che c'è dentro</h3>
+    <ul>
+      <li><b>Niente che scada.</b> I varchi del laboratorio durano una settimana di gioco invece di
+        trenta secondi: uno che si chiude mentre leggi il pannello di analisi renderebbe il
+        laboratorio inutile proprio nel momento in cui serve.</li>
+      <li><b>Niente da cercare.</b> Ogni stazione ha sotto una lastra colorata, e il comando scrive
+        in chat dove sta cosa.</li>
+      <li><b>Tutto sbloccato.</b> La catena degli incarichi viene completata e vengono consegnate
+        cinque gemme: qui si prova il gioco, non lo si gioca.</li>
+    </ul>
+
+    <h3>Cosa c'è nei tre barili</h3>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Barile</th>
+            <th>Contenuto</th>
+            <th>Serve a</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Materiali</b></td>
+            <td>Ardesia, sabbia delle anime, frammenti d'eco, ossidiana, fornaci, calderoni,
+              tramogge, ferro e oro grezzo, cibo</td>
+            <td>Costruire i quattro macchinari da zero al banco, e dargli da mangiare</td>
+          </tr>
+          <tr>
+            <td><b>Officina</b></td>
+            <td>4× ciascun macchinario, 8 anime da rango E ad A, 16 catalizzatori per grado</td>
+            <td>Riempire un Crogiolo due volte senza dover prima farmare</td>
+          </tr>
+          <tr>
+            <td><b>Bottino</b></td>
+            <td>Un'arma per rango + un completo di rango A, tirati col generatore vero</td>
+            <td>Provare il menu del Cacciatore e il banco delle gemme</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>I macchinari sono <b>già alimentati</b> e intestati a chi ha dato il comando, e cominciano a
+      lavorare da soli. È la parola importante: un Pozzo dell'Abisso vuoto è identico a un Pozzo
+      rotto, e distinguere i due casi è esattamente il tempo che questo comando esiste per
+      risparmiare.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">7</span> Come si prova</h2>
+    <p class="kicker">Dal nulla a un'officina che gira, in ordine.</p>
+
+    <pre><code><span class="c"># il laboratorio, con tutto dentro</span>
+/arise lab            <span class="c"># oppure /arise arena — stesso comando</span>
+/arise lab 64         <span class="c"># più grande, se serve spazio</span>
+
+<span class="c"># le due regole nuove, guardate da vicino</span>
+/arise level 20       <span class="c"># capienza esercito ~10</span>
+/arise spawn zombie 12
+<span class="c"># uccidili, poi premi il tasto di estrazione a esercito pieno:</span>
+<span class="c"># l'anima arriva in inventario invece del rifiuto</span>
+
+/arise summon         <span class="c"># manda fuori l'esercito, fai morire qualcuno</span>
+/arise summon         <span class="c"># "N ombre evocate. M si stanno ancora riprendendo"</span>
+
+<span class="c"># la fusione</span>
+<span class="c"># quattro anime nelle caselle viola del Crogiolo + un catalizzatore a destra</span>
+<span class="c"># dieci secondi, ed esce una sola anima di livello più alto con un tratto</span>
+
+<span class="c"># l'arruolamento</span>
+<span class="c"># Shift + tasto destro con l'anima in mano</span>
+
+<span class="c"># l'automazione vera</span>
+<span class="c"># tramoggia sopra la Fucina con dentro ferro grezzo, tramoggia sotto verso una cassa</span></code></pre>
+
+    <div class="panel">
+      <p><b>Il file di config</b> è <code>config/arise.json</code>, voce
+        <code>hunter.workshop</code> per l'officina e <code>shadows.downtime_ticks</code> per il
+        recupero. <code>enabled: false</code> spegne tutta l'officina e lascia i quattro blocchi
+        come decorazione.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">8</span> Cos'è cambiato nel codice</h2>
+    <p class="kicker">Tredici file nuovi, undici toccati, zero PNG.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Dove</th>
+            <th>Cosa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="mono">workshop/</span></td>
+            <td><b>Il pacchetto nuovo.</b> <span class="mono">LooseSoul</span>,
+              <span class="mono">SoulTrait</span>, <span class="mono">Catalyst</span>,
+              <span class="mono">SoulItems</span>, <span class="mono">MachineKind</span>,
+              <span class="mono">MachineBlock</span>, <span class="mono">MachineBlockEntity</span>,
+              <span class="mono">MachineMenu</span>, <span class="mono">WorkshopManager</span></td>
+          </tr>
+          <tr>
+            <td><span class="mono">registry/ModBlocks</span></td>
+            <td>I primi blocchi veri della mod. Un tipo di block entity per tutti e quattro; i
+              modelli sono cubi con facce prese dallo sculk, dall'ancora di rinascita e
+              dall'ardesia</td>
+          </tr>
+          <tr>
+            <td><span class="mono">shadow/ShadowDowntime</span></td>
+            <td>Attachment sincronizzato, non persistente: quali ombre sono a terra e da che tick
+              si rialzano</td>
+          </tr>
+          <tr>
+            <td><span class="mono">command/LabBuilder</span></td>
+            <td>La stanza, i sei varchi, i quattro macchinari alimentati, i tre barili. Estratto da
+              <span class="mono">DebugCommands</span>, che era diventato illeggibile</td>
+          </tr>
+          <tr>
+            <td><span class="mono">config/WorkshopConfig</span></td>
+            <td>Annidata sotto <span class="mono">hunter</span>: la radice era già ai sedici campi
+              che il codec di un record consente</td>
+          </tr>
+          <tr>
+            <td><span class="mono">client/screen/MachineScreen</span></td>
+            <td>Una schermata sola per tutti e quattro: le caselle stanno già dove il menu le ha
+              messe</td>
+          </tr>
+          <tr>
+            <td><span class="mono">assets + data</span></td>
+            <td>4 blockstate, 4 modelli, 4 modelli d'oggetto, 4 loot table, 4 ricette, 4 suoni,
+              44 stringhe × 2 lingue</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Tre trappole della 26.2, annotate in CLAUDE.md</span>
+      <p><code>BaseEntityBlock.getRenderShape</code> risponde <code>INVISIBLE</code>: un macchinario
+        che non lo riscrive a <code>MODEL</code> esiste, si apre, funziona — e non si vede.
+        <code>Properties.setId(ResourceKey)</code> è obbligatorio o il costruttore lancia. E il
+        modello di un oggetto sta in <code>assets/&lt;ns&gt;/items/</code>, non più in
+        <code>models/item/</code>.</p>
+    </div>
+  </section>
+
+  <div class="verify">
+    <span class="tag">Da verificare in gioco</span>
+    <ul class="check">
+      <li>I quattro blocchi si vedono nel mondo e si distinguono a colpo d'occhio</li>
+      <li>Il click destro apre la schermata, e le caselle delle anime rifiutano tutto il resto</li>
+      <li>La barra avanza, e va più veloce con un'anima di rango alto dentro</li>
+      <li>Il Crogiolo consuma le quattro anime e il catalizzatore, e restituisce una sola anima con
+        un tratto nuovo nel tooltip</li>
+      <li>La Fucina fonde ferro grezzo senza carbone, e una tramoggia riesce a caricarla dall'alto
+        e a svuotarla dal basso</li>
+      <li>Il Pozzo accredita soul coin (guardali con <code>/arise souls</code>)</li>
+      <li>Rompere un macchinario restituisce le anime che aveva dentro</li>
+      <li>Estrarre a esercito pieno dà l'anima invece del rifiuto</li>
+      <li>Shift + tasto destro su un'anima la arruola col livello che aveva</li>
+      <li>Un'ombra caduta mostra il conto alla rovescia nella schermata dell'esercito, e
+        <code>/arise summon</code> evoca le altre</li>
+      <li><code>/arise lab</code> costruisce tutto e i sei varchi restano aperti</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <footer>
+    <p>Progetto Arise · Minecraft 26.2 · Fabric 0.19.3 · design completo in
+      <span class="mono">DESIGN-solo-leveling.md</span> §10.</p>
+    <p>Letture: <a href="https://technicpack.fandom.com/wiki/Thermal_Expansion">Thermal
+      Expansion</a>, <a href="https://www.minecraft-guides.com/mod/mekanism/">Mekanism</a>,
+      <a href="https://rocketnode.com/blog/create-mod-101">Create</a>,
+      <a href="https://wiki.gtnewhorizons.com/wiki/Mana_Generating_Flowers">Botania</a>,
+      <a href="https://docs.fabricmc.net/develop/blocks/first-block">Fabric — Creating Your First
+      Block</a>.</p>
+  </footer>
+
+</div>

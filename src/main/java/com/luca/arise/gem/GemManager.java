@@ -7,6 +7,7 @@ import com.luca.arise.city.CityManager;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.GemConfig;
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.gear.GearItems;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.PlayerGear;
@@ -69,24 +70,30 @@ public final class GemManager {
 
 		PlayerGear current = gear(player);
 		Optional<Gem> gem = current.findGem(gemId);
-		Optional<GearPiece> piece = current.find(pieceId);
+		GearPiece piece = GearItems.piece(GearManager.findStack(player, pieceId));
 
-		if (gem.isEmpty() || piece.isEmpty()) {
+		if (gem.isEmpty() || piece == null) {
 			return Component.translatable("arise.msg.gem.unknown");
 		}
 
-		if (piece.get().freeSockets() <= 0) {
-			return Component.translatable("arise.msg.gem.no_socket", piece.get().displayName());
+		if (piece.freeSockets() <= 0) {
+			return Component.translatable("arise.msg.gem.no_socket", piece.displayName());
 		}
 
-		set(player, current.withoutGem(gemId).withReplaced(piece.get().withGem(gem.get())));
+		// Prima si scrive nell'oggetto, poi si toglie la gemma dalla sacca: se il pezzo fosse
+		// sparito nel frattempo, meglio una gemma ancora in sacca che una gemma svanita.
+		if (!GearManager.replace(player, piece.withGem(gem.get()))) {
+			return Component.translatable("arise.msg.gem.unknown");
+		}
+
+		set(player, gear(player).withoutGem(gemId));
 
 		if (player.level() instanceof ServerLevel level) {
 			AriseFx.gemSocketed(level, player.position(), gem.get().rank());
 		}
 
 		return Component.translatable("arise.msg.gem.socketed",
-				gem.get().displayName(), piece.get().displayName());
+				gem.get().displayName(), piece.displayName());
 	}
 
 	/**
@@ -103,7 +110,7 @@ public final class GemManager {
 		}
 
 		PlayerGear current = gear(player);
-		GearPiece host = hostOf(current, gemId);
+		GearPiece host = hostOf(player, gemId);
 
 		if (host == null) {
 			return Component.translatable("arise.msg.gem.unknown");
@@ -120,7 +127,8 @@ public final class GemManager {
 			return Component.translatable("arise.msg.shop.no_souls", cost, ProgressManager.souls(player));
 		}
 
-		set(player, current.withReplaced(host.withoutGem(gemId)).withGem(gem));
+		GearManager.replace(player, host.withoutGem(gemId));
+		set(player, gear(player).withGem(gem));
 
 		if (player.level() instanceof ServerLevel level) {
 			AriseFx.gemExtracted(level, player.position(), gem.rank());
@@ -132,11 +140,12 @@ public final class GemManager {
 	/** Rompe una gemma incastonata per liberare il posto. Ovunque, gratis, e senza ritorno. */
 	public static Component shatter(ServerPlayer player, UUID gemId) {
 		PlayerGear current = gear(player);
-		GearPiece host = hostOf(current, gemId);
+		GearPiece host = hostOf(player, gemId);
 
 		if (host != null) {
 			Gem gem = host.gems().stream().filter(g -> g.id().equals(gemId)).findFirst().orElseThrow();
-			set(player, current.withReplaced(host.withoutGem(gemId)));
+			GearManager.replace(player, host.withoutGem(gemId));
+			ProgressManager.applyAttributes(player);
 			return Component.translatable("arise.msg.gem.shattered", gem.displayName());
 		}
 
@@ -151,14 +160,8 @@ public final class GemManager {
 	}
 
 	/** Il pezzo che porta questa gemma, o {@code null} se non e' incastonata da nessuna parte. */
-	private static GearPiece hostOf(PlayerGear gear, UUID gemId) {
-		for (GearPiece piece : gear.equipped()) {
-			if (piece.gems().stream().anyMatch(gem -> gem.id().equals(gemId))) {
-				return piece;
-			}
-		}
-
-		for (GearPiece piece : gear.stash()) {
+	private static GearPiece hostOf(ServerPlayer player, UUID gemId) {
+		for (GearPiece piece : GearManager.owned(player)) {
 			if (piece.gems().stream().anyMatch(gem -> gem.id().equals(gemId))) {
 				return piece;
 			}
@@ -181,7 +184,7 @@ public final class GemManager {
 		GemConfig config = AriseConfig.get().gems();
 		double total = 0.0;
 
-		for (GearPiece piece : gear(player).equipped()) {
+		for (GearPiece piece : GearManager.worn(player)) {
 			for (Gem gem : piece.gems()) {
 				if (gem.type() == type) {
 					total += gem.magnitude(config);
@@ -194,7 +197,7 @@ public final class GemManager {
 
 	/** Vero se il giocatore ha almeno una gemma di questo tipo addosso. Evita conti inutili. */
 	public static boolean has(ServerPlayer player, GemType type) {
-		for (GearPiece piece : gear(player).equipped()) {
+		for (GearPiece piece : GearManager.worn(player)) {
 			for (Gem gem : piece.gems()) {
 				if (gem.type() == type) {
 					return true;

@@ -297,7 +297,7 @@ public final class GateManager {
 		}
 
 		if (instance.bossId() == null || !victim.getUUID().equals(instance.bossId())) {
-			GateLoot.mobDrop(player, instance.rank());
+			GateLoot.mobDrop(player, instance.rank(), victim.position());
 			return;
 		}
 

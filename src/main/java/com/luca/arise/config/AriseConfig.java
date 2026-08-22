@@ -127,6 +127,11 @@ public record AriseConfig(
 		return hunter.gems();
 	}
 
+	/** L'Officina delle Anime, scorciatoia per la voce annidata. */
+	public WorkshopConfig workshop() {
+		return hunter.workshop();
+	}
+
 	/** Il rango di un Cacciatore di questo livello. */
 	public Rank hunterRank(int level) {
 		return hunter.rank(level);

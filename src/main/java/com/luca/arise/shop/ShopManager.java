@@ -186,12 +186,6 @@ public final class ShopManager {
 		ShopOffer offer = found.get();
 		GearConfig gear = AriseConfig.get().gear();
 
-		// Lo spazio si verifica *prima* di togliere le anime: pagare per un pezzo che non entra
-		// nello zaino sarebbe il modo piu' rapido di perdere la fiducia in un negozio.
-		if (GearManager.get(player).stash().size() >= gear.stashSize()) {
-			return Component.translatable("arise.msg.gear.stash_full", gear.stashSize());
-		}
-
 		if (!ProgressManager.spendSouls(player, offer.price())) {
 			return Component.translatable("arise.msg.shop.no_souls",
 					offer.price(), ProgressManager.souls(player));

@@ -7,6 +7,7 @@ import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.GearConfig;
 import com.luca.arise.config.GemConfig;
 import com.luca.arise.config.LootConfig;
+import com.luca.arise.gear.GearDrop;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.GearRoll;
@@ -19,8 +20,10 @@ import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModAttachments;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Il bottino di un Gate completato.
@@ -49,14 +52,23 @@ public final class GateLoot {
 		RandomSource random = player.level().getRandom();
 
 		List<Component> lines = new ArrayList<>();
+		int pieces = count(loot.pieceCount(rank.ordinal()), random);
 
-		for (int i = 0; i < count(loot.pieceCount(rank.ordinal()), random); i++) {
+		for (int i = 0; i < pieces; i++) {
 			Rank pieceRank = random.nextDouble() < loot.upgradeChance() ? next(rank) : rank;
 			GearPiece piece = GearRoll.rollAny(gear, pieceRank, random);
 
-			// grant() sa gia' dire che lo zaino e' pieno: si inoltra il suo messaggio invece di
-			// far sparire il pezzo in silenzio, che e' il modo migliore di far arrabbiare qualcuno.
-			lines.add(GearManager.grant(player, piece));
+			// Cade per terra, non arriva in una lista. Il premio di venti minuti di Gate deve
+			// essere qualcosa che si raccoglie, non una riga di chat.
+			if (player.level() instanceof ServerLevel level) {
+				GearDrop.drop(level, player.position(), piece);
+			} else {
+				lines.add(GearManager.grant(player, piece));
+			}
+		}
+
+		if (pieces > 0) {
+			lines.add(Component.translatable("arise.msg.loot.pieces", pieces));
 		}
 
 		if (random.nextDouble() < loot.gemChanceAt(rank.ordinal())) {
@@ -79,19 +91,44 @@ public final class GateLoot {
 	 * <p>Di solito un rango sotto quello del Gate: il bottino della strada non deve competere con
 	 * quello del boss, o l'ultima stanza diventerebbe una formalita' da saltare.
 	 */
-	public static void mobDrop(ServerPlayer player, Rank rank) {
+	public static void mobDrop(ServerPlayer player, Rank rank, Vec3 position) {
 		AriseConfig config = AriseConfig.get();
 		LootConfig loot = config.gates().loot();
+
+		roll(player, rank, position, loot.mobDropChance(), loot.mobRankDownChance());
+	}
+
+	/**
+	 * Il pezzo che, molto piu' di rado, lascia una creatura del mondo normale.
+	 *
+	 * <p>Esiste per una ragione sola: far scoprire il bottino a chi non ha ancora aperto un varco.
+	 * La probabilita' e' un ordine di grandezza sotto quella dentro un Gate, e deve restarci — un
+	 * mondo in cui ci si veste uccidendo zombi dietro casa e' un mondo in cui i Gate non servono.
+	 * Il rango e' quello del Cacciatore, di solito uno sotto: quello che si trova per strada non
+	 * compete con quello che si guadagna scendendo.
+	 */
+	public static void worldDrop(ServerPlayer player, Vec3 position) {
+		AriseConfig config = AriseConfig.get();
+		LootConfig loot = config.gates().loot();
+		Rank rank = GearManager.hunterRank(player);
+
+		roll(player, rank, position, loot.worldDropChance(), loot.mobRankDownChance());
+	}
+
+	private static void roll(ServerPlayer player, Rank rank, Vec3 position, double chance,
+			double rankDownChance) {
 		RandomSource random = player.level().getRandom();
 
-		if (random.nextDouble() >= loot.mobDropChance()) {
+		if (random.nextDouble() >= chance || !(player.level() instanceof ServerLevel level)) {
 			return;
 		}
 
-		Rank pieceRank = random.nextDouble() < loot.mobRankDownChance() ? previous(rank) : rank;
-		GearPiece piece = GearRoll.rollAny(config.gear(), pieceRank, random);
+		Rank pieceRank = random.nextDouble() < rankDownChance ? previous(rank) : rank;
+		GearDrop.drop(level, position, GearRoll.rollAny(config().gear(), pieceRank, random));
+	}
 
-		player.sendSystemMessage(GearManager.grant(player, piece));
+	private static AriseConfig config() {
+		return AriseConfig.get();
 	}
 
 	/**

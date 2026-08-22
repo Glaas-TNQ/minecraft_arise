@@ -20,7 +20,14 @@ public enum Objective {
 	EXTRACT,
 	/** Usare abilita'. */
 	USE_ABILITY,
-	/** Indossare pezzi di equipaggiamento. */
+	/**
+	 * Avere addosso pezzi di equipaggiamento.
+	 *
+	 * <p>E' un valore raggiunto e non un conteggio, perche' da quando i pezzi stanno nelle caselle
+	 * indossare non e' piu' un <em>momento</em> che qualcuno intercetta: e' uno stato che si
+	 * osserva. "Indossa due pezzi" vuol dire averne due addosso, non averne infilato due nel corso
+	 * della partita.
+	 */
 	EQUIP,
 	/** Completare Gate. */
 	CLEAR_GATE,
@@ -36,6 +43,6 @@ public enum Objective {
 	 * deve dover salire una volta sola. Per questi il contatore si sostituisce, non si somma.
 	 */
 	public boolean absolute() {
-		return this == REACH_LEVEL;
+		return this == REACH_LEVEL || this == EQUIP;
 	}
 }

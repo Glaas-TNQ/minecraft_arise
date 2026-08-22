@@ -26,6 +26,14 @@ public record AriseActionPayload(Action action) implements CustomPacketPayload {
 		RECALL("recall"),
 		/** Cicla la postura di combattimento dell'esercito. */
 		STANCE("stance"),
+		/**
+		 * Apre il menu del Cacciatore.
+		 *
+		 * <p>Un menu con delle caselle nasce sul server e non sul client: e' il server a
+		 * costruirlo, ad assegnargli un identificativo e a spedirne il contenuto. Il tasto puo'
+		 * solo chiederlo.
+		 */
+		OPEN_GEAR("open_gear"),
 		ABILITY_1("ability_1"),
 		ABILITY_2("ability_2"),
 		ABILITY_3("ability_3"),

@@ -20,6 +20,9 @@ import com.luca.arise.quest.Unlock;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.registry.ModEntities;
+import com.luca.arise.workshop.LooseSoul;
+import com.luca.arise.workshop.SoulItems;
+import com.luca.arise.workshop.WorkshopManager;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -111,7 +114,14 @@ public final class ShadowManager {
 
 		ShadowArmy army = army(player);
 		int capacity = capacity(player);
-		if (army.size() >= capacity) {
+
+		// A esercito pieno non si rinuncia piu' al cadavere: l'estrazione si tenta lo stesso, e
+		// quello che ne esce e' un'anima da mettere a lavorare invece che un'ombra da comandare.
+		// E' l'ingresso dell'Officina, ed e' il motivo per cui il tetto dell'esercito ha smesso
+		// di essere una parete ed e' diventato un bivio.
+		boolean full = army.size() >= capacity;
+
+		if (full && !AriseConfig.get().workshop().overflowSoul()) {
 			return Component.translatable("arise.msg.shadow.army_full", capacity);
 		}
 
@@ -123,6 +133,18 @@ public final class ShadowManager {
 			AriseFx.extractionFailed(level, best.position());
 			return Component.translatable("arise.msg.shadow.extraction_failed",
 					String.format("%.0f", chance * 100));
+		}
+
+		if (full) {
+			LooseSoul soul = LooseSoul.of(best.sourceType(),
+					best.maxHealth() * config.healthFactor(),
+					best.attackDamage() * config.damageFactor());
+
+			AriseFx.extractionSuccess(level, best.position(), SoulItems.rankOf(soul));
+			QuestManager.advance(player, Objective.EXTRACT);
+			WorkshopManager.grantSoul(player, soul);
+
+			return Component.translatable("arise.msg.shadow.overflow", capacity);
 		}
 
 		// Le ombre nascono sempre al livello 1: la loro forza viene dal mob d'origine e da quanto
@@ -203,12 +225,26 @@ public final class ShadowManager {
 			return Component.translatable("arise.msg.shadow.summon_limit", config.maxSummoned());
 		}
 
+		ShadowDowntime downtime = downtime(player);
+		long now = player.level().getGameTime();
+
 		int spawned = 0;
+		int resting = 0;
+
 		for (ShadowData shadow : army.shadows()) {
-			if (slots <= 0) {
-				break;
-			}
 			if (summoned.containsKey(shadow.id())) {
+				continue;
+			}
+
+			// Un'ombra caduta da poco si conta ma non si evoca. Il tasto non fallisce: manda in
+			// campo quelle che ci sono. Rifiutare in blocco perche' una su dieci non e' pronta
+			// sarebbe la peggiore delle due risposte possibili.
+			if (downtime.isDown(shadow.id(), now)) {
+				resting++;
+				continue;
+			}
+
+			if (slots <= 0) {
 				continue;
 			}
 
@@ -219,12 +255,17 @@ public final class ShadowManager {
 		}
 
 		if (spawned == 0) {
-			return Component.translatable("arise.msg.shadow.already_summoned");
+			return resting > 0
+					? Component.translatable("arise.msg.shadow.all_resting", resting)
+					: Component.translatable("arise.msg.shadow.already_summoned");
 		}
 
 		playSummonSound(player);
 		syncSummoned(player, summoned);
-		return Component.translatable("arise.msg.shadow.summoned", spawned);
+
+		return resting > 0
+				? Component.translatable("arise.msg.shadow.summoned_partial", spawned, resting)
+				: Component.translatable("arise.msg.shadow.summoned", spawned);
 	}
 
 	/** Evoca una singola ombra, per la schermata dell'esercito. */
@@ -244,6 +285,12 @@ public final class ShadowManager {
 
 		if (summoned.size() >= config.maxSummoned()) {
 			return Component.translatable("arise.msg.shadow.summon_limit", config.maxSummoned());
+		}
+
+		long remaining = downtime(player).remaining(shadowId, player.level().getGameTime());
+		if (remaining > 0) {
+			return Component.translatable("arise.msg.shadow.resting",
+					shadow.get().displayName(), Math.max(1L, remaining / 20L));
 		}
 
 		if (!spawn(player, shadow.get(), summoned)) {
@@ -422,8 +469,17 @@ public final class ShadowManager {
 
 		AriseFx.shadowFell(owner.level(), entity.position(), entity.getColor());
 
+		int downtimeTicks = AriseConfig.get().shadows().downtimeTicks();
+		long now = owner.level().getGameTime();
+
+		if (shadowId != null && downtimeTicks > 0) {
+			owner.setAttached(ModAttachments.DOWNTIME,
+					downtime(owner).with(shadowId, now + downtimeTicks, now));
+		}
+
 		army(owner).find(shadowId).ifPresent(shadow ->
-				owner.sendSystemMessage(Component.translatable("arise.msg.shadow.fallen", shadow.displayName())));
+				owner.sendSystemMessage(Component.translatable("arise.msg.shadow.fallen",
+						shadow.displayName(), Math.max(1, downtimeTicks / 20))));
 	}
 
 	/** All'uscita del giocatore le entità vanno rimosse: i dati bastano a ricostruirle. */
@@ -505,6 +561,12 @@ public final class ShadowManager {
 
 		setArmy(player, army(player).without(shadowId));
 		ProgressManager.addSouls(player, refund);
+
+		// L'anima torna in mano, col livello che aveva. Congedare smette di essere una perdita e
+		// diventa uno spostamento: dall'esercito all'officina, e volendo di nuovo indietro.
+		if (AriseConfig.get().workshop().dismissReturnsSoul()) {
+			WorkshopManager.grantSoul(player, WorkshopManager.soulOf(shadow.get()));
+		}
 
 		return Component.translatable("arise.msg.shadow.dismissed", shadow.get().displayName(), refund);
 	}
@@ -589,6 +651,60 @@ public final class ShadowManager {
 				action.accept(entity);
 			}
 		}
+	}
+
+	// ---------------------------------------------------------------- recupero
+
+	/**
+	 * Le ombre ancora a terra, gia' ripulite dalle voci scadute.
+	 *
+	 * <p>La pulizia avviene alla lettura e non in un tick apposta: nessuno ha bisogno di sapere
+	 * che un'ombra e' tornata disponibile finche' non prova a evocarla o non apre la schermata.
+	 */
+	public static ShadowDowntime downtime(ServerPlayer player) {
+		ShadowDowntime current = player.getAttachedOrCreate(ModAttachments.DOWNTIME);
+		ShadowDowntime pruned = current.pruned(player.level().getGameTime());
+
+		if (pruned != current) {
+			player.setAttached(ModAttachments.DOWNTIME, pruned);
+		}
+
+		return pruned;
+	}
+
+	// ---------------------------------------------------------------- arruolamento
+
+	/**
+	 * Un'anima dell'Officina entra nell'esercito.
+	 *
+	 * <p>E' la porta di ritorno dall'automazione al combattimento, e conserva tutto: mob
+	 * d'origine, vita, danno e soprattutto il <em>livello</em> guadagnato nel Crogiolo. Un'anima
+	 * fusa fino al livello dieci diventa un'ombra di livello dieci, non un'ombra appena nata: se
+	 * cosi' non fosse, fondere per l'esercito non avrebbe alcun senso.
+	 */
+	public static Component enlist(ServerPlayer player, LooseSoul soul) {
+		Component locked = QuestManager.require(player, Unlock.ARMY);
+		if (locked != null) {
+			return locked;
+		}
+
+		ShadowConfig config = AriseConfig.get().shadows();
+		ShadowArmy army = army(player);
+		int capacity = capacity(player);
+
+		if (army.size() >= capacity) {
+			return Component.translatable("arise.msg.shadow.army_full", capacity);
+		}
+
+		ShadowData shadow = new ShadowData(UUID.randomUUID(), soul.sourceType(), soul.level(), 0L,
+				soul.health(), WorkshopManager.enlistedDamage(soul), Optional.empty(),
+				ShadowData.DEFAULT_COLOR);
+
+		setArmy(player, army.with(shadow));
+		AriseFx.soulEnlisted(player.level(), player.position(), shadow.rank(config));
+
+		return Component.translatable("arise.msg.shadow.enlisted", shadow.displayName(),
+				shadow.level(), army.size() + 1, capacity);
 	}
 
 	// ---------------------------------------------------------------- debug

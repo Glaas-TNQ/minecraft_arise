@@ -7,10 +7,16 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 /**
  * Dove stanno le città e quanto in fretta si costruiscono.
  *
- * <p>{@code blocksPerTick} è la voce che conta davvero: una città è quasi un milione di blocchi, e
- * piazzarli tutti in una volta bloccherebbe il server per minuti — con il client che nel frattempo
- * dichiara la partita morta. Il costruttore ne mette un tot per battito e riprende al successivo.
- * Alzarlo va più veloce e fa scattare il gioco; abbassarlo lo rende impercettibile e lento.
+ * <p>{@code blocksPerTick} è la voce che conta davvero: una città è più di dieci milioni di
+ * blocchi, e piazzarli tutti in una volta bloccherebbe il server per minuti — con il client che nel
+ * frattempo dichiara la partita morta. Il costruttore ne mette un tot per battito e riprende al
+ * successivo. Alzarlo va più veloce e fa scattare il gioco; abbassarlo lo rende impercettibile e
+ * lento. Le cinque città sono costruite una alla volta proprio perché questo numero valga sempre,
+ * e non cinque volte tanto quando si tira su un mondo da zero.
+ *
+ * <p>{@code size} e {@code blockSize} sono la <em>griglia di base</em>, non la misura finale: ogni
+ * città la riscala secondo il suo stile, così Tokyo resta fitta e Roma larga anche dopo che si è
+ * cambiato un numero solo qui.
  */
 public record CityConfig(
 		/** Coordinata X della prima città. Lontano dallo spawn: nessuno costruisce laggiù. */
@@ -37,7 +43,7 @@ public record CityConfig(
 		boolean autoBuild) {
 
 	public static final CityConfig DEFAULT =
-			new CityConfig(200000, 200000, 15000, 112, 28, 6, 24000, true);
+			new CityConfig(200000, 200000, 15000, 320, 32, 6, 45000, true);
 
 	public static final Codec<CityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.INT.fieldOf("origin_x").forGetter(CityConfig::originX),
