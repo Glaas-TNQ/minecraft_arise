@@ -1,6 +1,8 @@
 package com.luca.arise.workshop;
 
 import com.luca.arise.config.AriseConfig;
+import com.luca.arise.quest.QuestManager;
+import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModBlocks;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -105,6 +107,15 @@ public class MachineBlock extends BaseEntityBlock {
 
 		if (!AriseConfig.get().workshop().enabled()) {
 			server.sendSystemMessage(Component.translatable("arise.msg.workshop.disabled"));
+			return InteractionResult.CONSUME;
+		}
+
+		// L'Officina si apre con la Via dell'Artigiano. Il Progetto e' gia' un lucchetto sulla
+		// costruzione, ma un macchinario piazzato in creativa o trovato in un laboratorio non deve
+		// scavalcare la catena: il permesso si chiede qui, dove si apre.
+		Component locked = QuestManager.require(server, Unlock.WORKSHOP);
+		if (locked != null) {
+			server.sendSystemMessage(locked);
 			return InteractionResult.CONSUME;
 		}
 

@@ -9,6 +9,7 @@ import com.luca.arise.config.GearConfig;
 import com.luca.arise.gate.GateManager;
 import com.luca.arise.gate.GateSpawner;
 import com.luca.arise.gear.GearManager;
+import com.luca.arise.npc.NpcManager;
 import java.util.List;
 
 import com.luca.arise.gear.GearPiece;
@@ -21,6 +22,7 @@ import com.luca.arise.quest.PlayerQuests;
 import com.luca.arise.quest.Quest;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.config.AriseConfig;
+import com.luca.arise.config.CityConfig;
 import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.progress.ProgressManager;
@@ -157,6 +159,12 @@ public final class AriseCommands {
 			city.then(Commands.literal("setup")
 					.requires(AriseCommands::canCheat)
 					.executes(context -> setupWorld(context.getSource())));
+
+			// Ripopolare le botteghe della citta' in cui ci si trova. E' idempotente: rimette solo
+			// chi manca, quindi si puo' battere il comando a raffica senza duplicare nessuno.
+			city.then(Commands.literal("npcs")
+					.requires(AriseCommands::canCheat)
+					.executes(context -> repopulate(context.getSource())));
 
 			city.then(cityBuild);
 			city.then(cityGo);
@@ -378,6 +386,45 @@ public final class AriseCommands {
 	 * silenzio su quelle che ci sono già è il comportamento giusto: si sta chiedendo un mondo
 	 * pronto, non cinque costruzioni.
 	 */
+	/**
+	 * Rimette le nove persone dietro i banconi della citta' piu' vicina.
+	 *
+	 * <p>Serve a due casi che capiteranno entrambi: una citta' costruita prima che il mercato
+	 * esistesse, e una citta' in cui qualcuno ha fatto una sciocchezza con {@code /kill}.
+	 */
+	private static int repopulate(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		net.minecraft.server.level.ServerLevel level = player.level();
+		CityConfig config = AriseConfig.get().cities();
+
+		City nearest = null;
+		double best = Double.MAX_VALUE;
+
+		for (City candidate : City.values()) {
+			double dx = player.getX() - config.centreX(candidate);
+			double dz = player.getZ() - config.centreZ(candidate);
+			double distance = dx * dx + dz * dz;
+
+			if (distance < best) {
+				best = distance;
+				nearest = candidate;
+			}
+		}
+
+		if (nearest == null || best > (double) config.size() * config.size()) {
+			source.sendFailure(Component.translatable("arise.msg.city.not_here"));
+			return 0;
+		}
+
+		int placed = NpcManager.populate(level, nearest, player.blockPosition().getY() - 1);
+		City city = nearest;
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.city.npcs", placed, city.label()),
+				true);
+		return placed;
+	}
+
 	private static int setupWorld(CommandSourceStack source) {
 		int started = CityManager.setup(source.getServer(), source.getPlayer());
 

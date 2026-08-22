@@ -121,6 +121,12 @@ public final class ShadowManager {
 		// di essere una parete ed e' diventato un bivio.
 		boolean full = army.size() >= capacity;
 
+		// A esercito pieno l'anima si conserva solo se l'Officina e' gia' stata concessa: prima
+		// della Via dell'Artigiano un'Anima Errante sarebbe un oggetto senza spiegazione.
+		if (full && !QuestManager.has(player, Unlock.WORKSHOP)) {
+			return Component.translatable("arise.msg.shadow.army_full", capacity);
+		}
+
 		if (full && !AriseConfig.get().workshop().overflowSoul()) {
 			return Component.translatable("arise.msg.shadow.army_full", capacity);
 		}
@@ -683,7 +689,7 @@ public final class ShadowManager {
 	 * cosi' non fosse, fondere per l'esercito non avrebbe alcun senso.
 	 */
 	public static Component enlist(ServerPlayer player, LooseSoul soul) {
-		Component locked = QuestManager.require(player, Unlock.ARMY);
+		Component locked = QuestManager.require(player, Unlock.ENLIST);
 		if (locked != null) {
 			return locked;
 		}
@@ -701,6 +707,7 @@ public final class ShadowManager {
 				ShadowData.DEFAULT_COLOR);
 
 		setArmy(player, army.with(shadow));
+		QuestManager.advance(player, Objective.ENLIST_SOUL);
 		AriseFx.soulEnlisted(player.level(), player.position(), shadow.rank(config));
 
 		return Component.translatable("arise.msg.shadow.enlisted", shadow.displayName(),

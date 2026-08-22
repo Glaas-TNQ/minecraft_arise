@@ -6,6 +6,7 @@ import com.luca.arise.client.network.ClientPayloads;
 import com.luca.arise.client.render.MarkerRenderer;
 import com.luca.arise.client.render.ModModelLayers;
 import com.luca.arise.client.render.ShadowRenderer;
+import com.luca.arise.client.render.ShopkeeperRenderer;
 import com.luca.arise.client.screen.HunterMenuScreen;
 import com.luca.arise.client.screen.MachineScreen;
 import com.luca.arise.registry.ModEntities;
@@ -30,6 +31,7 @@ public class AriseModClient implements ClientModInitializer {
 		ModModelLayers.register();
 		EntityRendererRegistry.register(ModEntities.SHADOW, ShadowRenderer::new);
 		EntityRendererRegistry.register(ModEntities.GATE, MarkerRenderer::new);
+		EntityRendererRegistry.register(ModEntities.SHOPKEEPER, ShopkeeperRenderer::new);
 
 		// Il menu del Cacciatore arriva dal server: qui si dice solo con che schermata disegnarlo.
 		MenuScreens.register(ModMenus.HUNTER, HunterMenuScreen::new);

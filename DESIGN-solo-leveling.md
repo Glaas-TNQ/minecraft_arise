@@ -529,6 +529,113 @@ tutto da zero. Serve a provare ogni sistema della mod in due minuti invece che i
 
 ---
 
+## 11. La citta' viva — mercato, NPC e la Via dell'Artigiano
+
+### 11.1 Il problema
+
+Le citta' esistono da due cicli e non servono a niente. Sono trecentoventi blocchi di facciate
+vuote con una sola porta che si apre — quella dell'Associazione — e dentro non c'e' nessuno. Un
+giocatore ci arriva, guarda in alto, e torna a combattere: **non c'e' un motivo per restare**.
+
+Allo stesso tempo l'Officina delle Anime e' arrivata tutta insieme. Quattro macchinari, sei gradi
+di catalizzatore, cinque tratti: chi apre il gioco oggi li trova gia' tutti, e la prima cosa che
+fa e' leggere una tabella. E' esattamente il difetto che il risveglio (§9) aveva risolto per gli
+altri sistemi, tornato a farsi vedere in un angolo nuovo.
+
+Tre lavori, una direzione sola: **dare alla citta' un mestiere, e all'Officina una strada**.
+
+### 11.2 Le citta' nascono col mondo
+
+Oggi le Associazioni si tirano su alla prima entrata di un giocatore. E' il momento sbagliato: chi
+entra per la prima volta in un mondo nuovo si trova un messaggio di avanzamento addosso mentre sta
+ancora capendo dove guardare.
+
+Il momento giusto e' **l'avvio del server**. Su un mondo nuovo e' letteralmente la creazione del
+mondo; su un mondo che le ha gia', il controllo di esistenza costa cinque letture e non fa niente.
+Nessuna bandiera da salvare: la prova che una citta' esiste resta la citta' stessa.
+
+E le citta' crescono: **da 320 a 512 blocchi di lato**, cioe' due volte e mezzo la superficie.
+E' il numero che governa tutto il resto — isolati, quartieri, distanza fra un monumento e il
+mercato — e cambiarlo qui basta perche' le cinque piante si riscalino da sole.
+
+### 11.3 Il Quartiere del Mercato
+
+Attorno alla piazza dell'Associazione, sui quattro lati, **nove botteghe**. Ognuna e' un edificio
+vero, con il bancone, la merce sugli scaffali e **una persona dietro il bancone**.
+
+Le persone sono nove, e sono *persone*: il modello e' quello umanoide, e le texture sono le nove
+skin predefinite che Minecraft si porta dietro dal 1.19 — alex, ari, efe, kai, makena, noor,
+steve, sunny, zuri. Nove volti diversi, riconoscibili, e **zero file nuovi**. Non sono villager:
+non camminano, non dormono, non si trasformano in zombie e non cambiano mestiere.
+
+**Cinque vendono, quattro fanno.**
+
+| Bottega | Chi c'e' | Cosa da' |
+|---|---|---|
+| **Fonderia** | il Fonditore | lingotti, carbone, bacchette di blaze |
+| **Cava** | il Cavatore | ardesia, ossidiana, ossidiana piangente |
+| **Casa delle Anime** | la Mercante d'Anime | sabbia delle anime, frammenti d'eco, catalizzatori bassi |
+| **Cartoleria** | il Cartografo dell'Abisso | i **Progetti** dei macchinari, tramogge, calderoni |
+| **Dispensa** | l'Erborista | cibo, mele d'oro, materiale da spedizione |
+| **Banco dell'Abisso** | il Cambiavalute | converte soul coin in **Monete d'Anima**, e viceversa |
+| **Intermediazione** | il Sensale dei Varchi | apre un varco del rango che chiedi, a pagamento |
+| **Bottega del Gemmiere** | la Gemmiera | il banco delle gemme, fuori dall'Associazione |
+| **Sportello** | il Segretario | viaggio fra citta' e Abyss Shop |
+
+### 11.4 La Moneta d'Anima
+
+Il mercato ha un problema che il resto della mod non aveva: **la finestra di scambio di Minecraft
+sa contare solo oggetti**. I soul coin sono un numero nell'attachment del giocatore, e un numero
+non si puo' mettere sul bancone.
+
+Quindi il numero diventa un oggetto. La **Moneta d'Anima** si conia al Banco dell'Abisso — soul
+coin dentro, monete fuori — e si riporta indietro allo stesso sportello. E' l'unica valuta che i
+cinque mercanti accettano.
+
+Non e' un giro a vuoto: e' cio' che rende il denaro **trasportabile e perdibile**. Un soul coin
+sta al sicuro nel Sistema; una moneta sta nello zaino, e se muori in un Gate resta li'.
+
+### 11.5 La Via dell'Artigiano — nove incarichi
+
+La catena degli incarichi si allunga da nove a diciotto, e il secondo arco insegna l'Officina
+un pezzo per volta. Ogni incarico apre esattamente cio' che serve al successivo.
+
+| # | Incarico | Cosa chiede | Cosa apre |
+|---|---|---|---|
+| 10 | **Il mercato** | parlare con qualcuno dietro un bancone | la Moneta d'Anima |
+| 11 | **Il conio** | coniare otto monete al Banco | l'Officina: le anime in esubero |
+| 12 | **L'esubero** | raccogliere tre Anime Erranti | il **Progetto del Richiamo** |
+| 13 | **Il richiamo** | piazzarlo e farlo lavorare una volta | il **Progetto del Crogiolo** |
+| 14 | **La fusione** | fondere quattro anime in una | il **Progetto della Fucina** |
+| 15 | **La fucina** | fondere sedici oggetti senza carbone | il **Progetto del Pozzo** |
+| 16 | **Il pozzo** | duecento soul coin munti dalle anime | l'arruolamento |
+| 17 | **La recluta** | arruolare un'anima fusa | i servizi del mercato |
+| 18 | **Il sensale** | comprare un varco su ordinazione | la catena e' finita |
+
+**I Progetti sono la chiave di volta.** Un macchinario non si costruisce senza il suo Progetto, e
+il Progetto **si consuma** nella ricetta. Il primo di ognuno lo regala la catena; i successivi si
+comprano in Cartoleria. E' il motivo per cui i quattro macchinari smettono di essere una tabella
+da leggere e diventano quattro cose che *arrivano*, una dopo l'altra, ciascuna quando si e' finito
+di capire la precedente.
+
+### 11.6 Perche' cosi'
+
+**Perche' non villager veri.** Un villager e' una macchina complicata: dorme, cerca un letto, si
+lega a un punto d'interesse, cambia mestiere se gli togli il blocco di lavoro, e un fulmine lo
+trasforma in strega. Tutto questo esiste per un gioco di villaggi, non per una bottega che deve
+stare dietro un bancone finche' il mondo esiste. La nostra entita' non ha IA, non ha inventario e
+non si muove: e' un bancone che parla.
+
+**Perche' la finestra di scambio vanilla.** Perche' e' l'unica interfaccia di questa mod che
+nessuno deve imparare. Chi ha giocato a Minecraft ha gia' comprato qualcosa da un villager, e la
+prima bottega di Arise gli chiede zero istruzioni.
+
+**Perche' i Progetti si consumano.** Perche' altrimenti sarebbero un permesso, non un oggetto: si
+otterrebbero una volta e non si guarderebbero mai piu'. Consumandosi diventano un costo che
+qualcuno vende, e la Cartoleria ha un motivo di esistere anche a catena finita.
+
+---
+
 ## Fonti
 
 - [Solo Leveling: Reawakening — CurseForge](https://www.curseforge.com/minecraft/mc-mods/solo-craft-reawakening) · [Modrinth](https://modrinth.com/project/YdsLXFph)

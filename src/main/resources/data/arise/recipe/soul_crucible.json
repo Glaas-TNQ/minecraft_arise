@@ -3,11 +3,12 @@
   "key": {
     "O": "minecraft:obsidian",
     "C": "minecraft:crying_obsidian",
-    "D": "minecraft:deepslate_bricks"
+    "D": "minecraft:deepslate_bricks",
+    "P": "arise:blueprint_soul_crucible"
   },
   "pattern": [
     "OCO",
-    "DCD",
+    "DPD",
     "DDD"
   ],
   "result": {

@@ -157,7 +157,21 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
      "model":"..."}}`), non piu' in `models/item/`. Dati: `data/<ns>/recipe/` e
      `data/<ns>/loot_table/blocks/` (singolare). **Senza loot table il blocco non lascia niente**;
    - le costanti di `CreativeModeTabs` sono **private** in 26.2: la chiave di una scheda vanilla
-     si ricostruisce con `ResourceKey.create(Registries.CREATIVE_MODE_TAB, ...)`.
+     si ricostruisce con `ResourceKey.create(Registries.CREATIVE_MODE_TAB, ...)`;
+   - **`AbstractVillager` non esiste piu'** e i villager stanno in
+     `net.minecraft.world.entity.npc.villager`. Per un NPC che commercia non serve ereditare da
+     loro: basta implementare `net.minecraft.world.item.trading.Merchant` (tredici metodi banali),
+     e il suo `openTradingScreen(Player, Component, int)` apre la finestra di scambio vanilla.
+     `MerchantOffer(ItemCost, ItemStack, usi, xp, moltiplicatore)`, e `ItemCost` confronta
+     l'**oggetto**, non i componenti — una valuta appoggiata su un item vanilla e' comprabile con
+     quell'item vanilla;
+   - `javax.annotation.Nullable` **non e' nel classpath**: o si usa l'annotazione di JetBrains, o
+     non si annota;
+   - un NPC umanoide non ha bisogno di texture nuove: vanilla ne ha **nove** in
+     `textures/entity/player/wide/` (alex, ari, efe, kai, makena, noor, steve, sunny, zuri). Il
+     modello e' `HumanoidModel` su un layer proprio, e il renderer `HumanoidMobRenderer`;
+   - imbardata di Minecraft: **0 e' sud**, 90 ovest, 180 nord, 270 est. Vale per `snapTo` e per
+     `setYHeadRot`/`setYBodyRot`, che vanno impostati entrambi o l'entita' nasce col collo storto.
 3. **La compilazione non è una verifica.** Un sistema è "fatto" quando lo si è visto
    funzionare in `runClient`. Vale soprattutto per AI delle ombre, generazione dungeon e HUD.
 
@@ -250,5 +264,14 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       (Richiamo, Crogiolo, Fucina, Pozzo), catalizzatori e tratti, ombre cadute con un minuto di
       recupero, `/arise arena` diventata laboratorio — *compilato, server verde, da verificare in
       gioco*
+- [ ] **E1** — La citta' viva: le citta' nascono all'avvio del server invece che alla prima
+      entrata, e passano da 320 a 512 blocchi di lato — *compilato, server verde, da verificare in
+      gioco*
+- [ ] **E2** — Il Quartiere del Mercato: nove botteghe sulla piazza, cinque mercanti con la
+      finestra di scambio vanilla e quattro servizi, Moneta d'Anima coniata al Banco — *compilato,
+      server verde, da verificare in gioco*
+- [ ] **E3** — La Via dell'Artigiano: nove incarichi nuovi (18 in tutto) che aprono l'Officina un
+      pezzo per volta, e quattro Progetti consumati dalle ricette dei macchinari — *compilato,
+      server verde, da verificare in gioco*
 
 Aggiorna questa lista quando una fase è **verificata in gioco**, non quando compila.

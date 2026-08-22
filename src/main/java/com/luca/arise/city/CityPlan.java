@@ -58,8 +58,15 @@ public final class CityPlan {
 
 	private static final int HQ_FLOORS = 4;
 
-	/** Mezzo lato della piazza: l'Associazione più lo spazio per vederla. */
-	private static final int PLAZA_HALF = 22;
+	/**
+	 * Mezzo lato della piazza.
+	 *
+	 * <p>Non è più una misura scelta a mano: la decide il Quartiere del Mercato, perché è il
+	 * quartiere che deve starci dentro. Prima erano ventidue blocchi attorno all'Associazione e
+	 * bastavano per guardarla; adesso sulla piazza ci sono nove botteghe, e una piazza troppo
+	 * stretta le farebbe finire dentro gli isolati — cioè dentro i palazzi.
+	 */
+	private static final int PLAZA_HALF = CityMarket.plazaHalf();
 
 	/** Mezza larghezza del viale che porta al monumento. */
 	private static final int AVENUE_HALF = 5;
@@ -106,6 +113,11 @@ public final class CityPlan {
 		CityLandmarks.build(fills, city, monument.centreX(), baseY, monument.centreZ());
 
 		square(fills, city, plaza, baseY, false);
+
+		// Le botteghe prima dell'Associazione, e dopo la piazza: la piazza ha appena spianato il
+		// suolo, e l'Associazione sta al centro dove le botteghe non arrivano.
+		CityMarket.build(fills, city, grid.centreX(), baseY, grid.centreZ());
+
 		headquarters(fills, city, grid, baseY);
 
 		return List.copyOf(fills);

@@ -34,7 +34,27 @@ public enum Objective {
 	/** Comprare all'Abyss Shop. */
 	BUY,
 	/** Mettere piede in un'Associazione dei Cacciatori. */
-	VISIT_CITY;
+	VISIT_CITY,
+
+	// --- la Via dell'Artigiano: il secondo arco, quello che insegna l'Officina ----------------
+	/** Parlare con qualcuno dietro un bancone del Quartiere del Mercato. */
+	VISIT_MARKET,
+	/** Coniare Monete d'Anima al Banco dell'Abisso. */
+	MINT_COIN,
+	/** Raccogliere Anime Erranti, comunque siano arrivate. */
+	COLLECT_SOUL,
+	/** Un giro di lavoro finito da un macchinario qualunque. */
+	MACHINE_WORK,
+	/** Una fusione riuscita nel Crogiolo. */
+	FUSE_SOUL,
+	/** Oggetti usciti dalla Fucina d'Ombra. */
+	FORGE_SMELT,
+	/** Soul coin munti dal Pozzo dell'Abisso. */
+	WELL_YIELD,
+	/** Un'anima arruolata nell'esercito. */
+	ENLIST_SOUL,
+	/** Un varco comprato dal Sensale. */
+	BUY_GATE;
 
 	/**
 	 * Vero se il progresso e' un <em>valore raggiunto</em> invece di un conteggio.

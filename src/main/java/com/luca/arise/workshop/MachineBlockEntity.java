@@ -11,6 +11,8 @@ import com.luca.arise.config.WorkshopConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.Rank;
+import com.luca.arise.quest.Objective;
+import com.luca.arise.quest.QuestManager;
 import com.luca.arise.registry.ModBlocks;
 
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuProvider;
@@ -523,7 +525,28 @@ public class MachineBlockEntity extends BaseContainerBlockEntity
 			case WELL -> completeWell(level, config);
 		}
 
+		advance(level, Objective.MACHINE_WORK, 1);
 		AriseFx.machineDone(level, centre(), tint());
+	}
+
+	/**
+	 * Segnala al proprietario che la sua macchina ha fatto qualcosa.
+	 *
+	 * <p>Al proprietario e non a chi passa: un macchinario lavora da solo, e un incarico che
+	 * avanzasse per chi si trova a passare davanti sarebbe un incarico che si completa per caso.
+	 * Se il proprietario non e' collegato non succede niente, ed e' giusto — la catena degli
+	 * incarichi si segue giocando, non lasciando il server acceso.
+	 */
+	private void advance(ServerLevel level, Objective objective, int amount) {
+		if (owner == null || amount <= 0) {
+			return;
+		}
+
+		ServerPlayer player = level.getServer().getPlayerList().getPlayer(owner);
+
+		if (player != null) {
+			QuestManager.advance(player, objective, amount);
+		}
 	}
 
 	/**
@@ -615,6 +638,7 @@ public class MachineBlockEntity extends BaseContainerBlockEntity
 		}
 
 		items.set(kind.firstOutput(), SoulItems.stack(result));
+		advance(level, Objective.FUSE_SOUL, 1);
 		AriseFx.soulFused(level, centre(), SoulItems.rankOf(result));
 	}
 
@@ -645,6 +669,7 @@ public class MachineBlockEntity extends BaseContainerBlockEntity
 			result.grow(result.getCount());
 		}
 
+		advance(level, Objective.FORGE_SMELT, result.getCount());
 		mergeIntoOutput(result);
 	}
 
@@ -666,7 +691,9 @@ public class MachineBlockEntity extends BaseContainerBlockEntity
 			coins *= 1.0 + config.traitPower(SoulTrait.AVIDITA);
 		}
 
-		ProgressManager.addSouls(player, Math.max(1L, Math.round(coins)));
+		long paid = Math.max(1L, Math.round(coins));
+		ProgressManager.addSouls(player, paid);
+		QuestManager.advance(player, Objective.WELL_YIELD, (int) Math.min(Integer.MAX_VALUE, paid));
 
 		if (level.getRandom().nextDouble() < config.wellCatalystChance()) {
 			mergeIntoOutput(SoulItems.catalyst(catalystGrade(), 1));

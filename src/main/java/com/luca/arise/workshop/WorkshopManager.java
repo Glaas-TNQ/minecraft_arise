@@ -36,6 +36,7 @@ public final class WorkshopManager {
 	 */
 	public static void grantSoul(ServerPlayer player, LooseSoul soul) {
 		give(player, SoulItems.stack(soul));
+		com.luca.arise.quest.QuestManager.advance(player, com.luca.arise.quest.Objective.COLLECT_SOUL);
 
 		player.sendSystemMessage(Component.translatable("arise.msg.workshop.soul_gained",
 				soul.displayName(), SoulItems.rankOf(soul).label()));

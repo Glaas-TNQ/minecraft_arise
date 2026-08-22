@@ -25,7 +25,14 @@ public record CityConfig(
 		int originZ,
 		/** Distanza fra una città e la successiva. */
 		int spacing,
-		/** Lato della città, in blocchi. */
+		/**
+		 * Lato della città, in blocchi.
+		 *
+		 * <p>Cinquecentododici: due volte e mezzo la superficie di prima. È il numero che governa
+		 * tutto il resto — quanti isolati, quanto è lontano il monumento dal mercato, quanto si
+		 * cammina — e le cinque piante si riscalano da sole quando cambia. Il prezzo è il tempo di
+		 * costruzione: mille chunk per città invece di quattrocento.
+		 */
 		int size,
 		/** Passo della griglia: isolato più strada. */
 		int blockSize,
@@ -40,10 +47,12 @@ public record CityConfig(
 		 * metà dei sistemi non ha un posto dove succedere. Chi le vuole costruire quando decide lui
 		 * lo spegne qui, e resta {@code /arise city build}.
 		 */
-		boolean autoBuild) {
+		boolean autoBuild,
+		/** Il Quartiere del Mercato: le nove botteghe e la Moneta d'Anima. */
+		MarketConfig market) {
 
 	public static final CityConfig DEFAULT =
-			new CityConfig(200000, 200000, 15000, 320, 32, 6, 45000, true);
+			new CityConfig(200000, 200000, 15000, 512, 32, 6, 60000, true, MarketConfig.DEFAULT);
 
 	public static final Codec<CityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.INT.fieldOf("origin_x").forGetter(CityConfig::originX),
@@ -53,7 +62,8 @@ public record CityConfig(
 			Codec.INT.fieldOf("block_size").forGetter(CityConfig::blockSize),
 			Codec.INT.fieldOf("road_width").forGetter(CityConfig::roadWidth),
 			Codec.INT.fieldOf("blocks_per_tick").forGetter(CityConfig::blocksPerTick),
-			Codec.BOOL.fieldOf("auto_build").forGetter(CityConfig::autoBuild)
+			Codec.BOOL.fieldOf("auto_build").forGetter(CityConfig::autoBuild),
+			MarketConfig.CODEC.fieldOf("market").forGetter(CityConfig::market)
 	).apply(instance, CityConfig::new));
 
 	/** L'angolo nord-ovest della città. */

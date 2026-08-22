@@ -368,6 +368,21 @@ public final class AriseFx {
 		play(level, centre, ModSounds.ABILITY_AUTHORITY, 0.9F, 1.0F);
 	}
 
+	// ---------------------------------------------------------------- il mercato
+
+	/**
+	 * Un affare concluso al bancone.
+	 *
+	 * <p>Sommesso e corto: al mercato si compra spesso, e un effetto da rango S ripetuto dodici
+	 * volte di fila diventerebbe rumore. Il colore e' l'oro della moneta, che e' l'unica cosa che
+	 * distingue questo momento dagli altri.
+	 */
+	public static void marketDeal(ServerLevel level, Vec3 position) {
+		FxConfig fx = config();
+		ring(level, position.add(0.0, 1.0, 0.0), 0.45, fx.scaled(8), dust(0xFFD54F, 0.8F), 0.15);
+		play(level, position, ModSounds.SHOP_DEAL, 0.5F, 1.25F);
+	}
+
 	// ---------------------------------------------------------------- l'Officina delle Anime
 
 	/**

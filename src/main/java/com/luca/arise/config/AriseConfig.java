@@ -132,6 +132,11 @@ public record AriseConfig(
 		return hunter.workshop();
 	}
 
+	/** Il Quartiere del Mercato, scorciatoia per la voce annidata. */
+	public MarketConfig market() {
+		return cities.market();
+	}
+
 	/** Il rango di un Cacciatore di questo livello. */
 	public Rank hunterRank(int level) {
 		return hunter.rank(level);

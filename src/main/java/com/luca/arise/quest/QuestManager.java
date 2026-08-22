@@ -96,6 +96,15 @@ public final class QuestManager {
 			ProgressManager.addSouls(player, quest.souls());
 		}
 
+		if (quest.reward() != null) {
+			net.minecraft.world.item.Item item = com.luca.arise.registry.ModItems.byPath(quest.reward());
+
+			if (item != null) {
+				com.luca.arise.workshop.WorkshopManager.give(player,
+						new net.minecraft.world.item.ItemStack(item));
+			}
+		}
+
 		if (quest.gearRank() != null) {
 			Rank rank = rankOf(quest.gearRank());
 			GearPiece piece = GearRoll.rollAny(AriseConfig.get().gear(), rank,

@@ -3,12 +3,13 @@
   "key": {
     "D": "minecraft:deepslate_bricks",
     "F": "minecraft:furnace",
-    "B": "minecraft:blaze_rod"
+    "B": "minecraft:blaze_rod",
+    "P": "arise:blueprint_shadow_forge"
   },
   "pattern": [
     "DBD",
-    "DFD",
-    "DDD"
+    "DPD",
+    "DFD"
   ],
   "result": {
     "id": "arise:shadow_forge"

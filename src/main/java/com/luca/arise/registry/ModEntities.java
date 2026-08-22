@@ -2,6 +2,7 @@ package com.luca.arise.registry;
 
 import com.luca.arise.AriseMod;
 import com.luca.arise.gate.GateEntity;
+import com.luca.arise.npc.ShopkeeperEntity;
 import com.luca.arise.shadow.ShadowEntity;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -42,6 +43,23 @@ public final class ModEntities {
 					.sized(1.6F, 2.6F)
 					.build(GATE_KEY));
 
+	public static final ResourceKey<EntityType<?>> SHOPKEEPER_KEY =
+			ResourceKey.create(Registries.ENTITY_TYPE, AriseMod.id("shopkeeper"));
+
+	/**
+	 * Chi sta dietro il bancone.
+	 *
+	 * <p>Le misure sono quelle di un giocatore, e devono esserlo: il modello e' l'umanoide vanilla
+	 * con addosso una delle nove skin predefinite, e un ingombro diverso farebbe sembrare la
+	 * bottega abitata da qualcuno di leggermente sbagliato.
+	 */
+	public static final EntityType<ShopkeeperEntity> SHOPKEEPER = Registry.register(
+			BuiltInRegistries.ENTITY_TYPE,
+			SHOPKEEPER_KEY,
+			EntityType.Builder.<ShopkeeperEntity>of(ShopkeeperEntity::new, MobCategory.MISC)
+					.sized(0.6F, 1.95F)
+					.build(SHOPKEEPER_KEY));
+
 	private ModEntities() {
 	}
 
@@ -49,5 +67,6 @@ public final class ModEntities {
 		// MISC e non CREATURE: le ombre non devono comparire nello spawn naturale né contare
 		// per i limiti di popolazione dei mob.
 		FabricDefaultAttributeRegistry.register(SHADOW, ShadowEntity.createAttributes());
+		FabricDefaultAttributeRegistry.register(SHOPKEEPER, ShopkeeperEntity.createAttributes());
 	}
 }

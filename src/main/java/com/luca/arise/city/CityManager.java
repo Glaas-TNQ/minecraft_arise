@@ -12,6 +12,7 @@ import com.luca.arise.city.CityPlan.Fill;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.CityConfig;
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.npc.NpcManager;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.quest.Unlock;
 
@@ -80,13 +81,18 @@ public final class CityManager {
 	// ---------------------------------------------------------------- mondo già pronto
 
 	/**
-	 * Tira su le città che mancano, la prima volta che qualcuno entra nel mondo.
+	 * Tira su le città che mancano, all'avvio del server.
 	 *
-	 * <p>All'ingresso di un giocatore e non all'avvio del server, per due motivi: un server dove
-	 * non entra nessuno non ha motivo di costruire niente, e chi entra vede l'avanzamento invece di
-	 * trovarsi il lavoro già fatto senza sapere da chi.
+	 * <p><strong>Su un mondo nuovo questo <em>è</em> la creazione del mondo</strong>, ed è il
+	 * momento giusto. Prima si costruiva alla prima entrata di un giocatore, e il risultato era che
+	 * chi apriva un mondo nuovo si trovava addosso un contatore di avanzamento mentre stava ancora
+	 * capendo dove guardare. Su un mondo che le città ce le ha già, questo controllo costa cinque
+	 * letture e non fa niente.
+	 *
+	 * <p>Nessuna bandiera salvata da nessuna parte: la prova che una città esiste resta la città
+	 * stessa. Una bandiera prima o poi finirebbe in disaccordo col mondo, e in silenzio.
 	 */
-	public static void onFirstJoin(MinecraftServer server, ServerPlayer player) {
+	public static void onServerStarted(MinecraftServer server) {
 		if (autoBuildChecked || !AriseConfig.get().cities().autoBuild()) {
 			return;
 		}
@@ -95,7 +101,7 @@ public final class CityManager {
 		int started = setup(server, null);
 
 		if (started > 0) {
-			player.sendSystemMessage(Component.translatable("arise.msg.city.auto_build", started));
+			AriseMod.LOGGER.info("Mondo nuovo: {} città da costruire.", started);
 		}
 	}
 
@@ -256,6 +262,10 @@ public final class CityManager {
 		Vec3 centre = new Vec3(config.centreX(city) + 0.5, build.baseY() + 1.0, config.centreZ(city) + 0.5);
 		AriseFx.cityRaised(build.level(), centre, city.color());
 
+		// Le botteghe si popolano adesso, non prima: i chunk della piazza sono appena stati
+		// toccati dal costruttore, quindi sono caricati e le entita' ci si possono appoggiare.
+		NpcManager.populate(build.level(), city, build.baseY());
+
 		message(server, city, Component.translatable("arise.msg.city.built", city.label(),
 				config.centreX(city), config.centreZ(city)));
 		REQUESTERS.remove(city);
@@ -400,6 +410,12 @@ public final class CityManager {
 		AriseFx.cityTravel(player.level(), player.position(), city.color());
 		player.teleportTo(level, x, y, z, Set.of(), 180.0F, 0.0F, true);
 		AriseFx.cityTravel(level, new Vec3(x, y, z), city.color());
+
+		// Ripopolare all'arrivo e non all'avvio del server: qui i chunk sono caricati perche' c'e'
+		// appena arrivato un giocatore, e il controllo e' idempotente — rimette solo cio' che
+		// manca. E' anche il modo in cui una citta' costruita prima che il mercato esistesse si
+		// ritrova le sue nove botteghe abitate senza doverla ricostruire.
+		NpcManager.populate(level, city, (int) y);
 
 		return Component.translatable("arise.msg.city.arrived", city.label());
 	}

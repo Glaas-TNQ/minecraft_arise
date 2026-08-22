@@ -34,6 +34,7 @@ public final class ModPayloads {
 		PayloadTypeRegistry.serverboundPlay().register(GemActionPayload.TYPE, GemActionPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(GateOfferPayload.TYPE, GateOfferPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(CityListPayload.TYPE, CityListPayload.STREAM_CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(OpenScreenPayload.TYPE, OpenScreenPayload.STREAM_CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(SpendPointPayload.TYPE, (payload, context) -> {
 			// Esecuzione esplicita sul thread del server: tocchiamo attributi e attachment, che

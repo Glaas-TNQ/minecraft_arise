@@ -3,12 +3,13 @@
   "key": {
     "D": "minecraft:deepslate_bricks",
     "C": "minecraft:cauldron",
-    "E": "minecraft:echo_shard"
+    "E": "minecraft:echo_shard",
+    "P": "arise:blueprint_abyss_well"
   },
   "pattern": [
     "DED",
-    "DCD",
-    "DDD"
+    "DPD",
+    "DCD"
   ],
   "result": {
     "id": "arise:abyss_well"

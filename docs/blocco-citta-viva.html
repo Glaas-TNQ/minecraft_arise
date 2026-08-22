@@ -1,0 +1,731 @@
+<title>La città viva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--gold);
+    background: linear-gradient(180deg, rgba(255,213,79,0.08), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------------------------------------------------------------- avvisi */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice.hot { border-top-color: var(--bad); }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice p + p { margin-top: 10px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .notice.hot .tag { color: var(--bad); }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+  .step.good { color: var(--good); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .compare > div { background: var(--panel-soft); padding: 16px 18px; }
+  .compare .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .compare .before .tag { color: var(--muted); }
+  .compare .after .tag { color: var(--good); }
+  .compare p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .compare .after p { color: var(--text); }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 620px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td b { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  tr.service td:first-child b { color: var(--gold); }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  .map {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+    white-space: pre;
+  }
+  .caption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  /* ---------------------------------------------------------------- la catena */
+
+  .chain { margin-top: 20px; border: 1px solid var(--line); background: var(--panel); padding: 10px; }
+  .chain svg { display: block; width: 100%; height: auto; }
+  .chain .n { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: #8FA0B5; }
+  .chain .t { font-family: "Chakra Petch", sans-serif; font-size: 12px; font-weight: 600; fill: #E8F2FF; }
+  .chain .g { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; fill: #FFD54F; }
+  .chain .box { fill: #0E1522; stroke: #1F2C42; }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: 52px 0 0; }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocco E</p>
+    <h1>La città viva</h1>
+    <p class="lede">Le città esistevano da due cicli e non servivano a niente: trecentoventi
+      blocchi di facciate con una porta sola che si apriva. Adesso <strong>nascono con il
+      mondo</strong>, sono grandi il doppio, e attorno alla piazza dell'Associazione ci sono
+      <strong>nove botteghe con dentro qualcuno</strong>. E l'Officina delle Anime ha smesso di
+      arrivare tutta insieme: <strong>nove incarichi nuovi</strong> la consegnano un pezzo per
+      volta.</p>
+
+    <p class="facts">
+      <span>lato città <b>320 → 512</b></span>
+      <span>superficie <b>× 2,6</b></span>
+      <span>botteghe <b>9</b></span>
+      <span>incarichi <b>9 → 18</b></span>
+      <span>oggetti nuovi <b>5</b></span>
+      <span>texture nuove <b>0</b></span>
+    </p>
+  </header>
+
+  <div class="notice hot">
+    <span class="tag">Da leggere prima di provare</span>
+    <p>Le città più grandi <strong>arrivano solo in un mondo nuovo</strong>. Una città esistente
+      viene riconosciuta dalla pietra segnaposto al centro dell'Associazione, e quella pietra non si
+      sposta: il mondo vecchio tiene le città che ha.</p>
+    <p>C'è un secondo motivo, ed è meno ovvio: <code>config/arise.json</code> <strong>conserva i
+      valori già scritti</strong>. Un mondo che ha già girato ha già dentro il suo
+      <code>size</code>, e il nuovo default da 512 non lo tocca. Per le città grandi serve un mondo
+      nuovo <em>e</em> una config nuova — o una modifica a mano di quella riga.</p>
+  </div>
+
+  <div class="notice">
+    <span class="tag">Non ancora verificato in gioco</span>
+    <p>Compila, il server di sviluppo si avvia senza un solo errore e la config si riscrive con le
+      voci nuove. Ma nessuno ha ancora <strong>cliccato una persona dietro un bancone</strong>: la
+      finestra di scambio, le nove skin e la catena degli incarichi si guardano solo con il client
+      aperto. La sezione 6 è la lista di cosa controllare.</p>
+  </div>
+
+  <section>
+    <h2><span class="step">1</span> Le città nascono con il mondo</h2>
+    <p class="kicker">Un aggancio spostato di una riga, e una misura raddoppiata.</p>
+
+    <div class="compare">
+      <div class="before">
+        <span class="tag">Prima</span>
+        <p>Le Associazioni si tiravano su alla <em>prima entrata di un giocatore</em>. Chi apriva un
+          mondo nuovo si trovava addosso un contatore di avanzamento mentre stava ancora capendo
+          dove guardare.</p>
+      </div>
+      <div class="after">
+        <span class="tag">Adesso</span>
+        <p>All'<em>avvio del server</em>. Su un mondo nuovo questo è letteralmente il momento in cui
+          il mondo viene creato; su uno che le città ce le ha già, il controllo costa cinque letture
+          e non fa niente.</p>
+      </div>
+    </div>
+
+    <p>E le città crescono: <strong>512 blocchi di lato invece di 320</strong>, due volte e mezzo la
+      superficie. È il numero che governa tutto il resto — quanti isolati, quanto è lontano il
+      monumento, quanto si cammina — e le cinque piante si riscalano da sole. Il prezzo è il tempo:
+      circa mille chunk per città invece di quattrocento, che il costruttore a budget spalma su
+      qualche minuto in sottofondo.</p>
+
+    <div class="panel why">
+      <span class="tag">Nessuna bandiera salvata</span>
+      <p>Non c'è un flag "mondo già preparato" da nessuna parte, e non ci sarà: la prova che una
+        città esiste resta <strong>la città stessa</strong>. Una bandiera prima o poi finirebbe in
+        disaccordo col mondo — un backup, un mondo copiato, un <code>/fill</code> di troppo — e il
+        disaccordo sarebbe silenzioso.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step gold">2</span> Il Quartiere del Mercato</h2>
+    <p class="kicker">Nove edifici veri, con il bancone, la vetrina e una persona dietro.</p>
+
+    <div class="map">          ┌──────────── la piazza dell'Associazione ────────────┐
+          │   ▣      ▣          ║          ▣      ▣                │
+          │ Fonderia Cava    il viale   Anime  Cartoleria          │
+          │                     ║                                  │
+          │              ┌──────────────┐                          │
+    ◄ si  │              │ ASSOCIAZIONE │                    ▣ ────┼─ Sportello
+    arriva│              │    29×29     │                          │
+    da qui│              └──────────────┘                          │
+          │                                                        │
+          │   ▣      ▣               ▣          ▣                  │
+          │ Dispensa Banco       Sensale     Gemmiere              │
+          └────────────────────────────────────────────────────────┘</div>
+    <p class="caption">Il lato ovest resta libero: è da lì che si arriva viaggiando, e una parete
+      addosso appena materializzati sarebbe un benvenuto pessimo.</p>
+
+    <h3>Chi c'è, e cosa fa</h3>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Bottega</th>
+            <th>Chi</th>
+            <th>Cosa dà</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><b>La Fonderia</b></td><td>Fonditore <span class="mono">efe</span></td>
+            <td>lingotti, carbone, bacchette di blaze; compra ferro grezzo</td></tr>
+          <tr><td><b>La Cava</b></td><td>Cavatore <span class="mono">steve</span></td>
+            <td>ardesia, ossidiana, ossidiana piangente; compra pietrisco</td></tr>
+          <tr><td><b>Casa delle Anime</b></td><td>Mercante d'Anime <span class="mono">zuri</span></td>
+            <td>sabbia delle anime, frammenti d'eco, catalizzatori E e D</td></tr>
+          <tr><td><b>La Cartoleria</b></td><td>Cartografo <span class="mono">makena</span></td>
+            <td>i quattro <b>Progetti</b>, tramogge, calderoni, fornaci</td></tr>
+          <tr><td><b>La Dispensa</b></td><td>Erborista <span class="mono">sunny</span></td>
+            <td>cibo, mele d'oro, perle dell'End, torce</td></tr>
+          <tr class="service"><td><b>Banco dell'Abisso</b></td><td>Cambiavalute <span class="mono">ari</span></td>
+            <td>conia <b>Monete d'Anima</b>; con lo shift le riprende indietro</td></tr>
+          <tr class="service"><td><b>Intermediazione</b></td><td>Sensale <span class="mono">kai</span></td>
+            <td>apre un varco del tuo rango, a pagamento</td></tr>
+          <tr class="service"><td><b>Bottega del Gemmiere</b></td><td>Gemmiera <span class="mono">noor</span></td>
+            <td>apre il banco delle gemme</td></tr>
+          <tr class="service"><td><b>Lo Sportello</b></td><td>Segretario <span class="mono">alex</span></td>
+            <td>viaggio fra città; con lo shift, l'Abyss Shop</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Perché non villager veri</span>
+      <p>Un villager dorme, cerca un letto, si lega a un punto d'interesse, cambia mestiere se gli
+        si toglie il blocco di lavoro, scappa se ha paura e diventa una strega se lo colpisce un
+        fulmine. Tutto questo esiste per un gioco di villaggi. Qui serve l'opposto: <strong>qualcuno
+        che stia fermo dietro un bancone finché il mondo esiste</strong>. La nostra entità non ha
+        IA, non ha inventario, non ha professione — e nessuno dei bug che quella macchina si porta
+        dietro.</p>
+      <p><strong>Ma la finestra di scambio è quella vera.</strong> L'entità implementa
+        <code>Merchant</code>, e il suo <code>openTradingScreen</code> apre la finestra di Minecraft:
+        l'unica interfaccia di questa mod che nessuno deve imparare. Chi ha comprato qualcosa da un
+        villager sa già usare la prima bottega di Arise.</p>
+    </div>
+
+    <h3>Nove volti, zero file</h3>
+    <p>Le texture sono le <strong>nove skin predefinite</strong> che Minecraft si porta dietro —
+      alex, ari, efe, kai, makena, noor, steve, sunny, zuri. Sono già in ogni installazione, sono
+      già disegnate bene, e hanno esattamente la qualità che serve: <em>gente</em> riconoscibile,
+      non un cast di personaggi da ricordare.</p>
+  </section>
+
+  <section>
+    <h2><span class="step gold">3</span> La Moneta d'Anima</h2>
+    <p class="kicker">Un problema tecnico che è diventato una regola di gioco.</p>
+
+    <p>La finestra di scambio di Minecraft <strong>sa contare solo oggetti</strong>. I soul coin
+      sono un numero dentro il Sistema, e un numero non si può mettere sul bancone. Quindi il numero
+      diventa un oggetto: la Moneta d'Anima si conia al Banco dell'Abisso, e allo stesso sportello
+      si riporta indietro.</p>
+
+    <p>Non è un giro a vuoto. È ciò che rende il denaro <strong>trasportabile e perdibile</strong>:
+      un soul coin sta al sicuro nel Sistema, una moneta sta nello zaino, e se muori in un Gate resta
+      lì. Il ritiro rende l'80% del conio, e la differenza è voluta — cambiare avanti e indietro
+      deve costare qualcosa, altrimenti il Banco è un parcheggio senza rischio.</p>
+
+    <pre><code><span class="c"># config/arise.json → cities.market</span>
+<span class="k">coin_value</span>   100     <span class="c"># soul coin per moneta</span>
+<span class="k">mint_batch</span>   16     <span class="c"># quante se ne coniano con un clic</span>
+<span class="k">redeem_rate</span> 0.8     <span class="c"># quanto si riprende riportandole indietro</span>
+<span class="k">gate_fee</span>    400     <span class="c"># quanto chiede il Sensale per un varco</span></code></pre>
+  </section>
+
+  <section>
+    <h2><span class="step violet">4</span> La Via dell'Artigiano</h2>
+    <p class="kicker">La catena passa da nove incarichi a diciotto. Il secondo arco è l'Officina,
+      consegnata un pezzo per volta.</p>
+
+    <div class="chain">
+      <svg viewBox="0 0 860 260" role="img"
+           aria-label="I nove incarichi del secondo arco: il mercato apre la moneta, il conio apre l'Officina, l'esubero il Progetto del Richiamo, e così via fino al Sensale.">
+        <defs>
+          <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+                  orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#3C8BD9"></path>
+          </marker>
+        </defs>
+
+        <g>
+          <rect class="box" x="8" y="20" width="160" height="58" stroke-width="1"></rect>
+          <text class="n" x="20" y="38">10</text>
+          <text class="t" x="20" y="55">Il mercato</text>
+          <text class="g" x="20" y="70">→ la Moneta d'Anima</text>
+
+          <rect class="box" x="184" y="20" width="160" height="58" stroke-width="1"></rect>
+          <text class="n" x="196" y="38">11</text>
+          <text class="t" x="196" y="55">Il conio</text>
+          <text class="g" x="196" y="70">→ l'Officina</text>
+
+          <rect class="box" x="360" y="20" width="160" height="58" stroke-width="1"></rect>
+          <text class="n" x="372" y="38">12</text>
+          <text class="t" x="372" y="55">L'esubero</text>
+          <text class="g" x="372" y="70">→ Progetto: Richiamo</text>
+
+          <rect class="box" x="536" y="20" width="160" height="58" stroke-width="1"></rect>
+          <text class="n" x="548" y="38">13</text>
+          <text class="t" x="548" y="55">Il richiamo</text>
+          <text class="g" x="548" y="70">→ Progetto: Crogiolo</text>
+
+          <rect class="box" x="692" y="98" width="160" height="58" stroke-width="1"></rect>
+          <text class="n" x="704" y="116">14</text>
+          <text class="t" x="704" y="133">La fusione</text>
+          <text class="g" x="704" y="148">→ Progetto: Fucina</text>
+
+          <rect class="box" x="516" y="98" width="160" height="58" stroke-width="1"></rect>
+          <text class="n" x="528" y="116">15</text>
+          <text class="t" x="528" y="133">La fucina</text>
+          <text class="g" x="528" y="148">→ Progetto: Pozzo</text>
+
+          <rect class="box" x="340" y="98" width="160" height="58" stroke-width="1"></rect>
+          <text class="n" x="352" y="116">16</text>
+          <text class="t" x="352" y="133">Il pozzo</text>
+          <text class="g" x="352" y="148">→ l'arruolamento</text>
+
+          <rect class="box" x="164" y="98" width="160" height="58" stroke-width="1"></rect>
+          <text class="n" x="176" y="116">17</text>
+          <text class="t" x="176" y="133">La recluta</text>
+          <text class="g" x="176" y="148">→ i servizi</text>
+
+          <rect class="box" x="8" y="98" width="140" height="58" stroke-width="1"></rect>
+          <text class="n" x="20" y="116">18</text>
+          <text class="t" x="20" y="133">Il sensale</text>
+          <text class="g" x="20" y="148">→ fine</text>
+        </g>
+
+        <line x1="168" y1="49" x2="180" y2="49" stroke="#3C8BD9" stroke-width="1.4" marker-end="url(#a)"></line>
+        <line x1="344" y1="49" x2="356" y2="49" stroke="#3C8BD9" stroke-width="1.4" marker-end="url(#a)"></line>
+        <line x1="520" y1="49" x2="532" y2="49" stroke="#3C8BD9" stroke-width="1.4" marker-end="url(#a)"></line>
+        <path d="M 696 49 L 772 49 L 772 94" fill="none" stroke="#3C8BD9" stroke-width="1.4" marker-end="url(#a)"></path>
+        <line x1="692" y1="127" x2="680" y2="127" stroke="#3C8BD9" stroke-width="1.4" marker-end="url(#a)"></line>
+        <line x1="516" y1="127" x2="504" y2="127" stroke="#3C8BD9" stroke-width="1.4" marker-end="url(#a)"></line>
+        <line x1="340" y1="127" x2="328" y2="127" stroke="#3C8BD9" stroke-width="1.4" marker-end="url(#a)"></line>
+        <line x1="164" y1="127" x2="152" y2="127" stroke="#3C8BD9" stroke-width="1.4" marker-end="url(#a)"></line>
+      </svg>
+    </div>
+
+    <h3>I Progetti sono la chiave di volta</h3>
+    <p>Un macchinario <strong>non si costruisce senza il suo Progetto</strong>, e il Progetto
+      <strong>si consuma</strong> nella ricetta. Il primo di ognuno lo regala la catena; i successivi
+      si comprano in Cartoleria.</p>
+
+    <div class="panel why">
+      <span class="tag">Perché si consumano</span>
+      <p>Perché altrimenti sarebbero un permesso, non un oggetto: si otterrebbero una volta e non si
+        guarderebbero mai più. Consumandosi diventano un costo che qualcuno vende, e la Cartoleria
+        ha un motivo di esistere anche a catena finita.</p>
+    </div>
+
+    <p>I quattro macchinari erano quattro cose che c'erano già, e la prima mossa di chi apriva il
+      gioco era leggere una tabella. Adesso sono quattro cose che <em>arrivano</em>, una dopo
+      l'altra, ciascuna quando si è finito di capire la precedente.</p>
+  </section>
+
+  <section>
+    <h2><span class="step good">5</span> Come si prova</h2>
+    <p class="kicker">Il laboratorio adesso ha anche il mercato: nove banconi in fila.</p>
+
+    <pre><code><span class="c"># tutto in una stanza, mercato compreso</span>
+/arise lab              <span class="c"># nove NPC sulla parete a est, i Progetti nel barile</span>
+
+<span class="c"># il mercato vero, in una città</span>
+/arise city build all   <span class="c"># qualche minuto in sottofondo</span>
+/arise city go tokyo    <span class="c"># le botteghe si popolano all'arrivo</span>
+/arise city npcs        <span class="c"># rimette chi manca; si può ribattere a raffica</span>
+
+<span class="c"># la catena nuova, dall'inizio</span>
+/arise reset            <span class="c"># torna al risveglio</span>
+<span class="c"># poi: parla con un bancone → conia otto monete → raccogli tre anime → ...</span>
+
+<span class="c"># il Banco</span>
+<span class="c"># clic = conia   ·   shift + clic = riporta indietro</span></code></pre>
+
+    <div class="panel">
+      <p><b>Una città vecchia si ripopola da sola</b> la prima volta che ci si viaggia: il controllo
+        è idempotente e rimette solo chi manca. Le botteghe però esistono solo nelle città costruite
+        <em>dopo</em> questo ciclo — gli edifici sono parte della pianta, e la pianta di una città
+        già costruita non si riscrive.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">6</span> Cos'è cambiato nel codice</h2>
+    <p class="kicker">Undici file nuovi, quindici toccati.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Dove</th><th>Cosa</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="mono">npc/</span></td>
+            <td><b>Il pacchetto nuovo.</b> <span class="mono">Shopkeeper</span> (le nove botteghe),
+              <span class="mono">ShopkeeperEntity</span> (Mob che implementa Merchant),
+              <span class="mono">ShopkeeperTrades</span> (i listini),
+              <span class="mono">ShopkeeperServices</span> (i quattro che non vendono),
+              <span class="mono">NpcManager</span> (chi li mette e li rimette)</td>
+          </tr>
+          <tr>
+            <td><span class="mono">city/CityMarket</span></td>
+            <td>Le nove botteghe come edifici, e la <b>lista condivisa</b> di dove stanno: i muri e
+              le persone leggono la stessa fonte. La piazza si allarga da sola per contenerle</td>
+          </tr>
+          <tr>
+            <td><span class="mono">registry/ModItems</span></td>
+            <td>I primi item registrati della mod: Moneta d'Anima e quattro Progetti. Sprite
+              prestati da vanilla, come sempre</td>
+          </tr>
+          <tr>
+            <td><span class="mono">quest/</span></td>
+            <td>Nove incarichi, nove obiettivi e nove sblocchi nuovi; gli incarichi possono ora
+              regalare un oggetto oltre ai soul coin</td>
+          </tr>
+          <tr>
+            <td><span class="mono">network/OpenScreenPayload</span></td>
+            <td>Server → client: apri questa schermata. Serve al Gemmiere e allo Sportello</td>
+          </tr>
+          <tr>
+            <td><span class="mono">config/MarketConfig</span></td>
+            <td>Annidata sotto <span class="mono">cities</span>: valore della moneta, lotto di
+              conio, trattenuta, tariffa del Sensale</td>
+          </tr>
+          <tr>
+            <td><span class="mono">client/render/ShopkeeperRenderer</span></td>
+            <td>Umanoide vanilla, skin scelta dal ruolo sincronizzato</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Tre trappole della 26.2, annotate in CLAUDE.md</span>
+      <p><code>AbstractVillager</code> non esiste più, ma non serviva: <code>Merchant</code> sono
+        tredici metodi banali e il suo <code>openTradingScreen</code> apre la finestra vera.
+        <code>ItemCost</code> confronta l'<em>oggetto</em>, non i componenti — ecco perché la moneta
+        è un item registrato e non un componente su un lingotto. E l'imbardata di Minecraft parte da
+        <strong>sud</strong>, con <code>setYHeadRot</code> e <code>setYBodyRot</code> da impostare
+        entrambi o l'NPC nasce col collo storto.</p>
+    </div>
+  </section>
+
+  <div class="verify">
+    <span class="tag">Da verificare in gioco</span>
+    <ul class="check">
+      <li>Un mondo nuovo comincia a costruire le cinque città da solo, senza che nessuno entri</li>
+      <li>Le città sono visibilmente più grandi, e la piazza contiene nove edifici</li>
+      <li>Dietro ogni bancone c'è una persona, con la sua skin e il suo nome sopra la testa</li>
+      <li>Cliccare un mercante apre la finestra di scambio vanilla con i prezzi in monete</li>
+      <li>Le scorte si esauriscono e non si rifanno finché il chunk non viene ricaricato</li>
+      <li>Il Banco conia con un clic e riprende le monete con shift + clic</li>
+      <li>Il Sensale apre un varco del rango giusto e scala la tariffa</li>
+      <li>Il Gemmiere apre il banco delle gemme, lo Sportello il viaggio (e l'Abyss Shop con shift)</li>
+      <li>La catena degli incarichi prosegue oltre il nono, e ogni Progetto arriva in inventario</li>
+      <li>Un macchinario non si costruisce senza il Progetto, e il Progetto sparisce nella ricetta</li>
+      <li>Un macchinario piazzato prima dell'incarico giusto rifiuta di aprirsi</li>
+      <li><code>/arise city npcs</code> ribattuto due volte non duplica nessuno</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <footer>
+    <p>Progetto Arise · Minecraft 26.2 · Fabric 0.19.3 · design completo in
+      <span class="mono">DESIGN-solo-leveling.md</span> §11.</p>
+    <p>Il ciclo precedente: <span class="mono">docs/blocco-officina-anime.html</span>.</p>
+  </footer>
+
+</div>

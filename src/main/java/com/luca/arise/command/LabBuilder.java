@@ -14,7 +14,11 @@ import com.luca.arise.gem.GemManager;
 import com.luca.arise.gem.GemType;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.quest.QuestManager;
+import com.luca.arise.city.CityMarket;
+import com.luca.arise.npc.ShopkeeperEntity;
 import com.luca.arise.registry.ModBlocks;
+import com.luca.arise.registry.ModEntities;
+import com.luca.arise.registry.ModItems;
 import com.luca.arise.workshop.LooseSoul;
 import com.luca.arise.workshop.MachineBlockEntity;
 import com.luca.arise.workshop.MachineKind;
@@ -107,6 +111,7 @@ public final class LabBuilder {
 			placed += raiseGates(level, player, centre, side);
 			placed += raiseMachines(level, player, centre, side);
 			placed += raiseSupplies(level, player, centre);
+			placed += raiseMarket(level, centre, side);
 
 			grantGems(player);
 		}
@@ -295,6 +300,56 @@ public final class LabBuilder {
 		return Identifier.withDefaultNamespace(path);
 	}
 
+	// ---------------------------------------------------------------- il mercato
+
+	/**
+	 * I nove banconi, in fila sulla parete a est.
+	 *
+	 * <p>Senza, provare il mercato vorrebbe dire costruire una citta' e andarci: quattro minuti di
+	 * costruzione e duecentomila blocchi di viaggio per cliccare una persona. Qui sono nove passi.
+	 *
+	 * <p>Non c'e' la bottega attorno, e non serve: quello che si prova qui e' cosa succede
+	 * cliccando, non se il tetto sta su.
+	 */
+	private static int raiseMarket(ServerLevel level, BlockPos centre, int side) {
+		int half = side / 2;
+		int x = centre.getX() + half - 4;
+		int floorY = centre.getY() - 1;
+		int placed = 0;
+
+		List<CityMarket.Stall> stalls = CityMarket.STALLS;
+		int span = Math.min(stalls.size() * 2, side - 8);
+		int start = centre.getZ() - span / 2;
+
+		for (int i = 0; i < stalls.size(); i++) {
+			CityMarket.Stall stall = stalls.get(i);
+			int z = start + i * 2;
+
+			// Il bancone: un blocco davanti, cosi' si legge come una bottega anche senza muri.
+			level.setBlock(new BlockPos(x - 1, floorY + 1, z),
+					Blocks.POLISHED_DEEPSLATE.defaultBlockState(), 2);
+			level.setBlock(new BlockPos(x, floorY, z),
+					Blocks.CONCRETE.pick(DyeColor.YELLOW).defaultBlockState(), 2);
+			placed += 2;
+
+			ShopkeeperEntity npc = ModEntities.SHOPKEEPER.create(level, EntitySpawnReason.EVENT);
+			if (npc == null) {
+				continue;
+			}
+
+			// Tutti rivolti a ovest, verso il centro della stanza: in fila si guardano tutti da un
+			// punto solo, che e' il modo piu' rapido di provarli uno dopo l'altro.
+			npc.setRole(stall.role());
+			npc.snapTo(x + 0.5, floorY + 1, z + 0.5, 90.0F, 0.0F);
+			npc.setYHeadRot(90.0F);
+			npc.setYBodyRot(90.0F);
+
+			level.addFreshEntity(npc);
+		}
+
+		return placed;
+	}
+
 	// ---------------------------------------------------------------- la cassa
 
 	/**
@@ -378,6 +433,14 @@ public final class LabBuilder {
 		for (Rank grade : Rank.values()) {
 			contents.add(SoulItems.catalyst(grade, 16));
 		}
+
+		// I quattro Progetti e un pugno di monete: senza, il mercato e le ricette dei macchinari
+		// restano due cose da guardare invece che da provare.
+		for (MachineKind kind : MachineKind.values()) {
+			contents.add(new ItemStack(ModItems.blueprintOf(kind), 4));
+		}
+
+		contents.add(ModItems.coins(64));
 
 		return contents;
 	}

@@ -12,10 +12,14 @@ public final class ModModelLayers {
 	public static final ModelLayerLocation SHADOW =
 			new ModelLayerLocation(AriseMod.id("shadow"), "main");
 
+	public static final ModelLayerLocation SHOPKEEPER =
+			new ModelLayerLocation(AriseMod.id("shopkeeper"), "main");
+
 	private ModModelLayers() {
 	}
 
 	public static void register() {
 		ModelLayerRegistry.registerModelLayer(SHADOW, ShadowModel::createLayer);
+		ModelLayerRegistry.registerModelLayer(SHOPKEEPER, ShopkeeperRenderer::createLayer);
 	}
 }

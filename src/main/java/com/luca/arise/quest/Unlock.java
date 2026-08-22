@@ -37,7 +37,27 @@ public enum Unlock implements StringRepresentable {
 	/** Viaggio fra Associazioni. */
 	CITIES("cities"),
 	/** Gemme e incastonature. */
-	GEMS("gems");
+	GEMS("gems"),
+
+	// --- la Via dell'Artigiano ----------------------------------------------------------------
+	/** La Moneta d'Anima: il Banco comincia a coniare. */
+	COIN("coin"),
+	/** L'Officina: le anime in esubero, e i macchinari si aprono. */
+	WORKSHOP("workshop"),
+	/** Il Richiamo d'Anime. */
+	LURE("lure"),
+	/** Il Crogiolo delle Anime. */
+	CRUCIBLE("crucible"),
+	/** La Fucina d'Ombra. */
+	FORGE("forge"),
+	/** Il Pozzo dell'Abisso. */
+	WELL("well"),
+	/** Arruolare un'anima nell'esercito. */
+	ENLIST("enlist"),
+	/** I servizi del mercato: varchi su ordinazione. */
+	SERVICES("services"),
+	/** La catena e' finita. Non apre niente: e' il segno che non manca piu' niente. */
+	MASTERY("mastery");
 
 	public static final Codec<Unlock> CODEC = StringRepresentable.fromEnum(Unlock::values);
 

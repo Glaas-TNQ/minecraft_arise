@@ -3,11 +3,12 @@
   "key": {
     "S": "minecraft:soul_sand",
     "D": "minecraft:deepslate_bricks",
-    "E": "minecraft:echo_shard"
+    "E": "minecraft:echo_shard",
+    "P": "arise:blueprint_soul_lure"
   },
   "pattern": [
     "SDS",
-    "DED",
+    "EPE",
     "SDS"
   ],
   "result": {

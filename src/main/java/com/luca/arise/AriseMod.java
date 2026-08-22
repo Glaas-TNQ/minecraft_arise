@@ -14,6 +14,7 @@ import com.luca.arise.gear.GearManager;
 import com.luca.arise.network.ModPayloads;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.registry.ModBlocks;
+import com.luca.arise.registry.ModItems;
 import com.luca.arise.registry.ModComponents;
 import com.luca.arise.registry.ModMenus;
 import com.luca.arise.registry.ModEntities;
@@ -37,6 +38,7 @@ public class AriseMod implements ModInitializer {
 		ModComponents.init();
 		// Prima dei menu: il tipo di block entity elenca i blocchi, quindi i blocchi devono esserci.
 		ModBlocks.init();
+		ModItems.init();
 		ModMenus.init();
 		ModEntities.init();
 		ModSounds.init();
