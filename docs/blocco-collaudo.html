@@ -1,0 +1,605 @@
+<title>Il collaudo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: linear-gradient(180deg, rgba(127,217,127,0.08), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--good);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------------------------------------------------------------- avvisi */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice.hot { border-top-color: var(--bad); }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice p + p { margin-top: 10px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .notice.hot .tag { color: var(--bad); }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+  .step.good { color: var(--good); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .compare > div { background: var(--panel-soft); padding: 16px 18px; }
+  .compare .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .compare .before .tag { color: var(--muted); }
+  .compare .after .tag { color: var(--good); }
+  .compare p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .compare .after p { color: var(--text); }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 620px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td b { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  tr.service td:first-child b { color: var(--gold); }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  .map {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+    white-space: pre;
+  }
+  .caption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  /* ---------------------------------------------------------------- la catena */
+
+  .chain { margin-top: 20px; border: 1px solid var(--line); background: var(--panel); padding: 10px; }
+  .chain svg { display: block; width: 100%; height: auto; }
+  .chain .n { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: #8FA0B5; }
+  .chain .t { font-family: "Chakra Petch", sans-serif; font-size: 12px; font-weight: 600; fill: #E8F2FF; }
+  .chain .g { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; fill: #FFD54F; }
+  .chain .box { fill: #0E1522; stroke: #1F2C42; }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: 52px 0 0; }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocco V</p>
+    <h1>Il collaudo</h1>
+    <p class="lede">Sette blocchi verificati su ventiquattro, e diciassette impilati sopra
+      fondamenta che nessuno aveva mai visto girare. Questo ciclo non aggiunge una funzione:
+      aggiunge <strong>due reti che si stendono da sole</strong> — un collaudo statico che legge
+      il progetto con metodo, e un banco di prova che esegue la logica senza aprire Minecraft.
+      Hanno trovato tre difetti nel primo minuto.</p>
+
+    <p class="facts">
+      <span>prove <b>38</b></span>
+      <span>controlli statici <b>12 famiglie</b></span>
+      <span>difetti trovati <b>3</b></span>
+      <span>file Java letti <b>144</b></span>
+      <span>chiavi controllate <b>509</b></span>
+      <span>funzioni nuove <b>0</b></span>
+    </p>
+  </header>
+
+  <div class="notice">
+    <span class="tag">Perché adesso e non dopo</span>
+    <p>Un'ora prima di questo ciclo, il codice delle città <strong>compilava, il server partiva, la
+      config si riscriveva giusta</strong> — e uccideva il server al primo mondo nuovo. Quattro
+      difetti, nessuno visibile senza eseguire. Non era sfortuna: era la regola §3 di
+      <span class="mono">CLAUDE.md</span> che si presentava a riscuotere.</p>
+    <p>Il rischio è composto. Ogni blocco nuovo sopra strati non verificati significa che quando
+      finalmente si prova, non si sa quale strato si è rotto.</p>
+  </div>
+
+  <section>
+    <h2><span class="step good">1</span> Cosa hanno trovato subito</h2>
+    <p class="kicker">Tre difetti, tutti già corretti. Nessuno dei tre dava un errore.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Difetto</th><th>Come si vedeva in gioco</th><th>Chi l'ha preso</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>L'Abyss Shop diceva sempre «0 incastonature»</b><br>
+              <span class="mono">la chiamata passava uno zero prima del numero vero, e la stringa
+                ha un segnaposto solo</span></td>
+            <td>Ogni pezzo in vendita sembrava senza incastonature. Un difetto di bilanciamento
+              apparente, che di bilanciamento non aveva niente</td>
+            <td>collaudo statico<br><span class="mono">argomenti che non tornano</span></td>
+          </tr>
+          <tr>
+            <td><b>Il suono <span class="mono">gear.drop</span> non esisteva più</b><br>
+              <span class="mono">registrato in ModSounds, sparito da sounds.json</span></td>
+            <td>Silenzio quando cade un pezzo — e <span class="mono">Missing sound for event:
+              arise:gear.drop</span> nel log, dove nessuno guarda</td>
+            <td>collaudo statico<br><span class="mono">suono non definito</span></td>
+          </tr>
+          <tr>
+            <td><b><span class="mono">AriseConfig</span> leggeva il disco caricando la classe</b><br>
+              <span class="mono">FabricLoader.getConfigDir() in un campo statico</span></td>
+            <td>Niente, in gioco. Ma rendeva la config <em>impossibile</em> da collaudare, e
+              fragile ovunque fuori da una partita avviata</td>
+            <td>banco di prova<br><span class="mono">ExceptionInInitializerError</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Il secondo è mio, ed è istruttivo</span>
+      <p>Due commit fa avevo «ripristinato l'ordine» di <code>sounds.json</code> ricostruendolo da
+        HEAD e riaggiungendo le voci nuove. Ma <code>gear.drop</code> stava nel lavoro <em>non
+        ancora committato</em>, e il mio script l'ha semplicemente riscritto via. Una regressione
+        introdotta da un'operazione di pulizia, invisibile a occhio, che sarebbe rimasta lì per
+        mesi. È esattamente la classe di errore per cui una rete automatica esiste.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">2</span> Il collaudo statico</h2>
+    <p class="kicker"><code>python tools/collaudo.py</code> — esce con 1 se trova qualcosa, così si
+      appende a un hook senza altra colla.</p>
+
+    <pre><code>Collaudo di Arise — 144 file Java, 509 chiavi, 26 suoni, 18 incarichi
+
+Pulito: nessun difetto trovato.</code></pre>
+
+    <p>Legge il progetto e cerca dodici famiglie di difetti che <strong>non danno errore</strong>.
+      Danno testo grezzo sullo schermo, silenzio al posto di un suono, un cubo viola al posto di un
+      blocco, o una partita che si ferma e non riparte.</p>
+
+    <h3>Cosa controlla</h3>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Famiglia</th><th>Cosa succederebbe senza</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Traduzioni mancanti</b><br><span class="mono">scritte e composte</span></td>
+            <td><span class="mono">arise.msg.market.minted</span> stampato tale e quale sullo
+              schermo. Le chiavi composte da un enum si espandono e si controllano una per una</td></tr>
+          <tr><td><b>Argomenti che non tornano</b></td>
+            <td>Un numero che manca, o uno di troppo che nessuno vede — come le incastonature</td></tr>
+          <tr><td><b>Lingue disallineate</b></td>
+            <td>Un giocatore italiano che legge una riga in inglese</td></tr>
+          <tr><td><b>Suoni inesistenti od orfani</b></td>
+            <td>Un evento che punta a un file che Minecraft non ha, o registrato e mai definito</td></tr>
+          <tr><td><b>Modelli, blockstate, loot table</b></td>
+            <td>Un cubo viola, o un blocco che si rompe e non lascia niente</td></tr>
+          <tr><td><b>Ricette rotte</b></td>
+            <td>Una ricetta che nomina un oggetto che non esiste: sparisce in silenzio dal gioco</td></tr>
+          <tr><td><b>Incarichi irraggiungibili</b></td>
+            <td>Un obiettivo che nessuno fa mai avanzare: <strong>la partita si ferma lì</strong></td></tr>
+          <tr><td><b>Catena che si morde la coda</b></td>
+            <td>Un compito che chiede un sistema concesso solo da un incarico successivo</td></tr>
+          <tr><td><b>Sistemi mai concessi</b></td>
+            <td>Un permesso che nessun incarico dà: chi lo richiede resta chiuso fuori per sempre</td></tr>
+          <tr><td><b>Entità senza renderer</b></td>
+            <td>Il client esplode appena ne vede una</td></tr>
+          <tr><td><b>Menu senza schermata</b></td>
+            <td>Aprirlo chiude il gioco</td></tr>
+          <tr><td><b>Pacchetti senza destinatario</b></td>
+            <td>Mandarlo chiude la connessione</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <p><b>Non passa a vuoto.</b> Prima di consegnarlo ho rotto due cose di proposito — tolta una
+        chiave composta, tolto un segnaposto da una stringa con due argomenti — e le ha prese
+        entrambe, indicando file e riga di origine. Poi ho rimesso a posto.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">3</span> Il banco di prova</h2>
+    <p class="kicker"><code>.\gradlew.bat test</code> — trentotto prove, e girano in venti
+      secondi.</p>
+
+    <p>Il progetto non aveva test. Adesso <code>src/test</code> accende quel tanto di Minecraft che
+      serve — <code>Bootstrap.bootStrap()</code> e nient'altro — e ci fa girare dentro la logica
+      della mod. Ci va quello che è <strong>aritmetica pura</strong>: le regole di gioco che si
+      sbagliano leggendo e non si scoprono giocando, perché un numero sbagliato non ha l'aria di un
+      errore.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Cosa</th><th class="num">Prove</th><th>Perché proprio questo</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Indici delle caselle</b><br><span class="mono">MachineKindTest</span></td>
+            <td class="num">5</td>
+            <td>Gli stessi numeri sono letti da tre posti che non si parlano: la block entity, il
+              menu, e le facce per le tramogge. Un indice sbagliato dà un Crogiolo che fonde la
+              casella sbagliata, o una tramoggia che si porta via le operaie invece del prodotto</td>
+          </tr>
+          <tr>
+            <td><b>Anime e catalizzatori</b><br><span class="mono">SoulTest</span></td>
+            <td class="num">9</td>
+            <td>Che un'anima e l'ombra che ne nasce dicano <em>lo stesso rango</em> — è scritto nei
+              commenti di mezza Officina ed è l'unica cosa che rende credibile l'arruolamento. E
+              che la fusione faccia sempre salire di livello, anche col catalizzatore peggiore</td>
+          </tr>
+          <tr>
+            <td><b>I codec su disco</b><br><span class="mono">PersistenceTest</span></td>
+            <td class="num">7</td>
+            <td><strong>Il danno peggiore che la mod possa fare.</strong> Non un crash: un
+              giocatore che riapre il mondo e ha perso l'esercito. Include un'anima salvata nel
+              formato di ieri, per provare che i mondi vecchi si aprano ancora</td>
+          </tr>
+          <tr>
+            <td><b>La catena e il mercato</b><br><span class="mono">ChainAndMarketTest</span></td>
+            <td class="num">10</td>
+            <td>La catena percorsa dall'inizio alla fine, un passo per volta, controllando che
+              nessun sistema risulti aperto prima del suo incarico. E che le nove botteghe non si
+              compenetrino, stiano dentro la piazza, non finiscano sopra l'Associazione, e che chi
+              vende stia <em>dietro</em> il bancone e non dentro un muro</td>
+          </tr>
+          <tr>
+            <td><b>La config</b><br><span class="mono">ConfigTest</span></td>
+            <td class="num">7</td>
+            <td>Il giro completo record → JSON → record. La radice è al limite dei sedici campi che
+              il codec di un record consente, e ogni sistema nuovo si annida da qualche parte: un
+              campo dimenticato non dà errore, dà una voce che sparisce dal file al primo
+              salvataggio</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">4</span> Cosa resta fuori</h2>
+    <p class="kicker">La parte onesta.</p>
+
+    <div class="compare">
+      <div class="after">
+        <span class="tag">Adesso coperto</span>
+        <p>Aritmetica, persistenza, struttura della catena, coerenza degli asset, registrazioni.
+          E <b>E1 sale a verificato</b>: le città nascono con il mondo, provato su cinque mondi
+          nuovi con un server dedicato e nessun giocatore collegato. È comportamento di server per
+          intero.</p>
+      </div>
+      <div class="before">
+        <span class="tag">Ancora da guardare con gli occhi</span>
+        <p>Tutto ciò che si <em>vede</em>: i quattro macchinari nel mondo, le otto schermate, le
+          nove skin dietro i banconi, la finestra di scambio che si apre, i particellari, l'HUD.
+          Nessuna rete automatica ci arriva, e nessuna ci arriverà.</p>
+      </div>
+    </div>
+
+    <p>Il collaudo non sostituisce <code>runClient</code>: gli toglie di mezzo il rumore. Quando ci
+      si siede a provare la mod, le due reti hanno già escluso che il problema sia una chiave
+      mancante, un modello assente o un incarico che non avanza — e restano solo le cose che
+      bisognava davvero guardare.</p>
+
+    <div class="panel why">
+      <span class="tag">La regola, aggiornata</span>
+      <p>La §3 di <span class="mono">CLAUDE.md</span> diceva «la compilazione non è una verifica».
+        Adesso dice anche <em>come</em> si verifica quello che si può verificare senza aprire il
+        gioco, e chiede che ogni sistema nuovo porti con sé le sue righe di collaudo. Una regola
+        che indica un metodo si segue; una che esorta e basta, no.</p>
+    </div>
+  </section>
+
+  <div class="verify">
+    <span class="tag">Il prossimo passo, quando ti siedi a giocare</span>
+    <ul class="check">
+      <li><code>/arise lab</code> — la stanza ha tutto: sei varchi, quattro macchinari alimentati,
+        nove banconi, tre barili</li>
+      <li>I quattro macchinari si vedono nel mondo e si distinguono a colpo d'occhio</li>
+      <li>Cliccare un mercante apre la finestra di scambio con i prezzi in monete</li>
+      <li>Le nove skin sono nove volti diversi, con il nome sopra la testa</li>
+      <li>La barra di avanzamento del Crogiolo sale, e va più veloce con un'anima di rango alto</li>
+      <li>Le otto schermate si aprono e si chiudono senza lasciare il gioco appeso</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <footer>
+    <p>Progetto Arise · Minecraft 26.2 · Fabric 0.19.3 · <span class="mono">tools/collaudo.py</span>
+      e <span class="mono">src/test</span>.</p>
+    <p>Il ciclo precedente: <span class="mono">docs/blocco-citta-viva.html</span>.</p>
+  </footer>
+
+</div>
