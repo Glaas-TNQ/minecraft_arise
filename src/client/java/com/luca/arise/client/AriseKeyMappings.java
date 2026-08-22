@@ -1,6 +1,7 @@
 package com.luca.arise.client;
 
 import com.luca.arise.client.screen.ArmyScreen;
+import com.luca.arise.client.screen.HunterScreen;
 import com.luca.arise.client.screen.StatusScreen;
 import com.luca.arise.network.AriseActionPayload;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -25,6 +26,9 @@ public final class AriseKeyMappings {
 
 	/** Apre la schermata dell'esercito. */
 	public static final KeyMapping OPEN_ARMY = register("army", GLFW.GLFW_KEY_J);
+
+	/** Apre l'equipaggiamento del Cacciatore. N: libero in vanilla e vicino a J e K. */
+	public static final KeyMapping OPEN_GEAR = register("gear", GLFW.GLFW_KEY_N);
 
 	/** "Arise": estrae l'ombra dal cadavere più vicino. */
 	public static final KeyMapping EXTRACT = register("extract", GLFW.GLFW_KEY_R);
@@ -67,6 +71,10 @@ public final class AriseKeyMappings {
 
 			while (OPEN_ARMY.consumeClick()) {
 				client.setScreenAndShow(new ArmyScreen());
+			}
+
+			while (OPEN_GEAR.consumeClick()) {
+				client.setScreenAndShow(new HunterScreen());
 			}
 
 			sendOnPress(EXTRACT, AriseActionPayload.Action.EXTRACT);

@@ -3,6 +3,7 @@ package com.luca.arise.registry;
 import com.luca.arise.AriseMod;
 import com.luca.arise.ability.AbilityCooldowns;
 import com.luca.arise.gate.ReturnPoint;
+import com.luca.arise.gear.PlayerGear;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.shadow.ShadowArmy;
 import com.luca.arise.shadow.ShadowStance;
@@ -42,6 +43,20 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.syncWith(ShadowArmy.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(AriseMod.id("army"));
+
+	/**
+	 * L'equipaggiamento del Cacciatore: indossato e da parte (design §8.1).
+	 *
+	 * <p>Stesse garanzie della progressione e dell'esercito. {@code copyOnDeath} soprattutto:
+	 * perdere l'equipaggiamento morendo sarebbe lo stesso bug che si evita per il livello, con in
+	 * piu' la beffa di aver perso ore di bottino.
+	 */
+	public static final AttachmentType<PlayerGear> GEAR = AttachmentRegistry.<PlayerGear>builder()
+			.initializer(() -> PlayerGear.EMPTY)
+			.persistent(PlayerGear.CODEC)
+			.copyOnDeath()
+			.syncWith(PlayerGear.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(AriseMod.id("gear"));
 
 	/**
 	 * Proiezione sincronizzata di quali ombre sono evocate ora.

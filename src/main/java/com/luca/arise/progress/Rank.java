@@ -41,6 +41,11 @@ public enum Rank implements StringRepresentable {
 		return name;
 	}
 
+	/** Lo stile del testo in chat e nei nomi. */
+	public ChatFormatting chatColor() {
+		return chatColor;
+	}
+
 	/** Colore ARGB per il disegno nella schermata. */
 	public int color() {
 		return color;

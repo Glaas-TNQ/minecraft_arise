@@ -5,6 +5,7 @@ import com.luca.arise.config.AriseConfig;
 import com.luca.arise.event.CityEvents;
 import com.luca.arise.event.ProgressEvents;
 import com.luca.arise.fx.ModSounds;
+import com.luca.arise.gear.GearManager;
 import com.luca.arise.network.ModPayloads;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.registry.ModEntities;
@@ -27,6 +28,8 @@ public class AriseMod implements ModInitializer {
 		ModAttachments.init();
 		ModEntities.init();
 		ModSounds.init();
+		// Prima dei giocatori: registra l'equipaggiamento fra le sorgenti di statistica.
+		GearManager.init();
 		ModPayloads.register();
 		ProgressEvents.register();
 		CityEvents.register();

@@ -1,5 +1,7 @@
 package com.luca.arise.progress;
 
+import java.util.Map;
+
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.registry.ModAttachments;
@@ -128,7 +130,7 @@ public final class ProgressManager {
 
 	public static int spentPoints(PlayerProgress progress) {
 		int total = 0;
-		for (Stat stat : Stat.values()) {
+		for (Stat stat : Stat.SPENDABLE) {
 			total += progress.stat(stat);
 		}
 		return total;
@@ -173,13 +175,12 @@ public final class ProgressManager {
 	 * che qualcosa più a valle rifà la mappa degli attributi. Invece di rincorrere il momento
 	 * esatto, ogni secondo si verifica che lo stato reale corrisponda ai dati e lo si corregge.
 	 *
-	 * <p>Costa quattro ricerche in una mappa per giocatore al secondo, e nel caso normale non
+	 * <p>Costa una somma delle sorgenti per giocatore al secondo, e nel caso normale non
 	 * scrive nulla: il prezzo giusto per una classe di bug che altrimenti riappare a ogni
 	 * cambiamento di Minecraft.
 	 */
 	public static void reconcile(ServerPlayer player) {
-		AriseConfig config = AriseConfig.get();
-		PlayerProgress progress = get(player);
+		Map<Stat, Double> totals = StatSources.totals(player);
 
 		for (Stat stat : Stat.values()) {
 			AttributeInstance instance = player.getAttribute(stat.attribute());
@@ -187,7 +188,7 @@ public final class ProgressManager {
 				continue;
 			}
 
-			double expected = progress.stat(stat) * config.perPoint(stat);
+			double expected = totals.getOrDefault(stat, 0.0);
 			AttributeModifier actual = instance.getModifier(stat.modifierId());
 
 			boolean missing = actual == null && expected != 0.0;
@@ -204,14 +205,14 @@ public final class ProgressManager {
 	 * Riscrive i modificatori di attributo a partire dalle statistiche correnti.
 	 *
 	 * <p>Un solo modificatore per statistica, con id fisso, <em>rimpiazzato</em> a ogni ricalcolo:
-	 * accumularne uno per livello e' l'errore che moltiplica la vita per quaranta.
+	 * accumularne uno per livello e' l'errore che moltiplica la vita per quaranta. Il valore e' la
+	 * somma di tutte le sorgenti (punti spesi, equipaggiamento, gemme): vedi {@link StatSources}.
 	 *
 	 * <p>I modificatori sono transitori (non salvati col giocatore) proprio perche' vengono
 	 * riapplicati al login e a ogni cambiamento: la fonte di verita' resta l'attachment.
 	 */
 	public static void applyAttributes(ServerPlayer player) {
-		AriseConfig config = AriseConfig.get();
-		PlayerProgress progress = get(player);
+		Map<Stat, Double> totals = StatSources.totals(player);
 
 		for (Stat stat : Stat.values()) {
 			AttributeInstance instance = player.getAttribute(stat.attribute());
@@ -221,7 +222,7 @@ public final class ProgressManager {
 
 			instance.removeModifier(stat.modifierId());
 
-			double amount = progress.stat(stat) * config.perPoint(stat);
+			double amount = totals.getOrDefault(stat, 0.0);
 			if (amount != 0.0) {
 				instance.addOrUpdateTransientModifier(
 						new AttributeModifier(stat.modifierId(), amount, stat.operation()));

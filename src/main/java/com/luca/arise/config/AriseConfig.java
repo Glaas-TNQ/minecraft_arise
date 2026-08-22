@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.luca.arise.AriseMod;
+import com.luca.arise.progress.Rank;
 import com.luca.arise.progress.Stat;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
@@ -54,7 +55,9 @@ public record AriseConfig(
 		/** Aspetto delle ombre ed effetti: le uniche voci che valgono sul client. */
 		FxConfig fx,
 		/** Dove stanno le città e quanto in fretta si costruiscono. */
-		CityConfig cities) {
+		CityConfig cities,
+		/** Il rango del Cacciatore e il suo equipaggiamento. */
+		HunterConfig hunter) {
 
 	public static final Codec<AriseConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.DOUBLE.fieldOf("xp_base").forGetter(AriseConfig::xpBase),
@@ -71,7 +74,8 @@ public record AriseConfig(
 			GateConfig.CODEC.fieldOf("gates").forGetter(AriseConfig::gates),
 			AbilityConfig.CODEC.fieldOf("abilities").forGetter(AriseConfig::abilities),
 			FxConfig.CODEC.fieldOf("fx").forGetter(AriseConfig::fx),
-			CityConfig.CODEC.fieldOf("cities").forGetter(AriseConfig::cities)
+			CityConfig.CODEC.fieldOf("cities").forGetter(AriseConfig::cities),
+			HunterConfig.CODEC.fieldOf("hunter").forGetter(AriseConfig::hunter)
 	).apply(instance, AriseConfig::new));
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -104,7 +108,18 @@ public record AriseConfig(
 		cap.put(Stat.ENDURANCE, 200);
 
 		return new AriseConfig(20.0, 1.6, 3, 100, 2.0, 1.0, perPoint, cap, 1.0, 0.25,
-				ShadowConfig.DEFAULT, GateConfig.DEFAULT, AbilityConfig.DEFAULT, FxConfig.DEFAULT, CityConfig.DEFAULT);
+				ShadowConfig.DEFAULT, GateConfig.DEFAULT, AbilityConfig.DEFAULT, FxConfig.DEFAULT,
+				CityConfig.DEFAULT, HunterConfig.DEFAULT);
+	}
+
+	/** L'equipaggiamento, scorciatoia per la voce annidata. */
+	public GearConfig gear() {
+		return hunter.gear();
+	}
+
+	/** Il rango di un Cacciatore di questo livello. */
+	public Rank hunterRank(int level) {
+		return hunter.rank(level);
 	}
 
 	public double perPoint(Stat stat) {

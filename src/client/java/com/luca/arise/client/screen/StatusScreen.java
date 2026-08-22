@@ -47,7 +47,7 @@ public class StatusScreen extends Screen {
 		int left = (width - PANEL_WIDTH) / 2;
 		int y = topOfRows();
 
-		for (Stat stat : Stat.values()) {
+		for (Stat stat : Stat.SPENDABLE) {
 			Button button = Button.builder(Component.literal("+"), b -> spend(stat))
 					.bounds(left + PANEL_WIDTH - 24, y - 6, 20, 20)
 					.build();
@@ -67,7 +67,7 @@ public class StatusScreen extends Screen {
 	}
 
 	private int topOfRows() {
-		return height / 2 - (Stat.values().length * ROW_HEIGHT) / 2 + 8;
+		return height / 2 - (Stat.SPENDABLE.size() * ROW_HEIGHT) / 2 + 8;
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class StatusScreen extends Screen {
 				progress.unspentPoints() > 0 ? COLOR_POINTS : COLOR_DIM);
 
 		int y = topOfRows();
-		for (Stat stat : Stat.values()) {
+		for (Stat stat : Stat.SPENDABLE) {
 			int points = progress.stat(stat);
 			int cap = config.cap(stat);
 			boolean canSpend = progress.unspentPoints() > 0 && points < cap;

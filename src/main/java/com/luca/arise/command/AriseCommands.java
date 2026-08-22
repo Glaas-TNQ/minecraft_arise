@@ -5,7 +5,13 @@ import java.util.function.Function;
 import com.luca.arise.city.City;
 import com.luca.arise.city.CityManager;
 import com.luca.arise.event.CityEvents;
+import com.luca.arise.config.GearConfig;
 import com.luca.arise.gate.GateManager;
+import com.luca.arise.gear.GearManager;
+import com.luca.arise.gear.GearPiece;
+import com.luca.arise.gear.GearRoll;
+import com.luca.arise.gear.GearSlot;
+import com.luca.arise.gear.PlayerGear;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.ShadowConfig;
@@ -59,7 +65,7 @@ public final class AriseCommands {
 			root.then(Commands.literal("info").executes(context -> info(context.getSource())));
 
 			LiteralArgumentBuilder<CommandSourceStack> spend = Commands.literal("spend");
-			for (Stat stat : Stat.values()) {
+			for (Stat stat : Stat.SPENDABLE) {
 				spend.then(Commands.literal(stat.getSerializedName())
 						.then(Commands.argument("punti", IntegerArgumentType.integer(1))
 								.executes(context -> spend(context.getSource(), stat,
@@ -83,18 +89,18 @@ public final class AriseCommands {
 					.requires(AriseCommands::canCheat)
 					.executes(context -> reset(context.getSource())));
 
-			root.then(Commands.literal("arise").executes(context -> shadowAction(context.getSource(),
+			root.then(Commands.literal("arise").executes(context -> playerAction(context.getSource(),
 					ShadowManager::extract)));
-			root.then(Commands.literal("summon").executes(context -> shadowAction(context.getSource(),
+			root.then(Commands.literal("summon").executes(context -> playerAction(context.getSource(),
 					ShadowManager::summon)));
-			root.then(Commands.literal("recall").executes(context -> shadowAction(context.getSource(),
+			root.then(Commands.literal("recall").executes(context -> playerAction(context.getSource(),
 					ShadowManager::recall)));
 
 			LiteralArgumentBuilder<CommandSourceStack> stance = Commands.literal("stance")
-					.executes(context -> shadowAction(context.getSource(), ShadowManager::cycleStance));
+					.executes(context -> playerAction(context.getSource(), ShadowManager::cycleStance));
 			for (ShadowStance value : ShadowStance.values()) {
 				stance.then(Commands.literal(value.getSerializedName())
-						.executes(context -> shadowAction(context.getSource(),
+						.executes(context -> playerAction(context.getSource(),
 								player -> ShadowManager.setStance(player, value))));
 			}
 			root.then(stance);
@@ -110,10 +116,10 @@ public final class AriseCommands {
 			LiteralArgumentBuilder<CommandSourceStack> gate = Commands.literal("gate");
 			for (Rank rank : Rank.values()) {
 				gate.then(Commands.literal(rank.getSerializedName())
-						.executes(context -> gateAction(context.getSource(),
+						.executes(context -> playerAction(context.getSource(),
 								player -> GateManager.offer(player, rank))));
 			}
-			gate.executes(context -> gateAction(context.getSource(),
+			gate.executes(context -> playerAction(context.getSource(),
 					player -> GateManager.offer(player, Rank.E)));
 			root.then(gate);
 
@@ -128,7 +134,7 @@ public final class AriseCommands {
 				cityBuild.then(Commands.literal(target.getSerializedName())
 						.executes(context -> buildCity(context.getSource(), target)));
 				cityGo.then(Commands.literal(target.getSerializedName())
-						.executes(context -> gateAction(context.getSource(),
+						.executes(context -> playerAction(context.getSource(),
 								player -> CityManager.travel(player, target))));
 			}
 
@@ -139,12 +145,51 @@ public final class AriseCommands {
 			city.then(cityGo);
 			root.then(city);
 
+			LiteralArgumentBuilder<CommandSourceStack> gear = Commands.literal("gear")
+					.executes(context -> listGear(context.getSource()));
+
+			// Un nodo per slot e per rango: piu' verboso di un argomento libero, ma il
+			// completamento automatico diventa l'elenco vero delle possibilita'.
+			LiteralArgumentBuilder<CommandSourceStack> gearGive = Commands.literal("give")
+					.requires(AriseCommands::canCheat);
+
+			for (GearSlot slot : GearSlot.values()) {
+				LiteralArgumentBuilder<CommandSourceStack> node = Commands.literal(slot.getSerializedName());
+
+				for (Rank rank : Rank.values()) {
+					node.then(Commands.literal(rank.getSerializedName())
+							.executes(context -> playerAction(context.getSource(),
+									player -> GearManager.grant(player, GearManager.roll(player, slot, rank)))));
+				}
+
+				gearGive.then(node);
+			}
+			gear.then(gearGive);
+
+			LiteralArgumentBuilder<CommandSourceStack> gearRoll = Commands.literal("roll")
+					.requires(AriseCommands::canCheat);
+
+			for (Rank rank : Rank.values()) {
+				gearRoll.then(Commands.literal(rank.getSerializedName())
+						.then(Commands.argument("quantita", IntegerArgumentType.integer(1, 40))
+								.executes(context -> rollGear(context.getSource(), rank,
+										IntegerArgumentType.getInteger(context, "quantita"))))
+						.executes(context -> rollGear(context.getSource(), rank, 1)));
+			}
+			gear.then(gearRoll);
+
+			gear.then(Commands.literal("clear")
+					.requires(AriseCommands::canCheat)
+					.executes(context -> clearGear(context.getSource())));
+
+			root.then(gear);
+
 			root.then(Commands.literal("hub")
 					.requires(AriseCommands::canCheat)
 					.executes(context -> openHub(context.getSource())));
 
 			root.then(Commands.literal("leave")
-					.executes(context -> gateAction(context.getSource(), GateManager::leave)));
+					.executes(context -> playerAction(context.getSource(), GateManager::leave)));
 
 			root.then(Commands.literal("shadows")
 					.executes(context -> listShadows(context.getSource()))
@@ -169,7 +214,7 @@ public final class AriseCommands {
 		source.sendSuccess(() -> Component.translatable("arise.msg.info.points",
 				progress.unspentPoints()), false);
 
-		for (Stat stat : Stat.values()) {
+		for (Stat stat : Stat.SPENDABLE) {
 			source.sendSuccess(() -> Component.translatable("arise.msg.info.stat",
 					Component.translatable(stat.translationKey()),
 					progress.stat(stat),
@@ -223,8 +268,8 @@ public final class AriseCommands {
 		return 1;
 	}
 
-	/** Le azioni sulle ombre restituiscono già il messaggio giusto: qui si inoltra e basta. */
-	private static int shadowAction(CommandSourceStack source, Function<ServerPlayer, Component> action)
+	/** Le azioni restituiscono già il messaggio giusto: qui si inoltra e basta. */
+	private static int playerAction(CommandSourceStack source, Function<ServerPlayer, Component> action)
 			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
 		ServerPlayer player = source.getPlayerOrException();
 		Component feedback = action.apply(player);
@@ -280,12 +325,48 @@ public final class AriseCommands {
 	}
 
 	/** I Gate restituiscono già il messaggio giusto: qui si inoltra e basta. */
-	private static int gateAction(CommandSourceStack source, Function<ServerPlayer, Component> action)
+	/** Un pezzo a caso per ogni tiro: e' la forma che avra' il bottino dei Gate. */
+	private static int rollGear(CommandSourceStack source, Rank rank, int count)
 			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
 		ServerPlayer player = source.getPlayerOrException();
-		Component feedback = action.apply(player);
-		source.sendSuccess(() -> feedback, false);
-		return 1;
+		GearConfig config = AriseConfig.get().gear();
+		int before = GearManager.get(player).stash().size();
+
+		for (int i = 0; i < count; i++) {
+			GearManager.grant(player, GearRoll.rollAny(config, rank, player.level().getRandom()));
+		}
+
+		int added = GearManager.get(player).stash().size() - before;
+		source.sendSuccess(() -> Component.translatable("arise.msg.gear.rolled", added, rank.label()), false);
+		return added;
+	}
+
+	private static int listGear(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		PlayerGear gear = GearManager.get(player);
+		Rank rank = GearManager.hunterRank(player);
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.gear.header",
+				rank.label(), gear.equipped().size(), gear.stash().size()), false);
+
+		for (GearPiece piece : gear.equipped()) {
+			source.sendSuccess(() -> Component.translatable("arise.msg.gear.line",
+					piece.slot().label(), piece.displayName(), piece.statSummary()), false);
+		}
+
+		return gear.equipped().size();
+	}
+
+	private static int clearGear(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		PlayerGear gear = GearManager.get(player);
+		int count = gear.equipped().size() + gear.stash().size();
+
+		GearManager.clear(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.gear.cleared", count), false);
+		return count;
 	}
 
 	private static int listShadows(CommandSourceStack source)

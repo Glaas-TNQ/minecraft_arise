@@ -5,6 +5,7 @@ import java.util.UUID;
 import com.luca.arise.ability.AbilityManager;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.gate.GateManager;
+import com.luca.arise.gear.GearManager;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.shadow.ShadowEntity;
 import com.luca.arise.shadow.ShadowManager;
@@ -63,6 +64,9 @@ public final class ProgressEvents {
 		// I modificatori di attributo sono transitori: vanno riapplicati ogni volta che il
 		// giocatore entra nel mondo o viene ricreato.
 		ServerPlayerEvents.JOIN.register(player -> {
+			// Prima gli slot, poi gli attributi: se il rango non regge piu' quello che il
+			// giocatore ha addosso, i pezzi in eccesso vanno tolti *prima* di contarli.
+			GearManager.enforce(player);
 			ProgressManager.applyAttributes(player);
 			GateManager.onPlayerJoin(player);
 		});
@@ -86,6 +90,7 @@ public final class ProgressEvents {
 
 			long now = server.overworld().getGameTime();
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+				GearManager.enforce(player);
 				ProgressManager.reconcile(player);
 				AbilityManager.prune(player, now);
 				GateManager.tick(player);

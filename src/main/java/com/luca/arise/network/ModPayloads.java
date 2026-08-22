@@ -4,6 +4,7 @@ import com.luca.arise.ability.AbilityManager;
 import com.luca.arise.city.CityManager;
 import com.luca.arise.gate.GateEntity;
 import com.luca.arise.gate.GateManager;
+import com.luca.arise.gear.GearManager;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.shadow.ShadowManager;
 
@@ -25,6 +26,7 @@ public final class ModPayloads {
 		PayloadTypeRegistry.serverboundPlay().register(ShadowActionPayload.TYPE, ShadowActionPayload.STREAM_CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(GateActionPayload.TYPE, GateActionPayload.STREAM_CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(CityTravelPayload.TYPE, CityTravelPayload.STREAM_CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(GearActionPayload.TYPE, GearActionPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(GateOfferPayload.TYPE, GateOfferPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(CityListPayload.TYPE, CityListPayload.STREAM_CODEC);
 
@@ -52,6 +54,20 @@ public final class ModPayloads {
 					case STANCE -> ShadowManager.cycleStance(player);
 					case ABILITY_1, ABILITY_2, ABILITY_3, ABILITY_4 ->
 							AbilityManager.use(player, payload.action().ability());
+				};
+
+				player.sendSystemMessage(feedback);
+			});
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(GearActionPayload.TYPE, (payload, context) -> {
+			context.server().execute(() -> {
+				ServerPlayer player = context.player();
+
+				Component feedback = switch (payload.action()) {
+					case EQUIP -> GearManager.equip(player, payload.pieceId());
+					case UNEQUIP -> GearManager.unequip(player, payload.pieceId());
+					case DISCARD -> GearManager.discard(player, payload.pieceId());
 				};
 
 				player.sendSystemMessage(feedback);

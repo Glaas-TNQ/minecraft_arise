@@ -234,6 +234,124 @@ Tutto ciò che è **logica** (XP, livello, cooldown, evocazione, danni) vive **s
 
 ---
 
+## 8. Equipaggiamento, Abyss Shop e gemme
+
+Il pilastro che mancava. Fino a qui la mod ha **progressione senza acquisizione**: i numeri
+crescono, ma non si ottiene mai niente, e i soul coin hanno due soli sbocchi (potenziare un'ombra,
+pagare un'abilità). Questa sezione chiude il ciclo *Gate → bottino → equipaggiamento → Gate più
+profondi*.
+
+### 8.1 L'equipaggiamento è un dato, non un item
+
+**Decisione, ed è la più importante di tutta la sezione.** Un pezzo di equipaggiamento è un
+record dentro un attachment del giocatore, non un `ItemStack` registrato.
+
+La ragione è aritmetica. Gli slot previsti sono una ventina; moltiplicati per sei ranghi e per le
+varianti di base fanno diverse centinaia di texture da disegnare a mano — e il progetto ha già un
+debito aperto sulla texture dell'ombra. Nessuna di quelle immagini può essere generata: le regole
+di Modrinth vietano gli asset prodotti da IA.
+
+È lo stesso principio già adottato per l'esercito (§3.5): *le ombre non evocate non sono entità*.
+Qui: **l'equipaggiamento posseduto non è un oggetto**. Lo disegniamo noi nella nostra schermata,
+con un'icona per tipo di slot tinta del colore del rango.
+
+Cosa si guadagna:
+
+- zero texture, zero modelli, zero data generation, zero registrazioni di item;
+- nessuna collisione con i quattro slot armatura di vanilla, che venti slot non potrebbero
+  contenere comunque;
+- niente duplicazioni, niente pezzi persi nella lava, niente interazione con le mod di inventario;
+- un pezzo può essere **generato** invece che disegnato: base × rango × modificatori estratti,
+  varietà infinita a costo zero (stessa idea di `GateOffer`, tirata da un seed).
+
+Cosa si perde, detto chiaramente: il pezzo non sta nell'inventario, non si butta per terra, non si
+passa a un amico infilandolo in un baule. Lo scambio fra giocatori, se servirà, diventerà un
+trasferimento fra due schermate — fattibile, ma va scritto.
+
+### 8.2 Le sorgenti di statistica si sommano prima di diventare modificatori
+
+Oggi ogni `Stat` ha un modificatore con id fisso, rimpiazzato a ogni ricalcolo (regola §6 di
+`CLAUDE.md`). Se anche equipaggiamento e gemme concedono forza, **non** si può aggiungere un
+secondo modificatore per sorgente: sarebbe esattamente il bug che quella regola previene.
+
+Il modello diventa:
+
+```
+punti spesi  ┐
+equipaggio   ├─→  totale per statistica  ─→  UN modificatore per statistica (id invariato)
+gemme        │
+buff a tempo ┘
+```
+
+La regola §6 non cambia, cambia solo *cosa* ci si scrive dentro. Questa rifattorizzazione va fatta
+**prima** dell'equipaggiamento, non durante.
+
+Ne consegue che `Stat` si allarga oltre le quattro statistiche spendibili: quelle restano le sole
+su cui si spendono punti (`spendable`), ma l'equipaggiamento può estrarre anche tempra, prontezza,
+saldezza, slancio, allungo, assorbimento, fortuna e impeto. Senza questa varietà due pezzi dello
+stesso slot sarebbero indistinguibili.
+
+### 8.3 Il rango è la rarità
+
+Non si inventano *comune / raro / epico*: esiste già `Rank` E→S, con i suoi colori e le sue
+etichette, usato da ombre e Gate. Un anello è **di rango A**, e questo determina:
+
+| | E | D | C | B | A | S |
+|---|---|---|---|---|---|---|
+| modificatori estratti | 1 | 1 | 2 | 3 | 3 | 4 |
+| incastonature | 0 | 0 | 1 | 2 | 3 | 4 |
+| moltiplicatore di potenza | 1,0 | 1,4 | 2,0 | 2,8 | 4,0 | 5,6 |
+
+Tutti numeri di config.
+
+### 8.4 Gli slot si sbloccano
+
+Venti caselle vuote davanti a un giocatore di livello 1 si leggono come una lista di faccende. Gli
+slot esistono tutti, ma si aprono al salire del rango del Cacciatore: si comincia con due anelli e
+si arriva a dieci, si comincia con due orecchini e si arriva a quattro. Ogni sblocco è un momento,
+e narrativamente regge — la capacità di un Cacciatore cresce.
+
+Gli anelli restano i contributori **più deboli** proprio perché sono i più numerosi: il tetto non
+deve banalizzare tutto il resto.
+
+### 8.5 Da dove arriva la roba
+
+Se l'unica fonte è il negozio, i Gate diventano un bancomat e il gioco si riduce a "farma monete,
+compra". Le fonti si dividono:
+
+- **i Gate lasciano cadere l'equipaggiamento**, di rango scalato su quello del Gate;
+- **i boss lasciano le gemme** e le scroll;
+- **l'Abyss Shop vende in modo affidabile ma caro** — è la rete di sicurezza di chi non è stato
+  fortunato, non la fonte principale.
+
+Le scroll che alzano una statistica in permanenza **non si comprano**: i soul coin si farmano
+all'infinito, e statistiche comprabili significherebbero statistiche infinite. Cadono dai boss.
+
+### 8.6 Le gemme
+
+Una gemma incastonata dà statistiche *e* un effetto passivo: furto di vita, probabilità di
+estrarre un'ombra da sola alla morte di un nemico, bonus ai soul coin sopra un certo rango di Gate.
+
+**Non abilità attive**, almeno per ora: quelle sono un enum chiuso di quattro voci, legato a
+quattro tasti e a quattro caselle nell'HUD, e aggiungerne una quinta è un lavoro a sé. Una gemma
+che *sblocchi* un quinto slot abilità è un buon obiettivo successivo.
+
+Incastonare si fa ovunque. **Estrarre una gemma senza distruggerla si fa solo al banco
+dell'Associazione dei Cacciatori**, in città: è un pozzo di risorse elegante e finalmente un motivo
+per viaggiare.
+
+### 8.7 Ordine di costruzione
+
+| Blocco | Contenuto | Criterio di "fatto" |
+|---|---|---|
+| **B1** | Somma delle sorgenti; slot, zaino, schermata del Cacciatore; comandi di debug | equipaggi un anello, le statistiche cambiano, sopravvive a morte e riavvio |
+| **B2** | Abyss Shop: stock a rotazione tirato da un seed, prezzi in config, consumabili | spendi soul coin e ti ritrovi il pezzo addosso |
+| **B3** | Varchi spontanei nel mondo | esci di casa e trovi un Gate che non hai evocato tu |
+| **B4** | Gemme, incastonature, effetti passivi, estrazione al banco | una gemma di furto vita si vede funzionare |
+| **B5** | Bottino: Gate e boss lasciano pezzi, gemme e scroll | chiudi un Gate di rango B ed esci con qualcosa che non avevi |
+
+---
+
 ## Fonti
 
 - [Solo Leveling: Reawakening — CurseForge](https://www.curseforge.com/minecraft/mc-mods/solo-craft-reawakening) · [Modrinth](https://modrinth.com/project/YdsLXFph)
