@@ -308,5 +308,8 @@
   "arise.msg.gem.needs_bench": "Only the Hunter's Association bench can take a gem out intact.",
   "arise.msg.gem.extracted": "%1$s extracted intact for %2$s soul coins.",
   "arise.msg.gem.shattered": "%s shattered.",
-  "arise.msg.gem.auto_extract": "The obsidian answers on its own. %s"
+  "arise.msg.gem.auto_extract": "The obsidian answers on its own. %s",
+  "arise.msg.loot.scroll": "System scroll: +%s stat points.",
+  "arise.screen.gem.bench_here": "Association bench within reach",
+  "arise.screen.gem.bench_far": "Far from the bench: here you can only socket or shatter"
 }

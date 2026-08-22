@@ -46,7 +46,9 @@ public record GateConfig(
 		/** Chi può essere il boss, per rango. */
 		Map<Rank, List<Identifier>> bosses,
 		/** Quando e dove i varchi si aprono da soli. */
-		SpawnConfig spawn) {
+		SpawnConfig spawn,
+		/** Cosa lascia un Gate completato. */
+		LootConfig loot) {
 
 	/** La geometria di un Gate. */
 	public record Shape(
@@ -118,7 +120,7 @@ public record GateConfig(
 
 	public static final GateConfig DEFAULT = new GateConfig(
 			Shape.DEFAULT, 3, 1.5, 6.0, 2.0, 120.0, 1.8, 60.0, 6000,
-			defaultMobs(), defaultBosses(), SpawnConfig.DEFAULT);
+			defaultMobs(), defaultBosses(), SpawnConfig.DEFAULT, LootConfig.DEFAULT);
 
 	private static final Codec<Map<Rank, List<Identifier>>> MOB_TABLE =
 			Codec.unboundedMap(Rank.CODEC, Identifier.CODEC.listOf());
@@ -135,7 +137,8 @@ public record GateConfig(
 			Codec.INT.fieldOf("offer_lifetime_ticks").forGetter(GateConfig::offerLifetimeTicks),
 			MOB_TABLE.fieldOf("mobs").forGetter(GateConfig::mobs),
 			MOB_TABLE.fieldOf("bosses").forGetter(GateConfig::bosses),
-			SpawnConfig.CODEC.fieldOf("spawn").forGetter(GateConfig::spawn)
+			SpawnConfig.CODEC.fieldOf("spawn").forGetter(GateConfig::spawn),
+			LootConfig.CODEC.fieldOf("loot").forGetter(GateConfig::loot)
 	).apply(instance, GateConfig::new));
 
 	public GateConfig {

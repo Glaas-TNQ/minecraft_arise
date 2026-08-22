@@ -109,12 +109,20 @@ public enum Stat implements StringRepresentable {
 		return translationKey;
 	}
 
-	/** Il valore come lo legge un giocatore: "+12,5%" oppure "+3,4". */
+	/**
+	 * Il valore come lo legge un giocatore: "+12,5%" oppure "+3,4".
+	 *
+	 * <p>I decimali si tolgono guardando il numero, non tagliando la stringa: su una macchina
+	 * italiana {@code String.format} scrive la virgola, e un taglio di ".00" non troverebbe mai
+	 * niente da tagliare.
+	 */
 	public String format(double amount) {
 		if (percentage()) {
 			return String.format("%+.1f%%", amount * 100.0);
 		}
 
-		return String.format("%+.2f", amount).replace(".00", "");
+		return amount == Math.rint(amount)
+				? String.format("%+.0f", amount)
+				: String.format("%+.2f", amount);
 	}
 }

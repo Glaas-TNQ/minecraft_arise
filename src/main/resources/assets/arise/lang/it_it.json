@@ -308,5 +308,8 @@
   "arise.msg.gem.needs_bench": "Solo al banco dell'Associazione dei Cacciatori si toglie una gemma intatta.",
   "arise.msg.gem.extracted": "%1$s estratta intatta per %2$s soul coin.",
   "arise.msg.gem.shattered": "%s si e' frantumata.",
-  "arise.msg.gem.auto_extract": "L'ossidiana risponde da sola. %s"
+  "arise.msg.gem.auto_extract": "L'ossidiana risponde da sola. %s",
+  "arise.msg.loot.scroll": "Pergamena del Sistema: +%s punti statistica.",
+  "arise.screen.gem.bench_here": "Banco dell'Associazione a portata",
+  "arise.screen.gem.bench_far": "Lontano dal banco: qui puoi solo incastonare o rompere"
 }

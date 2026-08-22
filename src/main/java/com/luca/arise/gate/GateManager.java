@@ -290,6 +290,11 @@ public final class GateManager {
 		AriseFx.gateClear(player, instance.rank());
 		player.sendSystemMessage(Component.translatable("arise.msg.gate.cleared",
 				instance.rank().label(), xp, souls));
+
+		// Il bottino dopo il messaggio di completamento: prima si sa di aver vinto, poi si vede
+		// cosa si e' vinto. Ogni riga se la scrive il gestore che assegna il pezzo, che e' l'unico
+		// a sapere se lo zaino era pieno.
+		GateLoot.award(player, instance.rank()).forEach(player::sendSystemMessage);
 	}
 
 	// ---------------------------------------------------------------- uscita

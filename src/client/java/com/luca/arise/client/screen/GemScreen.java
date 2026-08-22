@@ -3,7 +3,9 @@ package com.luca.arise.client.screen;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.luca.arise.city.City;
 import com.luca.arise.config.AriseConfig;
+import com.luca.arise.config.CityConfig;
 import com.luca.arise.config.GemConfig;
 import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.PlayerGear;
@@ -27,8 +29,10 @@ import net.minecraft.network.chat.Component;
  * "scegli il pezzo" da "scegli la gemma" in due passaggi avrebbe voluto dire tenere in testa la
  * prima scelta mentre si fa la seconda, per un gesto che si ripete decine di volte.
  *
- * <p>La riga in alto dice sempre se il banco dell'Associazione e' a portata: estrarre una gemma
- * intatta si puo' solo li', e scoprirlo dopo aver premuto sarebbe una piccola presa in giro.
+ * <p>La riga in alto dice se il banco dell'Associazione e' a portata, e finche' non lo e' il
+ * bottone "Estrai" resta spento: scoprire il vincolo dopo aver premuto sarebbe una piccola presa in
+ * giro. E' un <em>indizio</em> — il client conosce solo la distanza dal centro pianificato di una
+ * citta', non se quella citta' e' stata costruita davvero. La verifica vera resta del server.
  */
 public class GemScreen extends Screen {
 
@@ -36,13 +40,14 @@ public class GemScreen extends Screen {
 	private static final int PANEL_WIDTH = 340;
 	private static final int ACTION_WIDTH = 56;
 	private static final int SMALL_WIDTH = 42;
-	private static final int POUCH_ROWS = 5;
+	private static final int POUCH_ROWS = 4;
 
 	private static final int COLOR_TITLE = 0xFFC77FE8;
 	private static final int COLOR_TEXT = 0xFFE8F2FF;
 	private static final int COLOR_DIM = 0xFF9BA8B8;
 	private static final int COLOR_EMPTY = 0xFF6B7684;
 	private static final int COLOR_SOULS = 0xFFFFD54F;
+	private static final int COLOR_BENCH = 0xFF7FD97F;
 	private static final int COLOR_ROW = 0x40000000;
 
 	private final Screen parent;
@@ -73,6 +78,29 @@ public class GemScreen extends Screen {
 		LocalPlayer player = minecraft != null ? minecraft.player : null;
 		PlayerProgress progress = player == null ? null : player.getAttached(ModAttachments.PROGRESS);
 		return progress == null ? 0L : progress.souls();
+	}
+
+	/** Vero se il giocatore sembra essere dentro il perimetro di un'Associazione. */
+	private boolean atBench() {
+		LocalPlayer player = minecraft != null ? minecraft.player : null;
+		if (player == null) {
+			return false;
+		}
+
+		CityConfig cities = AriseConfig.get().cities();
+		int radius = AriseConfig.get().gems().benchRadius();
+		double limit = (double) radius * radius;
+
+		for (City city : City.values()) {
+			double dx = player.getX() - cities.centreX(city);
+			double dz = player.getZ() - cities.centreZ(city);
+
+			if (dx * dx + dz * dz <= limit) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/** I pezzi che hanno almeno un'incastonatura, indossati per primi. */
@@ -126,15 +154,19 @@ public class GemScreen extends Screen {
 		}
 
 		int row = 0;
+		boolean bench = atBench();
+		long cost = (long) AriseConfig.get().gems().extractCost();
 
 		if (piece != null) {
 			for (Gem gem : piece.gems()) {
 				int y = top + row * ROW_HEIGHT - 2;
 
-				addRenderableWidget(Button.builder(Component.translatable("arise.screen.gem.extract"),
+				Button extract = Button.builder(Component.translatable("arise.screen.gem.extract"),
 								button -> send(GemActionPayload.of(gem.id(), GemActionPayload.Action.EXTRACT)))
 						.bounds(left + PANEL_WIDTH - ACTION_WIDTH - SMALL_WIDTH - 4, y, ACTION_WIDTH, 20)
-						.build());
+						.build();
+				extract.active = bench && souls() >= cost;
+				addRenderableWidget(extract);
 
 				addRenderableWidget(Button.builder(Component.translatable("arise.screen.gem.shatter"),
 								button -> send(GemActionPayload.of(gem.id(), GemActionPayload.Action.SHATTER)))
@@ -253,6 +285,12 @@ public class GemScreen extends Screen {
 		graphics.centeredText(font, title, width / 2, top - 46, COLOR_TITLE);
 		graphics.centeredText(font, Component.translatable("arise.screen.gem.cost",
 				souls(), (long) config.extractCost()), width / 2, top - 34, COLOR_SOULS);
+
+		boolean bench = atBench();
+		graphics.centeredText(font, Component.translatable(bench
+						? "arise.screen.gem.bench_here"
+						: "arise.screen.gem.bench_far"),
+				width / 2, top - 60, bench ? COLOR_BENCH : COLOR_DIM);
 
 		if (piece == null) {
 			graphics.centeredText(font, Component.translatable("arise.screen.gem.no_pieces"),
