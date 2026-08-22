@@ -176,6 +176,10 @@ public class HunterScreen extends Screen {
 		addRenderableWidget(Button.builder(Tab.STASH.label(), button -> switchTo(Tab.STASH))
 				.bounds(left + 84, top - 26, 80, 20).build()).active = tab != Tab.STASH;
 
+		addRenderableWidget(Button.builder(Component.translatable("arise.screen.hunter.gems"),
+						button -> openGems())
+				.bounds(left + PANEL_WIDTH - 80, top - 26, 80, 20).build());
+
 		int index = 0;
 		for (Row row : currentPage()) {
 			int y = top + index * ROW_HEIGHT - 2;
@@ -238,6 +242,12 @@ public class HunterScreen extends Screen {
 		if (fingerprint != lastFingerprint) {
 			lastFingerprint = fingerprint;
 			rebuildWidgets();
+		}
+	}
+
+	private void openGems() {
+		if (minecraft != null) {
+			minecraft.setScreenAndShow(new GemScreen(this));
 		}
 	}
 

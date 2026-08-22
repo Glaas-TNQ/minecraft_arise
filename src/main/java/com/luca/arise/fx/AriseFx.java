@@ -242,6 +242,22 @@ public final class AriseFx {
 		play(player.level(), player.position(), ModSounds.GATE_OPEN, SoundSource.AMBIENT, 0.35F, 0.6F);
 	}
 
+	// ---------------------------------------------------------------- gemme
+
+	/** Una gemma entra in un'incastonatura. */
+	public static void gemSocketed(ServerLevel level, Vec3 position, Rank rank) {
+		FxConfig fx = config();
+		ring(level, position, 0.6, fx.scaled(12), dust(rank.color() & 0xFFFFFF, 1.0F), 0.5);
+		play(level, position, ModSounds.SHOP_DEAL, 0.7F, 1.4F);
+	}
+
+	/** Una gemma ne esce intatta, al banco dell'Associazione. */
+	public static void gemExtracted(ServerLevel level, Vec3 position, Rank rank) {
+		FxConfig fx = config();
+		ring(level, position, 0.9, fx.scaled(14), dust(rank.color() & 0xFFFFFF, 1.0F), -0.1);
+		play(level, position, ModSounds.SHOP_REFRESH, 0.7F, 1.2F);
+	}
+
 	// ---------------------------------------------------------------- l'Abyss Shop
 
 	/** La finestra del Sistema che si apre. Un tintinnio e nient'altro: non e' un evento del mondo. */

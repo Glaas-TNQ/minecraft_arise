@@ -236,6 +236,36 @@ public final class CityManager {
 		return result;
 	}
 
+	/**
+	 * Vero se il giocatore è dentro il perimetro di un'Associazione dei Cacciatori.
+	 *
+	 * <p>Il confronto è sulla distanza dal centro pianificato, non sul segnaposto: leggere il
+	 * segnaposto obbliga a generare il chunk, e questa domanda arriva ogni volta che qualcuno prova
+	 * a estrarre una gemma. Solo quando la distanza torna si va a verificare che la città esista
+	 * davvero.
+	 */
+	public static boolean atAssociation(ServerPlayer player, int radius) {
+		ServerLevel level = player.level() instanceof ServerLevel server ? server : null;
+
+		if (level == null || !level.dimension().equals(Level.OVERWORLD)) {
+			return false;
+		}
+
+		CityConfig config = AriseConfig.get().cities();
+		double limit = (double) radius * radius;
+
+		for (City city : City.values()) {
+			double dx = player.getX() - config.centreX(city);
+			double dz = player.getZ() - config.centreZ(city);
+
+			if (dx * dx + dz * dz <= limit) {
+				return exists(level, city);
+			}
+		}
+
+		return false;
+	}
+
 	/** Il terminale di viaggio di una città, se questa posizione è il suo segnaposto. */
 	public static City terminalAt(Level level, BlockPos pos) {
 		if (!level.getBlockState(pos).is(CityPlan.marker().getBlock())) {

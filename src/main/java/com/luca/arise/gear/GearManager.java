@@ -9,6 +9,7 @@ import java.util.function.BiConsumer;
 
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.GearConfig;
+import com.luca.arise.gem.Gem;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.Rank;
@@ -183,7 +184,7 @@ public final class GearManager {
 
 		List<GearPiece> stash = new ArrayList<>(gear.stash());
 		stash.addAll(removed);
-		set(player, new PlayerGear(kept, stash));
+		set(player, new PlayerGear(kept, stash, gear.pouch()));
 
 		player.sendSystemMessage(Component.translatable("arise.msg.gear.demoted", removed.size()));
 	}
@@ -194,6 +195,14 @@ public final class GearManager {
 		for (GearPiece piece : get(player).equipped()) {
 			for (Map.Entry<Stat, Double> entry : piece.stats().entrySet()) {
 				out.accept(entry.getKey(), entry.getValue());
+			}
+
+			// Le gemme incastonate contano come parte del pezzo che le porta: una gemma nella
+			// sacca non fa niente, ed e' proprio la differenza fra averla e usarla.
+			for (Gem gem : piece.gems()) {
+				for (Map.Entry<Stat, Double> entry : gem.stats().entrySet()) {
+					out.accept(entry.getKey(), entry.getValue());
+				}
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.luca.arise.gem.Gem;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.progress.Stat;
 import com.mojang.serialization.Codec;
@@ -29,10 +30,11 @@ import net.minecraft.network.chat.MutableComponent;
  * proposito: un'ombra deve poter essere riscalata cambiando la config, un pezzo di bottino no —
  * "l'anello che ho trovato ieri" deve restare quello che era ieri.
  *
- * @param sockets incastonature disponibili; le gemme arrivano in B4, il numero si fissa qui
+ * @param sockets quante gemme il pezzo puo' reggere; lo decide il rango e non cambia mai piu'
+ * @param gems    le gemme incastonate, al piu' {@code sockets}
  */
 public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
-		Map<Stat, Double> stats, int sockets) {
+		Map<Stat, Double> stats, int sockets, List<Gem> gems) {
 
 	public static final Codec<GearPiece> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			UUIDUtil.CODEC.fieldOf("id").forGetter(GearPiece::id),
@@ -40,8 +42,16 @@ public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
 			Rank.CODEC.fieldOf("rank").forGetter(GearPiece::rank),
 			GearAffix.CODEC.fieldOf("affix").forGetter(GearPiece::affix),
 			Codec.unboundedMap(Stat.CODEC, Codec.DOUBLE).fieldOf("stats").forGetter(GearPiece::stats),
-			Codec.INT.optionalFieldOf("sockets", 0).forGetter(GearPiece::sockets)
+			Codec.INT.optionalFieldOf("sockets", 0).forGetter(GearPiece::sockets),
+			// Opzionale: i pezzi tirati prima che le gemme esistessero si caricano senza migrazioni.
+			Gem.CODEC.listOf().optionalFieldOf("gems", List.of()).forGetter(GearPiece::gems)
 	).apply(instance, GearPiece::new));
+
+	/** Un pezzo appena tirato: incastonature vuote. */
+	public static GearPiece of(UUID id, GearBase base, Rank rank, GearAffix affix,
+			Map<Stat, Double> stats, int sockets) {
+		return new GearPiece(id, base, rank, affix, stats, sockets, List.of());
+	}
 
 	public GearPiece {
 		// EnumMap e non Map.copyOf: l'ordine di scorrimento diventa quello di dichiarazione delle
@@ -50,6 +60,23 @@ public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
 		EnumMap<Stat, Double> ordered = new EnumMap<>(Stat.class);
 		ordered.putAll(stats);
 		stats = Collections.unmodifiableMap(ordered);
+		gems = List.copyOf(gems);
+	}
+
+	public int freeSockets() {
+		return Math.max(0, sockets - gems.size());
+	}
+
+	public GearPiece withGem(Gem gem) {
+		List<Gem> updated = new ArrayList<>(gems);
+		updated.add(gem);
+		return new GearPiece(id, base, rank, affix, stats, sockets, updated);
+	}
+
+	public GearPiece withoutGem(UUID gemId) {
+		List<Gem> updated = new ArrayList<>(gems);
+		updated.removeIf(gem -> gem.id().equals(gemId));
+		return new GearPiece(id, base, rank, affix, stats, sockets, updated);
 	}
 
 	public GearSlot slot() {

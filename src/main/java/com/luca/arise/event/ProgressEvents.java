@@ -5,6 +5,8 @@ import java.util.UUID;
 import com.luca.arise.ability.AbilityManager;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.gate.GateManager;
+import com.luca.arise.gem.GemManager;
+import com.luca.arise.gem.GemType;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.shadow.ShadowEntity;
@@ -49,15 +51,24 @@ public final class ProgressEvents {
 			ServerPlayer player = resolveOwner(killer);
 
 			if (player != null) {
-				long xp = ProgressManager.xpFor(victim);
+				// Le gemme moltiplicano il bottino della singola uccisione: ametista l'XP, zaffiro
+				// i soul coin. Il tetto lo ha gia' applicato GemManager, qui si legge e basta.
+				long xp = Math.round(ProgressManager.xpFor(victim)
+						* (1.0 + GemManager.effect(player, GemType.AMETHYST)));
+				long souls = Math.round(AriseConfig.get().soulsFor(victim.getMaxHealth())
+						* (1.0 + GemManager.effect(player, GemType.SAPPHIRE)));
+
 				ProgressManager.addXp(player, xp);
-				ProgressManager.addSouls(player, AriseConfig.get().soulsFor(victim.getMaxHealth()));
+				ProgressManager.addSouls(player, souls);
 				ShadowManager.recordKill(player, victim);
 
 				// L'ombra che ha inferto il colpo prende tutta l'XP, le altre evocate una quota.
 				UUID killerShadow = killer instanceof ShadowEntity shadow ? shadow.getShadowId() : null;
 				ShadowManager.awardXp(player, xp, killerShadow);
 				GateManager.onEntityDied(player, victim);
+
+				// Dopo recordKill: l'ossidiana estrae dal cadavere appena registrato.
+				GemEvents.onKill(player);
 			}
 		});
 

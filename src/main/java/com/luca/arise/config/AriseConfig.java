@@ -122,6 +122,11 @@ public record AriseConfig(
 		return hunter.shop();
 	}
 
+	/** Le gemme, scorciatoia per la voce annidata. */
+	public GemConfig gems() {
+		return hunter.gems();
+	}
+
 	/** Il rango di un Cacciatore di questo livello. */
 	public Rank hunterRank(int level) {
 		return hunter.rank(level);

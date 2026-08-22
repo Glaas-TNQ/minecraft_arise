@@ -49,7 +49,7 @@ public final class GearRoll {
 			}
 		}
 
-		return new GearPiece(UUID.randomUUID(), base, rank, GearAffix.of(picked.getFirst()),
+		return GearPiece.of(UUID.randomUUID(), base, rank, GearAffix.of(picked.getFirst()),
 				stats, config.sockets(rank));
 	}
 

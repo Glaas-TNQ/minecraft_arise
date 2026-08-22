@@ -13,6 +13,8 @@ import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.GearRoll;
 import com.luca.arise.gear.GearSlot;
 import com.luca.arise.gear.PlayerGear;
+import com.luca.arise.gem.GemManager;
+import com.luca.arise.gem.GemType;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.ShadowConfig;
@@ -190,6 +192,25 @@ public final class AriseCommands {
 					.executes(context -> clearGear(context.getSource())));
 
 			root.then(gear);
+
+			LiteralArgumentBuilder<CommandSourceStack> gem = Commands.literal("gem");
+			LiteralArgumentBuilder<CommandSourceStack> gemGive = Commands.literal("give")
+					.requires(AriseCommands::canCheat);
+
+			for (GemType type : GemType.values()) {
+				LiteralArgumentBuilder<CommandSourceStack> node = Commands.literal(type.getSerializedName());
+
+				for (Rank rank : Rank.values()) {
+					node.then(Commands.literal(rank.getSerializedName())
+							.executes(context -> playerAction(context.getSource(),
+									player -> GemManager.grant(player, GemManager.roll(player, type, rank)))));
+				}
+
+				gemGive.then(node);
+			}
+
+			gem.then(gemGive);
+			root.then(gem);
 
 			root.then(Commands.literal("shop")
 					.executes(context -> listShop(context.getSource()))
