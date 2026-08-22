@@ -214,7 +214,7 @@ public class AbyssShopScreen extends AriseScreen {
 
 		if (piece.sockets() > 0) {
 			y += 4;
-			graphics.text(font, Component.translatable("arise.screen.hunter.sockets", 0,
+			graphics.text(font, Component.translatable("arise.screen.hunter.sockets",
 					piece.sockets()), left, y, AriseTheme.DISABLED);
 		}
 	}

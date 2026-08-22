@@ -79,7 +79,19 @@ public record AriseConfig(
 	).apply(instance, AriseConfig::new));
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("arise.json");
+
+	/**
+	 * Dove sta il file, chiesto al momento del bisogno e non al caricamento della classe.
+	 *
+	 * <p>Era una costante, e la differenza non e' di stile: una costante interroga
+	 * {@code FabricLoader} mentre la classe si carica, quindi <em>toccare</em>
+	 * {@code AriseConfig} fuori da un gioco avviato faceva esplodere l'inizializzatore statico.
+	 * Fuori da un gioco avviato e' esattamente dove girano le prove, ed e' anche dove serve di piu'
+	 * poter leggere i valori di default.
+	 */
+	private static Path file() {
+		return FabricLoader.getInstance().getConfigDir().resolve("arise.json");
+	}
 
 	private static AriseConfig current = createDefault();
 
@@ -163,14 +175,14 @@ public record AriseConfig(
 	/** Carica la config da disco, scrivendo il file di default se non esiste. */
 	public static void load() {
 		try {
-			if (Files.notExists(FILE)) {
+			if (Files.notExists(file())) {
 				current = createDefault();
 				save();
-				AriseMod.LOGGER.info("Config non trovata: creata con i valori di default in {}", FILE);
+				AriseMod.LOGGER.info("Config non trovata: creata con i valori di default in {}", file());
 				return;
 			}
 
-			JsonElement json = withDefaults(GSON.fromJson(Files.readString(FILE), JsonElement.class));
+			JsonElement json = withDefaults(GSON.fromJson(Files.readString(file()), JsonElement.class));
 			current = CODEC.parse(JsonOps.INSTANCE, json)
 					.resultOrPartial(error -> AriseMod.LOGGER.error("Config non valida: {}", error))
 					.orElseGet(AriseConfig::createDefault);
@@ -223,8 +235,9 @@ public record AriseConfig(
 				.resultOrPartial(error -> AriseMod.LOGGER.error("Impossibile serializzare la config: {}", error))
 				.ifPresent(json -> {
 					try {
-						Files.createDirectories(FILE.getParent());
-						Files.writeString(FILE, GSON.toJson(json));
+						Path target = file();
+						Files.createDirectories(target.getParent());
+						Files.writeString(target, GSON.toJson(json));
 					} catch (IOException e) {
 						AriseMod.LOGGER.error("Impossibile scrivere la config", e);
 					}

@@ -38,3 +38,7 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
+
+# il banco di prova: fabric-loader scrive qui quando i test accendono il gioco
+
+logs/

@@ -27,10 +27,13 @@ aggiorna questa tabella nello stesso commit.
 
 ```powershell
 $env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-25.0.4.7-hotspot"
-.\gradlew.bat build        # compila + remappa il jar
+.\gradlew.bat build        # compila, esegue le prove, remappa il jar
+.\gradlew.bat test         # solo le prove
 .\gradlew.bat runClient    # avvia il client di sviluppo (account fittizio, nessun login)
 .\gradlew.bat runServer    # avvia il server di sviluppo
 .\gradlew.bat --stop       # ferma il daemon se il build si comporta in modo strano
+
+python tools/collaudo.py   # il collaudo statico: esce con 1 se trova qualcosa
 ```
 
 Su macOS e Linux gli stessi comandi sono `./gradlew ...`, con
@@ -193,6 +196,24 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
 3. **La compilazione non è una verifica.** Un sistema è "fatto" quando lo si è visto
    funzionare in `runClient`. Vale soprattutto per AI delle ombre, generazione dungeon e HUD.
 
+   Fra "compila" e "ci ho giocato" ci sono però due reti che si stendono da sole, e vanno tirate
+   **prima** di aprire il gioco, perché trovano in due secondi cose che a mano costerebbero un'ora:
+
+   - **`python tools/collaudo.py`** — il collaudo statico. Chiavi di traduzione mancanti o con gli
+     argomenti che non tornano, suoni che puntano a file inesistenti, modelli e loot table assenti,
+     ricette che nominano oggetti che non esistono, incarichi che aspettano un obiettivo che
+     nessuno fa avanzare, sistemi mai concessi, entità senza renderer, pacchetti senza
+     destinatario. Nessuno di questi dà errore: danno testo grezzo, silenzio, cubi viola e partite
+     bloccate. Esce con 1 se trova qualcosa.
+   - **`.\gradlew.bat test`** — il banco di prova (`src/test`). Ci va la logica che è aritmetica
+     pura: indici delle caselle, vigore di un'anima, curva dei livelli, resa del Banco, geometria
+     del mercato, e soprattutto **i codec che scrivono su disco** — perché un codec sbagliato non
+     dà un errore, dà un giocatore che riapre il mondo senza esercito.
+
+   Quando si aggiunge un sistema si aggiungono anche le sue righe qui. Il collaudo si tara da
+   solo per le chiavi composte: se nasce un enum nuovo che compone chiavi, va aggiunto alla
+   tabella `DYNAMIC` dentro `tools/collaudo.py`.
+
 ### Architettura
 
 4. **La logica sta sul server.** XP, livelli, cooldown, evocazioni, danni: tutto server-side.
@@ -282,9 +303,10 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       (Richiamo, Crogiolo, Fucina, Pozzo), catalizzatori e tratti, ombre cadute con un minuto di
       recupero, `/arise arena` diventata laboratorio — *compilato, server verde, da verificare in
       gioco*
-- [ ] **E1** — La citta' viva: le citta' nascono all'avvio del server invece che alla prima
-      entrata, e passano da 320 a 512 blocchi di lato — *compilato, server verde, da verificare in
-      gioco*
+- [x] **E1** — La citta' viva: le citta' nascono all'avvio del server invece che alla prima
+      entrata, e passano da 320 a 512 blocchi di lato — **verificato**: cinque mondi nuovi su
+      server dedicato, nessun giocatore collegato, coda di cinque città nove secondi dopo l'avvio,
+      ~4 minuti a città. È tutto comportamento di server: non c'è niente da guardare sul client
 - [ ] **E2** — Il Quartiere del Mercato: nove botteghe sulla piazza, cinque mercanti con la
       finestra di scambio vanilla e quattro servizi, Moneta d'Anima coniata al Banco — *compilato,
       server verde, da verificare in gioco*

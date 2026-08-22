@@ -328,5 +328,20 @@
         "pitch": 1.3
       }
     ]
+  },
+  "gear.drop": {
+    "subtitle": "arise.subtitle.gear_drop",
+    "sounds": [
+      {
+        "name": "minecraft:block/amethyst/shimmer",
+        "volume": 0.8,
+        "pitch": 1.2
+      },
+      {
+        "name": "minecraft:block/vault/insert",
+        "volume": 0.6,
+        "pitch": 1.1
+      }
+    ]
   }
 }

@@ -29,6 +29,22 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	// Il banco di prova. Serve a una cosa sola ma indispensabile: eseguire la logica della mod
+	// senza aprire Minecraft. Le regole di gioco che sono aritmetica pura — indici delle caselle,
+	// vigore di un'anima, resa del Banco, curva dei livelli — si sbagliano leggendo e non si
+	// scoprono giocando, perche' un numero sbagliato non ha l'aria di un errore.
+	testImplementation "org.junit.jupiter:junit-jupiter:5.11.3"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+test {
+	useJUnitPlatform()
+
+	testLogging {
+		events "passed", "failed", "skipped"
+		exceptionFormat "full"
+	}
 }
 
 processResources {
