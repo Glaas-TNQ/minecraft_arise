@@ -249,5 +249,22 @@
   "arise.msg.gear.rolled": "Rolled %1$s pieces of rank %2$s.",
   "arise.msg.gear.header": "Rank %1$s hunter — %2$s worn, %3$s stashed.",
   "arise.msg.gear.line": "%1$s — %2$s (%3$s)",
-  "arise.msg.gear.cleared": "Removed %s pieces."
+  "arise.msg.gear.cleared": "Removed %s pieces.",
+  "key.arise.shop": "Abyss Shop",
+  "arise.shop.sealed": "Sealed rank %s package",
+  "arise.screen.shop.title": "Abyss Shop",
+  "arise.screen.shop.balance": "%s soul coins",
+  "arise.screen.shop.empty": "Sold out. Come back next rotation.",
+  "arise.screen.shop.buy": "%s",
+  "arise.screen.shop.refresh": "Reroll stock (%s)",
+  "arise.screen.shop.sealed_hint": "Slot and modifiers show after the purchase.",
+  "arise.subtitle.shop_open": "The System opens a window",
+  "arise.subtitle.shop_deal": "Deal struck",
+  "arise.subtitle.shop_refresh": "The stock turns over",
+  "arise.msg.shop.gone": "That entry is gone.",
+  "arise.msg.shop.no_souls": "You need %1$s soul coins, you have %2$s.",
+  "arise.msg.shop.bought": "Bought: %1$s for %2$s soul coins.",
+  "arise.msg.shop.refreshed": "Stock rerolled for %s soul coins.",
+  "arise.msg.shop.header": "Abyss Shop: %1$s entries, reroll at %2$s soul coins, turns over in ~%3$s minutes.",
+  "arise.msg.shop.line": "%1$s — %2$s soul coins"
 }

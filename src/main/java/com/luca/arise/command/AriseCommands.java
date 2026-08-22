@@ -19,6 +19,9 @@ import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.Stat;
 import com.luca.arise.shadow.ShadowArmy;
+import com.luca.arise.shop.ShopManager;
+import com.luca.arise.shop.ShopOffer;
+import com.luca.arise.shop.ShopStock;
 import com.luca.arise.shadow.ShadowData;
 import com.luca.arise.shadow.ShadowManager;
 import com.luca.arise.shadow.ShadowStance;
@@ -183,6 +186,11 @@ public final class AriseCommands {
 					.executes(context -> clearGear(context.getSource())));
 
 			root.then(gear);
+
+			root.then(Commands.literal("shop")
+					.executes(context -> listShop(context.getSource()))
+					.then(Commands.literal("refresh")
+							.executes(context -> playerAction(context.getSource(), ShopManager::refresh))));
 
 			root.then(Commands.literal("hub")
 					.requires(AriseCommands::canCheat)
@@ -367,6 +375,24 @@ public final class AriseCommands {
 		GearManager.clear(player);
 		source.sendSuccess(() -> Component.translatable("arise.msg.gear.cleared", count), false);
 		return count;
+	}
+
+	/** L'assortimento in chat: serve a provare rotazione e prezzi senza aprire la schermata. */
+	private static int listShop(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		ShopStock stock = ShopManager.stock(player);
+		long minutes = ShopManager.ticksToRotation(player) / 1200L;
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.shop.header",
+				stock.offers().size(), ShopManager.refreshPrice(player), minutes), false);
+
+		for (ShopOffer offer : stock.offers()) {
+			source.sendSuccess(() -> Component.translatable("arise.msg.shop.line",
+					offer.label(), offer.price()), false);
+		}
+
+		return stock.offers().size();
 	}
 
 	private static int listShadows(CommandSourceStack source)

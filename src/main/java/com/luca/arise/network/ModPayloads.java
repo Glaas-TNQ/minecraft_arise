@@ -6,6 +6,7 @@ import com.luca.arise.gate.GateEntity;
 import com.luca.arise.gate.GateManager;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.shop.ShopManager;
 import com.luca.arise.shadow.ShadowManager;
 
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -27,6 +28,7 @@ public final class ModPayloads {
 		PayloadTypeRegistry.serverboundPlay().register(GateActionPayload.TYPE, GateActionPayload.STREAM_CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(CityTravelPayload.TYPE, CityTravelPayload.STREAM_CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(GearActionPayload.TYPE, GearActionPayload.STREAM_CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(ShopActionPayload.TYPE, ShopActionPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(GateOfferPayload.TYPE, GateOfferPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(CityListPayload.TYPE, CityListPayload.STREAM_CODEC);
 
@@ -57,6 +59,18 @@ public final class ModPayloads {
 				};
 
 				player.sendSystemMessage(feedback);
+			});
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(ShopActionPayload.TYPE, (payload, context) -> {
+			context.server().execute(() -> {
+				ServerPlayer player = context.player();
+
+				switch (payload.action()) {
+					case OPEN -> ShopManager.announceOpen(player);
+					case BUY -> player.sendSystemMessage(ShopManager.buy(player, payload.offerId()));
+					case REFRESH -> player.sendSystemMessage(ShopManager.refresh(player));
+				}
 			});
 		});
 

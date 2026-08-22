@@ -117,6 +117,11 @@ public record AriseConfig(
 		return hunter.gear();
 	}
 
+	/** L'Abyss Shop, scorciatoia per la voce annidata. */
+	public ShopConfig shop() {
+		return hunter.shop();
+	}
+
 	/** Il rango di un Cacciatore di questo livello. */
 	public Rank hunterRank(int level) {
 		return hunter.rank(level);

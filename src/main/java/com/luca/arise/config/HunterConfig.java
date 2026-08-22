@@ -19,15 +19,18 @@ public record HunterConfig(
 		/** Il livello a cui si entra in ciascun rango, da E a S. */
 		List<Integer> rankLevels,
 		/** Quanto vale un pezzo di equipaggiamento. */
-		GearConfig gear) {
+		GearConfig gear,
+		/** Prezzi e rotazione dell'Abyss Shop. */
+		ShopConfig shop) {
 
 	public static final Codec<HunterConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.INT.listOf().fieldOf("rank_levels").forGetter(HunterConfig::rankLevels),
-			GearConfig.CODEC.fieldOf("gear").forGetter(HunterConfig::gear)
+			GearConfig.CODEC.fieldOf("gear").forGetter(HunterConfig::gear),
+			ShopConfig.CODEC.fieldOf("shop").forGetter(HunterConfig::shop)
 	).apply(instance, HunterConfig::new));
 
 	public static final HunterConfig DEFAULT =
-			new HunterConfig(List.of(1, 10, 20, 35, 55, 80), GearConfig.DEFAULT);
+			new HunterConfig(List.of(1, 10, 20, 35, 55, 80), GearConfig.DEFAULT, ShopConfig.DEFAULT);
 
 	public HunterConfig {
 		rankLevels = List.copyOf(rankLevels);

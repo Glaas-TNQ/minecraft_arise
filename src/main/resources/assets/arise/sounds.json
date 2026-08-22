@@ -223,5 +223,35 @@
         "pitch": 1.2
       }
     ]
+  },
+  "shop.open": {
+    "subtitle": "arise.subtitle.shop_open",
+    "sounds": [
+      {
+        "name": "minecraft:ui/toast/in",
+        "volume": 0.7,
+        "pitch": 1.1
+      }
+    ]
+  },
+  "shop.deal": {
+    "subtitle": "arise.subtitle.shop_deal",
+    "sounds": [
+      {
+        "name": "minecraft:block/vault/insert",
+        "volume": 0.8,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "shop.refresh": {
+    "subtitle": "arise.subtitle.shop_refresh",
+    "sounds": [
+      {
+        "name": "minecraft:block/amethyst/shimmer",
+        "volume": 0.7,
+        "pitch": 0.9
+      }
+    ]
   }
 }

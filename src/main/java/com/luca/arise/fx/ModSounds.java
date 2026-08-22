@@ -51,6 +51,14 @@ public final class ModSounds {
 	public static final SoundEvent GATE_BOSS = create("gate.boss");
 	public static final SoundEvent GATE_CLEAR = create("gate.clear");
 
+	// ---- l'Abyss Shop
+	/** La finestra del Sistema che si apre. */
+	public static final SoundEvent SHOP_OPEN = create("shop.open");
+	/** Affare concluso. */
+	public static final SoundEvent SHOP_DEAL = create("shop.deal");
+	/** L'assortimento che cambia. */
+	public static final SoundEvent SHOP_REFRESH = create("shop.refresh");
+
 	// ---- le abilità
 	/** Lancio generico, per le abilità che non ne hanno uno proprio. */
 	public static final SoundEvent ABILITY_CAST = create("ability.cast");

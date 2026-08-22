@@ -1,9 +1,11 @@
 package com.luca.arise.client;
 
+import com.luca.arise.client.screen.AbyssShopScreen;
 import com.luca.arise.client.screen.ArmyScreen;
 import com.luca.arise.client.screen.HunterScreen;
 import com.luca.arise.client.screen.StatusScreen;
 import com.luca.arise.network.AriseActionPayload;
+import com.luca.arise.network.ShopActionPayload;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -29,6 +31,9 @@ public final class AriseKeyMappings {
 
 	/** Apre l'equipaggiamento del Cacciatore. N: libero in vanilla e vicino a J e K. */
 	public static final KeyMapping OPEN_GEAR = register("gear", GLFW.GLFW_KEY_N);
+
+	/** Apre l'Abyss Shop. Il negozio è una finestra del Sistema: si apre ovunque. */
+	public static final KeyMapping OPEN_SHOP = register("shop", GLFW.GLFW_KEY_O);
 
 	/** "Arise": estrae l'ombra dal cadavere più vicino. */
 	public static final KeyMapping EXTRACT = register("extract", GLFW.GLFW_KEY_R);
@@ -75,6 +80,13 @@ public final class AriseKeyMappings {
 
 			while (OPEN_GEAR.consumeClick()) {
 				client.setScreenAndShow(new HunterScreen());
+			}
+
+			while (OPEN_SHOP.consumeClick()) {
+				// Il colpetto al server prima della schermata: il negozio si rigenera pigramente,
+				// e senza questo si vedrebbe l'assortimento della rotazione scorsa.
+				ClientPlayNetworking.send(ShopActionPayload.of(ShopActionPayload.Action.OPEN));
+				client.setScreenAndShow(new AbyssShopScreen());
 			}
 
 			sendOnPress(EXTRACT, AriseActionPayload.Action.EXTRACT);

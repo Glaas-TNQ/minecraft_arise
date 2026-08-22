@@ -231,6 +231,27 @@ public final class AriseFx {
 		play(level, position, ModSounds.GATE_OPEN, 0.7F, 1.3F);
 	}
 
+	// ---------------------------------------------------------------- l'Abyss Shop
+
+	/** La finestra del Sistema che si apre. Un tintinnio e nient'altro: non e' un evento del mondo. */
+	public static void shopOpened(ServerLevel level, Vec3 position) {
+		play(level, position, ModSounds.SHOP_OPEN, 0.6F, 1.1F);
+	}
+
+	/** Affare concluso: il colore e' quello del rango comprato. */
+	public static void shopDeal(ServerLevel level, Vec3 position, Rank rank) {
+		FxConfig fx = config();
+		ring(level, position, 0.8, fx.scaled(16), dust(rank.color() & 0xFFFFFF, 1.1F), 0.25);
+		play(level, position, ModSounds.SHOP_DEAL, 0.8F, 1.0F);
+	}
+
+	/** L'assortimento che cambia. */
+	public static void shopRefreshed(ServerLevel level, Vec3 position) {
+		FxConfig fx = config();
+		ring(level, position, 1.0, fx.scaled(14), dust(SHADOW_VIOLET, 0.9F), 0.4);
+		play(level, position, ModSounds.SHOP_REFRESH, 0.7F, 0.9F);
+	}
+
 	// ---------------------------------------------------------------- abilità
 
 	/** Scatto d'ombra: una scia fra le due posizioni, così si legge la direzione. */

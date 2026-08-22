@@ -4,6 +4,7 @@ import com.luca.arise.AriseMod;
 import com.luca.arise.ability.AbilityCooldowns;
 import com.luca.arise.gate.ReturnPoint;
 import com.luca.arise.gear.PlayerGear;
+import com.luca.arise.shop.ShopStock;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.shadow.ShadowArmy;
 import com.luca.arise.shadow.ShadowStance;
@@ -57,6 +58,21 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.syncWith(PlayerGear.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(AriseMod.id("gear"));
+
+	/**
+	 * L'assortimento dell'Abyss Shop, uno per giocatore.
+	 *
+	 * <p>Quello che va salvato non e' l'assortimento in se': quello si rigenera dal seed. Sono
+	 * <em>cosa e' gia' stato comprato</em> e <em>quanti ritiri sono stati pagati</em>. Ecco perche'
+	 * anche questo attachment sopravvive alla morte: senza, morire regalerebbe un negozio nuovo di
+	 * zecca e i ritiri tornerebbero a costare il minimo.
+	 */
+	public static final AttachmentType<ShopStock> SHOP = AttachmentRegistry.<ShopStock>builder()
+			.initializer(() -> ShopStock.EMPTY)
+			.persistent(ShopStock.CODEC)
+			.copyOnDeath()
+			.syncWith(ShopStock.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(AriseMod.id("shop"));
 
 	/**
 	 * Proiezione sincronizzata di quali ombre sono evocate ora.

@@ -249,5 +249,22 @@
   "arise.msg.gear.rolled": "Estratti %1$s pezzi di rango %2$s.",
   "arise.msg.gear.header": "Cacciatore di rango %1$s — %2$s indossati, %3$s nello zaino.",
   "arise.msg.gear.line": "%1$s — %2$s (%3$s)",
-  "arise.msg.gear.cleared": "Rimossi %s pezzi."
+  "arise.msg.gear.cleared": "Rimossi %s pezzi.",
+  "key.arise.shop": "Abyss Shop",
+  "arise.shop.sealed": "Pacchetto sigillato di rango %s",
+  "arise.screen.shop.title": "Abyss Shop",
+  "arise.screen.shop.balance": "%s soul coin",
+  "arise.screen.shop.empty": "L'assortimento e' esaurito. Torna alla prossima rotazione.",
+  "arise.screen.shop.buy": "%s",
+  "arise.screen.shop.refresh": "Ritira l'assortimento (%s)",
+  "arise.screen.shop.sealed_hint": "Slot e modificatori si vedono dopo l'acquisto.",
+  "arise.subtitle.shop_open": "Il Sistema apre una finestra",
+  "arise.subtitle.shop_deal": "Affare concluso",
+  "arise.subtitle.shop_refresh": "L'assortimento cambia",
+  "arise.msg.shop.gone": "Quella voce non c'e' piu'.",
+  "arise.msg.shop.no_souls": "Servono %1$s soul coin, ne hai %2$s.",
+  "arise.msg.shop.bought": "Comprato: %1$s per %2$s soul coin.",
+  "arise.msg.shop.refreshed": "Assortimento ritirato per %s soul coin.",
+  "arise.msg.shop.header": "Abyss Shop: %1$s voci, ritiro a %2$s soul coin, cambia fra ~%3$s minuti.",
+  "arise.msg.shop.line": "%1$s — %2$s soul coin"
 }
