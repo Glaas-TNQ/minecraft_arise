@@ -4,6 +4,7 @@ import com.luca.arise.city.City;
 import com.luca.arise.city.CityManager;
 import com.luca.arise.network.CityListPayload;
 
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -27,6 +28,10 @@ public final class CityEvents {
 
 	public static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(CityManager::tick);
+
+		// Il mondo già pronto: alla prima entrata, le Associazioni che mancano si tirano su da sole.
+		ServerPlayerEvents.JOIN.register(player ->
+				CityManager.onFirstJoin(player.level().getServer(), player));
 
 		// Le costruzioni a metà vivono in memoria: a server fermo non hanno più senso, e tenerle
 		// significherebbe ripartire da uno stato che non corrisponde più a nessun mondo.

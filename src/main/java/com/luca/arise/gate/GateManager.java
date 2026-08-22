@@ -274,10 +274,22 @@ public final class GateManager {
 
 	// ---------------------------------------------------------------- completamento
 
-	/** Chiamato alla morte di ogni creatura: riconosce il boss del Gate del suo uccisore. */
+	/**
+	 * Chiamato alla morte di ogni creatura uccisa da un giocatore.
+	 *
+	 * <p>Due esiti diversi: il boss chiude il Gate e paga tutto, un mob qualunque ogni tanto lascia
+	 * un pezzo lungo la strada. Il controllo su {@code isInGate} non è ridondante rispetto alla
+	 * mappa delle istanze: quella resta aperta anche nell'istante in cui il giocatore ne sta
+	 * uscendo, e senza, un mob ucciso fuori conterebbe lo stesso.
+	 */
 	public static void onEntityDied(ServerPlayer player, LivingEntity victim) {
 		Instance instance = ACTIVE.get(player.getUUID());
-		if (instance == null || instance.bossId() == null || !victim.getUUID().equals(instance.bossId())) {
+		if (instance == null || !isInGate(player)) {
+			return;
+		}
+
+		if (instance.bossId() == null || !victim.getUUID().equals(instance.bossId())) {
+			GateLoot.mobDrop(player, instance.rank());
 			return;
 		}
 

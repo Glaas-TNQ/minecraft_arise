@@ -29,7 +29,11 @@ public record LootConfig(
 		/** Punti in piu' per ogni rango sopra E. */
 		double scrollPointsPerRank,
 		/** Probabilita' che un singolo pezzo esca di un rango sopra quello del Gate. */
-		double upgradeChance) {
+		double upgradeChance,
+		/** Probabilita' che un mob qualunque dentro un Gate lasci un pezzo. */
+		double mobDropChance,
+		/** Probabilita' che quel pezzo sia di un rango sotto quello del Gate. */
+		double mobRankDownChance) {
 
 	public static final Codec<LootConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.DOUBLE.fieldOf("pieces").forGetter(LootConfig::pieces),
@@ -38,10 +42,18 @@ public record LootConfig(
 			Codec.DOUBLE.fieldOf("gem_chance_per_rank").forGetter(LootConfig::gemChancePerRank),
 			Codec.DOUBLE.fieldOf("scroll_points").forGetter(LootConfig::scrollPoints),
 			Codec.DOUBLE.fieldOf("scroll_points_per_rank").forGetter(LootConfig::scrollPointsPerRank),
-			Codec.DOUBLE.fieldOf("upgrade_chance").forGetter(LootConfig::upgradeChance)
+			Codec.DOUBLE.fieldOf("upgrade_chance").forGetter(LootConfig::upgradeChance),
+			Codec.DOUBLE.fieldOf("mob_drop_chance").forGetter(LootConfig::mobDropChance),
+			Codec.DOUBLE.fieldOf("mob_rank_down_chance").forGetter(LootConfig::mobRankDownChance)
 	).apply(instance, LootConfig::new));
 
-	public static final LootConfig DEFAULT = new LootConfig(1.4, 0.5, 0.35, 0.12, 0.6, 0.35, 0.12);
+	/**
+	 * Il 7% sui mob e' tarato su un Gate intero: con una ventina di creature fanno un paio di pezzi
+	 * lungo la strada, che e' quanto basta perche' il percorso valga qualcosa senza che il boss
+	 * finale smetta di essere il momento che conta.
+	 */
+	public static final LootConfig DEFAULT =
+			new LootConfig(1.4, 0.5, 0.35, 0.12, 0.6, 0.35, 0.12, 0.07, 0.6);
 
 	/** Quanti pezzi, dato il rango. La parte decimale resta come probabilita' del pezzo in piu'. */
 	public double pieceCount(int rankOrdinal) {

@@ -150,6 +150,10 @@ public final class AriseCommands {
 			cityBuild.then(Commands.literal("all")
 					.executes(context -> buildAll(context.getSource())));
 
+			city.then(Commands.literal("setup")
+					.requires(AriseCommands::canCheat)
+					.executes(context -> setupWorld(context.getSource())));
+
 			city.then(cityBuild);
 			city.then(cityGo);
 			root.then(city);
@@ -343,6 +347,23 @@ public final class AriseCommands {
 	 * battito. Con cinque cantieri aperti il server piazza cinque volte i blocchi di uno: se il
 	 * gioco scatta, si costruiscono una per volta oppure si abbassa {@code blocks_per_tick}.
 	 */
+	/**
+	 * Il mondo pronto: tira su quello che manca e basta.
+	 *
+	 * <p>Diverso da {@code city build all}, che si lamenta di ogni città già esistente. Qui il
+	 * silenzio su quelle che ci sono già è il comportamento giusto: si sta chiedendo un mondo
+	 * pronto, non cinque costruzioni.
+	 */
+	private static int setupWorld(CommandSourceStack source) {
+		int started = CityManager.setup(source.getServer(), source.getPlayer());
+
+		source.sendSuccess(() -> started == 0
+				? Component.translatable("arise.msg.city.setup_done")
+				: Component.translatable("arise.msg.city.setup", started), true);
+
+		return started;
+	}
+
 	private static int buildAll(CommandSourceStack source) {
 		for (City target : City.values()) {
 			buildCity(source, target);

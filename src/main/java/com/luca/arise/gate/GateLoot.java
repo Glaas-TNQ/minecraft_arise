@@ -74,6 +74,27 @@ public final class GateLoot {
 	}
 
 	/**
+	 * Il pezzo che ogni tanto lascia un mob qualunque dentro un Gate.
+	 *
+	 * <p>Di solito un rango sotto quello del Gate: il bottino della strada non deve competere con
+	 * quello del boss, o l'ultima stanza diventerebbe una formalita' da saltare.
+	 */
+	public static void mobDrop(ServerPlayer player, Rank rank) {
+		AriseConfig config = AriseConfig.get();
+		LootConfig loot = config.gates().loot();
+		RandomSource random = player.level().getRandom();
+
+		if (random.nextDouble() >= loot.mobDropChance()) {
+			return;
+		}
+
+		Rank pieceRank = random.nextDouble() < loot.mobRankDownChance() ? previous(rank) : rank;
+		GearPiece piece = GearRoll.rollAny(config.gear(), pieceRank, random);
+
+		player.sendSystemMessage(GearManager.grant(player, piece));
+	}
+
+	/**
 	 * La pergamena: punti statistica in piu', da spendere dove si vuole.
 	 *
 	 * <p>Non e' un oggetto da tenere in tasca. Un consumabile da usare quando si vuole avrebbe
@@ -101,5 +122,9 @@ public final class GateLoot {
 
 	private static Rank next(Rank rank) {
 		return Rank.values()[Math.min(rank.ordinal() + 1, Rank.values().length - 1)];
+	}
+
+	private static Rank previous(Rank rank) {
+		return Rank.values()[Math.max(rank.ordinal() - 1, 0)];
 	}
 }

@@ -26,9 +26,18 @@ public record CityConfig(
 		/** Larghezza della carreggiata. */
 		int roadWidth,
 		/** Quanti blocchi si piazzano per battito del server. */
-		int blocksPerTick) {
+		int blocksPerTick,
+		/**
+		 * Se le città si tirano su da sole la prima volta che qualcuno entra in un mondo.
+		 *
+		 * <p>Acceso di default: un mondo dove le cinque Associazioni non esistono è un mondo dove
+		 * metà dei sistemi non ha un posto dove succedere. Chi le vuole costruire quando decide lui
+		 * lo spegne qui, e resta {@code /arise city build}.
+		 */
+		boolean autoBuild) {
 
-	public static final CityConfig DEFAULT = new CityConfig(200000, 200000, 15000, 112, 28, 6, 24000);
+	public static final CityConfig DEFAULT =
+			new CityConfig(200000, 200000, 15000, 112, 28, 6, 24000, true);
 
 	public static final Codec<CityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.INT.fieldOf("origin_x").forGetter(CityConfig::originX),
@@ -37,7 +46,8 @@ public record CityConfig(
 			Codec.INT.fieldOf("size").forGetter(CityConfig::size),
 			Codec.INT.fieldOf("block_size").forGetter(CityConfig::blockSize),
 			Codec.INT.fieldOf("road_width").forGetter(CityConfig::roadWidth),
-			Codec.INT.fieldOf("blocks_per_tick").forGetter(CityConfig::blocksPerTick)
+			Codec.INT.fieldOf("blocks_per_tick").forGetter(CityConfig::blocksPerTick),
+			Codec.BOOL.fieldOf("auto_build").forGetter(CityConfig::autoBuild)
 	).apply(instance, CityConfig::new));
 
 	/** L'angolo nord-ovest della città. */

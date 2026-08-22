@@ -311,5 +311,8 @@
   "arise.msg.gem.auto_extract": "The obsidian answers on its own. %s",
   "arise.msg.loot.scroll": "System scroll: +%s stat points.",
   "arise.screen.gem.bench_here": "Association bench within reach",
-  "arise.screen.gem.bench_far": "Far from the bench: here you can only socket or shatter"
+  "arise.screen.gem.bench_far": "Far from the bench: here you can only socket or shatter",
+  "arise.msg.city.auto_build": "The Hunter's Associations don't exist yet: raising %s of them. Give it a moment.",
+  "arise.msg.city.setup": "Started %s builds.",
+  "arise.msg.city.setup_done": "All five Associations are already there."
 }

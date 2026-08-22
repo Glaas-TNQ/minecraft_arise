@@ -54,7 +54,56 @@ public final class CityManager {
 	/** Ogni quanti punti percentuali si dà notizia. */
 	private static final int ANNOUNCE_STEP = 10;
 
+	/**
+	 * Se il controllo di "mondo già pronto" è già stato fatto in questa sessione.
+	 *
+	 * <p>Verificare l'esistenza delle cinque città costa cinque chunk generati a duecentomila
+	 * blocchi dallo spawn: una volta per avvio è il prezzo giusto, a ogni ingresso non lo sarebbe.
+	 */
+	private static boolean autoBuildChecked;
+
 	private CityManager() {
+	}
+
+	// ---------------------------------------------------------------- mondo già pronto
+
+	/**
+	 * Tira su le città che mancano, la prima volta che qualcuno entra nel mondo.
+	 *
+	 * <p>All'ingresso di un giocatore e non all'avvio del server, per due motivi: un server dove
+	 * non entra nessuno non ha motivo di costruire niente, e chi entra vede l'avanzamento invece di
+	 * trovarsi il lavoro già fatto senza sapere da chi.
+	 */
+	public static void onFirstJoin(MinecraftServer server, ServerPlayer player) {
+		if (autoBuildChecked || !AriseConfig.get().cities().autoBuild()) {
+			return;
+		}
+
+		autoBuildChecked = true;
+		int started = setup(server, null);
+
+		if (started > 0) {
+			player.sendSystemMessage(Component.translatable("arise.msg.city.auto_build", started));
+		}
+	}
+
+	/**
+	 * Avvia la costruzione di tutte le città che non ci sono ancora.
+	 *
+	 * @return quante ne sono state avviate
+	 */
+	public static int setup(MinecraftServer server, ServerPlayer requester) {
+		ServerLevel level = server.overworld();
+		int started = 0;
+
+		for (City city : City.values()) {
+			if (!exists(level, city) && !RUNNING.containsKey(city)) {
+				build(server, requester, city);
+				started++;
+			}
+		}
+
+		return started;
 	}
 
 	// ---------------------------------------------------------------- costruzione
@@ -307,6 +356,7 @@ public final class CityManager {
 
 	/** All'arresto del server le costruzioni a metà non hanno senso di sopravvivere in memoria. */
 	public static void clear() {
+		autoBuildChecked = false;
 		RUNNING.clear();
 		REQUESTERS.clear();
 		ANNOUNCED.clear();

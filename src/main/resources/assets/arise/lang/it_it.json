@@ -311,5 +311,8 @@
   "arise.msg.gem.auto_extract": "L'ossidiana risponde da sola. %s",
   "arise.msg.loot.scroll": "Pergamena del Sistema: +%s punti statistica.",
   "arise.screen.gem.bench_here": "Banco dell'Associazione a portata",
-  "arise.screen.gem.bench_far": "Lontano dal banco: qui puoi solo incastonare o rompere"
+  "arise.screen.gem.bench_far": "Lontano dal banco: qui puoi solo incastonare o rompere",
+  "arise.msg.city.auto_build": "Le Associazioni dei Cacciatori non esistono ancora: ne sto tirando su %s. Ci vuole qualche istante.",
+  "arise.msg.city.setup": "Avviate %s costruzioni.",
+  "arise.msg.city.setup_done": "Le cinque Associazioni ci sono gia' tutte."
 }
