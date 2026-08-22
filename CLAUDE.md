@@ -89,6 +89,23 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
    - registri dei pacchetti: `PayloadTypeRegistry.clientboundPlay()` (non `playS2C`);
    - `ServerPlayer` non ha `playNotifySound`: per un suono a un solo giocatore o si costruisce il
      pacchetto a mano, o lo si suona alla sua posizione con `Level.playSound(null, x, y, z, ...)`.
+   - **il codec di un record si ferma a sedici campi**: `RecordCodecBuilder.group(...)` non ne
+     accetta di più. Quando `AriseConfig` ci è arrivata, la via è stata annidare (`HunterConfig`
+     tiene rango, equipaggiamento, negozio e gemme), non spezzare la radice;
+   - `ServerLivingEntityEvents.AFTER_DAMAGE` ha firma `(LivingEntity, DamageSource, float base,
+     float inflitto, boolean parato)`; il danno da spine rientra da lì, quindi ogni effetto che
+     restituisce danno ha bisogno di una guardia contro il rimbalzo infinito;
+   - `DamageSources.thorns(Entity)` esiste; il danno si applica con
+     `LivingEntity.hurtServer(ServerLevel, DamageSource, float)`;
+   - `LevelReader.hasChunkAt(BlockPos)` è il controllo da fare **prima** di leggere il terreno
+     lontano: senza, si obbliga il server a generare chunk che nessuno ha chiesto. `getMinY()`
+     sostituisce `getMinBuildHeight()`, e la solidità si chiede a `BlockState.isSolidRender()`;
+   - gli attributi vanilla utili sono molti più dei quattro ovvi: `ARMOR_TOUGHNESS`, `ATTACK_SPEED`,
+     `KNOCKBACK_RESISTANCE`, `JUMP_STRENGTH`, `ENTITY_INTERACTION_RANGE`, `MAX_ABSORPTION`, `LUCK`,
+     `ATTACK_KNOCKBACK`. Attenzione a `KNOCKBACK_RESISTANCE`, che si ferma a 1;
+   - **`String.format` usa la lingua di sistema**: su una macchina italiana `%.2f` scrive la
+     virgola, quindi ogni trucco del tipo `.replace(".00", "")` non trova mai niente da tagliare.
+     I decimali si tolgono guardando il numero, non la stringa.
 3. **La compilazione non è una verifica.** Un sistema è "fatto" quando lo si è visto
    funzionare in `runClient`. Vale soprattutto per AI delle ombre, generazione dungeon e HUD.
 
@@ -156,5 +173,14 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       *compilato, da verificare*
 - [ ] **F9** — Le città: cinque hub con Associazione dei Cacciatori, costruzione a budget e rete
       di viaggio — *compilato, da verificare*
+- [ ] **B1** — Somma delle sorgenti e inventario del Cacciatore: `StatSources`, dodici statistiche,
+      ventiquattro slot che si sbloccano col rango, zaino, schermata — *compilato, da verificare*
+- [ ] **B2** — Abyss Shop: assortimento tirato da un seed, voci sigillate, ritiro a prezzo
+      crescente — *compilato, da verificare*
+- [ ] **B3** — Varchi spontanei: i Gate si aprono da soli vicino a chi gioca — *compilato, da
+      verificare*
+- [ ] **B4** — Gemme e incastonature: cinque effetti passivi, estrazione al banco dell'Associazione
+      — *compilato, da verificare*
+- [ ] **B5** — Bottino: i Gate lasciano pezzi, gemme e pergamene — *compilato, da verificare*
 
 Aggiorna questa lista quando una fase è **verificata in gioco**, non quando compila.
