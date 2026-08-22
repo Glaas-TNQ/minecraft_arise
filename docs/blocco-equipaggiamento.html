@@ -1,0 +1,758 @@
+<title>Cacciatore equipaggiato</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(142,107,255,0.08), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; }
+
+  /* ---------------------------------------------------------------- avviso */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  /* La numerazione è vera: B1 doveva esistere prima di tutti gli altri. */
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-left: 3px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 460px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 14px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td code { white-space: nowrap; }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  /* checklist di verifica */
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 52px 0 0;
+  }
+
+  footer {
+    margin-top: 26px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocchi B1–B5</p>
+    <h1>Cacciatore equipaggiato</h1>
+    <p class="lede">
+      La mod aveva <strong>progressione senza acquisizione</strong>: i numeri crescevano, ma non si
+      otteneva mai niente, e i soul coin avevano due soli sbocchi. Questi cinque blocchi chiudono il
+      ciclo — <strong>Gate → bottino → equipaggiamento → Gate più profondi</strong> — e aggiungono un
+      mondo che si muove da solo.
+    </p>
+
+    <div class="facts">
+      <span><b>29</b> file nuovi</span>
+      <span><b>135</b> chiavi di traduzione</span>
+      <span><b>6</b> commit</span>
+      <span>repo <b><a href="https://github.com/Glaas-TNQ/minecraft_arise">minecraft_arise</a></b></span>
+      <span>build <b>verde</b></span>
+    </div>
+  </header>
+
+  <div class="notice">
+    <span class="tag">Da verificare in gioco</span>
+    <p>
+      Tutto compila e il jar si costruisce, ma <b>niente di questo è stato visto funzionare</b>: non
+      ho un server su cui girare, perché la EULA di Mojang non è ancora accettata in
+      <code>run/</code>. Le checklist qui sotto sono quello che va guardato. Se accetti la EULA una
+      volta con <code>avvia-server.bat</code>, dal prossimo blocco posso lanciare i comandi e leggere
+      i risultati da solo.
+    </p>
+  </div>
+
+  <!-- ================================================================ B1 -->
+
+  <section>
+    <h2><span class="step">B1</span> Le sorgenti si sommano</h2>
+    <p class="kicker">La rifattorizzazione che doveva venire prima di ogni altra cosa.</p>
+
+    <p>
+      Fino a ieri ogni statistica aveva un modificatore d'attributo con id fisso, riscritto a ogni
+      cambiamento. Con una sola sorgente — i punti spesi — bastava. Con quattro (punti,
+      equipaggiamento, gemme, buff a tempo) la strada facile sarebbe stata un modificatore per
+      sorgente, che è <em>esattamente</em> il bug che quella regola previene: modificatori che si
+      accumulano e non se ne vanno più.
+    </p>
+
+    <div class="panel why">
+      <span class="tag">Come funziona ora</span>
+      <p style="margin:0">
+        Le sorgenti si registrano in <code>StatSources</code>, si sommano lì, e
+        <code>ProgressManager</code> continua a scrivere un modificatore solo per statistica.
+        La regola non è cambiata: è cambiato cosa ci si scrive dentro. Aggiungere una sorgente nuova
+        non tocca niente di tutto questo.
+      </p>
+    </div>
+
+    <p>
+      Conseguenza: <code>Stat</code> passa da quattro voci a dodici. Le prime quattro restano le sole
+      spendibili e le sole nella schermata di stato. Le altre otto esistono perché
+      l'equipaggiamento possa estrarle — senza quella varietà, due pezzi dello stesso slot sarebbero
+      indistinguibili.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Statistica</th><th>Attributo vanilla</th><th>Note</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Tempra</td><td><code>armor_toughness</code></td><td>—</td></tr>
+          <tr><td>Prontezza</td><td><code>attack_speed</code></td><td>percentuale</td></tr>
+          <tr><td>Saldezza</td><td><code>knockback_resistance</code></td><td>l'attributo si ferma a 1: passi minuscoli</td></tr>
+          <tr><td>Slancio</td><td><code>jump_strength</code></td><td>percentuale</td></tr>
+          <tr><td>Allungo</td><td><code>entity_interaction_range</code></td><td>—</td></tr>
+          <tr><td>Egida</td><td><code>max_absorption</code></td><td>cuori gialli</td></tr>
+          <tr><td>Fortuna</td><td><code>luck</code></td><td>pesa sul bottino vanilla</td></tr>
+          <tr><td>Impeto</td><td><code>attack_knockback</code></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>L'equipaggiamento è un dato, non un item</h3>
+    <p>
+      Venti slot per sei ranghi per le varianti fanno centinaia di texture da disegnare a mano, e
+      quelle immagini non si possono generare — Modrinth le vieta. Quindi si applica lo stesso
+      principio già usato per le ombre a riposo: <b>il pezzo posseduto è un record</b>, e a
+      disegnarlo pensa la nostra schermata.
+    </p>
+    <p>
+      Il prezzo, detto chiaro: il pezzo non sta nell'inventario, non si butta per terra, non si passa
+      a un amico dentro un baule. Lo scambio fra giocatori, se servirà, sarà un trasferimento fra due
+      schermate.
+    </p>
+
+    <h3>Ventiquattro posizioni che si aprono</h3>
+    <p>
+      Dodici slot, ventiquattro posizioni. Non ci sono tutte dal primo minuto: venti caselle vuote
+      davanti a un principiante si leggono come una lista di faccende.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Rango</th><th>Si apre</th><th class="num">Anelli</th><th class="num">Orecchini</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>E</td><td>testa, busto, gambe, piedi, mani</td><td class="num">2</td><td class="num">0</td></tr>
+          <tr><td>D</td><td>cintura</td><td class="num">3</td><td class="num">0</td></tr>
+          <tr><td>C</td><td>spalle</td><td class="num">4</td><td class="num">1</td></tr>
+          <tr><td>B</td><td>mantello</td><td class="num">6</td><td class="num">2</td></tr>
+          <tr><td>A</td><td>collo</td><td class="num">8</td><td class="num">3</td></tr>
+          <tr><td>S</td><td>talismano</td><td class="num">10</td><td class="num">4</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      Il rango del Cacciatore si ricava dal livello (1 / 10 / 20 / 35 / 55 / 80, in config) invece di
+      essere un dato a parte: un secondo valore da tenere in sincronia col primo è un secondo valore
+      che prima o poi ci va in disaccordo.
+    </p>
+
+    <div class="verify">
+      <span class="tag">Cosa guardare</span>
+      <ul class="check">
+        <li><code>/arise gear give ring e</code> poi <b>N</b> → scheda <em>Zaino</em> → Indossa. La vita o il danno devono cambiare davvero.</li>
+        <li><code>/arise info</code> prima e dopo: la colonna dell'attributo deve muoversi, i punti spesi no.</li>
+        <li>Morire con roba addosso e tornare: deve esserci ancora tutto.</li>
+        <li><code>/arise level 1</code> con otto anelli addosso: i pezzi in eccesso tornano nello zaino da soli, con un messaggio.</li>
+        <li>Riavviare il server: equipaggiamento e zaino sopravvivono.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ B2 -->
+
+  <section>
+    <h2><span class="step violet">B2</span> Abyss Shop</h2>
+    <p class="kicker">Si apre ovunque con <b>O</b>, perché è una finestra del Sistema.</p>
+
+    <p>
+      L'assortimento non è una decisione salvata voce per voce: si <b>tira da un seed</b> costruito
+      su giocatore, finestra temporale e numero di ritiri. Del salvataggio serve solo cosa è già
+      stato comprato e quanti ritiri sono stati pagati — se il file sparisse, la stessa rotazione
+      rigenererebbe le stesse voci. È l'idea già usata per le offerte dei Gate: il seed è il dato, il
+      resto è conseguenza.
+    </p>
+    <p>
+      Per giocatore e non globale, e non per pigrizia: nella finzione è una finestra del Sistema, non
+      un banco in piazza. In pratica evita la corsa fra due giocatori sullo stesso pezzo, dove il
+      secondo click perde sempre.
+    </p>
+
+    <div class="panel why">
+      <span class="tag">Sigillato</span>
+      <p style="margin:0">
+        Quattro voci mostrano il pezzo: si legge cosa fa prima di pagarlo. Le ultime due sono
+        <b>sigillate</b> — si compra un rango e il pezzo esce all'acquisto — e costano meno perché il
+        rischio lo prende chi paga. È l'unico punto della mod dove si paga senza sapere cosa si
+        prende, ed è voluto che resti una scelta.
+      </p>
+    </div>
+
+    <p>
+      Il prezzo di un pezzo si ricava dalla stessa potenza che lo ha generato, non da una tabella a
+      parte: ritoccare il valore di uno slot in config muove anche il prezzo, invece di lasciarlo
+      indietro in silenzio. Il ritiro dell'assortimento costa <b>400</b> soul coin e si moltiplica per
+      <b>1,8</b> a ogni ritiro dentro la stessa rotazione — è quello che impedisce di trasformare i
+      soul coin in un tiro a ripetizione finché non esce il pezzo giusto.
+    </p>
+
+    <div class="verify">
+      <span class="tag">Cosa guardare</span>
+      <ul class="check">
+        <li><code>/arise souls add 20000</code>, poi <b>O</b>: sei voci, prezzi diversi, le ultime due sigillate.</li>
+        <li>Comprare: il pezzo finisce nello zaino, la voce sparisce, il saldo cala.</li>
+        <li>Con lo zaino pieno, comprare deve <b>rifiutare senza incassare</b>.</li>
+        <li>Ritirare due volte di fila: il secondo ritiro costa quasi il doppio.</li>
+        <li>Uscire, aspettare un giorno di gioco, rientrare: assortimento nuovo e ritiro di nuovo a 400.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ B3 -->
+
+  <section>
+    <h2><span class="step">B3</span> I varchi si aprono da soli</h2>
+    <p class="kicker">La differenza fra una mod e un gioco.</p>
+
+    <p>
+      Finché un Gate esisteva solo scrivendo <code>/arise gate</code>, nel mondo non succedeva mai
+      niente da solo. Ora ogni trenta secondi si tira un dado al 6%: in media un varco ogni otto
+      minuti e mezzo, fra 48 e 160 blocchi, con un tetto di due per volta nel raggio di duecento.
+    </p>
+
+    <div class="panel why">
+      <span class="tag">Due vincoli che hanno deciso il resto</span>
+      <p>
+        <b>Mai generare chunk.</b> Un varco si apre solo dove il mondo è già caricato: cercare un bel
+        posto a duecento blocchi obbligherebbe il server a generare terreno che nessuno ha chiesto,
+        ogni trenta secondi e per ogni giocatore. Il tentativo che cade su un chunk assente si
+        scarta e si ritira il dado.
+      </p>
+      <p style="margin-bottom:0">
+        <b>Nessuna contabilità.</b> Quanti varchi ci sono già attorno si scopre guardando il mondo,
+        non tenendo una lista: una lista sopravvivrebbe ai varchi che descrive, e prima o poi
+        andrebbe in disaccordo con la realtà.
+      </p>
+    </div>
+
+    <p>
+      L'avviso dà rango, distanza approssimata e punto cardinale — non le coordinate. Un varco da
+      cercare vale più di un varco da raggiungere seguendo tre numeri.
+    </p>
+
+    <div class="panel">
+      <p style="margin:0; font-family: var(--mono); font-size: 13.5px; color: var(--muted)">
+        Un varco di rango <span style="color:var(--good)">C</span> si è aperto a circa
+        <span style="color:var(--text)">118</span> blocchi a
+        <span style="color:var(--text)">nord-est</span>.
+      </p>
+    </div>
+
+    <p>
+      Il generatore ha un battito proprio invece di appendersi a quello della progressione: quel
+      ciclo gira ogni venti tick, e un conto «ogni seicento tick» appeso a un ciclo che ne salta
+      diciannove su venti sarebbe vero solo se i due contatori fossero in fase — cosa che nessuno
+      garantisce. Un varco spontaneo vive cinque minuti invece di uno: a centocinquanta blocchi ci
+      vuole il tempo di arrivarci.
+    </p>
+
+    <div class="verify">
+      <span class="tag">Cosa guardare</span>
+      <ul class="check">
+        <li><code>/arise gate spawn</code> più volte: il messaggio dà distanza e direzione giuste, e il varco è davvero lì.</li>
+        <li>Il varco è <b>in piedi sul terreno</b>, non dentro una collina, non sull'acqua, non a mezz'aria.</li>
+        <li>È rivolto verso di te, non di taglio.</li>
+        <li>Chiamarlo cinque volte di fila: dopo due, deve smettere (tetto nel raggio).</li>
+        <li>Lasciarlo stare cinque minuti: si richiude da solo.</li>
+        <li>Restare fermi in un prato una decina di minuti: dovrebbe aprirsene uno senza chiederlo.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ B4 -->
+
+  <section>
+    <h2><span class="step violet">B4</span> Gemme e incastonature</h2>
+    <p class="kicker">Incastonare ovunque, estrarre solo in città.</p>
+
+    <p>
+      La regola che dà forma a tutto il resto: <b>mettere una gemma è un gesto libero, toglierla
+      intatta è un servizio</b>. Si fa solo al banco dell'Associazione dei Cacciatori, entro
+      24 blocchi dal centro di una città, e costa 750 soul coin. È un pozzo di risorse e finalmente
+      un motivo per tornare in città. Chi non vuole viaggiare rompe la gemma: gratis, ovunque, senza
+      ritorno.
+    </p>
+
+    <p>
+      Passivi e non abilità attive. Le abilità sono un enum chiuso di quattro voci legato a quattro
+      tasti e a quattro caselle dell'HUD, e aggiungerne una quinta è un lavoro a sé; un passivo costa
+      un decimo ed è altrettanto interessante.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Gemma</th><th>Effetto</th><th class="num">Tetto</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Ematite</td><td>una quota del danno inferto torna come vita</td><td class="num">25%</td></tr>
+          <tr><td>Ossidiana</td><td>alla morte di un nemico, l'ombra si estrae da sola</td><td class="num">30%</td></tr>
+          <tr><td>Zaffiro</td><td>più soul coin per uccisione</td><td class="num">150%</td></tr>
+          <tr><td>Ametista</td><td>più XP per uccisione</td><td class="num">150%</td></tr>
+          <tr><td>Diaspro</td><td>una quota del danno incassato torna al mittente</td><td class="num">60%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Perché il tetto è la voce più importante della config</span>
+      <p style="margin:0">
+        Dieci anelli di rango S con quattro incastonature ciascuno fanno quaranta gemme. Senza un
+        limite, il furto di vita arriverebbe al cento per cento e il gioco finirebbe lì. Non è
+        bilanciamento fine: è la garanzia che nessuna combinazione possa rompere una regola.
+      </p>
+    </div>
+
+    <p>
+      I cinque effetti sono stati scelti <em>perché</em> capitano in punti che la mod già guarda — un
+      colpo inferto, un colpo incassato, un nemico che cade. Nessun mixin nuovo: un passivo che ne
+      avesse richiesto uno sarebbe stato un passivo per un'altra volta.
+    </p>
+
+    <h3>Tre dettagli risolti subito</h3>
+    <ul>
+      <li>Il danno da spine rientra <b>dallo stesso evento che lo ha generato</b>, quindi fra due portatori di diaspro rimbalzerebbe all'infinito. Un flag durante la restituzione chiude la porta.</li>
+      <li>L'estrazione automatica dell'ossidiana passa dalla stessa porta di quella a comando: stesse probabilità, stesso tetto d'esercito.</li>
+      <li>Una gemma nella sacca non fa niente. Contano solo quelle incastonate in un pezzo <b>indossato</b> — è la differenza fra averla e usarla.</li>
+    </ul>
+
+    <div class="verify">
+      <span class="tag">Cosa guardare</span>
+      <ul class="check">
+        <li><code>/arise gem give hematite b</code>, poi <b>N</b> → <em>Gemme</em>. Serve un pezzo di rango C o sopra: sotto non ha incastonature.</li>
+        <li>Incastonare, poi colpire uno zombie: la vita deve risalire di poco a ogni colpo.</li>
+        <li>Diaspro addosso e farsi colpire: il nemico prende danno di rimando, e <b>il gioco non si blocca</b>.</li>
+        <li>Ametista addosso: <code>/arise info</code> mostra XP che salgono più in fretta per uccisione.</li>
+        <li>Fuori città il bottone <b>Estrai</b> è spento e la riga in alto lo dice; dentro città si accende.</li>
+        <li>Estrarre in città: la gemma torna nella sacca e il saldo cala di 750.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ B5 -->
+
+  <section>
+    <h2><span class="step gold">B5</span> Il bottino chiude il ciclo</h2>
+    <p class="kicker">La ragione per cui il negozio può permettersi di essere caro.</p>
+
+    <p>
+      Un Gate completato lascia pezzi, una gemma ogni tanto e una pergamena. Se il bottino fosse
+      avaro, comprare diventerebbe la prima strada e i Gate un bancomat.
+    </p>
+
+    <p>
+      Tre cose diverse di proposito. I <b>pezzi</b> sono il pane e cadono quasi sempre. La
+      <b>gemma</b> esce ogni tanto perché cambia una regola e non un numero. La <b>pergamena</b> è
+      l'unico modo di guadagnare punti statistica senza salire di livello, e <b>non si compra da
+      nessuna parte</b>: i soul coin si farmano all'infinito, e statistiche comprabili
+      significherebbero statistiche infinite.
+    </p>
+
+    <div class="panel why">
+      <span class="tag">Numeri con la virgola apposta</span>
+      <p style="margin:0">
+        La parte intera è garantita, la decimale è la probabilità di uno in più. «1,4 pezzi» vuol
+        dire davvero uno e quasi mezzo in media, e la curva fra un rango e il successivo resta liscia
+        invece di saltare a scalini. A rango E: 1,4 pezzi, 35% di gemma, 0,6 punti statistica. A
+        rango S: 3,9 pezzi, 95% di gemma, 2,4 punti.
+      </p>
+    </div>
+
+    <p>
+      La pergamena non è un oggetto da tenere in tasca: sarebbe stata un'altra lista da salvare,
+      un'altra schermata e un altro bottone, per una scelta che nessuno rimanderebbe mai. I punti si
+      prendono e basta. La scelta vera — su quale statistica metterli — resta intatta nella
+      schermata di stato.
+    </p>
+
+    <div class="verify">
+      <span class="tag">Cosa guardare</span>
+      <ul class="check">
+        <li>Aprire un varco, entrarci, uccidere il boss: dopo il messaggio di completamento devono arrivare le righe del bottino.</li>
+        <li>I pezzi sono nello zaino, la gemma nella sacca, i punti nella schermata di stato.</li>
+        <li>Farlo con lo zaino pieno: deve dirlo, non far sparire i pezzi in silenzio.</li>
+        <li>Un Gate di rango A deve rendere visibilmente più di uno di rango E.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================================================================ riferimento -->
+
+  <section>
+    <h2>Comandi e tasti</h2>
+    <p class="kicker">Dalla console del server vanno senza la barra davanti.</p>
+
+    <pre><code><span class="c"># equipaggiamento</span>
+/arise gear                        <span class="c">elenco di quello che hai addosso</span>
+/arise gear give <span class="k">&lt;slot&gt; &lt;rango&gt;</span>   <span class="c">un pezzo preciso, es. ring s</span>
+/arise gear roll <span class="k">&lt;rango&gt; [n]</span>       <span class="c">n pezzi a caso, fino a 40</span>
+/arise gear clear                  <span class="c">via tutto</span>
+
+<span class="c"># gemme</span>
+/arise gem give <span class="k">&lt;tipo&gt; &lt;rango&gt;</span>     <span class="c">hematite obsidian sapphire amethyst jasper</span>
+
+<span class="c"># negozio</span>
+/arise shop                        <span class="c">assortimento in chat, col tempo alla rotazione</span>
+/arise shop refresh                <span class="c">ritira pagando</span>
+
+<span class="c"># varchi</span>
+/arise gate spawn                  <span class="c">apre un varco spontaneo qui attorno</span>
+/arise gate <span class="k">&lt;rango&gt;</span>                 <span class="c">ne evoca uno davanti ai piedi</span>
+
+<span class="c"># utili per provare</span>
+/arise souls add 20000
+/arise level <span class="k">&lt;n&gt;</span>                     <span class="c">80 = rango S, tutti gli slot aperti</span></code></pre>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Tasto</th><th>Apre</th></tr></thead>
+        <tbody>
+          <tr><td><code>N</code></td><td>Equipaggiamento del Cacciatore (e da lì le gemme)</td></tr>
+          <tr><td><code>O</code></td><td>Abyss Shop</td></tr>
+          <tr><td><code>K</code> · <code>J</code></td><td>Stato del Sistema · Esercito d'ombra</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================================================================ note -->
+
+  <section>
+    <h2>Cose che devi sapere</h2>
+
+    <ul>
+      <li>
+        <b>La config si aggiorna da sola.</b> Il file <code>config/arise.json</code> che hai già
+        viene letto, completato con le voci nuove e riscritto: i valori che avevi toccato
+        sopravvivono. Le voci nuove sono <code>hunter</code> (rango, equipaggiamento, negozio,
+        gemme), <code>gates.spawn</code> e <code>gates.loot</code>.
+      </li>
+      <li>
+        <b>La CI su GitHub non è nel repo.</b> Il token di <code>gh</code> non ha il permesso
+        <code>workflow</code>, quindi <code>.github/workflows/build.yml</code> è rimasto fuori dal
+        push. Se vuoi la build automatica: <code>gh auth refresh -h github.com -s workflow</code>,
+        poi <code>git add .github &amp;&amp; git commit &amp;&amp; git push</code>.
+      </li>
+      <li>
+        <b>Il rango mostrato nella schermata è calcolato sul client.</b> In singleplayer è
+        identico; su un server dedicato con una config diversa potrebbe non coincidere. Chi valida
+        se uno slot è aperto resta comunque il server.
+      </li>
+      <li>
+        <b>Da guardare con la GUI molto ingrandita.</b> La schermata delle gemme mette in colonna
+        fino a quattro incastonature più quattro gemme della sacca: a scala 4 su uno schermo piccolo
+        potrebbe uscire dal bordo. È la cosa più fragile del lotto.
+      </li>
+      <li>
+        <b>Debito ancora aperto:</b> <code>textures/entity/shadow.png</code> è un segnaposto
+        generato da uno script e va ridisegnato a mano prima di pubblicare — Modrinth vieta le
+        immagini generate.
+      </li>
+    </ul>
+  </section>
+
+  <hr>
+
+  <footer>
+    <p>
+      Il design è scritto in <code>DESIGN-solo-leveling.md</code> §8, e le trappole delle API 26.2
+      incontrate strada facendo sono finite in <code>CLAUDE.md</code> — fra le altre, che il codec di
+      un record si ferma a sedici campi, e che <code>String.format</code> usa la lingua di sistema,
+      il che rende inutile qualunque tentativo di tagliare <code>".00"</code> da una stringa su una
+      macchina italiana.
+    </p>
+  </footer>
+
+</div>
