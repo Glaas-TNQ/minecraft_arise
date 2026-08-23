@@ -196,6 +196,47 @@ class ConfigTest {
 	}
 
 	@Test
+	@DisplayName("la Raccolta d'Essenza chiede sempre meno di quello che il varco contiene")
+	void essenceTargetIsAlwaysReachable() {
+		var gates = AriseConfig.createDefault().gates();
+
+		for (com.luca.arise.progress.Rank rank : com.luca.arise.progress.Rank.values()) {
+			var offer = com.luca.arise.gate.GateOffer.roll(gates, rank, 1234L);
+			int inhabitants = offer.inhabitants(gates);
+			int target = com.luca.arise.gate.GateObjective.ESSENCE.essenceTarget(inhabitants);
+
+			assertTrue(inhabitants > 0, rank + ": un varco senza abitanti non si puo' raccogliere");
+			assertTrue(target > 0, rank + ": un bersaglio a zero sarebbe gia' completo all'ingresso");
+
+			// Il bersaglio deve stare sotto il totale, e con margine: l'ultimo mob di un varco e'
+			// sempre quello incastrato in un angolo, e cercarlo non e' contenuto.
+			assertTrue(target < inhabitants,
+					rank + ": chiedere tutti gli abitanti e' una caccia al mob incastrato");
+		}
+
+		// Gli altri due obiettivi non hanno un bersaglio di uccisioni, e devono dire zero invece di
+		// un numero che nessuno guarda: un contatore che sale durante la Caccia direbbe al
+		// giocatore che sta facendo la cosa giusta mentre perde il tempo che gli serve.
+		assertEquals(0, com.luca.arise.gate.GateObjective.SOVEREIGN.essenceTarget(50));
+		assertEquals(0, com.luca.arise.gate.GateObjective.HUNT.essenceTarget(50));
+	}
+
+	@Test
+	@DisplayName("lo stesso seme da' sempre lo stesso obiettivo: il pannello non puo' mentire")
+	void objectiveComesFromTheSeed() {
+		var gates = AriseConfig.createDefault().gates();
+
+		for (long seed : new long[] {0L, 7L, 42L, -19L, 123456789L}) {
+			var first = com.luca.arise.gate.GateOffer.roll(gates, com.luca.arise.progress.Rank.C, seed);
+			var second = com.luca.arise.gate.GateOffer.roll(gates, com.luca.arise.progress.Rank.C, seed);
+
+			assertEquals(first.objective(), second.objective(),
+					"seme " + seed + ": il pannello promette un obiettivo e il varco ne darebbe un altro");
+			assertEquals(first, second, "seme " + seed + ": l'intero preventivo deve coincidere");
+		}
+	}
+
+	@Test
 	@DisplayName("il cantiere delle citta' ha un tetto di tempo, non solo di blocchi")
 	void cityBuildingIsBounded() {
 		var cities = AriseConfig.createDefault().cities();

@@ -378,6 +378,8 @@ guardi una cosa sola, guarda queste.</p>
     <li><b>Le sette ombre con un nome</b> — Igris, Iron, Beru… → <a href="#nominate">qui sotto</a></li>
     <li><b>Le soglie delle statistiche</b> — a 25, 50 e 100 punti succede qualcosa. → <a href="#soglie">qui sotto</a></li>
     <li><b>Gli affissi dei nemici</b> — sei, dal rango C in su. → <a href="#affissi">qui sotto</a></li>
+    <li><b>Gli obiettivi del varco</b> — tre, e cambiano come lo percorri. → <a href="#obiettivi">i varchi</a></li>
+    <li><b>Il Sovrano a tre fasi</b> — martella, spazza le ombre, e in fondo ti punta. → <a href="#varchi">i varchi</a></li>
     <li><b>La Pergamena del Rimpianto</b> — il respec. → <a href="#roba">roba</a></li>
     <li><b>Shift + <kbd>R</kbd></b> — guarda il cadavere prima di bruciarlo. → <a href="#esercito">l'esercito</a></li>
     <li><b>Tre istruzioni che mentivano</b> a chi rimappa i tasti — corrette.</li>
@@ -463,6 +465,22 @@ mob affissi nella stessa stanza. Il nome sopra la testa lo dice, e ognuno ha una
 </div>
 <p style="color: var(--muted); font-size: 14.5px;">Per provarli:
 <code>/arise gate affix &lt;nome&gt;</code> li mette addosso al mob più vicino.</p>
+
+<h3 id="fasi">Il Sovrano a tre fasi</h3>
+<p>Non è più un mob vanilla con la vita moltiplicata. Ogni fase <b>aggiunge una regola</b>, mai un
+attacco nuovo — è la differenza fra un boss che si impara e uno che si subisce.</p>
+<ul class="tight">
+  <li><b>Dalla piena ai due terzi</b> — la <b>martellata</b>. Un anello rosso compare sotto i tuoi
+  piedi, poco più di un secondo, poi il colpo cade lì. Si esce camminando: è l'unico pattern, e
+  serve a impararlo.</li>
+  <li><b>Sotto i due terzi</b> — martella più spesso e <b>spazza le ombre</b>: non le distrugge, le
+  fa cadere, e cadere costa un minuto di recupero. L'esercito smette di essere un pilota automatico
+  e diventa una risorsa che si consuma.</li>
+  <li><b>Sotto un terzo</b> — <b>ti vede attraverso l'ombra</b> e punta te. È il momento in cui devi
+  giocare in prima persona, almeno una volta per incontro.</li>
+</ul>
+<p>Ogni cambio di fase si annuncia con un titolo e un suono grave: se cominci a perdere e non sai
+perché, guarda in alto.</p>
 
 <!-- ══════════════════════════════════════════════════════════════ INIZIO -->
 
@@ -779,6 +797,25 @@ può mentire.</p>
   <div class="card"><h4>Sculk</h4><p>Il buio che sente.</p></div>
   <div class="card"><h4>Vuoto</h4><p>Endstone e niente.</p></div>
 </div>
+
+<h3 id="obiettivi">Perché ci sei entrato</h3>
+<p>Non tutti i varchi chiedono la stessa cosa. L'obiettivo è nel seme come tutto il resto, e
+<b>si legge nel pannello prima di entrare</b>: guardi il varco, vedi che chiede fretta, e decidi se
+stasera hai voglia di correre.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Obiettivo</th><th>Cosa chiede</th><th>Come cambia la strada</th></tr></thead>
+  <tbody>
+    <tr><td class="q">Il Sovrano</td><td>Abbatti il guardiano</td><td>Quello di sempre: si corre in fondo</td></tr>
+    <tr><td class="q" style="color:#8E6BFF">Raccolta d'Essenza</td><td>Ripulisci i tre quarti degli abitanti</td><td>Si apre tutto. <b>Il guardiano diventa facoltativo</b> — e con lui lo scontro che non puoi vincere</td></tr>
+    <tr><td class="q" style="color:#E8A34F">La caccia</td><td>Il Sovrano, entro quattro minuti</td><td>Il contrario esatto: ogni stanza che ripulisci è tempo che non hai. Per la prima volta scappare è la mossa giusta</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Un obiettivo diverso dal Sovrano, portato a casa, paga <b>metà in più</b> in XP e soul coin.
+La caccia scaduta non ti chiude dentro: perdi il premio della fretta, e il varco torna a essere un
+Sovrano qualunque. Il Sovrano esce tre volte su quattro — è quello che il gioco ti ha insegnato,
+ed è quello che vuoi quando hai in testa qualcos'altro.</p>
 
 <h3>Dentro</h3>
 <p>Il Gate ha una sua dimensione e una pianta generata: da <b>5 a 8 stanze</b> in fila, più

@@ -35,9 +35,10 @@ import net.minecraft.util.RandomSource;
  * @param boss    chi lo custodisce — deciso ora, non all'ingresso
  * @param xp      XP di completamento
  * @param souls   soul coin di completamento
+ * @param objective perche' ci si entra: e' cio' che decide come lo si percorre
  */
 public record GateOffer(Rank rank, long seed, GateTheme theme, int rooms, int halls, int branches,
-		List<Identifier> mobs, Identifier boss, long xp, long souls) {
+		List<Identifier> mobs, Identifier boss, long xp, long souls, GateObjective objective) {
 
 	public static final Codec<GateOffer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Rank.CODEC.fieldOf("rank").forGetter(GateOffer::rank),
@@ -49,7 +50,11 @@ public record GateOffer(Rank rank, long seed, GateTheme theme, int rooms, int ha
 			Identifier.CODEC.listOf().fieldOf("mobs").forGetter(GateOffer::mobs),
 			Identifier.CODEC.fieldOf("boss").forGetter(GateOffer::boss),
 			Codec.LONG.fieldOf("xp").forGetter(GateOffer::xp),
-			Codec.LONG.fieldOf("souls").forGetter(GateOffer::souls)
+			Codec.LONG.fieldOf("souls").forGetter(GateOffer::souls),
+			// Opzionale: i varchi gia' aperti quando gli obiettivi non esistevano si rileggono
+			// interi, e chiedono la cosa che hanno sempre chiesto.
+			GateObjective.CODEC.optionalFieldOf("objective", GateObjective.SOVEREIGN)
+					.forGetter(GateOffer::objective)
 	).apply(instance, GateOffer::new));
 
 	public static final StreamCodec<RegistryFriendlyByteBuf, GateOffer> STREAM_CODEC =
@@ -86,12 +91,37 @@ public record GateOffer(Rank rank, long seed, GateTheme theme, int rooms, int ha
 		Identifier boss = bosses.get(random.nextInt(bosses.size()));
 
 		return new GateOffer(rank, seed, theme, layout.rooms().size(), halls, branches,
-				config.mobsFor(rank), boss, config.clearXp(rank), config.clearSouls(rank));
+				config.mobsFor(rank), boss, config.clearXp(rank), config.clearSouls(rank),
+				GateObjective.roll(random));
 	}
 
 	/** La pianta promessa da questo preventivo. Ricostruirla è deterministico: è il punto. */
 	public GateLayout layout(GateConfig config) {
 		return GateLayout.generate(config, RandomSource.create(seed));
+	}
+
+	/**
+	 * Quante creature abitano questo varco, contate come le pianta il generatore.
+	 *
+	 * <p>Serve al bersaglio della Raccolta d'Essenza, e va calcolato <em>qui</em> e non dentro il
+	 * Gate: il pannello di analisi deve poterlo dire prima di entrare, e per farlo ha solo il
+	 * preventivo. La formula e' la stessa di {@code GateManager.populate} — se le due divergessero,
+	 * il pannello prometterebbe un bersaglio che il varco non puo' soddisfare.
+	 */
+	public int inhabitants(GateConfig config) {
+		int perRoom = config.mobsPerRoom(rank);
+		int total = 0;
+
+		for (GateLayout.Kind kind : layout(config).rooms().values()) {
+			total += switch (kind) {
+				case ENTRANCE, BOSS -> 0;
+				case HALL -> perRoom + 2;
+				case SIDE -> Math.max(1, perRoom - 1);
+				default -> perRoom;
+			};
+		}
+
+		return total;
 	}
 
 	/** Stanze del percorso principale: il totale meno le diramazioni. */

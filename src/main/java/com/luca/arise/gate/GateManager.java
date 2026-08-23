@@ -196,6 +196,18 @@ public final class GateManager {
 		player.teleportTo(gate, entrance.x(), entrance.y(), entrance.z(), Set.of(), player.getYRot(), 0.0F, true);
 		AriseFx.gateEntered(gate, entrance, offer.rank());
 
+		if (offer.objective() == GateObjective.HUNT) {
+			HUNT_DEADLINE.put(player.getUUID(),
+					gate.getGameTime() + GateObjective.HUNT_TICKS);
+		}
+
+		if (offer.objective() != GateObjective.SOVEREIGN) {
+			// L'obiettivo si e' gia' letto nel pannello, ma il pannello si chiude: la riga
+			// all'ingresso e' quella che il giocatore ha davanti mentre decide da che parte andare.
+			player.sendSystemMessage(Component.translatable("arise.msg.gate.objective",
+					offer.objective().label(), offer.objective().description()));
+		}
+
 		if (red) {
 			// Il varco si chiude adesso, e il giocatore lo scopre adesso. E' l'unico momento di
 			// tutta la mod in cui il gioco toglie qualcosa invece di darla, e va detto forte.
@@ -224,6 +236,21 @@ public final class GateManager {
 		Instance instance = ACTIVE.get(player.getUUID());
 		return instance != null && instance.red() && isInGate(player);
 	}
+
+	/**
+	 * Chi ha gia' completato il varco in cui si trova.
+	 *
+	 * <p>Perche' le fini sono tre e possono capitare due volte: un giocatore che riempie la barra
+	 * dell'Essenza e poi decide di uccidere comunque il Sovrano ha diritto a farlo, e non a essere
+	 * pagato due volte.
+	 */
+	private static final java.util.Set<UUID> COMPLETED = new java.util.HashSet<>();
+
+	/** giocatore → quante creature ha abbattuto in questo varco. Serve alla Raccolta d'Essenza. */
+	private static final Map<UUID, Integer> SLAIN = new HashMap<>();
+
+	/** giocatore → a che tick di gioco scade la Caccia. Assente se questo varco non la chiede. */
+	private static final Map<UUID, Long> HUNT_DEADLINE = new HashMap<>();
 
 	private static int allocateRegion() {
 		int index = 0;
@@ -350,11 +377,72 @@ public final class GateManager {
 
 		if (instance.bossId() == null || !victim.getUUID().equals(instance.bossId())) {
 			GateLoot.mobDrop(player, instance.rank(), victim.position());
+			countTowardsEssence(player, instance);
 			return;
 		}
 
-		long xp = instance.offer().xp();
-		long souls = instance.offer().souls();
+		complete(player, instance);
+	}
+
+	/**
+	 * Una creatura in meno, e forse il varco e' finito.
+	 *
+	 * <p>Solo per la Raccolta d'Essenza: negli altri due obiettivi ripulire una stanza e' una scelta
+	 * tattica, non un progresso, e un contatore che salisse comunque direbbe al giocatore che sta
+	 * facendo la cosa giusta mentre perde tempo.
+	 */
+	private static void countTowardsEssence(ServerPlayer player, Instance instance) {
+		GateObjective objective = instance.offer().objective();
+
+		if (objective != GateObjective.ESSENCE) {
+			return;
+		}
+
+		int target = objective.essenceTarget(instance.offer().inhabitants(AriseConfig.get().gates()));
+		int slain = SLAIN.merge(player.getUUID(), 1, Integer::sum);
+
+		if (slain < target) {
+			Overlay.actionBar(player, Component.translatable("arise.msg.gate.essence",
+					slain, target));
+			return;
+		}
+
+		complete(player, instance);
+	}
+
+	/**
+	 * Il varco e' finito: paga, apre l'uscita, e lo fa una volta sola.
+	 *
+	 * <p>Prima stava dentro la morte del boss, perche' quella era l'unica fine possibile. Adesso le
+	 * fini sono tre — il Sovrano, la barra piena, il Sovrano entro il tempo — e il pagamento sta
+	 * fuori da tutte e tre: se restasse attaccato a una, le altre due chiuderebbero un varco senza
+	 * ricompensarlo.
+	 */
+	private static void complete(ServerPlayer player, Instance instance) {
+		if (!ACTIVE.containsKey(player.getUUID()) || COMPLETED.contains(player.getUUID())) {
+			return;
+		}
+
+		COMPLETED.add(player.getUUID());
+
+		GateObjective objective = instance.offer().objective();
+		boolean inTime = objective != GateObjective.HUNT
+				|| player.level().getGameTime() <= HUNT_DEADLINE.getOrDefault(player.getUUID(),
+						Long.MAX_VALUE);
+
+		// Il premio della fretta e della fatica: mezzo in piu' su XP e soul coin. Un obiettivo
+		// diverso che pagasse uguale sarebbe una variazione senza motivo di sceglierla.
+		double bonus = objective == GateObjective.SOVEREIGN || !inTime
+				? 1.0
+				: 1.0 + GateObjective.BONUS;
+
+		long xp = Math.round(instance.offer().xp() * bonus);
+		long souls = Math.round(instance.offer().souls() * bonus);
+
+		if (objective == GateObjective.HUNT && !inTime) {
+			player.sendSystemMessage(Component.translatable("arise.msg.gate.hunt_late")
+					.withStyle(net.minecraft.ChatFormatting.GRAY));
+		}
 
 		ProgressManager.addXp(player, xp);
 		ProgressManager.addSouls(player, souls);
@@ -525,6 +613,9 @@ public final class GateManager {
 		USED_REGIONS.remove(instance.regionIndex());
 		BOSS_GREETED.remove(player.getUUID());
 		GateBoss.forget(player.getUUID());
+		COMPLETED.remove(player.getUUID());
+		SLAIN.remove(player.getUUID());
+		HUNT_DEADLINE.remove(player.getUUID());
 	}
 
 	/**
@@ -555,6 +646,8 @@ public final class GateManager {
 			bite(player);
 		}
 
+		countdown(player, instance);
+
 		// Il Sovrano batte dentro il battito del giocatore che lo sta combattendo: non ha un tick
 		// suo, e cosi' non ne consuma nessuno quando nella sua sala non c'e' nessuno.
 		if (player.level() instanceof ServerLevel gate) {
@@ -565,6 +658,33 @@ public final class GateManager {
 		if (player.getRandom().nextFloat() < AMBIENCE_CHANCE) {
 			AriseFx.gateAmbience(player);
 		}
+	}
+
+	/**
+	 * Il tempo che resta alla Caccia, scritto sopra la hotbar.
+	 *
+	 * <p>Un obiettivo a tempo senza il tempo visibile e' un obiettivo a tradimento. Sta nella barra
+	 * d'azione e non in chat per lo stesso motivo per cui ci sta il contatore degli incarichi: e'
+	 * un numero che cambia, e i numeri che cambiano in chat diventano venti righe.
+	 */
+	private static void countdown(ServerPlayer player, Instance instance) {
+		Long deadline = HUNT_DEADLINE.get(player.getUUID());
+
+		if (deadline == null || COMPLETED.contains(player.getUUID())) {
+			return;
+		}
+
+		long left = deadline - player.level().getGameTime();
+
+		if (left <= 0) {
+			HUNT_DEADLINE.remove(player.getUUID());
+			player.sendSystemMessage(Component.translatable("arise.msg.gate.hunt_over")
+					.withStyle(net.minecraft.ChatFormatting.GRAY));
+			return;
+		}
+
+		Overlay.actionBar(player, Component.translatable("arise.msg.gate.hunt_left",
+				left / 1200, (left / 20) % 60));
 	}
 
 	/**

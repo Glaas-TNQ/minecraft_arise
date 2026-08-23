@@ -27,7 +27,7 @@ import net.minecraft.world.entity.EntityType;
 public class GateOfferScreen extends AriseScreen {
 
 	private static final int PANEL_W = 320;
-	private static final int PANEL_H = 250;
+	private static final int PANEL_H = 274;
 	private static final int LABEL_W = 92;
 
 	/** Sotto questa soglia il tempo residuo passa in rosso: il varco sta per chiudersi. */
@@ -121,6 +121,14 @@ public class GateOfferScreen extends AriseScreen {
 		int y = bodyTop() + 6;
 
 		row(graphics, "arise.screen.gate.rank", offer.rank().label(), left, y, offer.rank().color());
+		y += 13;
+
+		// L'obiettivo per primo dopo il rango, e non in fondo: e' la voce che decide come si
+		// percorrera' il varco, e va letta prima di tutto quello che descrive com'e' fatto.
+		row(graphics, "arise.screen.gate.objective", offer.objective().label(), left, y,
+				0xFF000000 | offer.objective().color());
+		y += 11;
+		graphics.text(font, offer.objective().description(), left, y, AriseTheme.MUTED);
 		y += 13;
 		row(graphics, "arise.screen.gate.theme", offer.theme().label(), left, y,
 				0xFF000000 | offer.theme().color());
