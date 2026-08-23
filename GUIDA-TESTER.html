@@ -391,6 +391,8 @@ guardi una cosa sola, guarda queste.</p>
     aperto. Al rango S lo sanno tutti quelli collegati. → <a href="#rango">qui sotto</a></li>
     <li><b><code>/arise doctor</code></b> — la scheda da incollare in una segnalazione.
     → <a href="#segnalare">in fondo</a></li>
+    <li><b>Sei interruttori</b> per spegnere quello che dà fastidio senza riavviare.
+    → <a href="#spegnere">qui sotto</a></li>
     <li><b>Tre istruzioni che mentivano</b> a chi rimappa i tasti — corrette.</li>
   </ol>
 </div>
@@ -1322,6 +1324,64 @@ che ti serviamo.</p>
   secondo ti è aperto, e <em>non</em> deve lasciarti saltare al quinto. Poi <code>/arise abyss 5</code>
   quando ci arrivi: da lì ogni stanza ha un mob con un affisso.</li>
 </ul>
+
+<h3 id="spegnere">Se qualcosa dà fastidio, si spegne</h3>
+
+<p>Tutto quello che segue sta in <code>config/arise.json</code> — il percorso esatto te lo dice
+<code>/arise doctor</code>, ultima riga. Si cambia col gioco aperto e si applica con
+<code>/arise config reload</code>: non serve riavviare il mondo. <b>Ogni riga qui sotto è stata
+verificata leggendo il codice che la legge</b>, non la documentazione.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Cosa spegne</th><th>Dove</th><th>Valore</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><b>I varchi che si aprono da soli</b>, e con loro i Dungeon Break</td>
+      <td><code>gates.spawn.enabled</code></td>
+      <td><code>false</code></td>
+    </tr>
+    <tr>
+      <td><b>Solo i Dungeon Break</b> — i varchi continuano ad aprirsi, ma nessuno cede più</td>
+      <td><code>gates.spawn.break_chance</code></td>
+      <td><code>0.0</code></td>
+    </tr>
+    <tr>
+      <td><b>La Quest Giornaliera</b> e con lei la Zona di Penalità</td>
+      <td><code>daily.enabled</code></td>
+      <td><code>false</code></td>
+    </tr>
+    <tr>
+      <td><b>L'Officina delle Anime</b> — i macchinari smettono di aprirsi e di macinare</td>
+      <td><code>hunter.workshop.enabled</code></td>
+      <td><code>false</code></td>
+    </tr>
+    <tr>
+      <td><b>L'aura sotto le ombre evocate</b>, se con l'esercito fuori il gioco arranca</td>
+      <td><code>fx.shadow_aura</code></td>
+      <td><code>false</code></td>
+    </tr>
+    <tr>
+      <td><b>Metà dei particellari</b> ovunque, senza toglierne nessuno del tutto</td>
+      <td><code>fx.effect_scale</code></td>
+      <td><code>0.5</code></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="callout-title">Spegnere la giornaliera non ti lascia dentro</p>
+  <p>Era un difetto vero, trovato stasera rileggendo il codice invece che giocandoci: la Zona di
+  Penalità non ha porte, e il battito che ti fa uscire è lo stesso che il sistema spento non esegue
+  più. Chi spegneva la giornaliera mentre scontava restava murato.</p>
+  <p>Peggio: l'elenco di chi sta scontando vive in memoria, il mondo no — quindi <em>bastava un
+  riavvio del server</em>. Adesso la regola è una sola: chi si trova nella Zona senza risultare fra
+  quelli che la stanno scontando torna a casa al battito dopo. Vale per lo spegnimento, per il
+  riavvio, e per chiunque ci arrivi con un teletrasporto.</p>
+  <p><b>Vale la pena provarlo:</b> <code>/arise daily penalty</code>, poi esci dal mondo e rientra.
+  Devi ritrovarti dove eri prima, non nel deserto.</p>
+</div>
 
 <div class="panel gold">
   <p class="callout-title" id="segnalare">Una segnalazione utile</p>

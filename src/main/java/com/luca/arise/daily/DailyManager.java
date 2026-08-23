@@ -149,7 +149,25 @@ public final class DailyManager {
 	public static void tick(ServerPlayer player) {
 		DailyConfig config = AriseConfig.get().daily();
 
-		if (!config.enabled() || !(player.level() instanceof ServerLevel level)) {
+		if (!(player.level() instanceof ServerLevel level)) {
+			return;
+		}
+
+		// Chi si trova nella Zona senza essere nell'elenco di chi la sta scontando e' un residuo, e
+		// va rimandato a casa prima di ogni altra cosa. La Zona non ha porte: se il battito non lo
+		// libera, non lo libera nessuno.
+		//
+		// Il caso non e' ipotetico, e' garantito. L'elenco vive in memoria e il mondo no, quindi
+		// basta un riavvio del server con qualcuno dentro. Ci arrivano anche due strade piu' corte:
+		// spegnere `daily.enabled` mentre uno sconta — il battito usciva subito, e la penalita'
+		// diventava un ergastolo — e un teletrasporto arrivato da fuori. Tre cause, una regola:
+		// nell'elenco o fuori dalla Zona, mai nessuna delle due.
+		if (PenaltyZone.contains(player) && !SURVIVING.containsKey(player.getUUID())) {
+			GateManager.sendHome(player);
+			return;
+		}
+
+		if (!config.enabled()) {
 			return;
 		}
 
