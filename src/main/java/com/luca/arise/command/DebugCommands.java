@@ -130,16 +130,22 @@ public final class DebugCommands {
 										ResourceArgument.getResource(context, "tipo", Registries.ENTITY_TYPE),
 										IntegerArgumentType.getInteger(context, "quantita"))))));
 
-		LiteralArgumentBuilder<CommandSourceStack> gear = Commands.literal("gear")
+		// "kit" e non "gear": il corredo vanilla di debug non e' l'equipaggiamento del Sistema, e
+		// finche' si chiamava allo stesso modo i due nodi si fondevano. Brigadier, in
+		// CommandNode.addChild, sovrascrive l'executes del nodo che trova e **non** ne fonde il
+		// requires: /arise gear smetteva di elencare i pezzi indossati e regalava un completo di
+		// netherite incantato — a chiunque, permessi compresi, perche' il nodo che restava era
+		// quello senza requires.
+		LiteralArgumentBuilder<CommandSourceStack> kit = Commands.literal("kit")
 				.requires(AriseCommands::canCheat)
 				.executes(context -> giveGear(context.getSource(), Gear.NETHERITE, buildContext));
 
 		for (Gear tier : Gear.values()) {
-			gear.then(Commands.literal(tier.name)
+			kit.then(Commands.literal(tier.name)
 					.executes(context -> giveGear(context.getSource(), tier, buildContext)));
 		}
 
-		root.then(gear);
+		root.then(kit);
 
 		LiteralArgumentBuilder<CommandSourceStack> fx = Commands.literal("fx")
 				.requires(AriseCommands::canCheat);

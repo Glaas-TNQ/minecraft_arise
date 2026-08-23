@@ -327,7 +327,7 @@
   "arise.quest.first_gate.lore": "I varchi si aprono da soli, dove il mondo è più sottile. Chiuderne uno vuol dire entrarci e abbattere ciò che lo tiene aperto.",
   "arise.quest.first_shadow": "La prima ombra",
   "arise.quest.first_shadow.brief": "Premi %s vicino a un cadavere fresco: hai pochi secondi prima che l'ombra svanisca.",
-  "arise.quest.first_shadow.goal": "Estrai %s ombra da un caduto, con il tasto R.",
+  "arise.quest.first_shadow.goal": "Estrai %s ombra da un caduto.",
   "arise.quest.first_shadow.lore": "Un corpo appena caduto trattiene l'ombra ancora per poco. Poi si dissolve, e quel soldato non tornerà.",
   "arise.quest.first_steps": "Primi passi",
   "arise.quest.first_steps.brief": "L'esperienza arriva uccidendo. Il riquadro in alto a sinistra dice quanto manca al livello dopo.",

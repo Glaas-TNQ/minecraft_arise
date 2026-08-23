@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arise — Guida del Cacciatore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 600px at 50% -200px, rgba(79,195,247,0.08), transparent 70%),
+      var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 24px 120px; }
+
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(79,195,247,0.35); }
+  a:hover { border-bottom-color: var(--accent); }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 27px;
+    letter-spacing: 0.01em;
+    margin: 64px 0 6px;
+    padding-top: 8px;
+  }
+  h3 {
+    font-family: var(--display);
+    font-size: 19px;
+    margin: 32px 0 8px;
+    color: var(--text);
+  }
+  p { margin: 0 0 14px; }
+
+  .lede { color: var(--muted); font-size: 17px; margin-bottom: 28px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    background: linear-gradient(180deg, rgba(79,195,247,0.10), transparent 65%), var(--panel-soft);
+    padding: 40px 32px 34px;
+    position: relative;
+    overflow: hidden;
+  }
+  .masthead::after {
+    content: "";
+    position: absolute;
+    inset: auto -40px -80px auto;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(142,107,255,0.16), transparent 65%);
+    pointer-events: none;
+  }
+  .masthead h1 {
+    font-family: var(--display);
+    font-size: 52px;
+    line-height: 1.05;
+    margin: 0 0 10px;
+    letter-spacing: 0.02em;
+  }
+  .masthead .sub { color: var(--muted); font-size: 18px; margin: 0; max-width: 62ch; }
+
+  .quote {
+    font-family: var(--display);
+    font-size: 18px;
+    color: var(--accent);
+    border-left: 2px solid var(--accent);
+    padding: 2px 0 2px 16px;
+    margin: 26px 0 0;
+    max-width: 60ch;
+  }
+
+  /* ---------------------------------------------------------------- indice */
+
+  .toc {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1px;
+    background: var(--line-soft);
+    border: 1px solid var(--line);
+    margin: 32px 0 0;
+  }
+  .toc a {
+    background: var(--panel-soft);
+    padding: 14px 16px;
+    border: 0;
+    display: block;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    transition: background .12s, color .12s;
+  }
+  .toc a:hover { background: var(--panel); color: var(--text); }
+  .toc a b { display: block; font-family: var(--display); font-size: 15px; color: var(--text); font-weight: 600; }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 22px 24px;
+    margin: 20px 0;
+  }
+  .panel.accent { border-left: 2px solid var(--accent); }
+  .panel.gold   { border-left: 2px solid var(--gold); }
+  .panel.warn   { border-left: 2px solid var(--warn); }
+  .panel.violet { border-left: 2px solid var(--violet); }
+  .panel h3 { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .callout-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 8px;
+  }
+  .panel.accent .callout-title { color: var(--accent); }
+  .panel.warn .callout-title { color: var(--warn); }
+  .panel.violet .callout-title { color: var(--violet); }
+
+  /* ---------------------------------------------------------------- tasti */
+
+  kbd {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    background: #1A2942;
+    border: 1px solid #2C4062;
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    padding: 2px 7px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .keys {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1px;
+    background: var(--line-soft);
+    border: 1px solid var(--line);
+  }
+  .key {
+    background: var(--panel-soft);
+    padding: 13px 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .key .k { flex: 0 0 42px; }
+  .key .d { font-size: 14px; }
+  .key .d small { display: block; color: var(--muted); font-size: 12.5px; }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 14.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    font-weight: 500;
+  }
+  tbody tr:hover { background: rgba(79,195,247,0.035); }
+  td.n { font-family: var(--mono); color: var(--accent); white-space: nowrap; }
+  td.q { font-family: var(--display); font-weight: 600; white-space: nowrap; }
+  .scroll { overflow-x: auto; }
+
+  /* ---------------------------------------------------------------- ranghi */
+
+  .rank {
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 12px;
+    padding: 1px 7px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+  }
+  .r-e { color: #9BA8B8; } .r-d { color: #E8F2FF; } .r-c { color: #7FD97F; }
+  .r-b { color: #4FC3F7; } .r-a { color: #C77FE8; } .r-s { color: #FFD54F; }
+
+  /* ---------------------------------------------------------------- passi */
+
+  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 22px 0; }
+  ol.steps > li {
+    counter-increment: s;
+    position: relative;
+    padding: 0 0 22px 52px;
+    border-left: 1px solid var(--line);
+    margin-left: 15px;
+  }
+  ol.steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  ol.steps > li::before {
+    content: counter(s);
+    position: absolute;
+    left: -15px; top: -2px;
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    background: var(--panel);
+    border: 1px solid var(--accent-deep);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  ol.steps > li b {
+    font-family: var(--display);
+    font-size: 17px;
+    display: block;
+    margin-bottom: 4px;
+  }
+  ol.steps > li p { margin: 0 0 8px; font-size: 15px; }
+
+  ul.tight { margin: 8px 0 14px; padding-left: 20px; }
+  ul.tight li { margin-bottom: 5px; }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+  }
+  .card {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 16px 18px;
+  }
+  .card h4 {
+    font-family: var(--display);
+    font-size: 16px;
+    margin: 0 0 6px;
+  }
+  .card p { font-size: 14px; color: var(--muted); margin: 0; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    background: #131C2E;
+    border: 1px solid var(--line-soft);
+    border-radius: 2px;
+    padding: 1px 6px;
+    color: #BFE4FF;
+  }
+  pre {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: #0C1220;
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--accent-deep);
+    padding: 14px 16px;
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+  pre code { background: none; border: 0; padding: 0; }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 56px 0 0;
+  }
+
+  footer {
+    color: var(--muted);
+    font-size: 13.5px;
+    padding-top: 24px;
+  }
+
+  .sep {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--line);
+    text-align: center;
+    margin: 40px 0;
+  }
+
+  @media (max-width: 640px) {
+    .masthead h1 { font-size: 38px; }
+    .wrap { padding: 28px 16px 80px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">Arise · guida del cacciatore · build di collaudo</p>
+  <h1>Non sei morto.</h1>
+  <p class="sub">Ti hanno fermato un istante prima, ed è per questo che sei qui. Questa è tutta la
+  mod: cosa c'è dentro, in che ordine si apre, e cosa devi guardare mentre ci giochi.</p>
+  <p class="quote">«Il Sistema non sceglie i forti: sceglie chi arriva al bordo e non lo attraversa.»</p>
+</header>
+
+<nav class="toc">
+  <a href="#inizio"><b>Da dove si comincia</b>la prima ora, passo per passo</a>
+  <a href="#tasti"><b>I tasti</b>tutto quello che si preme</a>
+  <a href="#sistema"><b>Il Sistema</b>livelli, statistiche, ranghi</a>
+  <a href="#esercito"><b>L'esercito</b>ombre, archetipi, gradi, ordini</a>
+  <a href="#varchi"><b>I varchi</b>gate, temi, guardiani</a>
+  <a href="#citta"><b>Le città</b>cinque hub, mercato, viaggio</a>
+  <a href="#roba"><b>Roba</b>equipaggiamento, gemme, negozio</a>
+  <a href="#officina"><b>L'Officina</b>anime al lavoro</a>
+  <a href="#incarichi"><b>I 18 incarichi</b>la catena completa</a>
+  <a href="#comandi"><b>Comandi</b>per barare in collaudo</a>
+  <a href="#collaudo"><b>Cosa guardare</b>e come segnalare</a>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════ INIZIO -->
+
+<h2 id="inizio">Da dove si comincia</h2>
+<p class="lede">Non devi preparare niente. Crea un mondo nuovo, in sopravvivenza, e gioca a
+Minecraft normalmente. Il resto arriva da solo.</p>
+
+<div class="panel accent">
+  <p class="callout-title">La regola d'oro del primo quarto d'ora</p>
+  <p>Arise <b>non parte all'inizio della partita</b>. Parte quando stai per morire. Il primo colpo
+  che ti porterebbe a zero non ti uccide: ti porta via. Finché non succede, non hai HUD, non hai
+  tasti, non hai poteri — ed è voluto.</p>
+</div>
+
+<ol class="steps">
+  <li>
+    <b>Fatti quasi ammazzare</b>
+    <p>Uno zombie, una caduta, un creeper. Il colpo che ti azzererebbe la vita ti porta invece
+    nella <b>Sala del Risveglio</b>, una stanza che esiste nella dimensione dei varchi. Non sei
+    morto: non hai perso niente, l'inventario è dov'era.</p>
+    <p><em>Fretta?</em> <code>/arise tutorial start</code> ti ci porta subito (servono i permessi).</p>
+  </li>
+  <li>
+    <b>Parla con l'Araldo</b>
+    <p>C'è qualcuno in fondo alla sala. Raggiungilo e fai <b>clic destro</b> su di lui: ti dice una
+    pagina per volta chi è, cos'è il Sistema, come funzionano gli incarichi, cosa sarà l'esercito e
+    quali tasti userai. Sono sei pagine — sei clic. Ti anticipa anche dei soul coin.</p>
+  </li>
+  <li>
+    <b>Torna nel mondo</b>
+    <p>Finito il discorso, «<em>Alzati</em>»: rientri esattamente dove stavi per morire, e quella
+    cosa che ti stava uccidendo è ancora lì. Adesso però in alto a sinistra c'è un riquadro.</p>
+  </li>
+  <li>
+    <b>Segui gli incarichi e basta</b>
+    <p>Premi <kbd>P</kbd>. C'è un incarico solo per volta e ognuno apre un pezzo di mod che prima
+    non avevi. Non c'è modo di perdersi: il contatore dell'obiettivo in corso sta sopra la hotbar,
+    e finito uno arriva il successivo.</p>
+  </li>
+  <li>
+    <b>Al terzo livello premi <kbd>K</kbd></b>
+    <p>Hai punti statistica da spendere. Spendili: fanno la differenza fra sopravvivere al primo
+    varco e non sopravviverci.</p>
+  </li>
+  <li>
+    <b>Poi il primo cadavere fresco</b>
+    <p>Uccidi qualcosa e premi <kbd>R</kbd> stando vicino al corpo, <b>subito</b>: l'ombra resta
+    lì solo pochi secondi. Se l'estrazione riesce hai il primo soldato. Se fallisce — è a
+    probabilità — riprova col prossimo.</p>
+  </li>
+</ol>
+
+<div class="panel warn">
+  <p class="callout-title">Se ti sei perso</p>
+  <p><kbd>P</kbd> dice sempre cos'è il prossimo passo, con un suggerimento su <em>come</em> farlo.
+  Ogni sistema appena concesso stampa in chat la riga che spiega a cosa serve. E se proprio niente
+  funziona, <code>/arise quest status</code> dice a che punto sei.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ TASTI -->
+
+<h2 id="tasti">I tasti</h2>
+<p class="lede">Tutti riassegnabili dalle opzioni di Minecraft. Un tasto premuto prima che il
+Sistema conceda quel sistema risponde con una riga in chat invece di aprire una finestra vuota.</p>
+
+<h3>Finestre</h3>
+<div class="keys">
+  <div class="key"><span class="k"><kbd>K</kbd></span><span class="d">Stato<small>livello, XP, le dodici statistiche, i punti da spendere</small></span></div>
+  <div class="key"><span class="k"><kbd>P</kbd></span><span class="d">Incarichi<small>la catena, cosa manca, cosa sblocca</small></span></div>
+  <div class="key"><span class="k"><kbd>J</kbd></span><span class="d">Esercito d'ombra<small>elenco, dettaglio, squadra, potenziamenti</small></span></div>
+  <div class="key"><span class="k"><kbd>N</kbd></span><span class="d">Equipaggiamento<small>le caselle del Cacciatore, lo zaino, lo spazio dimensionale</small></span></div>
+  <div class="key"><span class="k"><kbd>O</kbd></span><span class="d">Abyss Shop<small>si apre ovunque: è una finestra del Sistema</small></span></div>
+  <div class="key"><span class="k"><kbd>M</kbd></span><span class="d">Mappa del mondo<small>città, varchi aperti, tu</small></span></div>
+</div>
+
+<h3>Comandare</h3>
+<div class="keys">
+  <div class="key"><span class="k"><kbd>R</kbd></span><span class="d">Arise<small>estrae l'ombra dal cadavere più vicino — pochi secondi di tempo</small></span></div>
+  <div class="key"><span class="k"><kbd>G</kbd></span><span class="d">Evoca<small>chiama la squadra al tuo fianco</small></span></div>
+  <div class="key"><span class="k"><kbd>H</kbd></span><span class="d">Richiama<small>le rimanda nell'ombra</small></span></div>
+  <div class="key"><span class="k"><kbd>B</kbd></span><span class="d">Postura<small>cicla aggressiva → difensiva → passiva</small></span></div>
+  <div class="key"><span class="k"><kbd>Y</kbd></span><span class="d">Uccidetelo<small>punta ciò che stai guardando</small></span></div>
+  <div class="key"><span class="k"><kbd>U</kbd></span><span class="d">Restate qui<small>tengono la posizione; ripremuto tornano a seguirti</small></span></div>
+</div>
+
+<h3>Abilità</h3>
+<p style="color: var(--muted); font-size: 14.5px; margin-top: -4px;">Non si equipaggiano e non si
+scelgono: sono quattro, sempre queste, e si accendono da sole al livello scritto. <b>Nessuna
+infligge danno</b> — sono movimento, potenziamento e controllo.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Tasto</th><th>Abilità</th><th>Cosa fa</th><th>Livello</th><th>Costo</th><th>Ricarica</th></tr></thead>
+  <tbody>
+    <tr><td><kbd>Z</kbd></td><td class="q">Passo d'ombra</td><td>Scatto di 8 blocchi nella direzione dello sguardo. Si ferma sui muri: non li attraversa.</td><td class="n">5</td><td class="n">—</td><td class="n">3 s</td></tr>
+    <tr><td><kbd>X</kbd></td><td class="q">Scambio d'ombra</td><td>Prendi il posto della tua ombra evocata più lontana. Una via di fuga, o un modo di aprirsi la strada.</td><td class="n">10</td><td class="n">—</td><td class="n">10 s</td></tr>
+    <tr><td><kbd>C</kbd></td><td class="q">Dominio del Monarca</td><td>Per 20 s tu <em>e tutte le ombre evocate</em> avete Velocità II e Forza I.</td><td class="n">20</td><td class="n">40</td><td class="n">30 s</td></tr>
+    <tr><td><kbd>V</kbd></td><td class="q">Autorità del Sovrano</td><td>Gli ostili entro 12 blocchi prendono Lentezza III, Debolezza II e Bagliore per 10 s.</td><td class="n">30</td><td class="n">60</td><td class="n">45 s</td></tr>
+  </tbody>
+</table>
+</div>
+<p style="color: var(--muted); font-size: 14.5px;">Un'abilità che non fa niente (uno scambio senza
+ombre, un'autorità senza bersagli) <b>non parte e non costa</b>: niente ricarica, soul coin
+rimborsati.</p>
+
+<!-- ══════════════════════════════════════════════════════════════ SISTEMA -->
+
+<h2 id="sistema">Il Sistema</h2>
+<p class="lede">Il riquadro in alto a sinistra. Livello, esperienza, soul coin. Non ti mentirà mai.</p>
+
+<h3>Livelli</h3>
+<p>L'esperienza arriva uccidendo, e il valore dipende da <em>cosa</em> uccidi: una quota fissa più
+una quota proporzionale alla vita massima della creatura. Un pollo vale poco, un Warden vale molto.
+La curva è <code>XP richiesta = 20 × livello<sup>1,6</sup></code>, il tetto è il <b>livello 100</b>,
+e ogni livello dà <b>3 punti statistica</b>.</p>
+
+<h3>Le dodici statistiche — ma solo quattro si comprano</h3>
+<p>Questa è la cosa che sorprende tutti: <b>i punti si spendono su quattro statistiche soltanto</b>.
+Le altre otto esistono, contano, e finiscono nella stessa schermata — ma arrivano <em>solo</em>
+dall'equipaggiamento e dalle gemme. È il motivo per cui un pezzo con l'affisso giusto vale più di
+dieci livelli.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Statistica</th><th>Cosa fa</th><th>Attributo</th><th>Punti?</th></tr></thead>
+  <tbody>
+    <tr><td class="q">Vitalità</td><td>Cuori in più sulla barra. Il modo più diretto di non morire.</td><td class="n">salute massima</td><td class="n" style="color:var(--good)">+2 / punto</td></tr>
+    <tr><td class="q">Forza</td><td>Ogni colpo a mano toglie più vita. Si somma all'arma, non la sostituisce.</td><td class="n">danno da mischia</td><td class="n" style="color:var(--good)">+0,4 / punto</td></tr>
+    <tr><td class="q">Resistenza</td><td>Armatura: riduce il danno in entrata. Non vale contro fame e vuoto.</td><td class="n">armatura</td><td class="n" style="color:var(--good)">+0,5 / punto</td></tr>
+    <tr><td class="q">Agilità</td><td>Ti muovi più in fretta. Tetto a 100 punti (= 2,5×): oltre, il client sfonda le collisioni.</td><td class="n">velocità</td><td class="n" style="color:var(--good)">+1,5% / punto</td></tr>
+    <tr><td class="q">Tempra</td><td>Riduce quanto i colpi grossi bucano l'armatura. Conta solo se l'armatura c'è.</td><td class="n">durezza</td><td style="color:var(--muted)">solo pezzi</td></tr>
+    <tr><td class="q">Prontezza</td><td>Colpisci più spesso: accorcia l'attesa della barra d'attacco.</td><td class="n">velocità d'attacco</td><td style="color:var(--muted)">solo pezzi</td></tr>
+    <tr><td class="q">Egida</td><td>Cuori gialli: assorbono per primi e non si rigenerano.</td><td class="n">assorbimento</td><td style="color:var(--muted)">solo pezzi</td></tr>
+    <tr><td class="q">Saldezza</td><td>Ti spostano di meno. A uno non ti spostano più affatto.</td><td class="n">resist. alla spinta</td><td style="color:var(--muted)">solo pezzi</td></tr>
+    <tr><td class="q">Impeto</td><td>I tuoi colpi spingono via più lontano.</td><td class="n">spinta</td><td style="color:var(--muted)">solo pezzi</td></tr>
+    <tr><td class="q">Slancio</td><td>Salti più in alto.</td><td class="n">altezza del salto</td><td style="color:var(--muted)">solo pezzi</td></tr>
+    <tr><td class="q">Allungo</td><td>Raggiungi entità più lontane senza avvicinarti.</td><td class="n">portata</td><td style="color:var(--muted)">solo pezzi</td></tr>
+    <tr><td class="q">Fortuna</td><td>Bottino migliore da tutto ciò che il gioco tira a sorte.</td><td class="n">fortuna</td><td style="color:var(--muted)">solo pezzi</td></tr>
+  </tbody>
+</table>
+</div>
+<p style="color: var(--muted); font-size: 14.5px;">Tetti dei punti: Vitalità 400, Forza 400,
+Resistenza 200, Agilità 100.</p>
+
+<div class="panel">
+  <p class="callout-title">La somma delle sorgenti</p>
+  <p>Il numero che vedi in <kbd>K</kbd> non viene solo dai punti spesi: equipaggiamento e gemme si
+  sommano. La schermata di stato distingue le tre voci — <em>dai punti spesi</em>, <em>dall'equipaggiamento</em>,
+  <em>totale del parametro</em> — passando il puntatore sopra una riga. Se i tre numeri non tornano,
+  è un difetto: segnalalo.</p>
+</div>
+
+<h3>I ranghi del Cacciatore</h3>
+<p>Il rango non si spende e non si esamina: <b>è il tuo livello, letto su una scala</b>. Apre
+caselle di equipaggiamento, alza il rango dei varchi che ti compaiono attorno e migliora il bottino.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Rango</th><th>Livello</th><th>Caselle aperte</th><th>Cosa si apre</th></tr></thead>
+  <tbody>
+    <tr><td><span class="rank r-e">E</span></td><td class="n">1</td><td class="n">8</td><td>Guanti, 2 anelli</td></tr>
+    <tr><td><span class="rank r-d">D</span></td><td class="n">10</td><td class="n">10</td><td>Cintura, 3° anello</td></tr>
+    <tr><td><span class="rank r-c">C</span></td><td class="n">20</td><td class="n">13</td><td>Spallacci, 1° orecchino, 4° anello</td></tr>
+    <tr><td><span class="rank r-b">B</span></td><td class="n">35</td><td class="n">17</td><td>Mantello, 2° orecchino, 5° e 6° anello</td></tr>
+    <tr><td><span class="rank r-a">A</span></td><td class="n">55</td><td class="n">21</td><td>Collana, 3° orecchino, 7° e 8° anello</td></tr>
+    <tr><td><span class="rank r-s">S</span></td><td class="n">80</td><td class="n">25</td><td>Talismano, 4° orecchino, 9° e 10° anello</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Gli stessi sei gradini valgono per i varchi, per i pezzi, per le gemme, per le anime e per i
+catalizzatori: un varco di rango B lascia roba di rango B. E sono i sei materiali di vanilla —
+<b>cuoio → rame → maglia → ferro → diamante → netherite</b> per le armature, <b>legno → rame →
+pietra → ferro → diamante → netherite</b> per le armi — che è il motivo per cui un pezzo di rango
+alto <em>si vede</em> addosso, senza una texture nuova.</p>
+
+<div class="panel warn">
+  <p class="callout-title">Il rango può anche scendere</p>
+  <p>Se il livello cala (in collaudo succede: <code>/arise level</code>, <code>/arise reset</code>),
+  le caselle che il rango non regge più si svuotano da sole e i pezzi finiscono nello spazio
+  dimensionale. Non si perde niente, ma non si indossa più.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ ESERCITO -->
+
+<h2 id="esercito">L'esercito d'ombra</h2>
+<p class="lede">«Quello che uccidi non deve restare a terra.» Le ombre non evocate non sono entità:
+vivono come dati. Diventano corpi solo quando le chiami.</p>
+
+<h3>Estrarre</h3>
+<p><kbd>R</kbd> entro <b>8 blocchi</b> da un cadavere fresco. Hai <b>15 secondi</b>: poi l'ombra si
+dissolve da sola. È a probabilità, e la probabilità dipende <em>solo dal tuo livello</em>: parte da
+<b>25%</b> e sale dello 0,5% a livello — 34,5% a livello 20, 49,5% a livello 50, 74,5% al 100.
+Il messaggio ti dice sempre con che percentuale hai giocato.</p>
+<p>Un cadavere si tenta <b>una volta sola</b>: premere R di nuovo sullo stesso corpo non serve. A
+esercito pieno l'ombra non si perde: resta un'<b>Anima Errante</b>, pronta per l'Officina.</p>
+<p>L'ombra che esce è sempre di livello 1, ma eredita il corpo da cui viene: <b>1,5× la vita</b> e
+<b>1,2× il danno</b> del mob d'origine. È il motivo per cui vale la pena estrarre da qualcosa di
+grosso.</p>
+
+<div class="panel">
+  <p class="callout-title">Quante ne puoi tenere, quante ne puoi tirare fuori</p>
+  <p>L'<b>esercito</b> parte da <b>6 posti</b> e cresce di uno ogni quattro livelli (10 al livello
+  20, 30 al 100). Ma <b>in campo ne stanno solo quattro alla volta</b> — quanti sono gli archetipi,
+  e non è un caso. La scelta di <em>quali</em> quattro è la vera decisione tattica: si fa in
+  <kbd>J</kbd>, con la squadra.</p>
+</div>
+
+<h3>I quattro archetipi</h3>
+<p>Il tipo di creatura da cui hai estratto decide come combatte. Non sono etichette: sono
+comportamenti veri, con goal diversi.</p>
+<div class="cards">
+  <div class="card"><h4>Guardia</h4><p>Si piazza fra te e chi ti sta dando la caccia, a due blocchi
+  da te sulla linea della minaccia. Statistiche piene, nessun bonus e nessuna penalità.</p></div>
+  <div class="card"><h4>Bestia</h4><p>Veloce e fragile: 75% vita, 120% danno, 130% velocità. Insegue
+  lontano e <em>salta addosso</em>. Da mob di categoria animale, o più larghi che alti.</p></div>
+  <div class="card"><h4>Mago</h4><p>60% vita. Tira una <b>lancia d'ombra</b> ogni 2 secondi da 16
+  blocchi (80% del suo danno), e si ritira se gli arrivi sotto i 5. Un muro lo ferma davvero.</p></div>
+  <div class="card"><h4>Colosso</h4><p>190% vita, 80% danno, più grosso del 25%. Ogni 3 secondi
+  <b>ruba il bersaglio</b> a chi ti sta puntando entro 12 blocchi. Difficile da spostare.</p></div>
+</div>
+<p style="color: var(--muted); font-size: 14.5px;">L'archetipo lo decide il corpo, non tu: prima la
+stazza (dai 40 di vita in su è sempre un Colosso), poi se sa colpire da lontano, poi la forma.</p>
+
+<h3>Gli otto gradi</h3>
+<p>Il grado non è un dato: è la potenza dell'ombra letta su una scala. Cresce col livello (fino al
+50, +8% di vita e danno a livello) e con i potenziamenti.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Grado</th><th>Nome proprio</th><th>Aura di comando</th></tr></thead>
+  <tbody>
+    <tr><td class="q" style="color:#9BA8B8">Normale</td><td>—</td><td>—</td></tr>
+    <tr><td class="q">Elite</td><td>—</td><td>—</td></tr>
+    <tr><td class="q" style="color:#7FD97F">Cavaliere</td><td>sì</td><td>—</td></tr>
+    <tr><td class="q" style="color:#4FC3F7">Cavaliere d'Elite</td><td>sì</td><td>—</td></tr>
+    <tr><td class="q" style="color:#6A7BE8">Comandante</td><td>sì</td><td class="n">+10% danno, +8% vita</td></tr>
+    <tr><td class="q" style="color:#C77FE8">Generale</td><td>sì</td><td class="n">+20% danno, +16% vita</td></tr>
+    <tr><td class="q" style="color:#FFD54F">Maresciallo</td><td>sì</td><td class="n">+30% danno, +24% vita</td></tr>
+    <tr><td class="q" style="color:#E86A6A">Gran Maresciallo</td><td>sì</td><td class="n">+40% danno, +32% vita</td></tr>
+  </tbody>
+</table>
+</div>
+<p>L'aura vale <b>per le altre</b>, mai per sé: un Comandante occupa uno dei quattro posti e lo
+restituisce potenziando gli altri tre. Le aure di più comandanti si sommano. È la ragione per cui la
+squadra migliore non è «i quattro più forti».</p>
+
+<h3>Comandare</h3>
+<ul class="tight">
+  <li><b>La squadra</b> — non esce tutto l'esercito: esce chi hai messo in squadra. La scegli in <kbd>J</kbd>, e <kbd>G</kbd> chiama loro.</li>
+  <li><b>Le posture</b> (<kbd>B</kbd>) — <em>aggressiva</em> attacca tutto ciò che si muove, <em>difensiva</em> risponde solo a chi colpisce te, <em>passiva</em> non attacca mai.</li>
+  <li><b>Uccidetelo</b> (<kbd>Y</kbd>) — guarda un bersaglio e premilo: tutti su quello. Se lo premi mentre tengono la posizione, sparano da fermi.</li>
+  <li><b>Restate qui</b> (<kbd>U</kbd>) — pianta l'esercito dov'è. Utile per tenere un corridoio mentre tu fai altro.</li>
+</ul>
+
+<div class="panel violet">
+  <p class="callout-title">Il dono del Monarca</p>
+  <p>L'esercito cresce con te: quello che guadagni tu rifluisce su di loro. Un Cacciatore forte non
+  ha soltanto più vita — ha un esercito che colpisce più forte.</p>
+</div>
+
+<h3>Gestire (<kbd>J</kbd>)</h3>
+<p>Nella schermata dell'esercito: elenco a sinistra con ordinamento (per chiamata, livello, nome,
+potenza), dettaglio a destra. Da lì si <b>potenzia</b> un'ombra con i soul coin, si <b>rinomina</b>,
+si cambia il <b>colore</b>, o si <b>congeda</b> (con rimborso — e resta un'anima errante).</p>
+
+<div class="panel warn">
+  <p class="callout-title">Le ombre cadute</p>
+  <p>Un'ombra che muore non si perde: torna disponibile dopo un tempo di recupero. Nel frattempo
+  <kbd>G</kbd> evoca le altre e ti dice quante si stanno ancora riprendendo.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ VARCHI -->
+
+<h2 id="varchi">I varchi</h2>
+<p class="lede">«I varchi si aprono da soli, dove il mondo è più sottile.»</p>
+
+<p>Un Gate compare spontaneamente vicino a te — in media <b>ogni otto minuti e mezzo</b>, fra 48 e
+160 blocchi, mai più di due alla volta nel raggio di 200 — e in chat arriva la riga con rango,
+distanza e direzione (mai le coordinate: si cerca). Vive <b>cinque minuti</b>, poi si richiude.</p>
+<p>Non è un ingresso da attraversare al buio: <b>clic destro sul varco lo analizza</b> prima di
+entrare. La finestra dice rango, composizione, quante stanze e quante sale, quanti abitanti, chi è
+il guardiano e quanto rende — e il conto alla rovescia. Non è una stima: la pianta è già stata
+generata da un seme, e all'ingresso viene ricostruita <em>dallo stesso seme</em>. Il pannello non
+può mentire.</p>
+<p>Il rango parte dal tuo: <b>15%</b> uno sopra, <b>35%</b> uno sotto, metà delle volte uguale.</p>
+
+<h3>I sei temi</h3>
+<div class="cards">
+  <div class="card"><h4>Rovina</h4><p>Pietra spaccata e muffa.</p></div>
+  <div class="card"><h4>Gelo</h4><p>Ghiaccio e neve.</p></div>
+  <div class="card"><h4>Cenere</h4><p>Basalto e braci.</p></div>
+  <div class="card"><h4>Profondità</h4><p>Roccia e acqua ferma.</p></div>
+  <div class="card"><h4>Sculk</h4><p>Il buio che sente.</p></div>
+  <div class="card"><h4>Vuoto</h4><p>Endstone e niente.</p></div>
+</div>
+
+<h3>Dentro</h3>
+<p>Il Gate ha una sua dimensione e una pianta generata: da <b>5 a 8 stanze</b> in fila, più
+<b>1-3 diramazioni</b> senza uscita, collegate da corridoi. Una stanza su tre è una <b>sala</b>, più
+grande e con i pilastri. L'ingresso è sempre sgombro. In fondo la sala del guardiano — il
+<b>Sovrano del Gate</b>, che ha <b>sei volte la vita</b> e <b>il doppio del danno</b> del mob da cui
+è fatto, e che senti prima di vederlo.</p>
+<p><b>Dentro un Gate non si scava.</b> Non c'è modo di aggirare il percorso, e il guscio regge
+anche i creeper.</p>
+<p>Quando il guardiano cade, <b>nella sua sala si apre la pietra del ritorno</b>: clic destro sulla
+lodestone per tornare esattamente da dove eri partito. In emergenza c'è sempre
+<code>/arise leave</code>. Se il server si riavvia mentre sei dentro, al rientro vieni riportato
+indietro da solo.</p>
+
+<h3>Cosa rende</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>Rango</th><th>XP</th><th>Soul coin</th><th>Pezzi</th><th>Gemma</th><th>Punti statistica</th></tr></thead>
+  <tbody>
+    <tr><td><span class="rank r-e">E</span></td><td class="n">120</td><td class="n">60</td><td class="n">1,4</td><td class="n">35%</td><td class="n">0,6</td></tr>
+    <tr><td><span class="rank r-d">D</span></td><td class="n">216</td><td class="n">108</td><td class="n">1,9</td><td class="n">47%</td><td class="n">0,95</td></tr>
+    <tr><td><span class="rank r-c">C</span></td><td class="n">388</td><td class="n">194</td><td class="n">2,4</td><td class="n">59%</td><td class="n">1,3</td></tr>
+    <tr><td><span class="rank r-b">B</span></td><td class="n">699</td><td class="n">349</td><td class="n">2,9</td><td class="n">71%</td><td class="n">1,65</td></tr>
+    <tr><td><span class="rank r-a">A</span></td><td class="n">1259</td><td class="n">629</td><td class="n">3,4</td><td class="n">83%</td><td class="n">2,0</td></tr>
+    <tr><td><span class="rank r-s">S</span></td><td class="n">2267</td><td class="n">1133</td><td class="n">3,9</td><td class="n">95%</td><td class="n">2,35</td></tr>
+  </tbody>
+</table>
+</div>
+<p>La parte decimale è la probabilità di uno in più: mai un arrotondamento secco. Ogni pezzo ha il
+<b>12%</b> di uscire un rango sopra quello del varco. Anche i mob lungo la strada lasciano un pezzo
+nel <b>7%</b> dei casi.</p>
+
+<div class="panel gold">
+  <p class="callout-title">Le pergamene sono l'unico modo</p>
+  <p>I punti statistica in eccesso <b>arrivano solo dai Gate</b>: non si comprano da nessuna parte e
+  non cadono da nessun mob del mondo. Un Cacciatore che non entra nei varchi resta indietro sulle
+  statistiche, e non c'è una scorciatoia.</p>
+</div>
+
+<div class="panel accent">
+  <p class="callout-title">Non vuoi aspettare?</p>
+  <p>La <b>Bussola dell'Abisso</b> punta il varco aperto più vicino e dice rango, distanza e
+  direzione. Il <b>Sensale dei Varchi</b>, in piazza al mercato, te ne apre uno del tuo rango dove
+  ti trovi — a pagamento. «Aspettare è gratis, questo no.»</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ CITTÀ -->
+
+<h2 id="citta">Le città</h2>
+<p class="lede">Cinque Associazioni dei Cacciatori, ognuna con la sua pianta stradale, la sua
+tavolozza e il suo monumento.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Città</th><th>Monumento</th></tr></thead>
+  <tbody>
+    <tr><td class="q">Roma</td><td>Colosseo</td></tr>
+    <tr><td class="q">Tokyo</td><td>Torre di Tokyo</td></tr>
+    <tr><td class="q">New York</td><td>Empire State Building</td></tr>
+    <tr><td class="q">Berlino</td><td>Porta di Brandeburgo</td></tr>
+    <tr><td class="q">Madrid</td><td>Puerta de Alcalá</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Sono <b>512 blocchi di lato</b> e stanno tutte in fila a <b>x 200.000, z 200.000</b>, una ogni
+15.000 blocchi: circa 283.000 blocchi dallo spawn. A piedi non ci arrivi, ed è voluto.</p>
+<p>Ci si arriva con il <b>Sigillo dell'Associazione</b>, che ricevi completando <em>Il primo
+affare</em>: tienilo in mano, clic destro ovunque nel mondo, e scegli la città. Ha una ricarica di
+<b>cinque minuti</b>. Da lì in poi lo <b>Sportello</b> di ogni Associazione porta gratis nelle altre
+quattro, e anche il segnaposto al centro dell'Associazione apre lo stesso pannello.
+<kbd>M</kbd> dice dove sono.</p>
+<p>Ogni città ha la sua pianta stradale e la sua tavolozza: New York è a scacchiera con le torri a
+scalini e uno skyline vero, Tokyo è fatta di palazzine strette con i vicoli in mezzo, Roma è bassa
+perché il Colosseo deve restare la cosa più alta, Madrid è tutta isolati chiusi con il patio,
+Berlino ha il boulevard che la taglia in due — e dietro la Porta di Brandeburgo, la torre della TV.</p>
+
+<h3>Il Quartiere del Mercato</h3>
+<p>Nove botteghe sulla piazza. Clic destro su chi sta dietro il bancone: <b>chi vende</b> apre la
+finestra di scambio di Minecraft, <b>chi fa un servizio</b> lo fa e basta.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Bottega</th><th>Chi c'è</th><th>Cosa ci fai</th></tr></thead>
+  <tbody>
+    <tr><td class="q">Lo Sportello</td><td>Segretario</td><td>Clic per viaggiare fra le città, shift per l'Abyss Shop</td></tr>
+    <tr><td class="q">Banco dell'Abisso</td><td>Cambiavalute</td><td>Conia soul coin in <b>Monete d'Anima</b>; shift per riportarle indietro (con una trattenuta)</td></tr>
+    <tr><td class="q">Intermediazione</td><td>Sensale dei Varchi</td><td>Ti apre un varco del tuo rango, subito, a pagamento</td></tr>
+    <tr><td class="q">Bottega del Gemmiere</td><td>Gemmiera</td><td>Incastonature e ritiri senza entrare nell'Associazione</td></tr>
+    <tr><td class="q">La Cartoleria</td><td>Cartografo dell'Abisso</td><td>Tiene tutti e quattro i <b>Progetti</b> dei macchinari</td></tr>
+    <tr><td class="q">Casa delle Anime</td><td>Mercante d'Anime</td><td>Sabbia delle anime, frammenti d'eco, catalizzatori bassi</td></tr>
+    <tr><td class="q">La Fonderia</td><td>Fonditore</td><td>Lingotti, carbone, bacchette di blaze</td></tr>
+    <tr><td class="q">La Cava</td><td>Cavatore</td><td>Ardesia e ossidiana: muri per i macchinari</td></tr>
+    <tr><td class="q">La Dispensa</td><td>Erborista</td><td>«Nessuno chiude un varco a stomaco vuoto.»</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel gold">
+  <p class="callout-title">Soul coin ≠ Moneta d'Anima</p>
+  <p>Il <b>soul coin</b> è un numero dentro il Sistema: lo guadagni uccidendo (1 + un quarto della
+  vita del mob) e lo spendi in potenziamenti delle ombre, abilità, gemme, negozio. La <b>Moneta
+  d'Anima</b> è un oggetto: si tiene in mano, si spende dai mercanti, e <b>si perde morendo</b>.</p>
+  <p>Si passa dall'uno all'altra solo al Banco: <b>100 soul coin = 1 moneta</b>, fino a 16 monete
+  per clic. Al ritorno il Banco trattiene il 20% — una moneta riportata indietro vale 80 soul coin.
+  Chi non vuole coniare può vendere: 12 ferro grezzo, 64 ciottoli o 32 carne marcia valgono una
+  moneta ciascuno.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ ROBA -->
+
+<h2 id="roba">Equipaggiamento, gemme, negozio</h2>
+
+<h3>L'equipaggiamento è un oggetto vero</h3>
+<p>Le posizioni sono <b>25</b>: le cinque di Minecraft (testa, busto, gambe, piedi, arma), che sono
+aperte dal primo minuto e funzionano come sempre, più <b>venti caselle del Cacciatore</b> che
+<kbd>N</kbd> apre in una finestra a parte — guanti, cintura, spallacci, mantello, collana,
+talismano, <b>quattro orecchini e dieci anelli</b>. Una casella chiusa non sparisce: resta spenta e
+dice a che rango si apre.</p>
+<ul class="tight">
+  <li><b>Shift + clic</b> su un pezzo lo indossa, o lo ripone se è già addosso. Il resto funziona come una cassa: trascina, scambia, tasti della hotbar.</li>
+  <li>Un pezzo ha una <b>base</b> (Elmo, Lama, Mantello…) che decide lo slot e le statistiche che tende a dare, un <b>affisso</b> (dell'Orso, del Falco, del Titano…) che <em>garantisce</em> la sua statistica e gli dà il nome, e delle <b>incastonature</b> — zero fino al rango D, poi 1, 2, 3, 4.</li>
+  <li>Un pezzo di rango alto non ha solo numeri più grandi: ne ha <b>di più</b>. Rango E e D hanno un modificatore, C due, B e A tre, S quattro.</li>
+  <li>Lo <b>spazio dimensionale</b> è un magazzino da 27 posti che accetta <em>solo</em> equipaggiamento del Sistema. Ci finisce da solo tutto quello che raccogli, tranne quello che tieni nella hotbar.</li>
+  <li><b>Vale solo ciò che indossi.</b> Una corazza in tasca non dà niente.</li>
+  <li>Esistono pezzi <b>unici</b>. Per ora ce n'è uno, e lo regala il Sistema: l'<em>Occhio dell'Oscurità</em> — un elmo che dà visione notturna finché lo porti. «Chi lo porta non ha più scuse per temere il buio.»</li>
+</ul>
+
+<div class="panel accent">
+  <p class="callout-title">Il vincolo all'anima</p>
+  <p>Quando muori, l'equipaggiamento del Sistema <b>non cade</b>: viene ritirato un istante prima e
+  ti torna addosso al respawn, ogni pezzo nella casella da cui era partito. Le <b>Monete d'Anima
+  no</b>: quelle sono oggetti normali e si perdono. Se una di queste due cose non succede, è un
+  difetto ed è il più importante da segnalare.</p>
+</div>
+
+<h3>Le cinque gemme</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>Gemma</th><th>Effetto</th></tr></thead>
+  <tbody>
+    <tr><td class="q" style="color:#C77FE8">Ametista</td><td>XP in più per uccisione</td></tr>
+    <tr><td class="q" style="color:#4FC3F7">Zaffiro</td><td>Soul coin in più per uccisione</td></tr>
+    <tr><td class="q" style="color:#E86A6A">Ematite</td><td>Parte del danno inferto torna come vita</td></tr>
+    <tr><td class="q" style="color:#E8A64F">Diaspro</td><td>Parte del danno incassato torna al mittente</td></tr>
+    <tr><td class="q" style="color:#8E6BFF">Ossidiana</td><td>Probabilità che l'ombra si estragga da sola</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Una gemma dà anche una statistica, oltre al suo effetto. Si incastonano <b>ovunque e gratis</b>;
+toglierne una <b>intatta</b> si può solo entro 24 blocchi dal segnaposto di un'Associazione (o dalla
+Gemmiera in piazza) e costa <b>750 soul coin</b>. Altrove la scelta è romperla — gratis, e la gemma
+è persa — o lasciarla dov'è. La sacca tiene 40 gemme sciolte.</p>
+<p>Gli effetti di tutte le gemme che porti si sommano, ma hanno un tetto: il furto di vita si ferma
+al 25%, la spina al 60%, l'auto-estrazione al 30%, XP e soul coin al 150%. Con dieci anelli di rango
+S da quattro incastonature l'uno il tetto serve davvero.</p>
+
+<h3>L'Abyss Shop (<kbd>O</kbd>)</h3>
+<p>Una finestra del Sistema: si apre ovunque, ed è personale — l'assortimento del tuo vicino è un
+altro. <b>Sei voci</b>: le prime quattro si vedono per intero (sai esattamente cosa compri), le
+ultime due sono <b>pacchetti sigillati</b> — conosci solo il rango, il pezzo viene tirato quando
+paghi. Costano meno perché il rischio lo prendi tu.</p>
+<p>L'assortimento <b>ruota da solo a ogni giorno di gioco</b>, e quello che non compri sparisce.
+Puoi forzare una rotazione pagando: <b>400</b> soul coin la prima volta, poi 720, 1296, 2332… il
+prezzo quasi raddoppia ogni volta e si azzera alla rotazione successiva.</p>
+<p>È caro di proposito. La fonte vera dell'equipaggiamento sono i Gate; il negozio è dove si va
+quando il bottino non ha sorriso.</p>
+
+<!-- ══════════════════════════════════════════════════════════════ OFFICINA -->
+
+<h2 id="officina">L'Officina delle Anime</h2>
+<p class="lede">«Un'anima che non combatte può lavorare. È la differenza fra un Monarca e un
+becchino.»</p>
+
+<p>L'esercito ha un limite. Tutto ciò che estrai oltre quel limite — e tutto ciò che congedi — resta
+un'<b>Anima Errante</b>: un oggetto con un livello, un vigore e dei <b>tratti</b>. Le anime si
+installano nei macchinari e lavorano.</p>
+
+<div class="cards">
+  <div class="card"><h4>Richiamo d'Anime</h4><p>2 anime, 3 uscite, 30 s a giro. Le anime installate
+  <em>ne chiamano altre</em> dall'Abisso — e più sono forti, più in alto arriva quello che chiamano.
+  Con abbastanza vigore risponde perfino un Warden.</p></div>
+  <div class="card"><h4>Crogiolo delle Anime</h4><p>4 anime + 1 catalizzatore, 10 s. Ne esce
+  <em>una</em>: la più forte delle quattro, salita di livello e con i tratti di tutte. È l'unico
+  macchinario che consuma le anime, e l'unico che dà tratti nuovi.</p></div>
+  <div class="card"><h4>Fucina d'Ombra</h4><p>3 anime, 8 s. Fonde <b>qualunque cosa</b> una fornace
+  sappia fondere, senza una briciola di carburante. Non si esaurisce mai.</p></div>
+  <div class="card"><h4>Pozzo dell'Abisso</h4><p>4 anime, 20 s. Trasforma il vigore in soul coin
+  (metà del vigore installato a giro), e nell'8% dei casi lascia anche un catalizzatore. Paga solo
+  mentre sei collegato.</p></div>
+</div>
+
+<p><b>Il vigore è l'unica leva.</b> Non c'è energia, non c'è carburante: un macchinario va più
+veloce se ci metti dentro anime più forti, e si ferma se le togli. Il tempo può scendere fino a un
+quarto di quello base, non oltre.</p>
+<p>Un macchinario <b>non si costruisce senza il suo Progetto</b>, che sta al centro della ricetta e
+si consuma. Il primo di ognuno arriva dagli incarichi; poi li vende il Cartografo dell'Abisso (da 24
+a 48 monete). Accettano le tramogge — sotto si preleva, sopra e di lato si carica, e nessuno può
+rubarti un'operaia.</p>
+
+<h3>I cinque tratti</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>Tratto</th><th>Cosa cambia</th></tr></thead>
+  <tbody>
+    <tr><td class="q">Ardore</td><td>Il macchinario lavora più in fretta</td></tr>
+    <tr><td class="q">Avidità</td><td>Più soul coin dal Pozzo</td></tr>
+    <tr><td class="q">Tenacia</td><td>Ogni tanto l'uscita è doppia</td></tr>
+    <tr><td class="q">Risonanza</td><td>Ogni tanto il catalizzatore si salva</td></tr>
+    <tr><td class="q">Ferocia</td><td>Più forte una volta arruolata</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Un'anima che ha lavorato abbastanza può tornare a combattere: <b>shift + clic destro</b>
+sull'oggetto la arruola nell'esercito, con il rango che ha adesso. «Poche cose sono più fedeli di un
+soldato che è stato operaio.»</p>
+
+<!-- ══════════════════════════════════════════════════════════════ INCARICHI -->
+
+<h2 id="incarichi">I diciotto incarichi</h2>
+<p class="lede">Uno per volta, in quest'ordine, e ognuno apre esattamente ciò che serve al
+successivo. <b>Sotto ci sono spoiler</b>: se vuoi scoprirlo giocando, salta al prossimo capitolo.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>#</th><th>Incarico</th><th>Obiettivo</th><th>Apre</th><th>Regalo</th></tr></thead>
+  <tbody>
+    <tr><td class="n">1</td><td class="q">Il risveglio</td><td>Arriva a un passo dalla morte</td><td>Il Sistema</td><td>—</td></tr>
+    <tr><td class="n">2</td><td class="q">Primi passi</td><td>Raggiungi il livello 3</td><td>Le statistiche</td><td class="n">50</td></tr>
+    <tr><td class="n">3</td><td class="q">Il conto dei caduti</td><td>Abbatti 15 creature</td><td>L'esercito d'ombra</td><td class="n">100</td></tr>
+    <tr><td class="n">4</td><td class="q">La prima ombra</td><td>Estrai 1 ombra (<kbd>R</kbd>)</td><td>Le abilità</td><td class="n">150</td></tr>
+    <tr><td class="n">5</td><td class="q">Il potere si usa</td><td>Usa 3 abilità</td><td>L'equipaggiamento</td><td>Occhio dell'Oscurità</td></tr>
+    <tr><td class="n">6</td><td class="q">Qualcosa addosso</td><td>Indossa 1 pezzo</td><td>I Gate</td><td class="n">250</td></tr>
+    <tr><td class="n">7</td><td class="q">Il primo varco</td><td>Chiudi 1 Gate</td><td>L'Abyss Shop</td><td class="n">400</td></tr>
+    <tr><td class="n">8</td><td class="q">Il primo affare</td><td>Compra 1 voce al negozio</td><td>Il viaggio fra Associazioni</td><td>Sigillo</td></tr>
+    <tr><td class="n">9</td><td class="q">L'Associazione</td><td>Metti piede in una città</td><td>Le gemme</td><td>800 + pezzo <span class="rank r-d">D</span></td></tr>
+    <tr><td class="n">10</td><td class="q">Il mercato</td><td>Parla con qualcuno dietro un bancone</td><td>La Moneta d'Anima</td><td class="n">300</td></tr>
+    <tr><td class="n">11</td><td class="q">Il conio</td><td>Conia 8 Monete d'Anima</td><td>L'Officina delle Anime</td><td>—</td></tr>
+    <tr><td class="n">12</td><td class="q">L'esubero</td><td>Raccogli 3 Anime Erranti</td><td>Il Richiamo d'Anime</td><td>Progetto</td></tr>
+    <tr><td class="n">13</td><td class="q">Il richiamo</td><td>Fai finire 1 giro a un macchinario</td><td>Il Crogiolo</td><td>Progetto</td></tr>
+    <tr><td class="n">14</td><td class="q">La fusione</td><td>Fondi quattro anime in una</td><td>La Fucina d'Ombra</td><td>Progetto</td></tr>
+    <tr><td class="n">15</td><td class="q">La fucina</td><td>Fondi 16 oggetti senza carburante</td><td>Il Pozzo dell'Abisso</td><td>Progetto</td></tr>
+    <tr><td class="n">16</td><td class="q">Il pozzo</td><td>Mungi 200 soul coin dal Pozzo</td><td>L'arruolamento</td><td>1000 + pezzo <span class="rank r-c">C</span></td></tr>
+    <tr><td class="n">17</td><td class="q">La recluta</td><td>Arruola 1 anima</td><td>I servizi del mercato</td><td class="n">1200</td></tr>
+    <tr><td class="n">18</td><td class="q">Il sensale</td><td>Compra 1 varco dal Sensale</td><td>La maestria</td><td>2000 + pezzo <span class="rank r-b">B</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p style="color: var(--muted); font-size: 14.5px;">Finita la catena: «Non manca più niente: da qui
+in avanti il Sistema tace e guarda.»</p>
+
+<!-- ══════════════════════════════════════════════════════════════ COMANDI -->
+
+<h2 id="comandi">Comandi, per il collaudo</h2>
+<p class="lede">Servono i permessi da operatore. In un mondo singleplayer basta aprirlo con i trucchi
+attivi.</p>
+
+<div class="panel accent">
+  <p class="callout-title">Il Laboratorio — comincia da qui</p>
+  <p><code>/arise lab</code> tira su una stanza chiusa e illuminata con <b>tutto dentro</b>: i sei
+  varchi (uno per rango) sulla parete nord, i quattro macchinari già alimentati con anime di prova
+  sulla sud, i nove banconi del mercato con i loro NPC a est, e al centro tre barili con progetti,
+  catalizzatori di ogni grado, monete, anime e un completo di rango A. Sblocca anche tutti i
+  sistemi. È il modo più rapido di provare qualsiasi cosa senza giocare un'ora.</p>
+</div>
+
+<h3>Progressione</h3>
+<pre><code>/arise info                       livello, XP, punti, statistiche
+/arise spend &lt;stat&gt; &lt;punti&gt;       spendi punti (vitality|agility|strength|endurance)
+/arise level &lt;n&gt;                  imposta il livello
+/arise xp &lt;n&gt;                     regala esperienza
+/arise souls                      il saldo
+/arise souls add &lt;n&gt;              regala soul coin
+/arise reset                      azzera la progressione</code></pre>
+
+<h3>Incarichi e tutorial</h3>
+<pre><code>/arise quest                      l'incarico in corso e il progresso
+/arise quest skip                 salta quello in corso
+/arise quest all                  completa tutta la catena
+/arise quest reset                riazzera la catena
+/arise tutorial                   ripassa il discorso dell'Araldo
+/arise tutorial start             rientra nella Sala del Risveglio</code></pre>
+
+<h3>Varchi</h3>
+<pre><code>/arise gate                       apre un varco di rango E davanti a te
+/arise gate &lt;e|d|c|b|a|s&gt;         apre un varco del rango scelto
+/arise gate spawn                 forza subito un varco spontaneo
+/arise gate list                  l'indice dei varchi aperti
+/arise compass                    dov'è il varco più vicino
+/arise leave                      uscita d'emergenza
+/arise map                        apre la mappa</code></pre>
+
+<h3>Ombre</h3>
+<pre><code>/arise arise                      estrai dal cadavere più vicino
+/arise summon | recall            evoca / richiama
+/arise stance [aggressive|defensive|passive]
+/arise shadows                    l'esercito, con grado e statistiche
+/arise shadows squad              la squadra, nell'ordine di uscita
+/arise shadows clear              svuota l'esercito</code></pre>
+
+<h3>Roba e città</h3>
+<pre><code>/arise gear                       cosa hai indosso
+/arise gear give &lt;slot&gt; &lt;rango&gt;   un pezzo preciso
+/arise gear roll &lt;rango&gt; [1-40]   pezzi a caso: è il bottino vero dei Gate
+/arise gear unique eye_of_darkness
+/arise gem give &lt;tipo&gt; &lt;rango&gt;    una gemma
+/arise kit [iron|diamond|netherite]   corredo vanilla incantato, per provare in fretta
+/arise shop                       l'assortimento in chat
+/arise city setup                 tira su le città mancanti
+/arise city go &lt;città&gt;            viaggia
+/arise city npcs                  ripopola i banconi della città più vicina
+/arise fx &lt;effetto&gt;               riproduce uno dei 15 effetti
+/arise spawn &lt;tipo&gt; [1-64]        evoca entità in cerchio</code></pre>
+
+<p style="color: var(--muted); font-size: 14.5px;">Scrivi <code>/arise</code> e premi TAB:
+l'elenco che dà il gioco è sempre più aggiornato di questa pagina.</p>
+
+<!-- ══════════════════════════════════════════════════════════════ COLLAUDO -->
+
+<h2 id="collaudo">Cosa guardare, e come segnalarlo</h2>
+<p class="lede">Questa è una build di collaudo. Molti sistemi compilano e passano le prove
+automatiche, ma <b>non sono ancora stati visti funzionare in gioco</b>: è esattamente per questo
+che ti serviamo.</p>
+
+<h3>Le cose che si rompono più facilmente</h3>
+<ul class="tight">
+  <li><b>Testo grezzo</b> — se leggi una chiave tipo <code>arise.msg.qualcosa</code> invece di una frase, è una traduzione mancante.</li>
+  <li><b>Cubi viola</b> — un modello o una texture che non c'è.</li>
+  <li><b>Numeri che non tornano</b> — la statistica in <kbd>K</kbd> contro quella che senti addosso.</li>
+  <li><b>Progressione persa</b> — <em>muori e ricontrolla</em>: livello, esercito, equipaggiamento, incarichi devono sopravvivere alla morte. Poi esci dal mondo e rientra: devono sopravvivere anche a quello.</li>
+  <li><b>Ombre duplicate o sparite</b> — soprattutto passando fra dimensioni (Nether, End, Gate).</li>
+  <li><b>Un incarico bloccato</b> — fai quello che chiede e il contatore non sale.</li>
+  <li><b>Rimanere chiusi dentro</b> — un Gate senza uscita, una città irraggiungibile.</li>
+  <li><b>Lag</b> — soprattutto lontano dallo spawn, o quando una città si costruisce.</li>
+</ul>
+
+<div class="panel gold">
+  <p class="callout-title">Una segnalazione utile</p>
+  <p>Cosa stavi facendo, cosa ti aspettavi, cosa è successo. Poi: <b>versione del mondo</b>
+  (nuovo o vecchio?), <b>singleplayer o server</b>, e se c'è un errore in chat o nel log
+  (<code>run/logs/latest.log</code>) incollane le righe. Uno screenshot vale più di tre paragrafi.</p>
+</div>
+
+<div class="sep">◆ ◆ ◆</div>
+
+<div class="panel violet">
+  <p class="callout-title">Un'ultima cosa</p>
+  <p>«Adesso torna. Il posto in cui stavi per morire è ancora lì, e ci sarà anche la cosa che ti
+  stava uccidendo — ma tu non sei più quello che l'ha lasciata.»</p>
+  <p style="font-family: var(--display); font-size: 21px; color: var(--accent); margin: 12px 0 0;">Alzati.</p>
+</div>
+
+<hr>
+<footer>
+  <p><b>Arise</b> — mod Fabric per Minecraft 26.2. Guida generata dal contenuto effettivo della
+  build: se qui c'è scritto qualcosa che il gioco non fa, è un difetto di uno dei due, e vale la
+  pena segnalarlo.</p>
+</footer>
+
+</div>
+</body>
+</html>
