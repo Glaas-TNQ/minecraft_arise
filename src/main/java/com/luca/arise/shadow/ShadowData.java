@@ -94,9 +94,19 @@ public record ShadowData(UUID id, Identifier sourceType, ShadowArchetype archety
 				customName, color);
 	}
 
+	/**
+	 * Quanto il danno pesa piu' della vita, quando si misura un'ombra.
+	 *
+	 * <p>Quattro, e non e' un numero tirato a caso: e' quante volte un punto di danno vale un punto
+	 * di vita in uno scontro fra due entita' che si picchiano. Sta qui come costante perche' la
+	 * stessa formula serve in tre posti — il rango dell'ombra, il suo grado, e l'anteprima del
+	 * cadavere prima di estrarlo — e se i tre divergessero l'anteprima direbbe una bugia.
+	 */
+	public static final double DAMAGE_WEIGHT = 4.0;
+
 	/** Quanto "pesa" questa ombra. Il danno conta più della vita perché decide gli scontri. */
 	public double powerScore() {
-		return baseMaxHealth + baseAttackDamage * 4.0;
+		return baseMaxHealth + baseAttackDamage * DAMAGE_WEIGHT;
 	}
 
 	public Rank rank(ShadowConfig config) {
@@ -121,7 +131,7 @@ public record ShadowData(UUID id, Identifier sourceType, ShadowArchetype archety
 	 * combattendo. Due domande diverse, due numeri diversi, entrambi ricavati e nessuno salvato.
 	 */
 	public double effectivePower(ShadowConfig config) {
-		return maxHealth(config) + attackDamage(config) * 4.0;
+		return maxHealth(config) + attackDamage(config) * DAMAGE_WEIGHT;
 	}
 
 	/** Il grado nella scala del manhwa, da Normale a Gran Maresciallo. */

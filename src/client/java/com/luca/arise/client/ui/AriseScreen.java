@@ -70,6 +70,19 @@ public abstract class AriseScreen extends Screen {
 		return null;
 	}
 
+	/**
+	 * Il nome del tasto che <em>questo</em> giocatore ha configurato per quel comando.
+	 *
+	 * <p>Le righe in fondo alle schermate scrivevano le lettere a mano — "Press K or Esc", "P to
+	 * close", "G summons the squad" — ed erano giuste finche' nessuno rimappava. Poi diventavano
+	 * istruzioni false, e nessuno viene a correggerle. Il resto della mod passa gia' da
+	 * {@link Component#keybind} (vedi {@code Unlock.hint} e le pagine dell'Araldo): questo lo rende
+	 * disponibile anche a chi disegna una schermata.
+	 */
+	protected static Component key(String mapping) {
+		return Component.keybind("key.arise." + mapping);
+	}
+
 	/** Il colore della riga d'accento: distingue una schermata dall'altra a colpo d'occhio. */
 	protected int accent() {
 		return AriseTheme.ACCENT;

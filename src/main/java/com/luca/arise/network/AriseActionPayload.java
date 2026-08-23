@@ -20,6 +20,14 @@ public record AriseActionPayload(Action action) implements CustomPacketPayload {
 	public enum Action implements StringRepresentable {
 		/** "Arise": tenta di estrarre l'ombra dal cadavere più vicino. */
 		EXTRACT("extract"),
+		/**
+		 * Lo stesso tasto tenuto accovacciati: <em>guarda</em> il cadavere invece di consumarlo.
+		 *
+		 * <p>Un cadavere si tenta una volta sola, e il tiro puo' andare male: il peggior momento
+		 * del gioco era bruciare il Warden appena ucciso senza sapere di stare tirando al trenta
+		 * per cento. Questo dice cosa c'e' e con che probabilita', e non tocca niente.
+		 */
+		SURVEY("survey"),
 		/** Evoca quante più ombre consente il limite. */
 		SUMMON("summon"),
 		/** Richiama tutte le ombre evocate. */

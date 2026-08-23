@@ -248,7 +248,8 @@ public class ArmyScreen extends AriseScreen {
 
 	@Override
 	protected Component hint() {
-		return Component.translatable("arise.screen.army.hint");
+		return Component.translatable("arise.screen.army.hint",
+				key("summon"), key("recall"), key("order_focus"), key("order_hold"));
 	}
 
 	@Override

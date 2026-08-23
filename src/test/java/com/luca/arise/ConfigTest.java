@@ -131,6 +131,24 @@ class ConfigTest {
 	}
 
 	@Test
+	@DisplayName("al livello massimo il tetto dell'estrazione e' quasi raggiunto")
+	void extractionCeilingIsReachable() {
+		var config = AriseConfig.createDefault();
+		var shadows = config.shadows();
+
+		double atCap = shadows.extractionChanceAt(config.maxLevel());
+
+		// Un tetto che nessuno puo' toccare non e' un tetto: con 0,005 a livello servivano
+		// centoquarantuno livelli su cento disponibili, e la costante era codice morto. La prova
+		// non fissa il numero — fissa il rapporto fra il tetto e il livello massimo, che e' la
+		// cosa che si rompe se qualcuno ritocca la curva senza guardare.
+		assertTrue(atCap > 0.90,
+				"al livello massimo l'estrazione deve sfiorare il tetto, invece vale " + atCap);
+		assertTrue(atCap <= 0.95,
+				"il tetto resta un tetto: nessun livello puo' superarlo");
+	}
+
+	@Test
 	@DisplayName("il cantiere delle citta' ha un tetto di tempo, non solo di blocchi")
 	void cityBuildingIsBounded() {
 		var cities = AriseConfig.createDefault().cities();

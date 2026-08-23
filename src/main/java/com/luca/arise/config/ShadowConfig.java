@@ -319,7 +319,7 @@ public record ShadowConfig(
 	}
 
 	public static final ShadowConfig DEFAULT = new ShadowConfig(
-			0.25, 0.005, 300, 8.0, 6, 0.25, 4, 1.5, 1.2, 0.32, 32.0, 1200,
+			0.25, 0.007, 300, 8.0, 6, 0.25, 4, 1.5, 1.2, 0.32, 32.0, 1200,
 			List.of(0.0, 30.0, 60.0, 110.0, 180.0, 280.0), Leveling.DEFAULT, Costs.DEFAULT,
 			Legion.DEFAULT);
 
@@ -367,8 +367,26 @@ public record ShadowConfig(
 		return baseCapacity + (int) (capacityPerLevel * (level - 1));
 	}
 
-	/** Probabilità di estrazione per un giocatore di questo livello, limitata al 95%. */
+	/**
+	 * Il tetto della probabilita' di estrazione: un'ombra puo' sempre dissolversi.
+	 *
+	 * <p>Non e' bilanciamento, e' una promessa: il verbo che da' il nome alla mod resta un tiro di
+	 * dado fino all'ultimo livello, e un Cacciatore al massimo non e' uno che estrae sempre — e'
+	 * uno che sbaglia una volta su venti.
+	 */
+	public static final double EXTRACTION_CEILING = 0.95;
+
+	/**
+	 * Probabilità di estrazione per un giocatore di questo livello.
+	 *
+	 * <p>Il tetto era irraggiungibile: con 0,005 a livello serviva il livello 141, e il massimo e'
+	 * 100. Una costante che nessuno puo' toccare non e' un tetto, e' una riga di codice morta —
+	 * il giocatore al livello massimo falliva ancora un'estrazione su quattro senza nessun modo di
+	 * migliorare. A 0,007 il centesimo livello vale 94,3%, e il tetto si tocca appena dopo:
+	 * esiste, si vede arrivare, e resta una promessa mantenuta.
+	 */
 	public double extractionChanceAt(int level) {
-		return Math.min(0.95, extractionChanceBase + extractionChancePerLevel * (level - 1));
+		return Math.min(EXTRACTION_CEILING,
+				extractionChanceBase + extractionChancePerLevel * (level - 1));
 	}
 }

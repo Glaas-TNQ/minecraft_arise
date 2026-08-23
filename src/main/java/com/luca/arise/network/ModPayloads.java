@@ -70,6 +70,7 @@ public final class ModPayloads {
 
 				Component feedback = switch (payload.action()) {
 					case EXTRACT -> ShadowManager.extract(player);
+					case SURVEY -> ShadowManager.survey(player);
 					case SUMMON -> ShadowManager.summon(player);
 					case RECALL -> ShadowManager.recall(player);
 					case STANCE -> ShadowManager.cycleStance(player);

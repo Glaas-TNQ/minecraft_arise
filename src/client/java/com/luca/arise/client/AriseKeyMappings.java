@@ -127,7 +127,15 @@ public final class AriseKeyMappings {
 				open(client, Unlock.SHOP, AbyssShopScreen::new);
 			}
 
-			sendOnPress(EXTRACT, AriseActionPayload.Action.EXTRACT);
+			// Lo stesso tasto fa due cose: accovacciati guarda, in piedi estrae. E' l'unico modo
+			// di dare un'anteprima senza chiedere un tredicesimo bind — e la posizione accovacciata
+			// e' gia', in tutto il resto della mod, quella che significa "con calma".
+			while (EXTRACT.consumeClick()) {
+				ClientPlayNetworking.send(new AriseActionPayload(client.player.isShiftKeyDown()
+						? AriseActionPayload.Action.SURVEY
+						: AriseActionPayload.Action.EXTRACT));
+			}
+
 			sendOnPress(SUMMON, AriseActionPayload.Action.SUMMON);
 			sendOnPress(RECALL, AriseActionPayload.Action.RECALL);
 			sendOnPress(STANCE, AriseActionPayload.Action.STANCE);

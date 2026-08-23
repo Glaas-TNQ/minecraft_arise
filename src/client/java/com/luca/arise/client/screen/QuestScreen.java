@@ -87,7 +87,7 @@ public class QuestScreen extends AriseScreen {
 
 	@Override
 	protected Component hint() {
-		return Component.translatable("arise.screen.quest.hint");
+		return Component.translatable("arise.screen.quest.hint", key("quests"));
 	}
 
 	@Override

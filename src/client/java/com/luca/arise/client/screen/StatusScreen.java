@@ -94,7 +94,7 @@ public class StatusScreen extends AriseScreen {
 
 	@Override
 	protected Component hint() {
-		return Component.translatable("arise.screen.status.hint");
+		return Component.translatable("arise.screen.status.hint", key("status"));
 	}
 
 	@Override

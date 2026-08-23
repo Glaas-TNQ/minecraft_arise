@@ -131,6 +131,47 @@ public final class ShadowManager {
 						killer.level().getGameTime() + config.extractionWindowTicks()));
 	}
 
+	/**
+	 * Guarda il cadavere più vicino senza toccarlo: rango, archetipo, probabilità.
+	 *
+	 * <p>Il gemello innocuo di {@link #extract}. La differenza sta tutta in una parola:
+	 * {@code peek} invece di {@code take} — il candidato <em>non</em> viene rimosso dalla lista, e
+	 * quindi l'anteprima si puo' chiedere quante volte si vuole finche' il corpo e' fresco.
+	 *
+	 * <p>Serve perche' l'estrazione ha due proprieta' che insieme fanno male: e' a probabilita', e
+	 * consuma il cadavere comunque. Sapere <em>prima</em> che quel corpo darebbe un Colosso di
+	 * rango A e che si sta tirando al trenta per cento non toglie niente al tiro — cambia solo la
+	 * qualita' della decisione, che e' esattamente cio' che un tiro di dado dovrebbe avere attorno.
+	 */
+	public static Component survey(ServerPlayer player) {
+		Component locked = QuestManager.require(player, Unlock.ARMY);
+		if (locked != null) {
+			return locked;
+		}
+
+		ShadowConfig config = AriseConfig.get().shadows();
+		Candidate best = peekNearestCandidate(player, player.level().getGameTime(),
+				config.extractionRange());
+
+		if (best == null) {
+			return Component.translatable("arise.msg.shadow.no_target");
+		}
+
+		// Il rango si legge dalla stessa formula che lo decidera' davvero, applicata ai numeri che
+		// l'ombra avrebbe: se qui dicesse un rango e l'estrazione ne producesse un altro,
+		// l'anteprima sarebbe peggio di niente.
+		Rank rank = Rank.fromScore(
+				best.maxHealth() * config.healthFactor()
+						+ best.attackDamage() * config.damageFactor() * ShadowData.DAMAGE_WEIGHT,
+				config.rankThresholds());
+
+		double chance = config.extractionChanceAt(ProgressManager.get(player).level());
+
+		return Component.translatable("arise.msg.shadow.survey",
+				rank.label(), best.archetype().label(),
+				String.format("%.0f", chance * 100));
+	}
+
 	/** Tenta l'estrazione dal cadavere più vicino. Restituisce il messaggio da mostrare. */
 	public static Component extract(ServerPlayer player) {
 		Component locked = QuestManager.require(player, Unlock.ARMY);
@@ -216,6 +257,32 @@ public final class ShadowManager {
 	 * probabilità.
 	 */
 	private static Candidate takeNearestCandidate(ServerPlayer player, long now, double range) {
+		Candidate best = peekNearestCandidate(player, now, range);
+		List<Candidate> candidates = CANDIDATES.get(player.getUUID());
+
+		if (candidates == null) {
+			return best;
+		}
+
+		if (best != null) {
+			candidates.remove(best);
+		}
+
+		if (candidates.isEmpty()) {
+			CANDIDATES.remove(player.getUUID());
+		}
+
+		return best;
+	}
+
+	/**
+	 * Il candidato valido più vicino, <em>senza</em> toglierlo dalla lista.
+	 *
+	 * <p>Scarta comunque gli scaduti mentre cerca: la pulizia e' una conseguenza del passare del
+	 * tempo, non del tentare l'estrazione, e farla anche in anteprima significa che l'elenco non
+	 * cresce mai per un giocatore che guarda e basta.
+	 */
+	private static Candidate peekNearestCandidate(ServerPlayer player, long now, double range) {
 		List<Candidate> candidates = CANDIDATES.get(player.getUUID());
 		if (candidates == null) {
 			return null;
@@ -239,14 +306,6 @@ public final class ShadowManager {
 				best = candidate;
 				bestDistance = distance;
 			}
-		}
-
-		if (best != null) {
-			candidates.remove(best);
-		}
-
-		if (candidates.isEmpty()) {
-			CANDIDATES.remove(player.getUUID());
 		}
 
 		return best;
