@@ -65,6 +65,14 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.ChatFormatting;
+import com.luca.arise.tutorial.Sanctum;
+import com.luca.arise.quest.Unlock;
+import com.luca.arise.daily.DailyQuest;
+import com.luca.arise.daily.DailyTask;
+import com.luca.arise.config.DailyConfig;
+import com.luca.arise.AriseMod;
+import java.util.Locale;
 
 /**
  * Comandi di debug e di gioco.
@@ -96,6 +104,10 @@ public final class AriseCommands {
 			LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("arise");
 
 			root.then(Commands.literal("info").executes(context -> info(context.getSource())));
+
+			// La scheda. Senza `requires`, ed e' voluto: non cambia niente, e su un server chi ha
+			// un problema di solito non e' chi ha i permessi.
+			root.then(Commands.literal("doctor").executes(context -> doctor(context.getSource())));
 
 			LiteralArgumentBuilder<CommandSourceStack> spend = Commands.literal("spend");
 			for (Stat stat : Stat.SPENDABLE) {
@@ -423,6 +435,131 @@ public final class AriseCommands {
 
 			dispatcher.register(root);
 		});
+	}
+
+	/**
+	 * La scheda: tutto quello che serve a chi segnala un difetto, in una schermata.
+	 *
+	 * <p>Nasce da una cosa che si vede solo quando qualcun altro collauda la mod. Una segnalazione
+	 * utile ha bisogno di sapere a che livello era il giocatore, quali sistemi gli erano stati
+	 * concessi, a che punto della catena stava, quante ombre aveva e quali varchi erano aperti — e
+	 * <em>nessuna</em> di queste cose e' visibile in una schermata sola. Ricostruirle costa a chi
+	 * segnala cinque comandi e a chi legge cinque domande, e in mezzo la meta' delle segnalazioni si
+	 * perde.
+	 *
+	 * <p>Non e' un comando di debug come gli altri: quelli <em>cambiano</em> lo stato, questo lo
+	 * <em>legge</em> e basta. Ed e' l'unico del gruppo che ha senso lasciare disponibile a tutti,
+	 * perche' non puo' fare danno e perche' su un server chi ha un problema di solito non e' chi ha
+	 * i permessi.
+	 *
+	 * <p>Le tre righe finali sono le sole che fanno una diagnosi invece di riferire un numero: la
+	 * catena finita col Sistema che tace, un esercito al limite che non se ne accorge, e un
+	 * giocatore fermo nella Sala del Risveglio. Sono tre stati leciti che <em>sembrano</em> difetti,
+	 * e dirlo qui evita tre segnalazioni sbagliate.
+	 */
+	private static int doctor(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		MinecraftServer server = source.getServer();
+
+		AriseConfig config = AriseConfig.get();
+		PlayerProgress progress = ProgressManager.get(player);
+		PlayerQuests quests = QuestManager.get(player);
+		Rank rank = config.hunter().rank(progress.level());
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.doctor.header", version())
+				.withStyle(ChatFormatting.AQUA), false);
+
+		// Chi sei.
+		source.sendSuccess(() -> Component.translatable("arise.msg.doctor.hunter",
+				progress.level(), rank.label(), progress.unspentPoints(), progress.souls()), false);
+
+		// Dove sei. La dimensione conta piu' delle coordinate: meta' dei difetti di questa mod si
+		// comportano in modo diverso dentro un varco.
+		source.sendSuccess(() -> Component.translatable("arise.msg.doctor.where",
+				player.level().dimension().identifier().toString(),
+				player.getBlockX(), player.getBlockY(), player.getBlockZ()), false);
+
+		// A che punto della catena. «Finita» e' uno stato, non un errore.
+		if (quests.finished()) {
+			source.sendSuccess(() -> Component.translatable("arise.msg.doctor.chain_done",
+					Quest.values().length), false);
+		} else {
+			source.sendSuccess(() -> Component.translatable("arise.msg.doctor.chain",
+					quests.index() + 1, Quest.values().length,
+					quests.current().title(), quests.progress(),
+					quests.current().amount()), false);
+		}
+
+		// Cosa e' stato concesso, e cosa no. I nomi grezzi degli sblocchi, non le etichette: chi
+		// legge una segnalazione cerca `workshop`, non «l'Officina delle Anime».
+		StringBuilder open = new StringBuilder();
+		StringBuilder shut = new StringBuilder();
+
+		for (Unlock unlock : Unlock.values()) {
+			StringBuilder into = quests.has(unlock) ? open : shut;
+			into.append(into.isEmpty() ? "" : " ").append(unlock.name().toLowerCase(Locale.ROOT));
+		}
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.doctor.unlocks_open",
+				open.isEmpty() ? "—" : open.toString()).withStyle(ChatFormatting.GREEN), false);
+		source.sendSuccess(() -> Component.translatable("arise.msg.doctor.unlocks_shut",
+				shut.isEmpty() ? "—" : shut.toString()).withStyle(ChatFormatting.DARK_GRAY), false);
+
+		// L'esercito.
+		ShadowArmy army = ShadowManager.army(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.doctor.army",
+				army.size(), ShadowManager.capacity(player),
+				ShadowManager.summonedCount(player), ShadowManager.summonLimit(player)), false);
+
+		// La giornaliera.
+		DailyConfig daily = config.daily();
+		if (daily.enabled()) {
+			DailyQuest today = DailyManager.get(player);
+			source.sendSuccess(() -> Component.translatable("arise.msg.doctor.daily",
+					today.day(),
+					DailyTask.values().length - today.remaining(daily),
+					DailyTask.values().length,
+					Component.translatable(today.settled()
+							? "arise.msg.doctor.yes" : "arise.msg.doctor.no")), false);
+		}
+
+		// I varchi. `reconciled` e' la vista buona: conta quelli che esistono davvero nel mondo,
+		// non quelli che l'indice ricorda.
+		source.sendSuccess(() -> Component.translatable("arise.msg.doctor.gates",
+				GateRegistry.reconciled(server).size(),
+				server.getPlayerList().getPlayerCount()), false);
+
+		// Il file di configurazione, per esteso. Chi segnala «ho cambiato un numero e non e'
+		// cambiato niente» quasi sempre ha modificato un altro file.
+		source.sendSuccess(() -> Component.translatable("arise.msg.doctor.config",
+				AriseConfig.file().toAbsolutePath().toString()), false);
+
+		// Le tre diagnosi.
+		if (quests.finished() && progress.level() < config.maxLevel()) {
+			source.sendSuccess(() -> Component.translatable("arise.msg.doctor.note_silent")
+					.withStyle(ChatFormatting.DARK_GRAY), false);
+		}
+
+		if (army.size() >= ShadowManager.capacity(player)) {
+			source.sendSuccess(() -> Component.translatable("arise.msg.doctor.note_full")
+					.withStyle(ChatFormatting.DARK_GRAY), false);
+		}
+
+		if (Sanctum.contains(player, config.awakening())) {
+			source.sendSuccess(() -> Component.translatable("arise.msg.doctor.note_sanctum")
+					.withStyle(ChatFormatting.DARK_GRAY), false);
+		}
+
+		return progress.level();
+	}
+
+	/** La versione dichiarata in fabric.mod.json: la prima riga di ogni segnalazione seria. */
+	private static String version() {
+		return net.fabricmc.loader.api.FabricLoader.getInstance()
+				.getModContainer(AriseMod.MOD_ID)
+				.map(container -> container.getMetadata().getVersion().getFriendlyString())
+				.orElse("?");
 	}
 
 	private static int info(CommandSourceStack source) throws com.mojang.brigadier.exceptions.CommandSyntaxException {

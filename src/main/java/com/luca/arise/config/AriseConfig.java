@@ -89,7 +89,14 @@ public record AriseConfig(
 	 * Fuori da un gioco avviato e' esattamente dove girano le prove, ed e' anche dove serve di piu'
 	 * poter leggere i valori di default.
 	 */
-	private static Path file() {
+	/**
+	 * Il file, per esteso.
+	 *
+	 * <p>Era privato, e {@code /arise doctor} l'ha reso pubblico per una ragione sola: la
+	 * segnalazione piu' frequente su una mod configurabile e' «ho cambiato un numero e non e'
+	 * cambiato niente», e quasi sempre il numero e' stato cambiato in un altro file.
+	 */
+	public static Path file() {
 		return FabricLoader.getInstance().getConfigDir().resolve("arise.json");
 	}
 
