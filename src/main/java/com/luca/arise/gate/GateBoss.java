@@ -45,8 +45,8 @@ import net.minecraft.world.phys.Vec3;
  * differenza fra un boss che si impara e uno che si subisce, ed e' anche l'unica via per alzare la
  * difficolta' senza rompere la leggibilita'.
  *
- * <p>Non ha un battito suo: gira dentro {@code GateManager.tick}, una volta al secondo, per il solo
- * giocatore che sta dentro quel varco. Un boss che ticchettasse per conto proprio sarebbe un boss
+ * <p>Non ha un battito suo: gira dentro {@code GateManager.tick}, quattro volte al secondo, per il
+ * solo giocatore che sta dentro quel varco. Un boss che ticchettasse per conto proprio sarebbe un boss
  * che ticchetta anche quando nella sua sala non c'e' nessuno.
  */
 public final class GateBoss {
@@ -55,8 +55,18 @@ public final class GateBoss {
 	private static final float PHASE_TWO = 0.66F;
 	private static final float PHASE_THREE = 0.33F;
 
-	/** Ogni quante chiamate (cioe' secondi) il Sovrano martella, per fase. */
-	private static final int[] SLAM_EVERY = {6, 4, 3};
+	/**
+	 * Ogni quanti <strong>tick</strong> il Sovrano martella, per fase: sei, quattro, tre secondi.
+	 *
+	 * <p>Erano contati in «chiamate», e la chiamata sembrava valere un secondo. Non vale un secondo:
+	 * il battito dei Gate gira ogni cinque tick, cioe' <em>quattro volte</em> al secondo, e il
+	 * Sovrano avrebbe martellato ogni secondo e mezzo invece che ogni sei — con un anello rosso
+	 * sotto i piedi quasi in permanenza, cioe' un preavviso che non preavvisa piu' niente.
+	 *
+	 * <p>Contarli in tick di gioco e confrontarli con l'orologio del mondo e' l'unico modo che non
+	 * dipende da quanto spesso qualcuno decide di chiamare questo metodo.
+	 */
+	private static final int[] SLAM_EVERY = {120, 80, 60};
 
 	/** Quanto e' larga la martellata, e quanto fa male rispetto al danno del Sovrano. */
 	private static final double SLAM_RADIUS = 4.0;
@@ -85,14 +95,14 @@ public final class GateBoss {
 	/** giocatore → a che fase e' arrivato il suo Sovrano. Si azzera con l'istanza. */
 	private static final Map<UUID, Integer> PHASE = new HashMap<>();
 
-	/** giocatore → quante volte il battito ha girato da quando il Sovrano ha martellato. */
-	private static final Map<UUID, Integer> SINCE_SLAM = new HashMap<>();
+	/** giocatore → a che tick di gioco il Sovrano potra' martellare di nuovo. */
+	private static final Map<UUID, Long> NEXT_SLAM = new HashMap<>();
 
 	private GateBoss() {
 	}
 
 	/**
-	 * Un battito del Sovrano, chiamato una volta al secondo mentre il giocatore e' nel varco.
+	 * Un battito del Sovrano, chiamato quattro volte al secondo mentre il giocatore e' nel varco.
 	 *
 	 * <p>Non fa niente finche' il giocatore non e' nella sala: un boss che martella mentre chi lo
 	 * combatte e' tre stanze piu' indietro sta solo sprecando i suoi anelli rossi.
@@ -113,13 +123,21 @@ public final class GateBoss {
 		int phase = Math.max(phaseOf(boss), relentless ? 1 : 0);
 		announce(player, boss, rank, phase, level);
 
-		int since = SINCE_SLAM.merge(player.getUUID(), 1, Integer::sum);
+		long now = level.getGameTime();
+		Long next = NEXT_SLAM.get(player.getUUID());
 
-		if (since < SLAM_EVERY[phase]) {
+		if (next == null) {
+			// La prima martellata non arriva nell'istante in cui si entra nella sala: si concede
+			// il tempo di guardarsi intorno, che e' il tempo in cui si impara dove sono i muri.
+			NEXT_SLAM.put(player.getUUID(), now + SLAM_EVERY[phase]);
 			return;
 		}
 
-		SINCE_SLAM.put(player.getUUID(), 0);
+		if (now < next) {
+			return;
+		}
+
+		NEXT_SLAM.put(player.getUUID(), now + SLAM_EVERY[phase]);
 		slam(level, player, boss, phase);
 	}
 
@@ -228,7 +246,7 @@ public final class GateBoss {
 	/** Il Sovrano di questo giocatore non c'e' piu': dimentica la sua fase. */
 	public static void forget(UUID player) {
 		PHASE.remove(player);
-		SINCE_SLAM.remove(player);
+		NEXT_SLAM.remove(player);
 	}
 
 	/** Il Sovrano di questa istanza, o {@code null} se e' gia' caduto. */

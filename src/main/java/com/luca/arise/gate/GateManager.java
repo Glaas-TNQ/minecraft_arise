@@ -335,6 +335,12 @@ public final class GateManager {
 	/** Chi si e' gia' sentito dire che la Caccia e' scaduta. Serve a dirglielo una volta sola. */
 	private static final java.util.Set<UUID> HUNT_EXPIRED = new java.util.HashSet<>();
 
+	/** giocatore → a che tick di gioco il gelo di un varco rosso potra' mordere di nuovo. */
+	private static final Map<UUID, Long> NEXT_BITE = new HashMap<>();
+
+	/** giocatore → a che tick di gioco riscrivere il conto alla rovescia della Caccia. */
+	private static final Map<UUID, Long> NEXT_COUNTDOWN = new HashMap<>();
+
 	private static int allocateRegion() {
 		int index = 0;
 		while (USED_REGIONS.contains(index)) {
@@ -742,10 +748,18 @@ public final class GateManager {
 		SLAIN.remove(player.getUUID());
 		HUNT_DEADLINE.remove(player.getUUID());
 		HUNT_EXPIRED.remove(player.getUUID());
+		NEXT_BITE.remove(player.getUUID());
+		NEXT_COUNTDOWN.remove(player.getUUID());
 	}
 
 	/**
-	 * Battito del Gate per un giocatore che ci sta dentro, chiamato una volta al secondo.
+	 * Battito del Gate per un giocatore che ci sta dentro, chiamato <strong>ogni cinque tick</strong>.
+	 *
+	 * <p>Quattro volte al secondo, non una — e la differenza ha gia' prodotto due difetti, quindi
+	 * vale la pena scriverla qui in grande. Tutto cio' che deve succedere «ogni N secondi» dentro
+	 * questo metodo conta i tick di gioco e li confronta con l'orologio del mondo: contare le
+	 * chiamate significherebbe legare il bilanciamento alla frequenza con cui qualcun altro,
+	 * altrove, ha deciso di chiamare.
 	 *
 	 * <p>Due cose che non possono succedere al momento della generazione: l'entrata in scena del
 	 * boss — costruire il Gate e suonarla subito significherebbe sprecarla a stanze vuote — e il
@@ -801,7 +815,20 @@ public final class GateManager {
 			return;
 		}
 
-		long left = deadline - player.level().getGameTime();
+		long now = player.level().getGameTime();
+		long left = deadline - now;
+
+		// Il battito gira quattro volte al secondo, e la barra d'azione mostra i secondi: riscriverla
+		// quattro volte per lo stesso numero e' tre pacchetti su quattro spesi per niente.
+		if (left > 0) {
+			Long nextWrite = NEXT_COUNTDOWN.get(player.getUUID());
+
+			if (nextWrite != null && now < nextWrite) {
+				return;
+			}
+
+			NEXT_COUNTDOWN.put(player.getUUID(), now + 20L);
+		}
 
 		if (left <= 0) {
 			// La scadenza NON si toglie dalla mappa. Toglierla sembrava pulito e regalava il
@@ -835,8 +862,26 @@ public final class GateManager {
 	private static void bite(ServerPlayer player) {
 		SpawnConfig spawn = AriseConfig.get().gates().spawn();
 
-		if (player.tickCount % Math.max(1, spawn.frostIntervalTicks()) != 0
-				|| player.isCreative() || player.isSpectator()) {
+		if (player.isCreative() || player.isSpectator()) {
+			return;
+		}
+
+		// Un orologio, non un modulo sul contatore dei tick del giocatore. Il battito dei Gate gira
+		// ogni cinque tick e il contatore del giocatore parte da quando e' entrato nel mondo: se i
+		// due non si allineano — e per meta' dei giocatori non si allineano — il resto della
+		// divisione non cade mai su una chiamata, e il gelo non morde mai nessuno.
+		long now = player.level().getGameTime();
+		Long next = NEXT_BITE.get(player.getUUID());
+
+		if (next != null && now < next) {
+			return;
+		}
+
+		NEXT_BITE.put(player.getUUID(), now + Math.max(1, spawn.frostIntervalTicks()));
+
+		if (next == null) {
+			// Il primo morso non arriva nell'istante dell'ingresso: si entra, si legge il titolo
+			// rosso, e si ha il tempo di accendere qualcosa prima che il freddo cominci.
 			return;
 		}
 
