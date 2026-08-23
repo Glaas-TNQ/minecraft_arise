@@ -142,7 +142,10 @@ public final class GateAffixes {
 				// ed e' il punto — questo affisso non e' piu' forte, e' piu' forte contro una
 				// certa squadra, e per questo la squadra diventa una decisione.
 				if (victim instanceof ShadowEntity) {
-					victim.hurtServer(level, level.damageSources().magic(),
+					// Il colpo in piu' passa dallo stesso mob che ha colpito: cosi' l'armatura
+					// dell'ombra conta come conterebbe su qualunque altro colpo suo, e un Colosso
+					// resta la risposta giusta anche a questo affisso.
+					victim.hurtServer(level, level.damageSources().mobAttack(living),
 							dealt * (MobAffix.SHADOW_EATER_FACTOR - 1.0F));
 					AriseFx.affixPulse(level, victim.position(), affix.color());
 				}

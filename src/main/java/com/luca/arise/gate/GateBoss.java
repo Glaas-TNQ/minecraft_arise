@@ -216,7 +216,9 @@ public final class GateBoss {
 	private static void sweep(ServerLevel level, Mob boss) {
 		for (ShadowEntity shadow : level.getEntitiesOfClass(ShadowEntity.class,
 				boss.getBoundingBox().inflate(SWEEP_RADIUS), LivingEntity::isAlive)) {
-			shadow.hurtServer(level, level.damageSources().magic(),
+			// Stessa ragione della martellata: `magic()` bypassa l'armatura, e un'ombra ha attributi
+			// come chiunque altro. La spazzata deve poter essere attutita da un Colosso.
+			shadow.hurtServer(level, level.damageSources().mobAttack(boss),
 					shadow.getMaxHealth() * SWEEP_SHARE);
 		}
 

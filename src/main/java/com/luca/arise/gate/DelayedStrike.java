@@ -78,9 +78,15 @@ public final class DelayedStrike {
 		// Colpisce solo il Monarca e il suo esercito. Un'area che ferisse anche i mob farebbe della
 		// martellata del Sovrano la cosa migliore che possa capitare in una stanza affollata, e
 		// dello scoppio di un Volatile un regalo: l'opposto di una minaccia, in entrambi i casi.
+		//
+		// E passa da `generic()` e non da `magic()`, che e' una correzione di sostanza. Il tipo di danno magico sta
+		// nel tag `bypasses_armor`: la martellata del Sovrano avrebbe ignorato l'armatura, e con
+		// lei tutta la Resistenza — cioe' una delle quattro statistiche spendibili non avrebbe
+		// fatto niente contro l'attacco principale del boss piu' duro del gioco. Un giocatore che
+		// avesse messo cento punti li' se ne sarebbe accorto e non avrebbe saputo perche'.
 		for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, area,
 				entity -> entity instanceof Player || entity instanceof ShadowEntity)) {
-			target.hurtServer(level, level.damageSources().magic(), pending.damage());
+			target.hurtServer(level, level.damageSources().generic(), pending.damage());
 		}
 	}
 
