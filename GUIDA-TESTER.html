@@ -367,7 +367,7 @@
 <!-- ══════════════════════════════════════════════════════════════ NOVITÀ -->
 
 <h2 id="novita">Nuovo stasera</h2>
-<p class="lede">Tredici blocchi aggiunti oggi. Nessuno di questi è mai stato visto girare in gioco: se
+<p class="lede">Quindici blocchi aggiunti oggi. Nessuno di questi è mai stato visto girare in gioco: se
 guardi una cosa sola, guarda queste.</p>
 
 <div class="panel warn">
@@ -383,6 +383,8 @@ guardi una cosa sola, guarda queste.</p>
     <li><b>Il Cubo dell'Abisso</b> — ogni varco ne lascia uno, e si apre in due modi. → <a href="#cubo">qui sotto</a></li>
     <li><b>L'Abisso</b> — la discesa che non finisce. È quello che mancava dopo l'ultimo incarico. → <a href="#abisso">qui sotto</a></li>
     <li><b>Dodici traguardi</b> nella schermata degli avanzamenti di Minecraft — con i toast.</li>
+    <li><b>La Quest Giornaliera e la Zona di Penalità</b> — il Sistema chiede ogni mattina, e se la sera non hai fatto ti <em>sposta</em>. → <a href="#giornaliera">qui sotto</a></li>
+    <li><b><code>/arise config reload</code></b> — taratura dei numeri senza riavviare.</li>
     <li><b>La Pergamena del Rimpianto</b> — il respec. → <a href="#roba">roba</a></li>
     <li><b>Shift + <kbd>R</kbd></b> — guarda il cadavere prima di bruciarlo. → <a href="#esercito">l'esercito</a></li>
     <li><b>Tre istruzioni che mentivano</b> a chi rimappa i tasti — corrette.</li>
@@ -468,6 +470,38 @@ mob affissi nella stessa stanza. Il nome sopra la testa lo dice, e ognuno ha una
 </div>
 <p style="color: var(--muted); font-size: 14.5px;">Per provarli:
 <code>/arise gate affix &lt;nome&gt;</code> li mette addosso al mob più vicino.</p>
+
+<h3 id="giornaliera">La Quest Giornaliera</h3>
+<p>Ogni alba il Sistema chiede quattro cose. Sono i cento flessioni, cento addominali, cento squat e
+dieci chilometri del canone, tradotti nelle sole quattro cose che Minecraft conta già:</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Obiettivo</th><th>Quanto</th><th>Nota</th></tr></thead>
+  <tbody>
+    <tr><td class="q">Blocchi scavati</td><td class="n">100</td><td>qualunque blocco, anche uno che avevi piazzato tu</td></tr>
+    <tr><td class="q">Colpi a segno</td><td class="n">100</td><td>a segno: un fendente a vuoto non conta</td></tr>
+    <tr><td class="q">Salti</td><td class="n">100</td><td>il momento in cui i piedi lasciano terra</td></tr>
+    <tr><td class="q">Blocchi di corsa</td><td class="n">1000</td><td>solo mentre corri, solo in orizzontale, e un viaggio fra città non conta</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Sono tarati per essere <b>un promemoria di giocare</b>, non un secondo lavoro: chi passa una
+giornata a scavare, combattere e camminare li fa senza accorgersene. Il pannello in alto a sinistra
+mostra una riga «Giornaliera n/4» finché è aperta, e sparisce quando la chiudi.</p>
+<p>Chiusa: <b>un punto statistica e le forze indietro</b>.</p>
+
+<div class="panel warn">
+  <p class="callout-title">Aperta al tramonto: il Sistema ti sposta</p>
+  <p>Ti ritrovi nella <b>Zona di Penalità</b> — una piana di sabbia delle anime senza cielo,
+  illuminata da sotto, con un muro che non si scavalca. Una sola quest: <em>sopravvivi otto
+  minuti</em>, mentre arrivano ondate di millepiedi che crescono.</p>
+  <p><b>La penalità non ti toglie niente.</b> Non leva livelli, non brucia l'inventario, non
+  cancella l'esercito, e <b>lì dentro non si può morire</b>: se arrivi a zero riparti dal centro a
+  metà vita col cronometro azzerato. Costa otto minuti e la faccia. Se una di queste cose non è
+  vera, è il difetto più importante da segnalare di tutta la build.</p>
+</div>
+<p style="color: var(--muted); font-size: 14.5px;"><code>/arise daily</code> per leggere i quattro
+contatori, <code>/arise daily penalty</code> per farti prendere subito senza aspettare un tramonto.</p>
 
 <h3 id="abisso">L'Abisso</h3>
 <p>Era il buco più grande della mod: finita la catena dei diciotto incarichi il Sistema diceva «da
@@ -1205,6 +1239,9 @@ attivi.</p>
 /arise city setup                 tira su le città mancanti
 /arise city go &lt;città&gt;            viaggia
 /arise city npcs                  ripopola i banconi della città più vicina
+/arise daily                      i quattro contatori della giornata
+/arise daily penalty              ti manda subito nella Zona di Penalità
+/arise config reload              rilegge arise.json senza riavviare
 /arise fx &lt;effetto&gt;               riproduce uno dei 15 effetti
 /arise spawn &lt;tipo&gt; [1-64]        evoca entità in cerchio</code></pre>
 
@@ -1248,6 +1285,9 @@ che ti serviamo.</p>
   <li><b>I traguardi</b>: apri la schermata degli avanzamenti (<kbd>L</kbd>) e cerca la scheda di
   Arise. Dodici voci, e una è nascosta finché non ci arrivi. Il toast deve comparire al momento
   giusto — se lo vedi arrivare per la cosa sbagliata, segnalalo.</li>
+  <li><b>La penalità</b>: <code>/arise daily penalty</code>, poi fatti uccidere apposta. Devi
+  ripartire dal centro a metà vita, e il cronometro deve ricominciare da capo — <em>non</em> devi
+  morire, né perdere niente.</li>
   <li><b>L'Abisso</b>: <code>/arise abyss</code>, chiudi il primo gradino, riprova. Deve dirti che il
   secondo ti è aperto, e <em>non</em> deve lasciarti saltare al quinto. Poi <code>/arise abyss 5</code>
   quando ci arrivi: da lì ogni stanza ha un mob con un affisso.</li>

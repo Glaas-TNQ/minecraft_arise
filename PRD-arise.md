@@ -741,23 +741,23 @@ Detto esplicitamente, perché uno scope negativo scritto vale più di dieci disc
 | 12 | **B12** — l'esame di rango | un giorno | aperto — Igris arriva intanto dal primo varco di rango C |
 | 13 | **B11** — l'Abisso | un giorno | ✅ *da verificare in gioco* |
 | 14 | **B15** — il Registro del Sistema | due giorni | aperto |
-| 15 | **B16** — adottabilità | un giorno | aperto |
-| 16 | **B3** — Quest Giornaliera e Penalità | un giorno | aperto |
+| 15 | **B16** — adottabilità | un giorno | ◐ *tag e ricarica della config fatti; interruttori per sistema e menu radiale aperti* |
+| 16 | **B3** — Quest Giornaliera e Penalità | un giorno | ✅ *da verificare in gioco* |
 | 17 | **B13** — i Monarchi | due giorni | aperto |
 
-**Dodici su diciassette**, in una sessione. Tutti e dodici compilano, passano 91 prove, escono puliti
-dal collaudo statico e fanno partire un server dedicato su un mondo nuovo — e **nessuno dei dodici
-e' ancora stato visto girare in gioco**, che secondo la regola 3 del progetto vuol dire che nessuno
-dei dodici e' finito.
+**Tredici su diciassette e mezzo**, in due sessioni. Tutti compilano, passano 94 prove, escono puliti
+dal collaudo statico e fanno partire un server dedicato su un mondo nuovo — e **niente di tutto
+questo e' ancora stato visto girare in gioco**, che secondo la regola 3 del progetto vuol dire che
+niente di tutto questo e' finito.
 
-Delle cinque che restano, tre (B13, B12, B3) sono contenuto nuovo e due (B15, B16) sono
-infrastruttura.
+Restano **B13** (i Monarchi), **B12** (l'esame di rango), **B15** (il Registro del Sistema), e la
+meta' aperta di **B16** — gli interruttori per sistema e il menu radiale.
 
-La lacuna **L1** — dopo il diciottesimo incarico non c'e' niente — e' **chiusa**: l'Abisso e' il
-traguardo che ne apre un altro, e ha il cronometro che trasforma un contenuto ripetibile in una
-prova di ottimizzazione. Restano aperte **L4** in parte (un Gate e' meno uguale a se stesso di
-prima, ma la pianta e' ancora quella) e **L7** in parte (sette ombre da inseguire, un pezzo unico
-solo).
+La lacuna **L1** — dopo il diciottesimo incarico non c'e' niente — e' **chiusa** due volte:
+l'Abisso e' il traguardo che ne apre un altro, e la Quest Giornaliera e' quello che il Sistema chiede
+ogni mattina anche a chi ha finito tutto. Restano aperte **L4** in parte (un Gate e' meno uguale a
+se stesso di prima, ma la pianta e' ancora quella) e **L7** in parte (sette ombre da inseguire, un
+pezzo unico solo).
 
 ---
 

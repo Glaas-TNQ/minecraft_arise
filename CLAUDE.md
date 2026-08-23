@@ -280,6 +280,10 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
    - **il collaudo si tara sugli enum con il nome per primo**: `NOME("nome", ...)`. Un enum che
      mette il nome in seconda posizione non viene letto, e il collaudo lo dice — `MobAffix`,
      `NamedShadow` e `StatThreshold` sono nati con l'ordine sbagliato tutti e tre;
+   - **le costanti dei tipi di entita' vanilla non stanno piu' su `EntityType`**: sono in
+     **`EntityTypes`** (plurale), stesso sdoppiamento di `RenderType`/`RenderTypes`. E per chiedere
+     se un tipo sta in un tag non c'e' `EntityType.is(tag)`: si passa da
+     `type.builtInRegistryHolder().is(tag)`;
    - **advancement**: stanno in `data/<ns>/advancement/` (singolare), il criterio
      `minecraft:impossible` e' quello da usare per un traguardo che concede il codice, e la
      concessione e' `player.getAdvancements().award(holder, "nome_criterio")` con l'holder preso da
@@ -439,19 +443,20 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       sul bordo per ciò che sta fuori. Indice dei varchi `GateRegistry` riconciliato; `/arise map`,
       `/arise gate list` — *compilato, da verificare in gioco*
 
-- [ ] **B-PRD** — la prima ondata del `PRD-arise.md`: **dodici blocchi su diciassette** contro il
+- [ ] **B-PRD** — la prima ondata del `PRD-arise.md`: **tredici blocchi e mezzo su diciassette** contro il
       silenzio dopo il diciottesimo incarico. **B0** le tre istruzioni che mentivano a chi rimappa,
       **B1** il tetto dell'estrazione reso raggiungibile e `shift+R` che guarda il cadavere senza
       consumarlo, **B10** la Pergamena del Rimpianto (respec), **B4** le sette ombre con un nome
       (Igris, Iron, Tank, Tusk, Greed, Beru, Bellion), **B2** il Dungeon Break, **B9** le dodici
       soglie delle statistiche, **B8** i sei affissi dei nemici, **B5** il Gate Rosso, **B6** i tre
       obiettivi del varco, **B7** il Sovrano a tre fasi, **B14** il Cubo dell'Abisso, **B11**
-      l'Abisso a profondita' infinita, piu' **dodici advancement** con i toast — *compilato, 91 prove
-      verdi, collaudo pulito, server verde su mondo nuovo ×5; **niente di tutto questo e' ancora
+      l'Abisso a profondita' infinita, **B3** la Quest Giornaliera con la Zona di Penalita', piu'
+      **dodici advancement** con i toast, i **tag** e `/arise config reload` — *compilato, 94 prove
+      verdi, collaudo pulito, server verde su mondo nuovo ×7; **niente di tutto questo e' ancora
       stato visto girare in gioco***
 
-      Restano fuori: **B13** i Monarchi, **B12** l'esame di rango, **B3** la Quest Giornaliera,
-      **B15** il Registro del Sistema, **B16** l'adottabilita'. La consegna sta in
+      Restano fuori: **B13** i Monarchi, **B12** l'esame di rango, **B15** il Registro del Sistema,
+      e la meta' aperta di **B16** (interruttori per sistema, menu radiale). La consegna sta in
       `docs/blocco-prd-prima-ondata.html`.
 
 Aggiorna questa lista quando una fase è **verificata in gioco**, non quando compila.

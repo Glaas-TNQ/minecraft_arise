@@ -359,7 +359,7 @@
 
   <header class="masthead">
     <p class="eyebrow">Arise · la prima ondata del PRD</p>
-    <h1>Tredici blocchi contro il silenzio</h1>
+    <h1>Quindici blocchi contro il silenzio</h1>
     <p class="lede">Arise aveva finito di costruire i suoi sistemi e non aveva ancora cominciato a
       costruire il suo <strong>gioco</strong>. La catena degli incarichi si chiudeva intorno al
       livello venti con la frase «da qui in avanti il Sistema tace e guarda», e da lì il gioco
@@ -367,25 +367,25 @@
       motivo per aprire il varco numero cinquanta dopo aver aperto il quarantanovesimo.</p>
     <p class="lede">Prima un <strong>PRD</strong> — dodici lacune con l'evidenza nel codice, sette
       principi, diciassette blocchi ordinati per valore diviso costo, e uno scope negativo scritto.
-      Poi dodici di quei diciassette, più i traguardi.</p>
+      Poi tredici di quei diciassette e mezzo, più i traguardi, i tag e la ricarica della config.</p>
 
     <p class="facts">
-      <span>blocchi <b>12 / 17</b></span>
-      <span>file nuovi <b>16</b></span>
-      <span>prove <b>91</b> (+22)</span>
-      <span>chiavi di lingua <b>842</b> (+138)</span>
+      <span>blocchi <b>13½ / 17</b></span>
+      <span>file nuovi <b>22</b></span>
+      <span>prove <b>94</b> (+25)</span>
+      <span>chiavi di lingua <b>868</b> (+164)</span>
       <span>collaudo statico <b>pulito</b></span>
-      <span>server dedicato <b>mondo nuovo ×5</b></span>
+      <span>server dedicato <b>mondo nuovo ×7</b></span>
       <span>difetti trovati <b>8</b></span>
     </p>
   </header>
 
   <div class="notice hot">
     <span class="tag">Cosa è verificato, e cosa no</span>
-    <p>Tutti e dodici i blocchi compilano, passano le novantuno prove, escono puliti dal collaudo
-      statico e fanno partire un server dedicato su un mondo vergine — quattro volte, a intervalli
-      lungo la sessione. <strong>Nessuno dei dodici è ancora stato visto girare in gioco</strong>, e
-      secondo la regola 3 del progetto questo vuol dire che nessuno dei dodici è finito.</p>
+    <p>Tutto compila, passa le novantaquattro prove, esce pulito dal collaudo statico e fa partire
+      un server dedicato su un mondo vergine — sette volte, a intervalli lungo le due sessioni.
+      <strong>Niente di tutto questo è ancora stato visto girare in gioco</strong>, e secondo la
+      regola 3 del progetto questo vuol dire che niente di tutto questo è finito.</p>
     <p>La guida per chi collauda è <span class="mono">GUIDA-TESTER.html</span>, nella root. In fondo
       ha sei prove mirate: sono le cose che un difetto romperebbe in silenzio.</p>
   </div>
@@ -771,6 +771,68 @@
       per ognuno vorrebbe dire un mixin per ognuno. La concessione è silenziosa in ogni caso in cui
       non si possa fare — un advancement mancante non deve impedire un'estrazione. È decorazione
       sopra una cosa che funziona, e va trattata come tale.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">8</span> La Quest Giornaliera, e la Zona di Penalità</h2>
+    <p class="kicker">La scena che chiunque conosca l'opera si aspetta, e che mancava del tutto.</p>
+
+    <p>Ogni alba il Sistema chiede quattro cose: cento blocchi scavati, cento colpi a segno, cento
+      salti, mille blocchi di corsa. Sono i cento flessioni, cento addominali, cento squat e dieci
+      chilometri del canone, tradotti nei soli quattro gesti che Minecraft sa già contare — e tarati
+      per essere <strong>un promemoria di giocare</strong>, non un secondo lavoro. Chi passa una
+      giornata a scavare, combattere e camminare li fa senza accorgersene.</p>
+
+    <p>Chiusa: un punto statistica e le forze indietro. Aperta al tramonto: <strong>il Sistema ti
+      sposta.</strong></p>
+
+    <div class="notice hot">
+      <span class="tag">La penalità non toglie niente</span>
+      <p>È la sola regola non negoziabile del blocco. Non leva livelli, non brucia l'inventario, non
+        cancella l'esercito, e <strong>nella Zona non si può morire</strong>: chi arriva a zero
+        riparte dal centro a metà vita col cronometro azzerato. Costa otto minuti e la faccia.</p>
+      <p>Una penalità che sottrae è la ricetta per disinstallare la mod. Una che <em>interrompe</em>
+        è la ricetta per ricordarsela — ed è il momento in cui il Sistema smette di essere
+        un'interfaccia e diventa un carceriere, che è esattamente ciò che è nel materiale
+        d'origine.</p>
+    </div>
+
+    <p>La Zona è una piana di sabbia delle anime nella dimensione dei varchi, illuminata da sotto,
+      con un muro invalicabile e niente sopra: il deserto senza sole né stelle del canone. Nella
+      dimensione che c'è già, e non in una nuova — un <span class="mono">DimensionType</span> in più
+      è un file che i mondi vecchi non hanno, cioè un giocatore che il Sistema può teletrasportare in
+      nessun posto. La Sala del Risveglio aveva risolto lo stesso problema nello stesso modo, e
+      questa sta accanto a lei.</p>
+
+    <div class="panel why">
+      <span class="tag">Due ritmi nello stesso giro</span>
+      <p>Il salto e la corsa si guardano a <em>ogni</em> tick, perché un salto è una transizione —
+        piedi a terra, piedi in aria — e guardarla una volta ogni cinque ne perde quattro su cinque.
+        La logica del giorno gira ogni cinque, perché chiedersi che giorno è venti volte al secondo è
+        diciannove volte di troppo.</p>
+      <p>E tre esclusioni sulla corsa, ognuna toglie un modo di chiudere la giornata senza giocarla:
+        chi non corre non conta, la componente verticale non conta (una caduta non è una corsa), e
+        uno spostamento oltre dodici blocchi in un battito non conta affatto — quello è un viaggio
+        fra città o un ingresso in un varco.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">9</span> Due cose che non si vedono giocando</h2>
+
+    <p><strong><span class="mono">/arise config reload</span></strong> rilegge
+      <span class="mono">arise.json</span> senza riavviare, <em>e</em> riscrive gli attributi di chi
+      è collegato. La seconda metà non è un dettaglio: le statistiche sono modificatori calcolati con
+      i valori di config di quando sono stati applicati, e cambiare «quanto vale un punto di Forza»
+      senza riscriverli lascerebbe tutti col vecchio numero addosso — il file direbbe una cosa e il
+      gioco un'altra, che è la divergenza che un comando di ricarica esiste per non produrre.</p>
+
+    <p><strong>Sette tag.</strong> Cinque di oggetti, uno di blocchi, e uno di entità che è l'unico
+      a cambiare davvero qualcosa: <span class="mono">arise:not_extractable</span> dice da chi non si
+      estrae un'ombra. Dentro ci sono i tre casi che erano già sbagliati — i villager, i golem di
+      ferro dei villaggi e le ombre stesse — e da adesso un pack che aggiunge un NPC amichevole non
+      deve più aspettare una versione della mod per impedire che qualcuno lo trasformi in un
+      soldato.</p>
   </section>
 
   <hr>
