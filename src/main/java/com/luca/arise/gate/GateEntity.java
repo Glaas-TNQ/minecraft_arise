@@ -65,6 +65,16 @@ public class GateEntity extends Entity {
 	 */
 	private boolean willBreach;
 
+	/**
+	 * Se questo varco e' rosso: si sigilla dietro chi entra.
+	 *
+	 * <p>Sta qui e <strong>non</strong> nel {@code GateOffer}, ed e' la differenza che fa
+	 * funzionare tutto il blocco. Il preventivo viaggia al client per riempire il pannello di
+	 * analisi: se il colore stesse li' dentro, un client modificato potrebbe leggerlo e il Gate
+	 * Rosso smetterebbe di essere una cosa che si scopre entrando. Il server lo sa, il pannello no.
+	 */
+	private boolean red;
+
 	public GateEntity(EntityType<? extends GateEntity> type, Level level) {
 		super(type, level);
 		this.noPhysics = true;
@@ -93,6 +103,8 @@ public class GateEntity extends Entity {
 		this.remainingTicks = lifetimeTicks;
 		this.willBreach = GateBreach.canBreach(this.level())
 				&& GateBreach.rollWillBreach(this.level().getRandom());
+		this.red = this.level().getRandom().nextDouble()
+				< AriseConfig.get().gates().spawn().redGateChance();
 		this.setCustomName(Component.translatable("arise.gate.varco_name",
 				offer.rank().label(), offer.theme().label()));
 		this.setCustomNameVisible(true);
@@ -104,6 +116,11 @@ public class GateEntity extends Entity {
 
 	public int remainingTicks() {
 		return remainingTicks;
+	}
+
+	/** Se attraversarlo significa restare dentro finche' il Sovrano non cade. */
+	public boolean isRed() {
+		return red;
 	}
 
 	@Override
@@ -212,6 +229,7 @@ public class GateEntity extends Entity {
 			output.store("Offer", GateOffer.CODEC, offer);
 			output.putInt("Remaining", remainingTicks);
 			output.putBoolean("WillBreach", willBreach);
+			output.putBoolean("Red", red);
 		}
 	}
 
@@ -220,5 +238,6 @@ public class GateEntity extends Entity {
 		this.offer = input.read("Offer", GateOffer.CODEC).orElse(null);
 		this.remainingTicks = input.getIntOr("Remaining", 0);
 		this.willBreach = input.getBooleanOr("WillBreach", false);
+		this.red = input.getBooleanOr("Red", false);
 	}
 }

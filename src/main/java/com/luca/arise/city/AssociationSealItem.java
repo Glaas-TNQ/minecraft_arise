@@ -49,6 +49,16 @@ public final class AssociationSealItem extends Item {
 			return InteractionResult.CONSUME;
 		}
 
+		// Un varco rosso disattiva il Sigillo, ed e' la prima volta in tutta la mod che un oggetto
+		// del giocatore smette di funzionare. Si nota, e deve notarsi: e' cosi' che il varco dice
+		// di essersi chiuso senza doverlo ripetere in chat.
+		if (com.luca.arise.gate.GateManager.isSealedIn(serverPlayer)) {
+			serverPlayer.sendSystemMessage(
+					Component.translatable("arise.msg.gate.red_no_seal")
+							.withStyle(net.minecraft.ChatFormatting.RED));
+			return InteractionResult.CONSUME;
+		}
+
 		ItemStack stack = player.getItemInHand(hand);
 		if (player.getCooldowns().isOnCooldown(stack)) {
 			return InteractionResult.PASS;

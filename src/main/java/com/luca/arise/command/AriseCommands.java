@@ -177,6 +177,17 @@ public final class AriseCommands {
 						.executes(context -> affixNearest(context.getSource(), which)));
 			}
 
+			// Uno su venti e' rosso, e non si vede da fuori: senza questo, provarlo vorrebbe dire
+			// entrare in venti varchi a occhi chiusi sperando che uno si chiuda alle spalle.
+			gate.then(Commands.literal("red")
+					.requires(AriseCommands::canCheat)
+					.executes(context -> playerAction(context.getSource(),
+							player -> GateManager.enter(player,
+									com.luca.arise.gate.GateOffer.roll(AriseConfig.get().gates(),
+											GearManager.hunterRank(player),
+											player.level().getRandom().nextLong()),
+									true))));
+
 			gate.then(affix);
 			gate.then(Commands.literal("breach")
 					.requires(AriseCommands::canCheat)

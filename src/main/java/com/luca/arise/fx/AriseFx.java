@@ -333,6 +333,31 @@ public final class AriseFx {
 		play(level, centre, ModSounds.GATE_BREACH, 0.8F, 1.4F);
 	}
 
+	/**
+	 * Il varco rosso si chiude alle spalle: un anello rosso che si stringe attorno a chi e' entrato.
+	 *
+	 * <p>Si stringe, non si allarga. L'anello che si allarga significa "sta per uscire qualcosa"
+	 * (il cedimento); questo significa il contrario, e la direzione e' l'unica cosa che il
+	 * giocatore deve leggere senza saperlo gia'.
+	 */
+	public static void redGateSealed(ServerLevel level, Vec3 position) {
+		FxConfig fx = config();
+		ring(level, position.add(0.0, 0.3, 0.0), 4.0, fx.scaled(44), dust(0xE05A5A, 1.4F), -0.9);
+		column(level, position, 3.0, fx.scaled(24), dust(0xE05A5A, 1.1F));
+		play(level, position, ModSounds.GATE_BREACHING, 1.0F, 0.5F);
+	}
+
+	/** Il gelo morde: fiocchi e un tintinnio, ogni due secondi finche' si sta al freddo. */
+	public static void frostBite(net.minecraft.world.level.Level world, Vec3 position) {
+		if (!(world instanceof ServerLevel level)) {
+			return;
+		}
+
+		level.sendParticles(ParticleTypes.SNOWFLAKE, position.x(), position.y() + 1.0, position.z(),
+				config().scaled(12), 0.4, 0.6, 0.4, 0.01);
+		play(level, position, ModSounds.SHADOW_HURT, 0.35F, 1.8F);
+	}
+
 	/** Il boss entra in scena: si sente da tutta la stanza. */
 	public static void gateBoss(ServerLevel level, Vec3 position, Rank rank) {
 		FxConfig fx = config();

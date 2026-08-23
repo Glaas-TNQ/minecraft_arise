@@ -170,6 +170,32 @@ class ConfigTest {
 	}
 
 	@Test
+	@DisplayName("il varco rosso resta raro, e il gelo lascia il tempo di accendere un fuoco")
+	void redGateStaysRare() {
+		var spawn = AriseConfig.createDefault().gates().spawn();
+
+		// Il Gate Rosso funziona perche' non lo sai prima. Se capitasse spesso, la seconda volta
+		// il giocatore lo saprebbe gia' — e la mod avrebbe perso l'unica cosa che quel varco ha.
+		assertTrue(spawn.redGateChance() > 0.0 && spawn.redGateChance() <= 0.15,
+				"un varco rosso su sette o piu' non e' piu' una sorpresa, e' una regola");
+
+		assertTrue(spawn.frostIntervalTicks() >= 20,
+				"un morso di gelo piu' fitto di un secondo non lascia il tempo di reagire");
+		assertTrue(spawn.frostHeatRadius() > 0,
+				"senza raggio, nessuna fonte di calore terrebbe mai lontano il gelo");
+		assertTrue(spawn.frostDamage() > 0.0, "un gelo che non morde non e' una traversata");
+
+		// I due pericoli si scrivono e si rileggono insieme al resto: sono nati annidati proprio
+		// perche' la radice era arrivata al limite dei sedici campi del codec.
+		assertEquals(spawn.hazard(),
+				com.luca.arise.config.SpawnConfig.Hazard.CODEC
+						.parse(JsonOps.INSTANCE, com.luca.arise.config.SpawnConfig.Hazard.CODEC
+								.encodeStart(JsonOps.INSTANCE, spawn.hazard())
+								.getOrThrow(message -> new AssertionError(message)))
+						.getOrThrow(message -> new AssertionError(message)));
+	}
+
+	@Test
 	@DisplayName("il cantiere delle citta' ha un tetto di tempo, non solo di blocchi")
 	void cityBuildingIsBounded() {
 		var cities = AriseConfig.createDefault().cities();

@@ -151,7 +151,7 @@ public final class ModPayloads {
 
 				switch (payload.action()) {
 					case ENTER -> {
-						Component feedback = GateManager.enter(player, varco.offer());
+						Component feedback = GateManager.enter(player, varco.offer(), varco.isRed());
 						player.sendSystemMessage(feedback);
 						varco.discard();
 					}

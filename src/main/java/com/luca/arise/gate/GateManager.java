@@ -9,7 +9,9 @@ import java.util.UUID;
 import com.luca.arise.AriseMod;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.GateConfig;
+import com.luca.arise.config.SpawnConfig;
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.fx.Overlay;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
@@ -28,6 +30,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -60,7 +64,7 @@ public final class GateManager {
 
 	/** Un Gate aperto, con tutto ciò che serve a chiuderlo. */
 	private record Instance(GateOffer offer, GateLayout layout, int originX, int originZ,
-			int regionIndex, UUID bossId) {
+			int regionIndex, UUID bossId, boolean red) {
 
 		Rank rank() {
 			return offer.rank();
@@ -146,6 +150,16 @@ public final class GateManager {
 
 	/** Attraversa il varco: <em>qui</em> il dungeon viene costruito. */
 	public static Component enter(ServerPlayer player, GateOffer offer) {
+		return enter(player, offer, false);
+	}
+
+	/**
+	 * Attraversa il varco, sapendo se era rosso.
+	 *
+	 * <p>Il colore arriva dall'entita' e non dal preventivo, e viene passato qui invece di essere
+	 * letto: cosi' il pannello di analisi puo' continuare a non saperlo, che e' il punto.
+	 */
+	public static Component enter(ServerPlayer player, GateOffer offer, boolean red) {
 		if (ACTIVE.containsKey(player.getUUID())) {
 			return Component.translatable("arise.msg.gate.already_open");
 		}
@@ -170,7 +184,8 @@ public final class GateManager {
 
 		UUID bossId = populate(gate, config, layout, offer, originX, originZ, random);
 
-		ACTIVE.put(player.getUUID(), new Instance(offer, layout, originX, originZ, regionIndex, bossId));
+		ACTIVE.put(player.getUUID(),
+				new Instance(offer, layout, originX, originZ, regionIndex, bossId, red));
 
 		// Il punto di ritorno prima del teletrasporto: se qualcosa va storto dopo, la via di casa
 		// è già scritta su disco.
@@ -181,7 +196,33 @@ public final class GateManager {
 		player.teleportTo(gate, entrance.x(), entrance.y(), entrance.z(), Set.of(), player.getYRot(), 0.0F, true);
 		AriseFx.gateEntered(gate, entrance, offer.rank());
 
+		if (red) {
+			// Il varco si chiude adesso, e il giocatore lo scopre adesso. E' l'unico momento di
+			// tutta la mod in cui il gioco toglie qualcosa invece di darla, e va detto forte.
+			Overlay.title(player, Component.translatable("arise.title.red_gate"),
+					Component.translatable("arise.subtitle.red_gate"));
+			player.sendSystemMessage(Component.translatable("arise.msg.gate.red_sealed")
+					.withStyle(net.minecraft.ChatFormatting.RED));
+			AriseFx.redGateSealed(gate, entrance);
+		}
+
 		return Component.translatable("arise.msg.gate.entered", offer.rank().label(), layout.rooms().size());
+	}
+
+	/**
+	 * Cosa scalda, dentro un varco rosso.
+	 *
+	 * <p>Un tag e non un elenco nel codice: un pack che voglia aggiungere il suo braciere lo mette
+	 * qui senza toccare Java, ed e' la prima cosa di Arise che si estende da datapack.
+	 */
+	private static final net.minecraft.tags.TagKey<net.minecraft.world.level.block.Block> HEAT =
+			net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.BLOCK,
+					AriseMod.id("heat_sources"));
+
+	/** Vero se questo giocatore e' dentro un varco che si e' chiuso alle sue spalle. */
+	public static boolean isSealedIn(ServerPlayer player) {
+		Instance instance = ACTIVE.get(player.getUUID());
+		return instance != null && instance.red() && isInGate(player);
 	}
 
 	private static int allocateRegion() {
@@ -327,6 +368,13 @@ public final class GateManager {
 		// cosa si e' vinto. Ogni riga se la scrive il gestore che assegna il pezzo, che e' l'unico
 		// a sapere se lo zaino era pieno.
 		GateLoot.award(player, instance.rank()).forEach(player::sendSystemMessage);
+
+		// Il varco rosso paga il doppio, ed e' l'unico posto della mod dove il bottino si tira due
+		// volte: non e' generosita', e' il prezzo di un'ora in cui non si poteva uscire.
+		if (instance.red()) {
+			GateLoot.award(player, instance.rank()).forEach(player::sendSystemMessage);
+			ShadowManager.grantNamed(player, NamedShadow.IRON);
+		}
 
 		awardNamedShadow(player, instance);
 
@@ -493,9 +541,70 @@ public final class GateManager {
 			return;
 		}
 
+		if (instance.red()) {
+			bite(player);
+		}
+
 		if (player.getRandom().nextFloat() < AMBIENCE_CHANCE) {
 			AriseFx.gateAmbience(player);
 		}
+	}
+
+	/**
+	 * Il gelo di un varco rosso: morde chi resta lontano da una fonte di calore.
+	 *
+	 * <p>E' la meta' di questo blocco che cambia come si gioca. Un dungeon in cui l'ambiente fa
+	 * male smette di essere un corridoio da percorrere e diventa una traversata da gestire: si
+	 * pianta un falo', si va avanti fin dove si arriva, si pianta il successivo. Ed e' la prima
+	 * volta che quello che ci si e' portati nello zaino conta piu' di quello che si ha addosso.
+	 *
+	 * <p>Il calore lo porti tu. Le lampade del tema non scaldano — sono luce, e la differenza fra
+	 * luce e calore e' esattamente la lezione che questo varco insegna.
+	 */
+	private static void bite(ServerPlayer player) {
+		SpawnConfig spawn = AriseConfig.get().gates().spawn();
+
+		if (player.tickCount % Math.max(1, spawn.frostIntervalTicks()) != 0
+				|| player.isCreative() || player.isSpectator()) {
+			return;
+		}
+
+		// Tank annulla il gelo. E' l'unica ombra che rende un intero tipo di varco piu' facile, ed
+		// e' anche il motivo per cui vale la pena andarla a prendere in un varco Gelo di rango B.
+		if (ShadowManager.isNamedSummoned(player, NamedShadow.TANK)) {
+			return;
+		}
+
+		if (nearHeat(player, spawn.frostHeatRadius())) {
+			return;
+		}
+
+		player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, spawn.frostIntervalTicks() + 20, 0));
+		player.hurtServer(player.level(), player.damageSources().freeze(),
+				(float) spawn.frostDamage());
+
+		AriseFx.frostBite(player.level(), player.position());
+	}
+
+	/**
+	 * Se c'e' qualcosa che scalda qui attorno.
+	 *
+	 * <p>Un cubo di lato undici, una volta ogni due secondi, per il solo giocatore che sta dentro
+	 * un varco rosso: e' il genere di scansione che sarebbe inaccettabile a ogni tick e che qui
+	 * non si nota. E si ferma al primo blocco trovato, che nella pratica e' subito — chi ha capito
+	 * il varco si tiene addosso il suo falo'.
+	 */
+	private static boolean nearHeat(ServerPlayer player, int radius) {
+		BlockPos centre = player.blockPosition();
+
+		for (BlockPos pos : BlockPos.betweenClosed(centre.offset(-radius, -radius, -radius),
+				centre.offset(radius, radius, radius))) {
+			if (player.level().getBlockState(pos).is(HEAT)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private static void removeMobs(ServerLevel gate, GateConfig config, Instance instance) {
