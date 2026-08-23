@@ -2,6 +2,8 @@ package com.luca.arise.event;
 
 import com.luca.arise.city.City;
 import com.luca.arise.city.CityManager;
+import com.luca.arise.gate.Abyss;
+import com.luca.arise.gate.GateManager;
 import com.luca.arise.network.CityListPayload;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -48,6 +50,16 @@ public final class CityEvents {
 			City city = CityManager.terminalAt(level, hit.getBlockPos());
 			if (city == null) {
 				return InteractionResult.PASS;
+			}
+
+			// Shift inverte il verso, come in tutto il Quartiere del Mercato: il segnaposto
+			// dell'Associazione manda in viaggio, e tenendo shift manda in giu'. L'Abisso non ha
+			// bisogno di un blocco suo — comincia dove i Cacciatori si radunano, che e' anche il
+			// posto giusto perche' un giorno accanto ci sia il Monumento delle Ombre.
+			if (serverPlayer.isShiftKeyDown()) {
+				serverPlayer.sendSystemMessage(GateManager.descend(serverPlayer,
+						Abyss.record(serverPlayer).next()));
+				return InteractionResult.SUCCESS;
 			}
 
 			openHub(serverPlayer);

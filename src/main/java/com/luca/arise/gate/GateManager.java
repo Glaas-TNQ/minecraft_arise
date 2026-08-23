@@ -67,8 +67,16 @@ public final class GateManager {
 	/**
 	 * @param essenceTarget quante creature vanno abbattute, se l'obiettivo e' la Raccolta
 	 */
+	/**
+	 * @param depth     la profondita' dell'Abisso, o zero se questo e' un varco qualunque
+	 * @param startedAt il tick in cui si e' entrati: serve solo all'Abisso, che ha un cronometro
+	 */
 	private record Instance(GateOffer offer, GateLayout layout, int originX, int originZ,
-			int regionIndex, UUID bossId, boolean red, int essenceTarget) {
+			int regionIndex, UUID bossId, boolean red, int essenceTarget, int depth, long startedAt) {
+
+		boolean isAbyss() {
+			return depth > 0;
+		}
 
 		Rank rank() {
 			return offer.rank();
@@ -164,6 +172,18 @@ public final class GateManager {
 	 * letto: cosi' il pannello di analisi puo' continuare a non saperlo, che e' il punto.
 	 */
 	public static Component enter(ServerPlayer player, GateOffer offer, boolean red) {
+		return enter(player, offer, red, 0);
+	}
+
+	/**
+	 * Attraversa il varco sapendo anche a che profondita' dell'Abisso ci si sta calando.
+	 *
+	 * <p>Zero vuol dire «non e' l'Abisso», ed e' il caso di tutti i varchi del mondo. La discesa
+	 * passa dallo stesso codice di un varco qualunque perche' <em>e'</em> un varco qualunque: quello
+	 * che cambia sono il rango, le regole e il cronometro, e nessuna delle tre e' una ragione per
+	 * avere un secondo generatore da tenere allineato al primo.
+	 */
+	public static Component enter(ServerPlayer player, GateOffer offer, boolean red, int depth) {
 		if (ACTIVE.containsKey(player.getUUID())) {
 			return Component.translatable("arise.msg.gate.already_open");
 		}
@@ -186,7 +206,7 @@ public final class GateManager {
 		GateLayout layout = offer.layout(config);
 		GateBuilder.build(gate, config, layout, offer.theme(), originX, originZ);
 
-		UUID bossId = populate(gate, config, layout, offer, originX, originZ, random);
+		UUID bossId = populate(gate, config, layout, offer, originX, originZ, random, depth);
 
 		// Il bersaglio si conta adesso, una volta sola. Chiederlo al preventivo a ogni uccisione
 		// vorrebbe dire rigenerare la pianta del varco a ogni mob che cade — un lavoro che
@@ -194,7 +214,7 @@ public final class GateManager {
 		int essenceTarget = offer.objective().essenceTarget(offer.inhabitants(config));
 
 		ACTIVE.put(player.getUUID(), new Instance(offer, layout, originX, originZ, regionIndex,
-				bossId, red, essenceTarget));
+				bossId, red, essenceTarget, depth, gate.getGameTime()));
 
 		// Il punto di ritorno prima del teletrasporto: se qualcosa va storto dopo, la via di casa
 		// è già scritta su disco.
@@ -204,6 +224,10 @@ public final class GateManager {
 		Vec3 entrance = roomCenter(config, layout.entrance(), originX, originZ);
 		player.teleportTo(gate, entrance.x(), entrance.y(), entrance.z(), Set.of(), player.getYRot(), 0.0F, true);
 		AriseFx.gateEntered(gate, entrance, offer.rank());
+
+		if (depth > 0) {
+			Abyss.brief(player, depth).forEach(player::sendSystemMessage);
+		}
 
 		if (offer.objective() == GateObjective.HUNT) {
 			HUNT_DEADLINE.put(player.getUUID(),
@@ -240,6 +264,52 @@ public final class GateManager {
 			net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.BLOCK,
 					AriseMod.id("heat_sources"));
 
+	/**
+	 * Quanti posti in campo restano a questo giocatore, tenuto conto di dove si trova.
+	 *
+	 * <p>Dentro l'Abisso, dal quindicesimo gradino in giu', sono la meta'. Sta qui e non in
+	 * {@code ShadowManager} perche' e' l'unico posto che sa in che varco e' il giocatore, e perche'
+	 * una regola dell'Abisso scritta dentro l'esercito sarebbe una regola che chi legge l'esercito
+	 * non si aspetta.
+	 */
+	public static int summonLimitIn(ServerPlayer player, int limit) {
+		Instance instance = ACTIVE.get(player.getUUID());
+
+		return instance != null && instance.isAbyss() && isInGate(player)
+				? Abyss.summonLimitAt(instance.depth(), limit)
+				: limit;
+	}
+
+	/** La profondita' dell'Abisso in cui si trova, o zero. */
+	public static int depthOf(ServerPlayer player) {
+		Instance instance = ACTIVE.get(player.getUUID());
+		return instance != null && isInGate(player) ? instance.depth() : 0;
+	}
+
+	/**
+	 * Apre una discesa nell'Abisso al gradino indicato.
+	 *
+	 * <p>Un gradino per volta: si puo' scendere al massimo a uno piu' in giu' di quello gia' chiuso.
+	 * L'Abisso e' una scala, non un menu di difficolta' — scendere al quindicesimo senza aver visto
+	 * il quattordicesimo significherebbe incontrare tre regole insieme senza averne imparata
+	 * nessuna, perdere, e non sapere quale delle tre ha vinto.
+	 */
+	public static Component descend(ServerPlayer player, int depth) {
+		Component locked = QuestManager.require(player, Unlock.GATES);
+		if (locked != null) {
+			return locked;
+		}
+
+		int allowed = Abyss.record(player).next();
+		int target = Math.clamp(depth, 1, allowed);
+
+		if (depth > allowed) {
+			return Component.translatable("arise.msg.abyss.too_deep", allowed);
+		}
+
+		return enter(player, Abyss.offer(AriseConfig.get().gates(), target), false, target);
+	}
+
 	/** Vero se questo giocatore e' dentro un varco che si e' chiuso alle sue spalle. */
 	public static boolean isSealedIn(ServerPlayer player) {
 		Instance instance = ACTIVE.get(player.getUUID());
@@ -275,7 +345,7 @@ public final class GateManager {
 
 	/** Riempie le stanze di mob e mette il boss in fondo. Restituisce l'id del boss. */
 	private static UUID populate(ServerLevel gate, GateConfig config, GateLayout layout, GateOffer offer,
-			int originX, int originZ, RandomSource random) {
+			int originX, int originZ, RandomSource random, int depth) {
 		Rank rank = offer.rank();
 		List<Identifier> mobs = config.mobsFor(rank);
 		int perRoom = config.mobsPerRoom(rank);
@@ -304,7 +374,13 @@ public final class GateManager {
 				// Solo il primo di ogni stanza, ed e' cosi' che la regola «mai piu' di un mob con
 				// affisso per stanza» resta vera senza doverla ricordare da nessun'altra parte.
 				if (i == 0 && spawned != null) {
-					GateAffixes.apply(spawned, rank, random);
+					// Dal quinto gradino dell'Abisso l'affisso c'e' comunque, anche a rango basso:
+					// e' la prima regola della discesa, e la prima che si impara a temere.
+					if (depth >= AbyssRule.AFFIXED.depth()) {
+						GateAffixes.apply(spawned, MobAffix.random(random));
+					} else {
+						GateAffixes.apply(spawned, rank, random);
+					}
 				}
 			}
 		}
@@ -448,8 +524,13 @@ public final class GateManager {
 				? 1.0
 				: 1.0 + GateObjective.BONUS;
 
-		long xp = Math.round(instance.offer().xp() * bonus);
-		long souls = Math.round(instance.offer().souls() * bonus);
+		// La profondita' moltiplica quello che gia' c'era: al decimo gradino una discesa vale il
+		// doppio di un varco del suo rango. Il premio deve crescere quanto le regole che si
+		// accumulano, o scendere piu' in giu' diventa una cosa che si fa solo per il numero.
+		double depthBonus = instance.isAbyss() ? Abyss.reward(instance.depth()) : 1.0;
+
+		long xp = Math.round(instance.offer().xp() * bonus * depthBonus);
+		long souls = Math.round(instance.offer().souls() * bonus * depthBonus);
 
 		if (objective == GateObjective.HUNT && !inTime) {
 			player.sendSystemMessage(Component.translatable("arise.msg.gate.hunt_late")
@@ -474,6 +555,12 @@ public final class GateManager {
 		if (instance.red()) {
 			GateLoot.award(player, instance.rank()).forEach(player::sendSystemMessage);
 			ShadowManager.grantNamed(player, NamedShadow.IRON);
+		}
+
+		if (instance.isAbyss()) {
+			Abyss.completed(player, instance.depth(),
+							player.level().getGameTime() - instance.startedAt())
+					.forEach(player::sendSystemMessage);
 		}
 
 		// Un cubo per varco chiuso, sempre. Non e' bottino a probabilita': e' la scelta che chiude
@@ -628,6 +715,13 @@ public final class GateManager {
 			DelayedStrike.forget(gate);
 		}
 
+		// Chi esce dall'Abisso ritrova l'esercito pronto: la quarta regola dice che le ombre cadute
+		// non tornano *fino all'uscita*, e questa e' l'uscita. Un recupero da un'ora che
+		// sopravvivesse alla discesa sarebbe una punizione che segue il giocatore fuori.
+		if (instance.isAbyss()) {
+			player.setAttached(ModAttachments.DOWNTIME, com.luca.arise.shadow.ShadowDowntime.EMPTY);
+		}
+
 		USED_REGIONS.remove(instance.regionIndex());
 		BOSS_GREETED.remove(player.getUUID());
 		GateBoss.forget(player.getUUID());
@@ -671,7 +765,8 @@ public final class GateManager {
 		// suo, e cosi' non ne consuma nessuno quando nella sua sala non c'e' nessuno.
 		if (player.level() instanceof ServerLevel gate) {
 			GateBoss.tick(player, GateBoss.find(gate, instance.bossId()), instance.rank(),
-					GateBoss.reach(config));
+					GateBoss.reach(config),
+					Abyss.hasRule(instance.depth(), AbyssRule.RELENTLESS));
 		}
 
 		if (player.getRandom().nextFloat() < AMBIENCE_CHANCE) {

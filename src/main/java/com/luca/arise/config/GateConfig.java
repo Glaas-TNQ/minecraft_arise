@@ -43,6 +43,14 @@ public record GateConfig(
 		int offerLifetimeTicks,
 		/** Attesa fra due usi della Bussola dell'Abisso. */
 		int compassCooldownTicks,
+		/**
+		 * Quanto rende in piu' ogni gradino di profondita' dell'Abisso.
+		 *
+		 * <p>Dodici per cento composto: al decimo gradino una discesa vale il doppio di un varco
+		 * normale del suo rango, al ventesimo il triplo. Deve crescere abbastanza da valere le
+		 * regole che si accumulano, e non tanto da rendere inutile tutto il resto della mod.
+		 */
+		double abyssRewardPerDepth,
 		/** Chi popola le stanze, per rango. */
 		Map<Rank, List<Identifier>> mobs,
 		/** Chi può essere il boss, per rango. */
@@ -121,7 +129,7 @@ public record GateConfig(
 	}
 
 	public static final GateConfig DEFAULT = new GateConfig(
-			Shape.DEFAULT, 3, 1.5, 6.0, 2.0, 120.0, 1.8, 60.0, 6000, 100,
+			Shape.DEFAULT, 3, 1.5, 6.0, 2.0, 120.0, 1.8, 60.0, 6000, 100, 0.12,
 			defaultMobs(), defaultBosses(), SpawnConfig.DEFAULT, LootConfig.DEFAULT);
 
 	private static final Codec<Map<Rank, List<Identifier>>> MOB_TABLE =
@@ -138,6 +146,7 @@ public record GateConfig(
 			Codec.DOUBLE.fieldOf("clear_souls_base").forGetter(GateConfig::clearSoulsBase),
 			Codec.INT.fieldOf("offer_lifetime_ticks").forGetter(GateConfig::offerLifetimeTicks),
 			Codec.INT.fieldOf("compass_cooldown_ticks").forGetter(GateConfig::compassCooldownTicks),
+			Codec.DOUBLE.fieldOf("abyss_reward_per_depth").forGetter(GateConfig::abyssRewardPerDepth),
 			MOB_TABLE.fieldOf("mobs").forGetter(GateConfig::mobs),
 			MOB_TABLE.fieldOf("bosses").forGetter(GateConfig::bosses),
 			SpawnConfig.CODEC.fieldOf("spawn").forGetter(GateConfig::spawn),

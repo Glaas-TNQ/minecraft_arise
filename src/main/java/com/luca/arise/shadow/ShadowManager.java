@@ -95,6 +95,14 @@ public final class ShadowManager {
 	 */
 	private static final double AIM_CONE = 0.995;
 
+	/**
+	 * Il recupero delle ombre oltre il ventesimo gradino dell'Abisso: un'ora di gioco.
+	 *
+	 * <p>Non un tempo piu' lungo: un tempo che, dentro una discesa, non scorre mai abbastanza.
+	 * L'uscita lo azzera comunque — la punizione e' la discesa, non la partita.
+	 */
+	private static final int UNFORGIVING_DOWNTIME = 72000;
+
 	private ShadowManager() {
 	}
 
@@ -123,8 +131,12 @@ public final class ShadowManager {
 	 * una statistica cambia <em>quante</em> cose puoi fare invece di quanto forte le fai.
 	 */
 	public static int summonLimit(ServerPlayer player) {
-		return StatThreshold.summonLimit(ProgressManager.get(player),
+		int limit = StatThreshold.summonLimit(ProgressManager.get(player),
 				AriseConfig.get().shadows().maxSummoned());
+
+		// L'Abisso puo' dimezzarlo, dal quindicesimo gradino in giu'. La regola vive li' e non qui:
+		// chi legge l'esercito non deve trovarci dentro le condizioni di un dungeon.
+		return com.luca.arise.gate.GateManager.summonLimitIn(player, limit);
 	}
 
 	// ---------------------------------------------------------------- estrazione
@@ -713,8 +725,18 @@ public final class ShadowManager {
 
 		AriseFx.shadowFell(owner.level(), entity.position(), entity.getColor());
 
-		int downtimeTicks = AriseConfig.get().shadows().downtimeTicks();
 		long now = owner.level().getGameTime();
+
+		// La quarta regola dell'Abisso: dal ventesimo gradino in giu' un'ombra caduta non torna
+		// fino all'uscita. Non e' un tempo piu' lungo, e' un tempo che non scorre — ed e' la
+		// differenza che trasforma l'esercito da risorsa rinnovabile in risorsa finita.
+		//
+		// Un'ora di gioco e' un'ora: chi resta dentro cosi' a lungo ha comunque scelto di restarci,
+		// e chi esce ritrova tutto pronto. La discesa e' la punizione, non la partita.
+		int downtimeTicks = com.luca.arise.gate.GateManager.depthOf(owner)
+						>= com.luca.arise.gate.AbyssRule.UNFORGIVING.depth()
+				? UNFORGIVING_DOWNTIME
+				: AriseConfig.get().shadows().downtimeTicks();
 
 		if (shadowId != null && downtimeTicks > 0) {
 			owner.setAttached(ModAttachments.DOWNTIME,

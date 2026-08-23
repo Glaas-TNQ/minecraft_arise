@@ -2,6 +2,7 @@ package com.luca.arise.registry;
 
 import com.luca.arise.AriseMod;
 import com.luca.arise.ability.AbilityCooldowns;
+import com.luca.arise.gate.AbyssRecord;
 import com.luca.arise.gate.GateRegistry;
 import com.luca.arise.gate.MobAffix;
 import com.luca.arise.gate.ReturnPoint;
@@ -209,6 +210,23 @@ public final class ModAttachments {
 			.initializer(() -> GateRegistry.EMPTY)
 			.persistent(GateRegistry.CODEC)
 			.buildAndRegister(AriseMod.id("gate_registry"));
+
+	/**
+	 * Quanto in fondo all'Abisso e' arrivato questo Cacciatore, e in quanto tempo.
+	 *
+	 * <p>Persistente e {@code copyOnDeath} come tutto il resto della progressione: perdere la
+	 * profondita' massima morendo vorrebbe dire che l'unico contenuto senza fine della mod si
+	 * azzera per una distrazione, il che e' l'opposto di cio' per cui esiste.
+	 *
+	 * <p>Sincronizzato perche' un giorno la schermata dovra' mostrarlo — e perche' il costo di
+	 * mandare due numeri e' zero.
+	 */
+	public static final AttachmentType<AbyssRecord> ABYSS = AttachmentRegistry.<AbyssRecord>builder()
+			.initializer(() -> AbyssRecord.NONE)
+			.persistent(AbyssRecord.CODEC)
+			.copyOnDeath()
+			.syncWith(AbyssRecord.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(AriseMod.id("abyss"));
 
 	private ModAttachments() {
 	}

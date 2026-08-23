@@ -367,7 +367,7 @@
 <!-- ══════════════════════════════════════════════════════════════ NOVITÀ -->
 
 <h2 id="novita">Nuovo stasera</h2>
-<p class="lede">Undici blocchi aggiunti oggi. Nessuno di questi è mai stato visto girare in gioco: se
+<p class="lede">Dodici blocchi aggiunti oggi. Nessuno di questi è mai stato visto girare in gioco: se
 guardi una cosa sola, guarda queste.</p>
 
 <div class="panel warn">
@@ -381,6 +381,7 @@ guardi una cosa sola, guarda queste.</p>
     <li><b>Gli obiettivi del varco</b> — tre, e cambiano come lo percorri. → <a href="#obiettivi">i varchi</a></li>
     <li><b>Il Sovrano a tre fasi</b> — martella, spazza le ombre, e in fondo ti punta. → <a href="#varchi">i varchi</a></li>
     <li><b>Il Cubo dell'Abisso</b> — ogni varco ne lascia uno, e si apre in due modi. → <a href="#cubo">qui sotto</a></li>
+    <li><b>L'Abisso</b> — la discesa che non finisce. È quello che mancava dopo l'ultimo incarico. → <a href="#abisso">qui sotto</a></li>
     <li><b>La Pergamena del Rimpianto</b> — il respec. → <a href="#roba">roba</a></li>
     <li><b>Shift + <kbd>R</kbd></b> — guarda il cadavere prima di bruciarlo. → <a href="#esercito">l'esercito</a></li>
     <li><b>Tre istruzioni che mentivano</b> a chi rimappa i tasti — corrette.</li>
@@ -466,6 +467,43 @@ mob affissi nella stessa stanza. Il nome sopra la testa lo dice, e ognuno ha una
 </div>
 <p style="color: var(--muted); font-size: 14.5px;">Per provarli:
 <code>/arise gate affix &lt;nome&gt;</code> li mette addosso al mob più vicino.</p>
+
+<h3 id="abisso">L'Abisso</h3>
+<p>Era il buco più grande della mod: finita la catena dei diciotto incarichi il Sistema diceva «da
+qui in avanti taccio e guardo», e da lì non c'era <em>niente</em>. Nessun traguardo che ne aprisse un
+altro, nessun motivo per aprire il varco numero cinquanta.</p>
+<p><b>Shift + clic destro sul segnaposto al centro di un'Associazione</b> — la stessa pietra che
+apre la rete di viaggio — e scendi. Oppure <code>/arise abyss</code>.</p>
+<ul class="tight">
+  <li>Si scende <b>un gradino per volta</b>: mai un salto. L'Abisso è una scala, non un menu di difficoltà.</li>
+  <li>Il rango sale ogni tre gradini fino a S. Poi si ferma: oltre, a crescere sono solo le regole.</li>
+  <li>Il <b>cronometro</b> parte all'ingresso, e il tempo migliore resta scritto.</li>
+  <li>La <b>pianta di un gradino è sempre la stessa</b>: due Cacciatori che scendono al dodici
+  trovano lo stesso varco, e possono parlarne. Un record che confronta prove diverse non confronta
+  niente.</li>
+  <li>Ogni gradino paga il <b>12% in più</b>: al decimo una discesa vale il doppio di un varco
+  normale del suo rango.</li>
+</ul>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Gradino</th><th>Regola</th><th>Cosa cambia</th></tr></thead>
+  <tbody>
+    <tr><td class="n">5</td><td class="q">Marchiato</td><td>Ogni stanza ha una creatura con un affisso, a qualunque rango</td></tr>
+    <tr><td class="n">10</td><td class="q">Implacabile</td><td>Il Sovrano comincia in seconda fase: spazza le ombre dal primo secondo</td></tr>
+    <tr><td class="n">15</td><td class="q">Sfoltito</td><td>Scendi con metà dei posti in campo</td></tr>
+    <tr><td class="n">20</td><td class="q">Senza perdono</td><td>Un'ombra caduta non torna finché non esci</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel violet">
+  <p class="callout-title">Regole, non numeri</p>
+  <p>Le quattro si sommano: al venticinquesimo ci sono tutte, e a quel punto non è un varco più
+  grosso — è un altro gioco, giocato con lo stesso esercito. È voluto: lo scaling infinito diventa
+  noioso esattamente quando il livello novecento è il livello dieci con più vita. <b>Chi perde deve
+  poter dire perché</b>, e «il Sovrano non aveva la prima fase» è una frase che si può dire.</p>
+</div>
 
 <h3 id="cubo">Il Cubo dell'Abisso</h3>
 <p>Ogni varco chiuso ne lascia uno, del suo rango. La stessa scatola, due modi di aprirla — e la
@@ -1206,6 +1244,9 @@ che ti serviamo.</p>
   <li><b>L'anello rosso del Volatile</b>: deve comparire prima dello scoppio e lasciarti il tempo di
   camminare fuori.</li>
   <li><b>Shift + <kbd>R</kbd></b>: guarda lo stesso cadavere tre volte di fila. Non deve consumarsi.</li>
+  <li><b>L'Abisso</b>: <code>/arise abyss</code>, chiudi il primo gradino, riprova. Deve dirti che il
+  secondo ti è aperto, e <em>non</em> deve lasciarti saltare al quinto. Poi <code>/arise abyss 5</code>
+  quando ci arrivi: da lì ogni stanza ha un mob con un affisso.</li>
 </ul>
 
 <div class="panel gold">

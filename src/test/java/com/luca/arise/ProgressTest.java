@@ -159,6 +159,77 @@ class ProgressTest {
 				"dopo il respec le soglie devono cadere insieme ai punti che le reggevano");
 	}
 
+	// ---------------------------------------------------------------- l'Abisso
+
+	@Test
+	@DisplayName("l'Abisso si scende un gradino per volta, e il record non peggiora mai")
+	void abyssRecordOnlyImproves() {
+		var record = com.luca.arise.gate.AbyssRecord.NONE;
+
+		assertEquals(1, record.next(), "chi non e' mai sceso comincia dal primo");
+
+		record = record.with(1, 900L);
+		assertEquals(1, record.deepest());
+		assertEquals(900L, record.bestTicks());
+		assertEquals(2, record.next());
+
+        // Una discesa piu' profonda ma piu' lenta alza la profondita' e lascia stare il tempo.
+		record = record.with(2, 1500L);
+		assertEquals(2, record.deepest());
+		assertEquals(900L, record.bestTicks(), "un tempo peggiore non deve sovrascrivere il record");
+
+		// E una piu' veloce ma meno profonda fa l'opposto.
+		record = record.with(1, 400L);
+		assertEquals(2, record.deepest(), "richiudere un gradino gia' fatto non abbassa la profondita'");
+		assertEquals(400L, record.bestTicks());
+	}
+
+	@Test
+	@DisplayName("il rango della discesa sale e si ferma a S, e le regole si accumulano")
+	void abyssScalesByRules() {
+		var rankAt = (java.util.function.IntFunction<com.luca.arise.progress.Rank>)
+				com.luca.arise.gate.Abyss::rankAt;
+
+		assertEquals(com.luca.arise.progress.Rank.E, rankAt.apply(1));
+		assertEquals(com.luca.arise.progress.Rank.S, rankAt.apply(16));
+
+		// Oltre il rango S non si inventa una tabella di mob peggiori: da li' in giu' a crescere
+		// sono soltanto le regole, che e' esattamente il punto del blocco.
+		assertEquals(com.luca.arise.progress.Rank.S, rankAt.apply(100));
+
+		assertTrue(com.luca.arise.gate.Abyss.rulesAt(1).isEmpty(),
+				"il primo gradino deve essere un varco normale");
+
+		int previous = 0;
+		for (int depth = 1; depth <= 30; depth++) {
+			int rules = com.luca.arise.gate.Abyss.rulesAt(depth).size();
+
+			assertTrue(rules >= previous, "gradino " + depth + ": una regola e' sparita");
+			previous = rules;
+		}
+
+		assertEquals(com.luca.arise.gate.AbyssRule.values().length,
+				com.luca.arise.gate.Abyss.rulesAt(25).size(),
+				"al venticinquesimo devono esserci tutte");
+	}
+
+	@Test
+	@DisplayName("la stessa profondita' da' sempre la stessa pianta: il record confronta qualcosa")
+	void abyssIsTheSameDescentForEveryone() {
+		for (int depth = 1; depth <= 12; depth++) {
+			assertEquals(com.luca.arise.gate.Abyss.seedFor(depth),
+					com.luca.arise.gate.Abyss.seedFor(depth),
+					"il seme di un gradino deve essere fisso");
+		}
+
+		// E diverso da quello di ogni altro gradino, o due profondita' sarebbero lo stesso varco.
+		var seeds = new java.util.HashSet<Long>();
+		for (int depth = 1; depth <= 50; depth++) {
+			assertTrue(seeds.add(com.luca.arise.gate.Abyss.seedFor(depth)),
+					"il gradino " + depth + " ripete il seme di un altro");
+		}
+	}
+
 	@Test
 	@DisplayName("un progresso e' immutabile: spendere produce un'istanza nuova")
 	void spendingDoesNotMutate() {

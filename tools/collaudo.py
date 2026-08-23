@@ -202,6 +202,7 @@ DYNAMIC = [
     ("arise.gate.theme.", "gate/GateTheme.java", [""]),
     ("arise.affix.", "gate/MobAffix.java", ["", ".desc"]),
     ("arise.objective.", "gate/GateObjective.java", ["", ".desc"]),
+    ("arise.abyss.rule.", "gate/AbyssRule.java", ["", ".desc"]),
     ("arise.gear.affix.", "gear/GearAffix.java", [""]),
     ("arise.gear.base.", "gear/GearBase.java", [""]),
     ("arise.gear.slot.", "gear/GearSlot.java", [""]),

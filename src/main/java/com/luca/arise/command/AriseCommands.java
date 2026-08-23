@@ -7,6 +7,7 @@ import com.luca.arise.city.City;
 import com.luca.arise.city.CityManager;
 import com.luca.arise.event.CityEvents;
 import com.luca.arise.config.GearConfig;
+import com.luca.arise.gate.Abyss;
 import com.luca.arise.gate.AbyssCompassItem;
 import com.luca.arise.gate.GateAffixes;
 import com.luca.arise.gate.MobAffix;
@@ -195,6 +196,17 @@ public final class AriseCommands {
 			root.then(gate);
 
 			// Legge la stessa cosa dell'oggetto in mano, senza doverlo craftare per verificarla.
+			// L'Abisso: senza argomento scende al gradino successivo, con un numero a quello scelto
+			// (mai piu' in giu' di quello che si e' guadagnato). E' anche l'unico modo di provarlo
+			// senza raggiungere una citta'.
+			root.then(Commands.literal("abyss")
+					.executes(context -> playerAction(context.getSource(),
+							player -> GateManager.descend(player, Abyss.record(player).next())))
+					.then(Commands.argument("profondita", IntegerArgumentType.integer(1))
+							.executes(context -> playerAction(context.getSource(),
+									player -> GateManager.descend(player,
+											IntegerArgumentType.getInteger(context, "profondita"))))));
+
 			root.then(Commands.literal("compass")
 					.executes(context -> playerAction(context.getSource(), AbyssCompassItem::locate)));
 

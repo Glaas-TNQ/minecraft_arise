@@ -431,18 +431,17 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       sul bordo per ciò che sta fuori. Indice dei varchi `GateRegistry` riconciliato; `/arise map`,
       `/arise gate list` — *compilato, da verificare in gioco*
 
-- [ ] **B-PRD** — la prima ondata del `PRD-arise.md`: **undici blocchi su diciassette** contro il
+- [ ] **B-PRD** — la prima ondata del `PRD-arise.md`: **dodici blocchi su diciassette** contro il
       silenzio dopo il diciottesimo incarico. **B0** le tre istruzioni che mentivano a chi rimappa,
       **B1** il tetto dell'estrazione reso raggiungibile e `shift+R` che guarda il cadavere senza
       consumarlo, **B10** la Pergamena del Rimpianto (respec), **B4** le sette ombre con un nome
       (Igris, Iron, Tank, Tusk, Greed, Beru, Bellion), **B2** il Dungeon Break, **B9** le dodici
       soglie delle statistiche, **B8** i sei affissi dei nemici, **B5** il Gate Rosso, **B6** i tre
-      obiettivi del varco, **B7** il Sovrano a tre fasi, **B14** il Cubo dell'Abisso — *compilato,
-      89 prove verdi, collaudo pulito, server verde su mondo nuovo ×3; **nessuno degli undici e'
-      ancora stato visto girare in gioco***
+      obiettivi del varco, **B7** il Sovrano a tre fasi, **B14** il Cubo dell'Abisso, **B11**
+      l'Abisso a profondita' infinita — *compilato, 92 prove verdi, collaudo pulito, server verde su
+      mondo nuovo ×4; **nessuno dei dodici e' ancora stato visto girare in gioco***
 
-      Restano fuori: **B11** l'Abisso a profondita' infinita (e' il blocco che chiude davvero la
-      lacuna L1), **B13** i Monarchi, **B12** l'esame di rango, **B3** la Quest Giornaliera,
+      Restano fuori: **B13** i Monarchi, **B12** l'esame di rango, **B3** la Quest Giornaliera,
       **B15** il Registro del Sistema, **B16** l'adottabilita'. La consegna sta in
       `docs/blocco-prd-prima-ondata.html`.
 

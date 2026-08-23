@@ -97,7 +97,8 @@ public final class GateBoss {
 	 * <p>Non fa niente finche' il giocatore non e' nella sala: un boss che martella mentre chi lo
 	 * combatte e' tre stanze piu' indietro sta solo sprecando i suoi anelli rossi.
 	 */
-	public static void tick(ServerPlayer player, Mob boss, Rank rank, double reach) {
+	public static void tick(ServerPlayer player, Mob boss, Rank rank, double reach,
+			boolean relentless) {
 		if (boss == null || !boss.isAlive() || !(player.level() instanceof ServerLevel level)) {
 			return;
 		}
@@ -106,7 +107,10 @@ public final class GateBoss {
 			return;
 		}
 
-		int phase = phaseOf(boss);
+		// Implacabile: dal decimo gradino dell'Abisso il Sovrano non ha una prima fase. Spazza le
+		// ombre dal primo secondo, e la martellata arriva ogni quattro invece che ogni sei — e'
+		// una regola sola, ma cambia il modo di entrare in quella sala.
+		int phase = Math.max(phaseOf(boss), relentless ? 1 : 0);
 		announce(player, boss, rank, phase, level);
 
 		int since = SINCE_SLAM.merge(player.getUUID(), 1, Integer::sum);
