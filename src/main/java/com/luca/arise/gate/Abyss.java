@@ -44,9 +44,6 @@ import net.minecraft.server.level.ServerPlayer;
  */
 public final class Abyss {
 
-	/** Ogni quanti gradini entra una regola nuova. */
-	public static final int RULE_EVERY = 5;
-
 	/** Ogni quanti gradini sale il rango, finche' c'e' rango da salire. */
 	public static final int RANK_EVERY = 3;
 

@@ -12,7 +12,6 @@ import com.luca.arise.gear.GearRoll;
 import com.luca.arise.gem.Gem;
 import com.luca.arise.gem.GemManager;
 import com.luca.arise.gem.GemRoll;
-import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModComponents;
 import com.luca.arise.registry.ModItems;
