@@ -262,6 +262,24 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
      ottenere un'entita' che spara invece di caricare — ma se quel goal resta attivo quando non ha
      niente da fare, l'entita' si pianta. La condizione che fa sparare e la condizione di `canUse`
      devono essere la stessa;
+   - **`RecordCodecBuilder` si ferma a sedici campi anche nei record annidati**: `SpawnConfig` ci e'
+     arrivata la seconda volta, e la via e' stata la stessa di `AriseConfig` — annidare per
+     argomento (`SpawnConfig.Hazard` tiene cedimento e varco rosso) con le scorciatoie sulla radice,
+     non spezzare a caso;
+   - **gli attachment di Fabric valgono su qualunque entita'**, non solo sui giocatori:
+     `ModAttachments.MOB_AFFIX` sta su un `Mob` ed e' persistente, che e' il modo giusto di dare
+     uno stato a un mob senza un mixin e senza una mappa da tenere allineata a mano;
+   - **`ServerLivingEntityEvents.ALLOW_DAMAGE`** dice si' o no e basta: non esiste un modo pulito di
+     *ridurre* il danno. Le riduzioni parziali si fanno curando dopo, e si vedono — la barra scende
+     e risale, lo schermo lampeggia lo stesso. Se un effetto difensivo deve essere leggibile, va
+     progettato come rifiuto assoluto, non come sconto;
+   - **i nomi dei file di suono vanilla non si indovinano**: `entity/generic/explode1` non esiste,
+     `random/explode3` si'; `mob/warden/heartbeat` non esiste, `mob/warden/heartbeat_1` si'. Il
+     collaudo statico li verifica contro l'indice degli asset, ed e' l'unico posto che se ne accorge
+     prima del silenzio in gioco;
+   - **il collaudo si tara sugli enum con il nome per primo**: `NOME("nome", ...)`. Un enum che
+     mette il nome in seconda posizione non viene letto, e il collaudo lo dice — `MobAffix`,
+     `NamedShadow` e `StatThreshold` sono nati con l'ordine sbagliato tutti e tre;
    - **leggere l'altezza del terreno senza generarlo**: `level.getHeight(...)` pretende il chunk;
      `level.getChunkSource().getGenerator().getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG,
      level, randomState())` interroga il rumore e risponde subito. Venticinque campioni sparsi su
@@ -413,4 +431,24 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       sul bordo per ciò che sta fuori. Indice dei varchi `GateRegistry` riconciliato; `/arise map`,
       `/arise gate list` — *compilato, da verificare in gioco*
 
+- [ ] **B-PRD** — la prima ondata del `PRD-arise.md`: otto blocchi contro il silenzio dopo il
+      diciottesimo incarico. **B0** le tre istruzioni che mentivano a chi rimappa, **B1** il tetto
+      dell'estrazione reso raggiungibile e `shift+R` che guarda il cadavere senza consumarlo,
+      **B10** la Pergamena del Rimpianto (respec), **B4** le sette ombre con un nome (Igris, Iron,
+      Tank, Tusk, Greed, Beru, Bellion), **B2** il Dungeon Break, **B9** le dodici soglie delle
+      statistiche, **B8** i sei affissi dei nemici, **B5** il Gate Rosso — *compilato, 85 prove
+      verdi, collaudo pulito, server verde su mondo nuovo; da verificare in gioco*
+
 Aggiorna questa lista quando una fase è **verificata in gioco**, non quando compila.
+
+---
+
+## Dove sta scritto cosa
+
+| File | Cosa contiene |
+|---|---|
+| `DESIGN-solo-leveling.md` | **cosa è** Arise: i dodici sistemi, in dettaglio. Resta valido |
+| `PRD-arise.md` | **cosa le manca**: dodici lacune con l'evidenza nel codice, sette principi, sedici blocchi ordinati per valore diviso costo, e uno scope negativo scritto |
+| `GUIDA-TESTER.html` | la guida per chi collauda, nella root. Scritta leggendo il codice: se la guida e il gioco non dicono la stessa cosa, uno dei due ha un difetto |
+| `REPORT-modding-con-claude.md` | il contesto sull'ecosistema |
+| `docs/blocco-*.html` | la consegna di ogni blocco, uno per file |

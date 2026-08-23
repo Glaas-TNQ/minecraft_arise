@@ -360,8 +360,109 @@
   <a href="#officina"><b>L'Officina</b>anime al lavoro</a>
   <a href="#incarichi"><b>I 18 incarichi</b>la catena completa</a>
   <a href="#comandi"><b>Comandi</b>per barare in collaudo</a>
+  <a href="#novita"><b>Nuovo stasera</b>otto cose mai provate</a>
   <a href="#collaudo"><b>Cosa guardare</b>e come segnalare</a>
 </nav>
+
+<!-- ══════════════════════════════════════════════════════════════ NOVITÀ -->
+
+<h2 id="novita">Nuovo stasera</h2>
+<p class="lede">Otto blocchi aggiunti oggi. Nessuno di questi è mai stato visto girare in gioco: se
+guardi una cosa sola, guarda queste.</p>
+
+<div class="panel warn">
+  <p class="callout-title">In ordine di quanto vale provarli</p>
+  <ol class="tight" style="margin-bottom: 0;">
+    <li><b>Il Dungeon Break</b> — un varco su tre, se lo ignori, <em>esplode</em>. → <a href="#varchi">i varchi</a></li>
+    <li><b>Il Gate Rosso</b> — uno su venti si chiude alle tue spalle. → <a href="#rosso">qui sotto</a></li>
+    <li><b>Le sette ombre con un nome</b> — Igris, Iron, Beru… → <a href="#nominate">qui sotto</a></li>
+    <li><b>Le soglie delle statistiche</b> — a 25, 50 e 100 punti succede qualcosa. → <a href="#soglie">qui sotto</a></li>
+    <li><b>Gli affissi dei nemici</b> — sei, dal rango C in su. → <a href="#affissi">qui sotto</a></li>
+    <li><b>La Pergamena del Rimpianto</b> — il respec. → <a href="#roba">roba</a></li>
+    <li><b>Shift + <kbd>R</kbd></b> — guarda il cadavere prima di bruciarlo. → <a href="#esercito">l'esercito</a></li>
+    <li><b>Tre istruzioni che mentivano</b> a chi rimappa i tasti — corrette.</li>
+  </ol>
+</div>
+
+<h3 id="rosso">Il Gate Rosso</h3>
+<p>Da fuori è un varco come tutti gli altri. Il pannello di analisi <b>non lo dice</b>: lo scopri
+entrando, perché si chiude alle tue spalle. Dentro cambiano tre cose:</p>
+<ul class="tight">
+  <li><b>Il Sigillo dell'Associazione non funziona.</b> È la prima volta che un tuo oggetto smette
+  di rispondere, ed è così che il varco ti dice cos'è senza ripeterlo.</li>
+  <li><b>Il gelo morde.</b> Ogni due secondi, se non hai una fonte di calore entro cinque blocchi:
+  rallentamento e mezzo cuore. Le lampade del tema non scaldano — <b>il calore te lo porti tu</b>:
+  falò, blocchi di magma, torce, fornaci. Il varco diventa una traversata da gestire, e per la
+  prima volta conta cosa hai nello zaino invece di cosa hai addosso.</li>
+  <li><b>Il bottino è doppio</b>, ed è l'unico posto da cui esce <b>Iron</b>.</li>
+</ul>
+<p><em>L'ombra <b>Tank</b> annulla il gelo.</em> È il motivo per cui vale la pena andarla a prendere
+in un varco Gelo prima di incontrare il primo rosso.</p>
+<p style="color: var(--muted); font-size: 14.5px;">Per provarlo senza aspettare:
+<code>/arise gate red</code>.</p>
+
+<h3 id="nominate">Le sette ombre con un nome</h3>
+<p>Non sono più forti. Sono <b>uniche in quello che fanno</b>, ed è per questo che una vale un posto
+in squadra anche quando ne hai di più potenti.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Ombra</th><th>Cosa fa che nessun'altra fa</th><th>Dove si prende</th></tr></thead>
+  <tbody>
+    <tr><td class="q" style="color:#E05A5A">Igris</td><td>Al grado di Maresciallo <em>dice una riga</em> quando lo evochi. È l'unica volta che l'esercito parla.</td><td>l'esame di rango (non ancora)</td></tr>
+    <tr><td class="q" style="color:#9BA8B8">Iron</td><td>Provoca al doppio della distanza: 24 blocchi invece di 12.</td><td>solo dal <b>Gate Rosso</b></td></tr>
+    <tr><td class="q" style="color:#BFE8F0">Tank</td><td>Non lo sposta niente, e <b>annulla il gelo</b> del Gate Rosso.</td><td>varco <b>Gelo</b>, rango B+</td></tr>
+    <tr><td class="q" style="color:#8FD9A0">Tusk</td><td>Lancia d'ombra da 24 blocchi invece di 16.</td><td>varco <b>Rovina</b>, rango B+</td></tr>
+    <tr><td class="q" style="color:#FFD54F">Greed</td><td><b>Raddoppia i soul coin</b> mentre è in campo.</td><td>varco <b>Cenere</b>, rango A+</td></tr>
+    <tr><td class="q" style="color:#4FBF9F">Beru</td><td><b>Ti cura</b> sotto metà vita. In una mod senza supporti, è il supporto.</td><td>varco <b>Sculk</b>, rango S</td></tr>
+    <tr><td class="q" style="color:#8E6BFF">Bellion</td><td>La sua aura vale per <b>tutto</b> l'esercito, non solo per chi è in campo.</td><td>si eredita, a fine catena (non ancora)</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Ognuna si ottiene <b>una volta sola</b>, e nessuna si può rinominare: Igris si chiama Igris.
+Per provarle tutte subito: <code>/arise shadows named igris</code> (e gli altri sei nomi).</p>
+
+<h3 id="soglie">Le soglie delle statistiche</h3>
+<p>Spendere punti non è più solo aritmetica. A <b>25, 50 e 100</b> punti in una statistica succede
+qualcosa che prima non succedeva — e la schermata di stato adesso te lo dice <em>prima</em>: la
+barra non punta più al tetto ma alla prossima soglia, con scritto quanto manca e cosa dà.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Statistica</th><th>25</th><th>50</th><th>100</th></tr></thead>
+  <tbody>
+    <tr><td class="q">Vitalità</td><td>la fame non uccide più</td><td>le cadute brevi non fanno danno</td><td>un colpo letale ti lascia a mezzo cuore, ogni 10 minuti</td></tr>
+    <tr><td class="q">Forza</td><td>+1 ombra in campo</td><td>le ombre colpiscono il 15% più forte</td><td>+1 ombra in campo (due in tutto)</td></tr>
+    <tr><td class="q">Resistenza</td><td>il fuoco non ti brucia</td><td>veleno e decadimento non ti toccano</td><td>nemmeno la lava</td></tr>
+    <tr><td class="q">Agilità</td><td>correre annulla il danno da caduta</td><td>il Passo d'ombra va metà più lontano</td><td>e si ricarica in metà tempo</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Contano i <b>punti spesi</b>, non il valore totale: una soglia raggiunta indossando un anello
+sarebbe una soglia che si perde togliendolo. E il respec le toglie insieme ai punti.</p>
+
+<h3 id="affissi">Gli affissi dei nemici</h3>
+<p>Dal rango C in su, <b>un mob per stanza</b> porta un affisso — mai due sullo stesso mob, mai due
+mob affissi nella stessa stanza. Il nome sopra la testa lo dice, e ognuno ha una contromisura.</p>
+<div class="scroll">
+<table>
+  <thead><tr><th>Affisso</th><th>Cosa fa</th><th>Cosa fare</th></tr></thead>
+  <tbody>
+    <tr><td class="q" style="color:#E8A34F">Rapido</td><td>Va la metà più veloce</td><td>Non scappare in linea retta</td></tr>
+    <tr><td class="q" style="color:#E86A6A">Assetato</td><td>Si cura a ogni colpo che mette a segno</td><td>Non farti colpire</td></tr>
+    <tr><td class="q" style="color:#9BA8B8">Riflesso</td><td>Rimanda parte del danno</td><td>Colpi grossi e lenti, o mandaci le ombre</td></tr>
+    <tr><td class="q" style="color:#8E6BFF">Divoratore d'Ombre</td><td>Danno doppio contro le ombre</td><td>Cambia squadra, o combattilo tu</td></tr>
+    <tr><td class="q" style="color:#8FD8F0">Gelido</td><td>Chi lo colpisce in mischia si rallenta</td><td>Colpiscilo da lontano, o con un Mago</td></tr>
+    <tr><td class="q" style="color:#FFD54F">Volatile</td><td>Dove cade lascia uno scoppio</td><td>Allontanati quando va giù</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="panel accent">
+  <p class="callout-title">L'anello rosso a terra</p>
+  <p>Prima che il Volatile scoppi, per circa un secondo, compare un <b>anello rosso sul pavimento</b>.
+  Da adesso in poi quel segnale significa sempre e solo una cosa — <em>danno ad area, spostati</em> —
+  e non verrà mai riusato per altro. Se lo vedi significare qualcos'altro, è un difetto.</p>
+</div>
+<p style="color: var(--muted); font-size: 14.5px;">Per provarli:
+<code>/arise gate affix &lt;nome&gt;</code> li mette addosso al mob più vicino.</p>
 
 <!-- ══════════════════════════════════════════════════════════════ INIZIO -->
 
@@ -505,6 +606,10 @@ dieci livelli.</p>
 <p style="color: var(--muted); font-size: 14.5px;">Tetti dei punti: Vitalità 400, Forza 400,
 Resistenza 200, Agilità 100.</p>
 
+<p>E a <b>25, 50 e 100 punti</b> spesi in una statistica non arriva solo un numero più grande:
+arriva qualcosa che il gioco prima non faceva. Sono dodici effetti in tutto, e li trovi
+<a href="#soglie">poco più su</a>.</p>
+
 <div class="panel">
   <p class="callout-title">La somma delle sorgenti</p>
   <p>Il numero che vedi in <kbd>K</kbd> non viene solo dai punti spesi: equipaggiamento e gemme si
@@ -551,8 +656,15 @@ vivono come dati. Diventano corpi solo quando le chiami.</p>
 <h3>Estrarre</h3>
 <p><kbd>R</kbd> entro <b>8 blocchi</b> da un cadavere fresco. Hai <b>15 secondi</b>: poi l'ombra si
 dissolve da sola. È a probabilità, e la probabilità dipende <em>solo dal tuo livello</em>: parte da
-<b>25%</b> e sale dello 0,5% a livello — 34,5% a livello 20, 49,5% a livello 50, 74,5% al 100.
-Il messaggio ti dice sempre con che percentuale hai giocato.</p>
+<b>25%</b> e sale dello 0,7% a livello — 38,3% a livello 20, 59,3% al 50, <b>94,3% al 100</b>. Il
+tetto è al 95%: un'ombra può sempre dissolversi, anche per un Monarca al massimo.</p>
+
+<div class="panel accent">
+  <p class="callout-title">Guarda prima di bruciare</p>
+  <p><b>Shift + <kbd>R</kbd></b> non estrae: <em>guarda</em>. Dice cosa c'è in quel cadavere — rango
+  e archetipo — e con che probabilità staresti tirando, senza consumare niente. Il peggior momento
+  del gioco era bruciare il Warden appena ucciso senza sapere di stare tirando al trenta per cento.</p>
+</div>
 <p>Un cadavere si tenta <b>una volta sola</b>: premere R di nuovo sullo stesso corpo non serve. A
 esercito pieno l'ombra non si perde: resta un'<b>Anima Errante</b>, pronta per l'Officina.</p>
 <p>L'ombra che esce è sempre di livello 1, ma eredita il corpo da cui viene: <b>1,5× la vita</b> e
@@ -562,9 +674,12 @@ grosso.</p>
 <div class="panel">
   <p class="callout-title">Quante ne puoi tenere, quante ne puoi tirare fuori</p>
   <p>L'<b>esercito</b> parte da <b>6 posti</b> e cresce di uno ogni quattro livelli (10 al livello
-  20, 30 al 100). Ma <b>in campo ne stanno solo quattro alla volta</b> — quanti sono gli archetipi,
-  e non è un caso. La scelta di <em>quali</em> quattro è la vera decisione tattica: si fa in
-  <kbd>J</kbd>, con la squadra.</p>
+  20, 30 al 100). Ma <b>in campo ne stanno quattro alla volta</b> — quanti sono gli archetipi, e non
+  è un caso. La scelta di <em>quali</em> quattro è la vera decisione tattica: si fa in <kbd>J</kbd>,
+  con la squadra.</p>
+  <p>Quattro, a meno che tu non abbia speso in <b>Forza</b>: a 25 punti diventano cinque, a 100
+  diventano sei. È l'unica cosa in tutta la mod che faccia <em>crescere</em> la squadra, ed è cento
+  punti che non sono andati in Vitalità.</p>
 </div>
 
 <h3>I quattro archetipi</h3>
@@ -644,6 +759,16 @@ il guardiano e quanto rende — e il conto alla rovescia. Non è una stima: la p
 generata da un seme, e all'ingresso viene ricostruita <em>dallo stesso seme</em>. Il pannello non
 può mentire.</p>
 <p>Il rango parte dal tuo: <b>15%</b> uno sopra, <b>35%</b> uno sotto, metà delle volte uguale.</p>
+
+<div class="panel warn">
+  <p class="callout-title">Un varco su tre non si richiude: cede</p>
+  <p>Ignorarlo non è più gratis. Alla scadenza, con probabilità di uno su tre, il portale
+  <b>collassa</b> e riversa nel mondo quello che c'era dentro: gli stessi mob che il pannello di
+  analisi aveva dichiarato, in superficie, entro quaranta blocchi, e <b>non despawnano</b>.</p>
+  <p>Non succede a tradimento. Un minuto prima il varco comincia a cedere e lo dice a chi è entro
+  duecento blocchi — chi vuole ha tutto il tempo di correre a chiuderlo. <em>Gli NPC del mercato non
+  muoiono</em>: la minaccia costa tempo e fastidio, mai contenuto.</p>
+</div>
 
 <h3>I sei temi</h3>
 <div class="cards">
@@ -790,6 +915,15 @@ dice a che rango si apre.</p>
   difetto ed è il più importante da segnalare.</p>
 </div>
 
+<div class="panel accent">
+  <p class="callout-title">Hai sbagliato a spendere?</p>
+  <p>La <b>Pergamena del Rimpianto</b> restituisce <em>tutti</em> i punti statistica spesi. Livello,
+  esperienza, soul coin ed esercito non si toccano: torna indietro solo quello che era una scelta.
+  La vende il Cartografo dell'Abisso, alla Cartoleria, per <b>30 Monete d'Anima</b> — cioè tremila
+  soul coin, cioè cinque Gate di rango C. Cambiare idea deve costare, ma non deve essere una
+  condanna. In collaudo: <code>/arise respec</code>, o due copie nel barile del Laboratorio.</p>
+</div>
+
 <h3>Le cinque gemme</h3>
 <div class="scroll">
 <table>
@@ -929,6 +1063,7 @@ attivi.</p>
 /arise xp &lt;n&gt;                     regala esperienza
 /arise souls                      il saldo
 /arise souls add &lt;n&gt;              regala soul coin
+/arise respec                     restituisce tutti i punti spesi
 /arise reset                      azzera la progressione</code></pre>
 
 <h3>Incarichi e tutorial</h3>
@@ -943,6 +1078,9 @@ attivi.</p>
 <pre><code>/arise gate                       apre un varco di rango E davanti a te
 /arise gate &lt;e|d|c|b|a|s&gt;         apre un varco del rango scelto
 /arise gate spawn                 forza subito un varco spontaneo
+/arise gate red                   apre ed entra in un Varco Rosso
+/arise gate breach                fa cedere subito il varco più vicino
+/arise gate affix &lt;nome&gt;          mette un affisso sul mob più vicino
 /arise gate list                  l'indice dei varchi aperti
 /arise compass                    dov'è il varco più vicino
 /arise leave                      uscita d'emergenza
@@ -954,6 +1092,7 @@ attivi.</p>
 /arise stance [aggressive|defensive|passive]
 /arise shadows                    l'esercito, con grado e statistiche
 /arise shadows squad              la squadra, nell'ordine di uscita
+/arise shadows named &lt;nome&gt;       regala una delle sette nominate
 /arise shadows clear              svuota l'esercito</code></pre>
 
 <h3>Roba e città</h3>
@@ -989,7 +1128,24 @@ che ti serviamo.</p>
   <li><b>Ombre duplicate o sparite</b> — soprattutto passando fra dimensioni (Nether, End, Gate).</li>
   <li><b>Un incarico bloccato</b> — fai quello che chiede e il contatore non sale.</li>
   <li><b>Rimanere chiusi dentro</b> — un Gate senza uscita, una città irraggiungibile.</li>
-  <li><b>Lag</b> — soprattutto lontano dallo spawn, o quando una città si costruisce.</li>
+  <li><b>Lag</b> — soprattutto lontano dallo spawn, o quando una città si costruisce, o con un
+  Dungeon Break appena scoppiato (sono trenta mob insieme).</li>
+</ul>
+
+<h3>E in particolare, delle cose di stasera</h3>
+<ul class="tight">
+  <li><b>Il gelo del Gate Rosso</b>: un falò piantato lì per lì deve bastare a fermarlo. Se muori
+  di freddo con un falò addosso, o se non muori mai anche stando al centro di una stanza vuota,
+  segnalalo — è il numero che più probabilmente è tarato male.</li>
+  <li><b>Il preavviso del Dungeon Break</b>: la riga in chat deve arrivare <em>prima</em>
+  dell'esplosione, non insieme.</li>
+  <li><b>Le soglie</b>: spendi fino a 25 in Resistenza e mettiti nel fuoco. Poi togli i punti con la
+  Pergamena e riprova: deve tornare a bruciare.</li>
+  <li><b>Le ombre nominate</b>: rifai lo stesso varco due volte e verifica che la seconda
+  <em>non</em> ti dia una seconda copia.</li>
+  <li><b>L'anello rosso del Volatile</b>: deve comparire prima dello scoppio e lasciarti il tempo di
+  camminare fuori.</li>
+  <li><b>Shift + <kbd>R</kbd></b>: guarda lo stesso cadavere tre volte di fila. Non deve consumarsi.</li>
 </ul>
 
 <div class="panel gold">
