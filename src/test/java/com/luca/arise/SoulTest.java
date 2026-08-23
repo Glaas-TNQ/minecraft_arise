@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.progress.Rank;
+import com.luca.arise.shadow.ShadowArchetype;
 import com.luca.arise.shadow.ShadowData;
 import com.luca.arise.workshop.Catalyst;
 import com.luca.arise.workshop.LooseSoul;
@@ -45,8 +46,8 @@ class SoulTest {
 				LooseSoul loose = soul(health, damage);
 
 				ShadowData shadow = new ShadowData(UUID.randomUUID(), loose.sourceType(),
-						loose.level(), 0L, loose.health(), loose.damage(), Optional.empty(),
-						ShadowData.DEFAULT_COLOR);
+						ShadowArchetype.GUARD, loose.level(), 0L, loose.health(), loose.damage(),
+						Optional.empty(), ShadowData.DEFAULT_COLOR);
 
 				assertEquals(loose.power(), shadow.powerScore(), 1.0E-9,
 						"il metro della potenza deve essere lo stesso");

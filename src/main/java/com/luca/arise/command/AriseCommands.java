@@ -39,7 +39,9 @@ import com.luca.arise.shop.ShopManager;
 import com.luca.arise.shop.ShopOffer;
 import com.luca.arise.shop.ShopStock;
 import com.luca.arise.shadow.ShadowData;
+import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.shadow.ShadowManager;
+import com.luca.arise.shadow.ShadowSquad;
 import com.luca.arise.shadow.ShadowStance;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -322,7 +324,17 @@ public final class AriseCommands {
 					.executes(context -> listShadows(context.getSource()))
 					.then(Commands.literal("clear")
 							.requires(AriseCommands::canCheat)
-							.executes(context -> clearShadows(context.getSource()))));
+							.executes(context -> clearShadows(context.getSource())))
+					// La squadra e gli ordini si vedono solo in gioco e solo per gli effetti che
+					// hanno: senza un modo di leggerli e azzerarli, una prova che va storta non si
+					// distingue da un difetto.
+					.then(Commands.literal("squad")
+							.executes(context -> listSquad(context.getSource()))
+							.then(Commands.literal("clear")
+									.executes(context -> clearSquad(context.getSource()))))
+					.then(Commands.literal("orders")
+							.then(Commands.literal("clear")
+									.executes(context -> clearOrders(context.getSource())))));
 
 			DebugCommands.addTo(root, registryAccess);
 
@@ -606,12 +618,52 @@ public final class AriseCommands {
 		ShadowConfig shadowConfig = AriseConfig.get().shadows();
 		for (ShadowData shadow : army.shadows()) {
 			source.sendSuccess(() -> Component.translatable("arise.msg.shadow.list_entry",
-					shadow.rank(shadowConfig).label(), shadow.displayName(), shadow.level(),
+					shadow.grade(shadowConfig).label(), shadow.archetype().label(),
+					shadow.displayName(), shadow.level(),
 					String.format("%.0f", shadow.maxHealth(shadowConfig)),
 					String.format("%.1f", shadow.attackDamage(shadowConfig))), false);
 		}
 
 		return army.size();
+	}
+
+	/** L'elenco della squadra, nell'ordine in cui esce. */
+	private static int listSquad(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		ShadowSquad squad = ShadowManager.squad(player);
+		ShadowArmy army = ShadowManager.army(player);
+		ShadowConfig config = AriseConfig.get().shadows();
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.shadow.squad_header",
+				squad.size(), config.maxSummoned()), false);
+
+		int slot = 0;
+		for (java.util.UUID id : squad.ids()) {
+			int position = ++slot;
+			army.find(id).ifPresent(shadow -> source.sendSuccess(() ->
+					Component.translatable("arise.msg.shadow.squad_entry", position,
+							shadow.displayName(), shadow.archetype().label(),
+							shadow.grade(config).label()), false));
+		}
+
+		return squad.size();
+	}
+
+	private static int clearSquad(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		player.setAttached(ModAttachments.SQUAD, ShadowSquad.EMPTY);
+		source.sendSuccess(() -> Component.translatable("arise.msg.shadow.squad_cleared"), false);
+		return 1;
+	}
+
+	private static int clearOrders(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		ShadowManager.clearOrders(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.shadow.orders_cleared"), false);
+		return 1;
 	}
 
 	private static int clearShadows(CommandSourceStack source)

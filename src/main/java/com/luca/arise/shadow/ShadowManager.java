@@ -1,6 +1,7 @@
 package com.luca.arise.shadow;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,7 @@ import com.luca.arise.workshop.LooseSoul;
 import com.luca.arise.workshop.SoulItems;
 import com.luca.arise.workshop.WorkshopManager;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -49,15 +51,47 @@ import net.minecraft.world.phys.Vec3;
  */
 public final class ShadowManager {
 
-	/** Un cadavere ancora estraibile. */
-	private record Candidate(Identifier sourceType, Vec3 position, double maxHealth, double attackDamage,
-			long expiresAtTick) {
+	/** Un cadavere ancora estraibile. L'archetipo si decide qui, finche' il corpo c'e' ancora. */
+	private record Candidate(Identifier sourceType, ShadowArchetype archetype, Vec3 position,
+			double maxHealth, double attackDamage, long expiresAtTick) {
+	}
+
+	/**
+	 * Quanto le altre ombre in campo rendono piu' forte questa. Moltiplicatori, non valori.
+	 *
+	 * <p>Zero e' il caso normale: l'aura la emana solo chi ha almeno il grado di Comandante, e
+	 * Comandanti non se ne hanno finche' non si e' fatta molta strada. E' esattamente quello che
+	 * deve essere — una ricompensa da fine partita che cambia il modo di comporre la squadra, non
+	 * un numero che c'e' sempre.
+	 */
+	public record Aura(double damage, double health) {
+
+		public static final Aura NONE = new Aura(0.0, 0.0);
 	}
 
 	private static final Map<UUID, List<Candidate>> CANDIDATES = new HashMap<>();
 
 	/** giocatore → (id dell'ombra → id dell'entità evocata). */
 	private static final Map<UUID, Map<UUID, UUID>> SUMMONED = new HashMap<>();
+
+	/**
+	 * giocatore → quanto valeva il Monarca l'ultima volta che l'esercito e' stato riallineato.
+	 *
+	 * <p>Serve al dono del Monarca (vedi {@code ShadowEntity.applyData}): una parte della vita e
+	 * del danno del giocatore finisce in ogni ombra evocata, quindi quando il giocatore cambia —
+	 * sale di livello, indossa un pezzo, incastona una gemma — le ombre gia' in campo vanno
+	 * riscritte. Confrontare due numeri una volta al secondo costa niente; riscrivere quattro
+	 * eserciti a ogni battito costerebbe, e per giunta per niente.
+	 */
+	private static final Map<UUID, Double> MONARCH_MARK = new HashMap<>();
+
+	/**
+	 * Quanto stretto e' il cono in cui si puo' indicare un bersaglio: coseno dell'angolo.
+	 *
+	 * <p>0,995 sono poco piu' di cinque gradi. Piu' largo e si indica il mob sbagliato in una
+	 * stanza affollata, che e' l'unico errore davvero fastidioso in un ordine di questo tipo.
+	 */
+	private static final double AIM_CONE = 0.995;
 
 	private ShadowManager() {
 	}
@@ -92,7 +126,8 @@ public final class ShadowManager {
 		}
 
 		CANDIDATES.computeIfAbsent(killer.getUUID(), key -> new ArrayList<>())
-				.add(new Candidate(type, victim.position(), victim.getMaxHealth(), attackDamage,
+				.add(new Candidate(type, ShadowArchetype.of(victim, config.legion().behaviour()),
+						victim.position(), victim.getMaxHealth(), attackDamage,
 						killer.level().getGameTime() + config.extractionWindowTicks()));
 	}
 
@@ -156,7 +191,7 @@ public final class ShadowManager {
 		// Le ombre nascono sempre al livello 1: la loro forza viene dal mob d'origine e da quanto
 		// hanno combattuto, non da quanto era avanti il giocatore quando le ha estratte.
 		// Il contrario premierebbe l'accumulo di cadaveri in attesa di salire di livello.
-		ShadowData shadow = new ShadowData(UUID.randomUUID(), best.sourceType(), 1, 0L,
+		ShadowData shadow = new ShadowData(UUID.randomUUID(), best.sourceType(), best.archetype(), 1, 0L,
 				best.maxHealth() * config.healthFactor(),
 				best.attackDamage() * config.damageFactor(),
 				Optional.empty(), ShadowData.DEFAULT_COLOR);
@@ -166,8 +201,11 @@ public final class ShadowManager {
 		AriseFx.extractionSuccess(level, best.position(), shadow.rank(config));
 		QuestManager.advance(player, Objective.EXTRACT);
 
+		// L'archetipo nel messaggio non e' decorazione: e' l'unica volta in cui il gioco dice al
+		// giocatore che quel cadavere ha prodotto un Mago invece di una Guardia, e da li' in poi
+		// quella parola e' l'unica ragione per cui sceglierla in squadra.
 		return Component.translatable("arise.msg.shadow.extracted", shadow.displayName(),
-				shadow.rank(config).label(), army.size() + 1, capacity);
+				shadow.archetype().label(), shadow.rank(config).label(), army.size() + 1, capacity);
 	}
 
 	/**
@@ -237,7 +275,7 @@ public final class ShadowManager {
 		int spawned = 0;
 		int resting = 0;
 
-		for (ShadowData shadow : army.shadows()) {
+		for (ShadowData shadow : callUp(player, army, config)) {
 			if (summoned.containsKey(shadow.id())) {
 				continue;
 			}
@@ -268,10 +306,56 @@ public final class ShadowManager {
 
 		playSummonSound(player);
 		syncSummoned(player, summoned);
+		refreshLegion(player);
 
 		return resting > 0
 				? Component.translatable("arise.msg.shadow.summoned_partial", spawned, resting)
 				: Component.translatable("arise.msg.shadow.summoned", spawned);
+	}
+
+	/**
+	 * In che ordine chiamare l'esercito.
+	 *
+	 * <p>Prima la <strong>squadra</strong>, nell'ordine in cui e' stata composta; poi, se avanza
+	 * posto, le altre <strong>dalla piu' forte alla piu' debole</strong>.
+	 *
+	 * <p>Prima di questo blocco l'ordine era quello della lista, cioe' quello di estrazione: il
+	 * tasto mandava fuori le prime quattro ombre <em>mai estratte</em>, che dopo dieci ore sono le
+	 * quattro piu' deboli che si possiedono. Era il difetto piu' grosso dell'esercito, e non si
+	 * vedeva perche' il gioco non diceva mai quali stesse chiamando.
+	 *
+	 * <p>La squadra vuota non e' un errore: chi non l'ha composta riceve semplicemente le piu'
+	 * forti, che e' quello che avrebbe scelto comunque.
+	 */
+	private static List<ShadowData> callUp(ServerPlayer player, ShadowArmy army, ShadowConfig config) {
+		return callUpOrder(army, squad(player), config);
+	}
+
+	/**
+	 * La stessa cosa senza giocatore: e' qui che vive la regola, ed e' l'unico modo di provarla.
+	 *
+	 * <p>Un ordine di chiamata sbagliato non da' un errore: da' un esercito che manda fuori le
+	 * ombre sbagliate, cioe' esattamente il difetto che questo blocco esiste per correggere. Va
+	 * sul banco di prova come i codec.
+	 */
+	public static List<ShadowData> callUpOrder(ShadowArmy army, ShadowSquad squad, ShadowConfig config) {
+		List<ShadowData> order = new ArrayList<>(army.size());
+
+		for (UUID id : squad.ids()) {
+			army.find(id).ifPresent(order::add);
+		}
+
+		// Con il completamento spento la squadra e' un elenco chiuso — ma solo se esiste.
+		if (!config.legion().fillFromRoster() && !order.isEmpty()) {
+			return order;
+		}
+
+		List<ShadowData> rest = new ArrayList<>(army.shadows());
+		rest.removeIf(shadow -> squad.contains(shadow.id()));
+		rest.sort(Comparator.comparingDouble((ShadowData shadow) -> shadow.effectivePower(config)).reversed());
+
+		order.addAll(rest);
+		return order;
 	}
 
 	/** Evoca una singola ombra, per la schermata dell'esercito. */
@@ -305,6 +389,7 @@ public final class ShadowManager {
 
 		playSummonSound(player);
 		syncSummoned(player, summoned);
+		refreshLegion(player);
 		return Component.translatable("arise.msg.shadow.summoned_one", shadow.get().displayName());
 	}
 
@@ -319,6 +404,7 @@ public final class ShadowManager {
 
 		despawn(player, entityId);
 		syncSummoned(player, summoned);
+		refreshLegion(player);
 
 		return army(player).find(shadowId)
 				.map(shadow -> Component.translatable("arise.msg.shadow.recalled_one", shadow.displayName()))
@@ -340,6 +426,7 @@ public final class ShadowManager {
 
 		summoned.clear();
 		syncSummoned(player, summoned);
+		clearOrders(player);
 		return Component.translatable("arise.msg.shadow.recalled", recalled);
 	}
 
@@ -486,6 +573,10 @@ public final class ShadowManager {
 		army(owner).find(shadowId).ifPresent(shadow ->
 				owner.sendSystemMessage(Component.translatable("arise.msg.shadow.fallen",
 						shadow.displayName(), Math.max(1, downtimeTicks / 20))));
+
+		// Se la caduta era un Comandante, chi resta in campo perde l'aura: le statistiche vanno
+		// riscritte subito, o l'esercito continuerebbe a colpire come se lui fosse ancora li'.
+		refreshLegion(owner);
 	}
 
 	/** All'uscita del giocatore le entità vanno rimosse: i dati bastano a ricostruirle. */
@@ -533,6 +624,7 @@ public final class ShadowManager {
 
 		summoned.clear();
 		syncSummoned(player, summoned);
+		clearOrders(player);
 
 		if (recalled > 0) {
 			player.sendSystemMessage(Component.translatable("arise.msg.shadow.recalled_travel", recalled));
@@ -549,6 +641,7 @@ public final class ShadowManager {
 		}
 
 		CANDIDATES.remove(player.getUUID());
+		MONARCH_MARK.remove(player.getUUID());
 	}
 
 	/** Ripulisce dalle evocazioni morte o sparite, e restituisce la mappa viva. */
@@ -576,6 +669,244 @@ public final class ShadowManager {
 	 */
 	private static void syncSummoned(ServerPlayer player, Map<UUID, UUID> summoned) {
 		player.setAttached(ModAttachments.SUMMONED, new SummonedShadows(List.copyOf(summoned.keySet())));
+	}
+
+	// ---------------------------------------------------------------- squadra
+
+	/** La squadra del giocatore, gia' ripulita da chi non fa piu' parte dell'esercito. */
+	public static ShadowSquad squad(ServerPlayer player) {
+		ShadowSquad current = player.getAttachedOrCreate(ModAttachments.SQUAD);
+		ShadowSquad pruned = current.pruned(army(player));
+
+		if (pruned != current) {
+			player.setAttached(ModAttachments.SQUAD, pruned);
+		}
+
+		return pruned;
+	}
+
+	/** Mette o toglie un'ombra dalla squadra. Il tetto e' quello delle evocazioni contemporanee. */
+	public static Component toggleSquad(ServerPlayer player, UUID shadowId) {
+		Optional<ShadowData> shadow = army(player).find(shadowId);
+		if (shadow.isEmpty()) {
+			return Component.translatable("arise.msg.shadow.unknown");
+		}
+
+		int capacity = AriseConfig.get().shadows().maxSummoned();
+		ShadowSquad current = squad(player);
+		ShadowSquad updated = current.toggled(shadowId, capacity);
+
+		if (updated == current) {
+			return Component.translatable("arise.msg.shadow.squad_full", capacity);
+		}
+
+		player.setAttached(ModAttachments.SQUAD, updated);
+
+		return Component.translatable(updated.contains(shadowId)
+						? "arise.msg.shadow.squad_added"
+						: "arise.msg.shadow.squad_removed",
+				shadow.get().displayName(), updated.size(), capacity);
+	}
+
+	// ---------------------------------------------------------------- ordini
+
+	public static ShadowOrders orders(ServerPlayer player) {
+		ShadowOrders orders = player.getAttached(ModAttachments.ORDERS);
+		return orders == null ? ShadowOrders.NONE : orders;
+	}
+
+	private static void setOrders(ServerPlayer player, ShadowOrders orders) {
+		player.setAttached(ModAttachments.ORDERS, orders);
+	}
+
+	public static void clearOrders(ServerPlayer player) {
+		if (!orders(player).isIdle()) {
+			setOrders(player, ShadowOrders.NONE);
+		}
+	}
+
+	/**
+	 * "Uccidetelo": l'esercito punta cio' che il Monarca sta guardando.
+	 *
+	 * <p>Premuto senza niente nel mirino, l'ordine si revoca invece di fallire. E' la stessa scelta
+	 * di ogni tasto di questa mod: un comando che non fa niente e non spiega perche' e' peggio di
+	 * un comando che fa la cosa opposta ma la dice.
+	 */
+	public static Component focus(ServerPlayer player) {
+		if (summonedCount(player) == 0) {
+			return Component.translatable("arise.msg.shadow.nothing_summoned");
+		}
+
+		LivingEntity target = aimedAt(player, AriseConfig.get().shadows().legion().behaviour().focusRange());
+
+		if (target == null) {
+			if (orders(player).hasFocus()) {
+				setOrders(player, orders(player).withoutFocus());
+				return Component.translatable("arise.msg.shadow.focus_cleared");
+			}
+
+			return Component.translatable("arise.msg.shadow.no_aim");
+		}
+
+		setOrders(player, orders(player).withFocus(target.getUUID()));
+		AriseFx.shadowFocus(player.level(), target.getBoundingBox().getCenter());
+
+		return Component.translatable("arise.msg.shadow.focus", target.getDisplayName());
+	}
+
+	/** "Restate qui": l'esercito tiene la posizione. Ripremuto, torna a seguire. */
+	public static Component hold(ServerPlayer player) {
+		ShadowOrders current = orders(player);
+
+		if (current.isHolding()) {
+			setOrders(player, current.withoutHold());
+			return Component.translatable("arise.msg.shadow.hold_released");
+		}
+
+		if (summonedCount(player) == 0) {
+			return Component.translatable("arise.msg.shadow.nothing_summoned");
+		}
+
+		BlockPos post = player.blockPosition();
+		setOrders(player, current.withHold(post));
+		AriseFx.shadowHold(player.level(), Vec3.atBottomCenterOf(post));
+
+		return Component.translatable("arise.msg.shadow.hold", post.getX(), post.getY(), post.getZ());
+	}
+
+	/**
+	 * L'essere vivente che il giocatore sta inquadrando, entro la distanza data.
+	 *
+	 * <p>Un cono attorno alla direzione dello sguardo invece di un raggio esatto: a venti blocchi
+	 * un raggio pretende una mira che con un mob che si muove non si ha. Vince il piu' <em>centrato</em>,
+	 * non il piu' vicino, che e' quello che si aspetta chiunque abbia un mirino davanti. Serve
+	 * comunque la linea di vista: indicare un bersaglio attraverso un muro sarebbe un radar.
+	 */
+	private static LivingEntity aimedAt(ServerPlayer player, double range) {
+		Vec3 eye = player.getEyePosition();
+		Vec3 look = player.getViewVector(1.0F).normalize();
+
+		LivingEntity best = null;
+		double bestAim = AIM_CONE;
+
+		for (LivingEntity candidate : player.level().getEntitiesOfClass(LivingEntity.class,
+				player.getBoundingBox().inflate(range),
+				entity -> entity != player && entity.isAlive()
+						&& !ShadowGoals.isProtected(entity, player))) {
+
+			Vec3 toward = candidate.getBoundingBox().getCenter().subtract(eye);
+			double distance = toward.length();
+
+			if (distance > range || distance < 1.0E-4) {
+				continue;
+			}
+
+			double aim = toward.scale(1.0 / distance).dot(look);
+			if (aim > bestAim && player.hasLineOfSight(candidate)) {
+				bestAim = aim;
+				best = candidate;
+			}
+		}
+
+		return best;
+	}
+
+	// ---------------------------------------------------------------- aura di comando
+
+	/**
+	 * Quanto le <em>altre</em> ombre in campo potenziano questa.
+	 *
+	 * <p>L'esclusione non e' un dettaglio: senza, un Gran Maresciallo si darebbe il quaranta per
+	 * cento di danno da solo, e la squadra migliore sarebbe sempre "il piu' forte, quattro volte".
+	 * Cosi' invece un Comandante costa un posto e lo restituisce agli altri tre, che e' una scelta.
+	 *
+	 * <p>Legge la mappa grezza e non {@link #pruneSummoned}: viene chiamata da dentro
+	 * {@code applyData}, cioe' nel mezzo di un'evocazione, e ripulire li' vorrebbe dire spedire un
+	 * pacchetto di sincronia a meta' di un'operazione che non e' ancora finita.
+	 */
+	public static Aura auraFor(ServerPlayer owner, UUID exclude) {
+		Map<UUID, UUID> summoned = SUMMONED.get(owner.getUUID());
+
+		if (summoned == null || summoned.isEmpty()) {
+			return Aura.NONE;
+		}
+
+		ShadowConfig config = AriseConfig.get().shadows();
+		ShadowArmy army = army(owner);
+		double damage = 0.0;
+		double health = 0.0;
+
+		for (UUID shadowId : summoned.keySet()) {
+			if (shadowId.equals(exclude)) {
+				continue;
+			}
+
+			ShadowData other = army.find(shadowId).orElse(null);
+			if (other == null) {
+				continue;
+			}
+
+			damage += other.auraDamage(config);
+			health += other.auraHealth(config);
+		}
+
+		return new Aura(damage, health);
+	}
+
+	/**
+	 * Riscrive le statistiche di tutte le ombre in campo.
+	 *
+	 * <p>Da chiamare ogni volta che cambia <em>chi</em> c'e' fuori — un'evocazione, un richiamo, una
+	 * caduta — perche' l'aura di comando dipende dalla composizione, e ogni volta che cambia il
+	 * Monarca, perche' una parte di lui e' dentro ognuna di loro.
+	 */
+	public static void refreshLegion(ServerPlayer player) {
+		ShadowArmy army = army(player);
+
+		for (Map.Entry<UUID, UUID> entry : pruneSummoned(player).entrySet()) {
+			ShadowData data = army.find(entry.getKey()).orElse(null);
+
+			if (data != null && player.level().getEntityInAnyDimension(entry.getValue())
+					instanceof ShadowEntity entity) {
+				entity.applyData(data, player, false);
+			}
+		}
+
+		MONARCH_MARK.put(player.getUUID(), monarchMark(player));
+	}
+
+	/**
+	 * Manutenzione al secondo: l'ordine che non ha piu' un bersaglio, e il Monarca che e' cambiato.
+	 *
+	 * <p>Girano insieme perche' sono le due sole cose dell'esercito che nessun evento annuncia. Un
+	 * bersaglio muore e nessuno lo dice all'ordine; un pezzo d'equipaggiamento cambia il danno del
+	 * giocatore e nessuno lo dice alle ombre.
+	 */
+	public static void tick(ServerPlayer player) {
+		ShadowOrders orders = orders(player);
+
+		if (orders.hasFocus() && orders.focus()
+				.map(id -> !(player.level().getEntity(id) instanceof LivingEntity living) || !living.isAlive())
+				.orElse(true)) {
+			setOrders(player, orders.withoutFocus());
+		}
+
+		Map<UUID, UUID> summoned = SUMMONED.get(player.getUUID());
+		if (summoned == null || summoned.isEmpty()) {
+			return;
+		}
+
+		double mark = monarchMark(player);
+		Double previous = MONARCH_MARK.get(player.getUUID());
+
+		if (previous == null || Math.abs(previous - mark) > 1.0E-4) {
+			refreshLegion(player);
+		}
+	}
+
+	/** Il numero che riassume "quanto vale il Monarca adesso": vita e danno in uno. */
+	private static double monarchMark(ServerPlayer player) {
+		return player.getMaxHealth() * 1000.0 + player.getAttributeValue(Attributes.ATTACK_DAMAGE);
 	}
 
 	// ---------------------------------------------------------------- postura
@@ -636,8 +967,28 @@ public final class ShadowManager {
 		return spent + (long) shadow.powerScore();
 	}
 
+	/**
+	 * Da' un nome a un'ombra — se il grado glielo consente.
+	 *
+	 * <p>Da Cavaliere in su, come nel manhwa: il nome e' un privilegio del grado, non un acquisto.
+	 * Il costo in soul coin resta, ma smette di essere l'unico requisito, e la scala dei gradi
+	 * smette di essere una decorazione nella schermata.
+	 */
 	public static Component rename(ServerPlayer player, UUID shadowId, String name) {
-		return modify(player, shadowId, AriseConfig.get().shadows().costs().rename(),
+		ShadowConfig config = AriseConfig.get().shadows();
+		Optional<ShadowData> current = army(player).find(shadowId);
+
+		if (current.isEmpty()) {
+			return Component.translatable("arise.msg.shadow.unknown");
+		}
+
+		ShadowGrade grade = current.get().grade(config);
+		if (!grade.canBeNamed()) {
+			return Component.translatable("arise.msg.shadow.cannot_name",
+					current.get().displayName(), ShadowGrade.KNIGHT.label(), grade.label());
+		}
+
+		return modify(player, shadowId, config.costs().rename(),
 				shadow -> shadow.withName(name),
 				updated -> Component.translatable("arise.msg.shadow.renamed", updated.displayName()));
 	}
@@ -752,9 +1103,17 @@ public final class ShadowManager {
 			return Component.translatable("arise.msg.shadow.army_full", capacity);
 		}
 
-		ShadowData shadow = new ShadowData(UUID.randomUUID(), soul.sourceType(), soul.level(), 0L,
-				soul.health(), WorkshopManager.enlistedDamage(soul), Optional.empty(),
-				ShadowData.DEFAULT_COLOR);
+		// L'archetipo si ricava dal mob d'origine e dalla vita che l'anima ha congelato dentro di
+		// se'. La vita e' gia' moltiplicata per il fattore di config, e la soglia dei Colossi
+		// guarda il mob vivo: qui si torna indietro, o un'anima di zombie passerebbe per un
+		// Colosso solo perche' l'ombra di uno zombie e' piu' robusta dello zombie.
+		double sourceHealth = soul.health() / Math.max(1.0E-3, config.healthFactor());
+		ShadowArchetype archetype = ShadowArchetype.ofSource(soul.sourceType(), sourceHealth,
+				config.legion().behaviour());
+
+		ShadowData shadow = new ShadowData(UUID.randomUUID(), soul.sourceType(), archetype,
+				soul.level(), 0L, soul.health(), WorkshopManager.enlistedDamage(soul),
+				Optional.empty(), ShadowData.DEFAULT_COLOR);
 
 		setArmy(player, army.with(shadow));
 		QuestManager.advance(player, Objective.ENLIST_SOUL);
@@ -769,5 +1128,7 @@ public final class ShadowManager {
 	public static void clear(ServerPlayer player) {
 		recall(player);
 		setArmy(player, ShadowArmy.EMPTY);
+		player.setAttached(ModAttachments.SQUAD, ShadowSquad.EMPTY);
+		clearOrders(player);
 	}
 }

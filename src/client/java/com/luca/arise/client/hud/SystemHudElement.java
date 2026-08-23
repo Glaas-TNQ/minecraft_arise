@@ -9,6 +9,7 @@ import com.luca.arise.quest.PlayerQuests;
 import com.luca.arise.quest.Quest;
 import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModAttachments;
+import com.luca.arise.shadow.ShadowOrders;
 import com.luca.arise.shadow.ShadowStance;
 
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
@@ -43,6 +44,9 @@ public class SystemHudElement implements HudElement {
 	private static final int COLOR_POINTS = 0xFFFFD54F;
 	private static final int COLOR_SOULS = 0xFFFFD54F;
 	private static final int COLOR_STANCE = 0xFF9BA8B8;
+
+	/** L'ordine in corso: rosso caldo, perche' e' l'unica riga del pannello che e' temporanea. */
+	private static final int COLOR_ORDER = 0xFFE86A6A;
 	private static final int COLOR_LOCKED = 0xFF5A6B80;
 	private static final int COLOR_QUEST = 0xFF7FD97F;
 	private static final int COLOR_COOLDOWN = 0xB01B2838;
@@ -85,7 +89,8 @@ public class SystemHudElement implements HudElement {
 		}
 
 		detectLevelUp(progress.level());
-		drawPanel(graphics, minecraft.font, progress, player.getAttached(ModAttachments.STANCE), quests);
+		drawPanel(graphics, minecraft.font, progress, player.getAttached(ModAttachments.STANCE),
+				player.getAttached(ModAttachments.ORDERS), quests);
 
 		if (quests.has(Unlock.ABILITIES)) {
 			drawAbilities(graphics, minecraft, progress.level(),
@@ -103,15 +108,21 @@ public class SystemHudElement implements HudElement {
 	}
 
 	private void drawPanel(GuiGraphicsExtractor graphics, Font font, PlayerProgress progress,
-			ShadowStance stance, PlayerQuests quests) {
+			ShadowStance stance, ShadowOrders orders, PlayerQuests quests) {
 		long needed = AriseConfig.get().xpForNextLevel(progress.level());
 		float fraction = needed <= 0 ? 1.0F : Math.min(1.0F, (float) progress.xp() / needed);
 
 		Quest quest = quests.current();
 
-		// Righe: livello, soul coin, postura, più i punti da spendere e l'incarico in corso,
-		// ciascuno solo quando c'è.
-		int lines = 3 + (progress.unspentPoints() > 0 ? 1 : 0) + (quest == null ? 0 : 1);
+		// L'ordine in corso e' l'unica riga che compare e sparisce da sola: un esercito che smette
+		// di seguire, o che si accanisce su un bersaglio solo, e' un comportamento che va spiegato
+		// mentre dura, o sembra un difetto.
+		Component order = orders == null ? null : orders.label();
+
+		// Righe: livello, soul coin, postura, più i punti da spendere, l'ordine in corso e
+		// l'incarico, ciascuno solo quando c'è.
+		int lines = 3 + (progress.unspentPoints() > 0 ? 1 : 0) + (order == null ? 0 : 1)
+				+ (quest == null ? 0 : 1);
 		int height = PADDING * 2 + font.lineHeight * lines + PADDING + BAR_HEIGHT;
 
 		graphics.fill(MARGIN, MARGIN, MARGIN + PANEL_WIDTH, MARGIN + height, COLOR_PANEL);
@@ -134,6 +145,11 @@ public class SystemHudElement implements HudElement {
 		if (progress.unspentPoints() > 0) {
 			graphics.text(font, Component.translatable("arise.hud.points", progress.unspentPoints()),
 					MARGIN + PADDING, y, COLOR_POINTS);
+			y += font.lineHeight;
+		}
+
+		if (order != null) {
+			graphics.text(font, order, MARGIN + PADDING, y, COLOR_ORDER);
 			y += font.lineHeight;
 		}
 

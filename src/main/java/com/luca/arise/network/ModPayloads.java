@@ -73,6 +73,8 @@ public final class ModPayloads {
 					case SUMMON -> ShadowManager.summon(player);
 					case RECALL -> ShadowManager.recall(player);
 					case STANCE -> ShadowManager.cycleStance(player);
+					case ORDER_FOCUS -> ShadowManager.focus(player);
+					case ORDER_HOLD -> ShadowManager.hold(player);
 					case ABILITY_1, ABILITY_2, ABILITY_3, ABILITY_4 ->
 							AbilityManager.use(player, payload.action().ability());
 					case OPEN_GEAR -> null;
@@ -125,6 +127,7 @@ public final class ModPayloads {
 					case RENAME -> ShadowManager.rename(player, payload.shadowId(), payload.name());
 					case RECOLOR -> ShadowManager.recolor(player, payload.shadowId(), payload.color());
 					case UPGRADE -> ShadowManager.upgrade(player, payload.shadowId());
+					case SQUAD -> ShadowManager.toggleSquad(player, payload.shadowId());
 				};
 
 				player.sendSystemMessage(feedback);

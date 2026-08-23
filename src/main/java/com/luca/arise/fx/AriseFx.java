@@ -104,6 +104,54 @@ public final class AriseFx {
 		play(level, position, ModSounds.SHADOW_DEATH, 0.9F, 1.0F);
 	}
 
+	/**
+	 * La provocazione del Colosso: un'onda bassa che si allarga, e un tonfo.
+	 *
+	 * <p>Deve vedersi da lontano e non coprire la mischia: un anello a terra, niente colonne. Che
+	 * l'aggro sia cambiato e' l'informazione piu' utile di uno scontro difficile, e senza un segno
+	 * il giocatore non ha modo di sapere se il suo Colosso sta funzionando.
+	 */
+	public static void shadowTaunt(ServerLevel level, Vec3 position, int color) {
+		FxConfig fx = config();
+		ring(level, position, 2.2, fx.scaled(24), dust(color, 1.3F), 0.05);
+		play(level, position, ModSounds.SHADOW_TAUNT, 0.8F, 0.6F);
+	}
+
+	/**
+	 * La lancia d'ombra: una linea di polvere dal Mago al bersaglio.
+	 *
+	 * <p>Il colpo e' istantaneo, quindi la linea <em>e'</em> il proiettile: senza, il danno
+	 * arriverebbe dal nulla e sembrerebbe un bug. Sedici punti bastano a sedici blocchi.
+	 */
+	public static void shadowLance(ServerLevel level, Vec3 from, Vec3 to, int color) {
+		FxConfig fx = config();
+		int steps = Math.max(4, fx.scaled(16));
+		ParticleOptions bolt = dust(color, 0.9F);
+
+		for (int i = 0; i <= steps; i++) {
+			Vec3 point = from.lerp(to.add(0.0, 0.9, 0.0), (double) i / steps);
+			level.sendParticles(bolt, point.x(), point.y(), point.z(), 1, 0.03, 0.03, 0.03, 0.0);
+		}
+
+		level.sendParticles(ParticleTypes.SCULK_SOUL, to.x(), to.y() + 0.9, to.z(),
+				fx.scaled(6), 0.2, 0.3, 0.2, 0.01);
+		play(level, from, ModSounds.SHADOW_LANCE, 0.7F, 1.2F);
+	}
+
+	/** Il bersaglio indicato all'esercito: un anello stretto attorno a lui, e nient'altro. */
+	public static void shadowFocus(ServerLevel level, Vec3 target) {
+		FxConfig fx = config();
+		ring(level, target, 0.8, fx.scaled(16), dust(0xE86A6A, 1.1F), 0.0);
+		play(level, target, ModSounds.SHADOW_ORDER, 0.8F, 1.3F);
+	}
+
+	/** Il punto da tenere: un anello a terra largo quanto il raggio dell'ordine non e', ma si vede. */
+	public static void shadowHold(ServerLevel level, Vec3 post) {
+		FxConfig fx = config();
+		ring(level, post, 1.6, fx.scaled(20), dust(0x4FC3F7, 1.0F), 0.0);
+		play(level, post, ModSounds.SHADOW_ORDER, 0.8F, 0.8F);
+	}
+
 	// ---------------------------------------------------------------- il Sistema
 
 	/** Salita di livello: colonna dorata attorno al giocatore. */

@@ -151,6 +151,7 @@ public final class ProgressEvents {
 			for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 				GearManager.tick(player);
 				ProgressManager.reconcile(player);
+				ShadowManager.tick(player);
 				AbilityManager.prune(player, now);
 				GateManager.tick(player);
 			}

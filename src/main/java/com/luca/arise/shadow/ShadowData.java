@@ -26,7 +26,7 @@ import net.minecraft.world.entity.EntityType;
  * non cambiano mai. Le statistiche effettive si ricavano applicando la crescita del livello, così
  * ritoccare il bilanciamento in config riscala l'intero esercito senza migrazioni.
  */
-public record ShadowData(UUID id, Identifier sourceType, int level, long xp,
+public record ShadowData(UUID id, Identifier sourceType, ShadowArchetype archetype, int level, long xp,
 		double baseMaxHealth, double baseAttackDamage, Optional<String> customName, int color) {
 
 	/** Colore predefinito: il nero-blu della texture, cioè "nessuna tinta". */
@@ -35,6 +35,10 @@ public record ShadowData(UUID id, Identifier sourceType, int level, long xp,
 	public static final Codec<ShadowData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			UUIDUtil.CODEC.fieldOf("id").forGetter(ShadowData::id),
 			Identifier.CODEC.fieldOf("source_type").forGetter(ShadowData::sourceType),
+			// Opzionale: le ombre estratte prima che gli archetipi esistessero diventano Guardie,
+			// che e' il comportamento che avevano gia' — mischia che segue e picchia.
+			ShadowArchetype.CODEC.optionalFieldOf("archetype", ShadowArchetype.GUARD)
+					.forGetter(ShadowData::archetype),
 			Codec.INT.fieldOf("level").forGetter(ShadowData::level),
 			// Opzionale: le ombre estratte prima che il livellamento esistesse ripartono da zero
 			// invece di rendere illeggibile l'intero esercito salvato.
@@ -69,18 +73,24 @@ public record ShadowData(UUID id, Identifier sourceType, int level, long xp,
 
 	public ShadowData withName(String name) {
 		String trimmed = name == null ? "" : name.trim();
-		return new ShadowData(id, sourceType, level, xp, baseMaxHealth, baseAttackDamage,
+		return new ShadowData(id, sourceType, archetype, level, xp, baseMaxHealth, baseAttackDamage,
 				trimmed.isEmpty() ? Optional.empty() : Optional.of(trimmed), color);
 	}
 
 	public ShadowData withColor(int newColor) {
-		return new ShadowData(id, sourceType, level, xp, baseMaxHealth, baseAttackDamage,
+		return new ShadowData(id, sourceType, archetype, level, xp, baseMaxHealth, baseAttackDamage,
 				customName, newColor);
+	}
+
+	/** Cambia archetipo. Serve solo ai comandi di prova: in gioco lo decide il cadavere. */
+	public ShadowData withArchetype(ShadowArchetype newArchetype) {
+		return new ShadowData(id, sourceType, newArchetype, level, xp, baseMaxHealth, baseAttackDamage,
+				customName, color);
 	}
 
 	/** Sale di un livello senza passare dall'esperienza: è quello che si compra coi soul coin. */
 	public ShadowData withLevelUp() {
-		return new ShadowData(id, sourceType, level + 1, 0L, baseMaxHealth, baseAttackDamage,
+		return new ShadowData(id, sourceType, archetype, level + 1, 0L, baseMaxHealth, baseAttackDamage,
 				customName, color);
 	}
 
@@ -94,11 +104,43 @@ public record ShadowData(UUID id, Identifier sourceType, int level, long xp,
 	}
 
 	public double maxHealth(ShadowConfig config) {
-		return baseMaxHealth * config.leveling().statMultiplier(level);
+		return baseMaxHealth * config.leveling().statMultiplier(level)
+				* archetype.tuning(config.legion()).health();
 	}
 
 	public double attackDamage(ShadowConfig config) {
-		return baseAttackDamage * config.leveling().statMultiplier(level);
+		return baseAttackDamage * config.leveling().statMultiplier(level)
+				* archetype.tuning(config.legion()).damage();
+	}
+
+	/**
+	 * Quanto vale <em>adesso</em>: base, livello e archetipo tutti insieme.
+	 *
+	 * <p>Distinta da {@link #powerScore()}, che guarda solo il mob d'origine. Il rango risponde
+	 * “da cosa viene” e non cambia mai; il grado risponde “quanto vale” e sale
+	 * combattendo. Due domande diverse, due numeri diversi, entrambi ricavati e nessuno salvato.
+	 */
+	public double effectivePower(ShadowConfig config) {
+		return maxHealth(config) + attackDamage(config) * 4.0;
+	}
+
+	/** Il grado nella scala del manhwa, da Normale a Gran Maresciallo. */
+	public ShadowGrade grade(ShadowConfig config) {
+		return ShadowGrade.fromPower(effectivePower(config), config.legion().gradeThresholds());
+	}
+
+	/**
+	 * Il moltiplicatore che quest'ombra regala alle <em>altre</em> in campo, se comanda.
+	 *
+	 * <p>Zero sotto il grado di Comandante. Non si applica a se stessa: un Gran Maresciallo che si
+	 * potenzia da solo renderebbe la squadra un posto solo con dentro il più forte.
+	 */
+	public double auraDamage(ShadowConfig config) {
+		return grade(config).commandSteps() * config.legion().commanderDamageBonus();
+	}
+
+	public double auraHealth(ShadowConfig config) {
+		return grade(config).commandSteps() * config.legion().commanderHealthBonus();
 	}
 
 	public long xpForNextLevel(ShadowConfig config) {
@@ -133,7 +175,7 @@ public record ShadowData(UUID id, Identifier sourceType, int level, long xp,
 			newXp = 0;
 		}
 
-		return new ShadowData(id, sourceType, newLevel, newXp, baseMaxHealth, baseAttackDamage,
+		return new ShadowData(id, sourceType, archetype, newLevel, newXp, baseMaxHealth, baseAttackDamage,
 				customName, color);
 	}
 }

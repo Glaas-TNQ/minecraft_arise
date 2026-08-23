@@ -27,6 +27,16 @@ public record AriseActionPayload(Action action) implements CustomPacketPayload {
 		/** Cicla la postura di combattimento dell'esercito. */
 		STANCE("stance"),
 		/**
+		 * "Uccidetelo": l'esercito punta cio' che il Monarca sta guardando.
+		 *
+		 * <p>Il bersaglio non viaggia nel pacchetto — sarebbe un id di entita' scelto dal client, e
+		 * quindi un modo per far attaccare qualunque cosa a qualunque distanza. Il client dice solo
+		 * "ho premuto"; chi ho davanti lo decide il server, dalla rotazione che gia' conosce.
+		 */
+		ORDER_FOCUS("order_focus"),
+		/** "Restate qui": l'esercito tiene la posizione. Ripremuto, torna a seguire. */
+		ORDER_HOLD("order_hold"),
+		/**
 		 * Apre il menu del Cacciatore.
 		 *
 		 * <p>Un menu con delle caselle nasce sul server e non sul client: e' il server a

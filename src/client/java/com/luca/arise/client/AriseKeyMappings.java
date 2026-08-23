@@ -62,6 +62,18 @@ public final class AriseKeyMappings {
 	/** Cicla fra aggressiva, difensiva e passiva. */
 	public static final KeyMapping STANCE = register("stance", GLFW.GLFW_KEY_B);
 
+	/**
+	 * "Uccidetelo": l'esercito punta cio' che si sta guardando.
+	 *
+	 * <p>Y e U sono liberi in vanilla, e stanno vicini fra loro e lontani dai tasti che si premono
+	 * per sbaglio in mischia. Un ordine dato per sbaglio in postura passiva farebbe attaccare un
+	 * esercito che non doveva muoversi.
+	 */
+	public static final KeyMapping ORDER_FOCUS = register("order_focus", GLFW.GLFW_KEY_Y);
+
+	/** "Restate qui": l'esercito tiene la posizione. Ripremuto, torna a seguire. */
+	public static final KeyMapping ORDER_HOLD = register("order_hold", GLFW.GLFW_KEY_U);
+
 	/** Le quattro abilità. Z X C V: vicine fra loro e libere in vanilla. */
 	public static final KeyMapping ABILITY_1 = register("ability_1", GLFW.GLFW_KEY_Z);
 	public static final KeyMapping ABILITY_2 = register("ability_2", GLFW.GLFW_KEY_X);
@@ -119,6 +131,8 @@ public final class AriseKeyMappings {
 			sendOnPress(SUMMON, AriseActionPayload.Action.SUMMON);
 			sendOnPress(RECALL, AriseActionPayload.Action.RECALL);
 			sendOnPress(STANCE, AriseActionPayload.Action.STANCE);
+			sendOnPress(ORDER_FOCUS, AriseActionPayload.Action.ORDER_FOCUS);
+			sendOnPress(ORDER_HOLD, AriseActionPayload.Action.ORDER_HOLD);
 			sendOnPress(ABILITY_1, AriseActionPayload.Action.ABILITY_1);
 			sendOnPress(ABILITY_2, AriseActionPayload.Action.ABILITY_2);
 			sendOnPress(ABILITY_3, AriseActionPayload.Action.ABILITY_3);

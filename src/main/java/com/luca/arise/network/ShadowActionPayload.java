@@ -33,7 +33,9 @@ public record ShadowActionPayload(UUID shadowId, Action action, String name, int
 		RENAME("rename"),
 		RECOLOR("recolor"),
 		/** Sale di un livello pagando in soul coin, senza combattere. */
-		UPGRADE("upgrade");
+		UPGRADE("upgrade"),
+		/** Mette o toglie l'ombra dalla squadra, cioe' da chi esce col tasto di evocazione. */
+		SQUAD("squad");
 
 		public static final Codec<Action> CODEC = StringRepresentable.fromEnum(Action::values);
 

@@ -38,6 +38,15 @@ public final class ModSounds {
 	/** L'ombra cade e torna nell'esercito. */
 	public static final SoundEvent SHADOW_DEATH = create("shadow.death");
 
+	/** Un ordine impartito all'esercito: il bersaglio indicato, la posizione tenuta. */
+	public static final SoundEvent SHADOW_ORDER = create("shadow.order");
+
+	/** La lancia d'ombra del Mago che parte. */
+	public static final SoundEvent SHADOW_LANCE = create("shadow.lance");
+
+	/** Il Colosso che si prende addosso la stanza. */
+	public static final SoundEvent SHADOW_TAUNT = create("shadow.taunt");
+
 	// ---- il Sistema
 	/** Salita di livello del giocatore. */
 	public static final SoundEvent SYSTEM_LEVEL_UP = create("system.level_up");

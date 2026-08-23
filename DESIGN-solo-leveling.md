@@ -710,6 +710,166 @@ qualcuno vende, e la Cartoleria ha un motivo di esistere anche a catena finita.
 
 ---
 
+## 12. L'esercito che obbedisce — archetipi, gradi, squadra e ordini
+
+### 12.1 Il problema
+
+L'esercito funzionava e non si giocava. Le prove in gioco lo dicono in tre frasi.
+
+**Le ombre erano tutte la stessa cosa.** Un'ombra di ragno e una di scheletro differivano per due
+numeri e per niente altro: entrambe correvano addosso al nemico e lo picchiavano. Un esercito di
+venti era venti volte lo stesso soldato, e non c'era ragione di guardare la lista.
+
+**Il tasto chiamava le ombre sbagliate.** `summon` scorreva l'esercito dall'inizio e mandava fuori
+le prime quattro disponibili, cioe' le prime quattro *estratte*: dopo dieci ore di gioco, le
+quattro piu' deboli che si possiedono. Per mandare fuori quelle giuste bisognava aprire la
+schermata ed evocarle a una a una, ogni volta.
+
+**Non si poteva comandare niente.** C'era la postura — aggressiva, difensiva, passiva — che e' una
+*politica*: si sceglie una volta e vale sempre. Non c'era un *ordine*, cioe' la cosa che nel manhwa
+definisce il personaggio: il Monarca indica, e l'esercito esegue.
+
+C'era anche un quarto difetto, piu' lento da vedere: la prima ombra estratta diventava inutile e
+restava inutile. Cresceva solo di suo, e la sua crescita non aveva niente a che fare con quanto era
+diventato forte chi la comandava.
+
+### 12.2 Quattro archetipi
+
+L'archetipo si decide **una volta**, al momento dell'estrazione, guardando il cadavere. Tre
+domande, in quest'ordine: *prima quanto e' grosso, poi come colpisce, poi che forma ha.*
+
+| Archetipo | Da chi | Cosa fa che gli altri non fanno | Vita | Danno | Velocita' |
+|---|---|---|---|---|---|
+| **Guardia** | zombie, piglin, tutto cio' che sta su due gambe | si mette **fra** il Monarca e chi lo punta | ×1,00 | ×1,00 | ×1,00 |
+| **Bestia** | ragni, animali, tutto cio' che e' piu' largo che alto | insegue lontano e **salta addosso** | ×0,75 | ×1,20 | ×1,30 |
+| **Mago** | scheletri, streghe, blaze, balestrieri | **lancia d'ombra** a 16 blocchi, e indietreggia sotto i 5 | ×0,60 | ×1,00 | ×1,00 |
+| **Colosso** | ravager, golem, warden — chiunque abbia 40 vite o piu' | **provoca**: si prende addosso chi puntava il Monarca | ×1,90 | ×0,80 | ×0,80 |
+
+Un solo tipo di entita' per quattro modi di combattere. E' §3.4 portata un passo piu' in la': non
+un modello per mob, non un modello per archetipo — un modello, quattro comportamenti, e la taglia
+(`minecraft:scale`) che li distingue a colpo d'occhio.
+
+**La provocazione del Colosso e' la meccanica piu' importante del blocco.** Senza, "tanta vita" e'
+una statistica che non serve a nessuno: i mob continuano a colpire il giocatore, che di vite ne ha
+venti. Con, un Colosso in squadra e' la differenza fra vivere e morire in un Gate di rango alto, e
+vale il suo posto anche se il suo danno e' l'ottanta per cento di quello di una Guardia.
+
+**La lancia del Mago non e' un proiettile.** Un proiettile vero sarebbe un'entita' in piu' da
+registrare, sincronizzare e renderizzare, per un effetto che a sedici blocchi nessuno vede volare.
+Il colpo e' istantaneo e si *disegna*: una fila di particelle dal mago al bersaglio. Pretende linea
+di vista, quindi un muro protegge davvero — ed e' la stessa condizione che fa mollare la presa al
+goal, cosi' un Mago con il bersaglio dietro a un muro va a cercarselo invece di restare fermo a
+mirare.
+
+**Come si classificano i mob.** L'elenco dei "lanciatori" sta in config ed e' la fonte di verita',
+non un complemento. Il motivo e' che l'interfaccia vanilla `RangedAttackMob` si puo' chiedere solo
+a un'entita' viva, e l'archetipo va deciso anche quando di viva non c'e' piu' niente — un'anima
+arruolata dall'Officina e' un id e due numeri. Un elenco in config risponde a entrambe le domande
+allo stesso modo, ed e' anche l'unico modo che un server ha di classificare i mob di un'altra mod.
+
+### 12.3 Il grado, che e' un secondo asse
+
+Il **rango** E-S dice *da cosa viene* un'ombra, e non cambia mai: e' la stessa etichetta dei Gate e
+dell'equipaggiamento, e serve a confrontare cose diverse fra loro. Il **grado** dice *quanto vale
+adesso*, e sale combattendo.
+
+> Normale → Elite → Cavaliere → Cavaliere d'Elite → Comandante → Generale → Maresciallo → Gran Maresciallo
+
+Come il rango, non e' un dato salvato: si ricava dalla potenza effettiva — base × livello ×
+archetipo — contro otto soglie in config. Nessun secondo valore da tenere in sincronia.
+
+Il grado non e' un'etichetta:
+
+- **da Cavaliere in su** un'ombra puo' ricevere un **nome proprio**. E' la regola del manhwa, ed e'
+  anche buon senso: dare un nome a una recluta che fra dieci minuti sara' congedata non e' un
+  privilegio, e' rumore. Prima il nome si comprava e basta;
+- **da Comandante in su** emana l'**aura di comando**: +10% danno e +8% vita alle *altre* ombre in
+  campo, per ogni gradino sopra Comandante. Un Gran Maresciallo ne da' quattro volte tanto.
+
+L'esclusione — l'aura non si applica a se stessa — e' quello che rende la composizione una scelta.
+Senza, la squadra migliore sarebbe sempre "il piu' forte, quattro volte".
+
+### 12.4 La squadra
+
+Un elenco ordinato di id, persistente e `copyOnDeath`, grande al piu' quanto il tetto delle
+evocazioni contemporanee. `summon` chiama **prima la squadra, nell'ordine in cui e' stata
+composta**; poi, se avanza posto, le altre **dalla piu' forte alla piu' debole**.
+
+Due dettagli che sembrano piccoli e non lo sono:
+
+- **la squadra vuota non e' un errore.** Chi non l'ha composta riceve le piu' forti, che e' quello
+  che avrebbe scelto comunque. Il comportamento vecchio — ordine di estrazione — non era una scelta
+  di nessuno, era il primo che capitava;
+- **l'ordine predefinito della schermata *e'* l'ordine di chiamata.** Quello che si vede in cima
+  alla lista e' quello che esce premendo il tasto. Prima la lista mostrava tutto e non diceva
+  niente su chi sarebbe uscito, ed era il difetto invisibile: nessuno lo cercava perche' nessuno
+  sapeva che ci fosse qualcosa da guardare.
+
+### 12.5 Gli ordini
+
+Due tasti, e si combinano fra loro:
+
+| Tasto | Ordine | Cosa fa |
+|---|---|---|
+| **Y** | *Uccidetelo* | tutte le ombre in campo puntano cio' che il Monarca sta guardando, e non mollano finche' non cade |
+| **U** | *Restate qui* | le ombre tengono un raggio attorno al punto in cui l'ordine e' stato dato; ripremuto, tornano a seguire |
+
+Il **fuoco concentrato** e' la meccanica che mancava. Quattro ombre contro quattro nemici prendono
+un bersaglio a testa e vincono quattro duelli a meta'; con l'ordine, il primo cade in due secondi e
+le altre tre combattono contro quattro. E' anche la cosa che *e'* Solo Leveling.
+
+Il bersaglio **non viaggia nel pacchetto**. Sarebbe un id di entita' scelto dal client, cioe' un
+modo per far attaccare qualunque cosa a qualunque distanza. Il client dice solo "ho premuto"; chi
+si ha davanti lo decide il server, con un cono di cinque gradi attorno alla direzione dello sguardo
+e la linea di vista obbligatoria.
+
+*Tenere la posizione* non e' "stai fermo": dentro il raggio l'ombra si muove e combatte
+normalmente, e quando ne esce — perche' ha inseguito qualcosa — torna. E' la differenza fra una
+sentinella e una statua. Perche' l'ordine voglia dire qualcosa, il goal che riporta al posto sta
+**sopra** la mischia: un'ombra che insegue un mob per trenta blocchi e non torna piu' ha ricevuto
+un ordine che il gioco ha ignorato.
+
+Gli ordini non sono persistenti — un'entita' bersaglio e un punto in una dimensione, dopo un
+riavvio, non vogliono piu' dire niente — ma sono sincronizzati: l'HUD scrive una riga finche' un
+ordine e' in corso. Un esercito che smette di seguirti senza spiegazione sembra rotto.
+
+### 12.6 Il dono del Monarca
+
+Ogni ombra evocata riceve una frazione della vita (25%) e del danno (35%) di chi la comanda.
+
+Si legge dagli **attributi** del giocatore e non dalle sue statistiche, ed e' la scelta che fa
+funzionare la cosa senza manutenzione: cosi' ci finiscono dentro anche l'equipaggiamento, le gemme
+e l'arma in mano, senza doverli sommare a mano e senza doversi ricordare di aggiungere ogni
+sorgente futura.
+
+E' il pezzo che risolve il quarto difetto: nel manhwa la forza dell'esercito **e'** la forza del
+Monarca, e senza questo un'ombra estratta all'inizio resta inutile per sempre.
+
+Il riallineamento avviene quando cambia *chi* c'e' in campo — evocazione, richiamo, caduta, perche'
+l'aura dipende dalla composizione — e una volta al secondo confrontando un numero che riassume il
+Monarca. Riscrivere quattro eserciti a ogni battito costerebbe, e per giunta per niente.
+
+### 12.7 Perche' cosi'
+
+**Perche' quattro archetipi e non otto.** Perche' quattro sono le ombre che si possono avere fuori
+insieme. Un quinto archetipo sarebbe un archetipo che non entra in squadra insieme agli altri, cioe'
+una scelta fra due cose che non si confrontano mai.
+
+**Perche' i goal non si registrano per archetipo.** L'archetipo si conosce solo in `applyData`, che
+gira *dopo* il costruttore e quindi dopo `registerGoals`. Registrarli condizionatamente vorrebbe
+dire ricostruire i goal su un'entita' gia' nel mondo, che e' delicato. Si registrano tutti, e
+ognuno controlla in `canUse` se e' il suo turno: costa un confronto fra enum ogni pochi tick.
+
+**Perche' il grado e' derivato e non salvato.** Stessa ragione del rango: due numeri da tenere in
+sincronia sono due numeri che prima o poi divergono, e le soglie in config devono poter
+riclassificare l'intero esercito senza migrazioni.
+
+**Perche' la squadra e' un elenco e non un flag sull'ombra.** Perche' l'*ordine* conta: se i posti
+disponibili sono meno della squadra — qualcuna e' gia' fuori, o e' a terra — devono uscire le
+prime. Un booleano per ombra non ha un ordine.
+
+---
+
 ## Fonti
 
 - [Solo Leveling: Reawakening — CurseForge](https://www.curseforge.com/minecraft/mc-mods/solo-craft-reawakening) · [Modrinth](https://modrinth.com/project/YdsLXFph)

@@ -11,6 +11,8 @@ import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.quest.PlayerQuests;
 import com.luca.arise.shadow.ShadowArmy;
 import com.luca.arise.shadow.ShadowDowntime;
+import com.luca.arise.shadow.ShadowOrders;
+import com.luca.arise.shadow.ShadowSquad;
 import com.luca.arise.shadow.ShadowStance;
 import com.luca.arise.shadow.SummonedShadows;
 
@@ -113,6 +115,32 @@ public final class ModAttachments {
 			.initializer(() -> ShadowDowntime.EMPTY)
 			.syncWith(ShadowDowntime.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(AriseMod.id("downtime"));
+
+	/**
+	 * La squadra: quali ombre escono col tasto di evocazione, e in che ordine.
+	 *
+	 * <p>Stesse garanzie dell'esercito, {@code copyOnDeath} compreso. Una squadra che si azzera
+	 * morendo costringerebbe a ricomporla a ogni incidente, che e' esattamente il fastidio che
+	 * questo attachment esiste per togliere.
+	 */
+	public static final AttachmentType<ShadowSquad> SQUAD = AttachmentRegistry.<ShadowSquad>builder()
+			.initializer(() -> ShadowSquad.EMPTY)
+			.persistent(ShadowSquad.CODEC)
+			.copyOnDeath()
+			.syncWith(ShadowSquad.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(AriseMod.id("squad"));
+
+	/**
+	 * Gli ordini in corso: un bersaglio da uccidere, un punto da tenere.
+	 *
+	 * <p>Come {@link #SUMMONED} e {@link #DOWNTIME}: sincronizzato ma non salvato. Un'entita'
+	 * bersaglio e un punto in una dimensione sono cose che dopo un riavvio non vogliono piu' dire
+	 * niente, e un esercito che al ritorno tiene una posizione dimenticata sembrerebbe rotto.
+	 */
+	public static final AttachmentType<ShadowOrders> ORDERS = AttachmentRegistry.<ShadowOrders>builder()
+			.initializer(() -> ShadowOrders.NONE)
+			.syncWith(ShadowOrders.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(AriseMod.id("orders"));
 
 	/** La postura di combattimento dell'esercito. Persiste e si sincronizza per l'HUD. */
 	public static final AttachmentType<ShadowStance> STANCE = AttachmentRegistry.<ShadowStance>builder()

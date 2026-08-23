@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.luca.arise.gear.GearSlot;
 import com.luca.arise.gem.GemType;
+import com.luca.arise.shadow.ShadowArchetype;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
@@ -25,6 +26,7 @@ public final class Glyphs {
 
 	private static final Map<GearSlot, String[]> SLOTS = new EnumMap<>(GearSlot.class);
 	private static final Map<GemType, String[]> GEMS = new EnumMap<>(GemType.class);
+	private static final Map<ShadowArchetype, String[]> ARCHETYPES = new EnumMap<>(ShadowArchetype.class);
 
 	static {
 		SLOTS.put(GearSlot.HEAD, new String[] {
@@ -200,6 +202,52 @@ public final class Glyphs {
 				"        " });
 	}
 
+	static {
+		// Scudo: la Guardia e' quella che si mette in mezzo.
+		ARCHETYPES.put(ShadowArchetype.GUARD, new String[] {
+				" ###### ",
+				" ###### ",
+				" ###### ",
+				" ###### ",
+				"  ####  ",
+				"  ####  ",
+				"   ##   ",
+				"        " });
+
+		// Zanne: la Bestia morde.
+		ARCHETYPES.put(ShadowArchetype.BEAST, new String[] {
+				"        ",
+				"##    ##",
+				"###  ###",
+				"########",
+				" ###### ",
+				"  #  #  ",
+				" ##  ## ",
+				"        " });
+
+		// Rombo su un'asta: il Mago colpisce da lontano.
+		ARCHETYPES.put(ShadowArchetype.MAGE, new String[] {
+				"   ##   ",
+				"  ####  ",
+				" ###### ",
+				"  ####  ",
+				"   ##   ",
+				"   ##   ",
+				"   ##   ",
+				"   ##   " });
+
+		// Blocco pieno con la base larga: il Colosso non si sposta.
+		ARCHETYPES.put(ShadowArchetype.TANK, new String[] {
+				"        ",
+				"  ####  ",
+				" ###### ",
+				" ###### ",
+				" ###### ",
+				"########",
+				"########",
+				"        " });
+	}
+
 	private Glyphs() {
 	}
 
@@ -209,6 +257,17 @@ public final class Glyphs {
 
 	public static void gem(GuiGraphicsExtractor graphics, GemType type, int x, int y, int color) {
 		draw(graphics, GEMS.get(type), x, y, color);
+	}
+
+	/**
+	 * Il segno dell'archetipo: scudo, zanne, asta, blocco.
+	 *
+	 * <p>E' l'unica cosa che in una lista di venti ombre si legge senza leggere. Il nome
+	 * dell'archetipo sta nel dettaglio; nella riga basta la forma.
+	 */
+	public static void archetype(GuiGraphicsExtractor graphics, ShadowArchetype archetype,
+			int x, int y, int color) {
+		draw(graphics, ARCHETYPES.get(archetype), x, y, color);
 	}
 
 	/**

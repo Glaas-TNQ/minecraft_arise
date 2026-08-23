@@ -109,6 +109,46 @@
       }
     ]
   },
+  "shadow.order": {
+    "subtitle": "arise.subtitle.shadow_order",
+    "sounds": [
+      {
+        "name": "minecraft:mob/warden/tendril_clicks_1",
+        "volume": 0.8,
+        "pitch": 1.3
+      },
+      {
+        "name": "minecraft:mob/warden/tendril_clicks_3",
+        "volume": 0.8,
+        "pitch": 1.3
+      }
+    ]
+  },
+  "shadow.lance": {
+    "subtitle": "arise.subtitle.shadow_lance",
+    "sounds": [
+      {
+        "name": "minecraft:mob/evocation_illager/cast1",
+        "volume": 0.7,
+        "pitch": 1.4
+      },
+      {
+        "name": "minecraft:mob/evocation_illager/cast2",
+        "volume": 0.7,
+        "pitch": 1.4
+      }
+    ]
+  },
+  "shadow.taunt": {
+    "subtitle": "arise.subtitle.shadow_taunt",
+    "sounds": [
+      {
+        "name": "minecraft:mob/warden/sonic_boom1",
+        "volume": 0.7,
+        "pitch": 0.6
+      }
+    ]
+  },
   "system.level_up": {
     "subtitle": "arise.subtitle.level_up",
     "sounds": [

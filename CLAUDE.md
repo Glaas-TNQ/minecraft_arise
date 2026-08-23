@@ -236,6 +236,32 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
    - **`optionalFieldOf(nome, default)` non scrive il campo** quando il valore e' quello di default:
      una sezione di config nuova resta invisibile nel file, quindi non modificabile da chi non legge
      il codice. Qui si usa `fieldOf`, e la tolleranza ai file vecchi la da' `AriseConfig.withDefaults`;
+   - **i package delle entita' sono stati rimescolati in 26.2**: `Zombie` sta in
+     `world/entity/monster/zombie/`, `Spider` in `monster/spider/`, `AbstractSkeleton` in
+     `monster/skeleton/`, `Evoker` in `monster/illager/`, `Wolf` in `animal/wolf/`, `IronGolem` in
+     `animal/golem/`. Prima di scrivere un `instanceof` su una classe di vanilla, cercarla:
+     `unzip -l ~/.gradle/caches/fabric-loom/26.2/minecraft-common.jar | grep NomeClasse`, e per le
+     firme `javap -cp minecraft-common.jar net.minecraft....`. Sono due secondi e tolgono ogni
+     dubbio;
+   - **`ChatFormatting` non espone piu' il suo colore**: niente `getColor()`, niente `isFormat()`.
+     Un enum che deve anche riempire dei pixel tiene la coppia — la formattazione e un ARGB scritto
+     a mano — come fanno `Rank` e `ShadowGrade`;
+   - **`Entity` non ha `hasLineOfSight`**: sta su `LivingEntity` (e un `Mob` ha anche
+     `getSensing().hasLineOfSight(Entity)`, che e' quello che usano i goal perche' e' cachato);
+   - **classificare un mob senza averne uno vivo**: `EntityType` espone `getWidth()`, `getHeight()`
+     e `getCategory()`, quindi la forma si puo' chiedere al solo id. Quello che <em>non</em> si puo'
+     chiedere e' se sa colpire da lontano: `RangedAttackMob` e' un'interfaccia, e le interfacce le
+     ha solo un'istanza. Se una decisione va presa in entrambi i casi — con il cadavere e senza —
+     la fonte di verita' deve essere un elenco in config, non l'`instanceof`;
+   - **`Attributes.SCALE` esiste** ed e' il modo piu' economico di far vedere che due entita' dello
+     stesso tipo sono cose diverse. Sta gia' in `createLivingAttributes`, come
+     `KNOCKBACK_RESISTANCE`: si scrive con `getAttribute(...).setBaseValue(...)`, e conviene
+     comunque passare da un metodo che tollera il `null`;
+   - **le bandiere di un goal decidono chi zittisce chi**: un goal con `Flag.LOOK` a priorita' alta
+     impedisce a `MeleeAttackGoal` (che vuole `MOVE` **e** `LOOK`) di partire. E' il modo giusto di
+     ottenere un'entita' che spara invece di caricare — ma se quel goal resta attivo quando non ha
+     niente da fare, l'entita' si pianta. La condizione che fa sparare e la condizione di `canUse`
+     devono essere la stessa;
    - **leggere l'altezza del terreno senza generarlo**: `level.getHeight(...)` pretende il chunk;
      `level.getChunkSource().getGenerator().getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG,
      level, randomState())` interroga il rumore e risponde subito. Venticinque campioni sparsi su
@@ -257,7 +283,10 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
      del mercato, e soprattutto **i codec che scrivono su disco** — perché un codec sbagliato non
      dà un errore, dà un giocatore che riapre il mondo senza esercito.
 
-   Quando si aggiunge un sistema si aggiungono anche le sue righe qui. Il collaudo si tara da
+   Quando si aggiunge un sistema si aggiungono anche le sue righe qui. E se una regola sta dentro
+   un metodo che pretende un `ServerPlayer`, la si estrae in una funzione pura e si prova quella:
+   `ShadowManager.callUpOrder` esiste separata da `callUp` solo per questo, e l'ordine di chiamata
+   sbagliato e' esattamente il genere di difetto che non da' nessun errore. Il collaudo si tara da
    solo per le chiavi composte: se nasce un enum nuovo che compone chiavi, va aggiunto alla
    tabella `DYNAMIC` dentro `tools/collaudo.py`.
 
@@ -374,6 +403,12 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       citta' irraggiungibili (Sigillo dell'Associazione), gli incarichi senza lore ne' istruzioni,
       le statistiche mute (tooltip + riga d'effetto), lo spazio dimensionale che rimbalzava i pezzi
       invece di indossarli — *compilato, 60 prove verdi, server pulito; da riverificare in gioco*
+- [ ] **O1** — L'esercito che obbedisce: quattro **archetipi** (Guardia, Bestia, Mago, Colosso) con
+      comportamenti veri — provocazione, lancia d'ombra, balzo, interposizione — otto **gradi** dal
+      Normale al Gran Maresciallo con nome e aura di comando, la **squadra** che decide chi esce col
+      tasto, due **ordini** puntati (Y uccidetelo, U restate qui) e il **dono del Monarca** che fa
+      crescere l'esercito insieme al giocatore. Design §12 — *compilato, 69 prove verdi, collaudo
+      pulito, server verde; da verificare in gioco*
 - [ ] **M2** — La mappa del mondo (tasto **M**): città, varchi aperti, tu; trascina/zoom, frecce
       sul bordo per ciò che sta fuori. Indice dei varchi `GateRegistry` riconciliato; `/arise map`,
       `/arise gate list` — *compilato, da verificare in gioco*

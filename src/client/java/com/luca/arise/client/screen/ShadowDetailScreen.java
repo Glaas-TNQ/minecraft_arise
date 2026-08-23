@@ -10,6 +10,7 @@ import com.luca.arise.network.ShadowActionPayload;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.shadow.ShadowData;
+import com.luca.arise.shadow.ShadowGrade;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
@@ -37,7 +38,7 @@ public class ShadowDetailScreen extends AriseScreen {
 	};
 
 	private static final int PANEL_WIDTH = 280;
-	private static final int PANEL_HEIGHT = 210;
+	private static final int PANEL_HEIGHT = 252;
 	private static final int SWATCH = 20;
 
 	private static final int COLOR_TITLE = AriseTheme.ACCENT;
@@ -95,19 +96,29 @@ public class ShadowDetailScreen extends AriseScreen {
 		nameBox.setValue(shadow.displayName().getString());
 		addRenderableWidget(nameBox);
 
-		addRenderableWidget(Button.builder(Component.translatable("arise.screen.detail.rename",
+		// Un nome e' un privilegio del grado, non un acquisto: da Cavaliere in su. Il bottone lo
+		// dice spegnendosi, perche' un rifiuto che arriva solo dopo il clic e' un rifiuto che
+		// sembra un errore.
+		boolean nameable = shadow.grade(config).canBeNamed();
+		Button rename = Button.builder(Component.translatable("arise.screen.detail.rename",
 						config.costs().rename()), button -> send(ShadowActionPayload.Action.RENAME))
 				.bounds(left + PANEL_WIDTH - 66, top + 28, 66, 20)
-				.build());
+				.build();
+		rename.active = nameable;
+		addRenderableWidget(rename);
+
+		if (nameBox != null) {
+			nameBox.setEditable(nameable);
+		}
 
 		// Le pastiglie non sono widget, ed e' la stessa decisione presa per le righe delle liste:
 		// il corpo della schermata si disegna nello *sfondo* (vedi AriseScreen), quindi qualunque
 		// bottone messo qui finisce sopra al colore e lo copre. Erano otto quadrati grigi
 		// identici, con l'unico segno visibile il trattino della selezione, che cade appena sotto.
 		swatchLeft = left;
-		swatchTop = top + 74;
+		swatchTop = top + 108;
 
-		int actionsTop = top + 120;
+		int actionsTop = top + 152;
 		boolean maxLevel = shadow.isMaxLevel(config);
 		long upgradeCost = config.costs().upgradeCost(shadow.level());
 
@@ -232,8 +243,25 @@ public class ShadowDetailScreen extends AriseScreen {
 				String.format("%.1f", shadow.attackDamage(config))),
 				left + 20, top + 4, COLOR_TEXT);
 
+		// Le due righe che spiegano l'ombra invece di numerarla: cosa sa fare, e a che punto e'
+		// della scala. Senza, l'archetipo resterebbe un glifo colorato che nessuno sa leggere.
+		ShadowGrade grade = shadow.grade(config);
+
+		int after = chip(graphics, shadow.archetype().label(), left, top + 54,
+				shadow.archetype().color());
+		chip(graphics, grade.label(), after + 4, top + 54, grade.color());
+
+		graphics.text(font, shadow.archetype().description(), left, top + 70, COLOR_DIM);
+		graphics.text(font, grade.commands()
+						? Component.translatable("arise.screen.detail.grade_commands",
+								String.format("%.0f", shadow.auraDamage(config) * 100.0))
+						: Component.translatable(grade.canBeNamed()
+								? "arise.screen.detail.grade_named"
+								: "arise.screen.detail.grade_plain"),
+				left, top + 82, grade.commands() ? COLOR_SOULS : COLOR_DIM);
+
 		graphics.text(font, Component.translatable("arise.screen.detail.color",
-				config.costs().recolor()), left, top + 60, COLOR_DIM);
+				config.costs().recolor()), left, top + 98, COLOR_DIM);
 
 		// La pastiglia di colore va disegnata sopra il bottone: il bottone è solo la zona
 		// cliccabile, il colore è l'informazione.
@@ -252,6 +280,6 @@ public class ShadowDetailScreen extends AriseScreen {
 		}
 
 		graphics.centeredText(font, Component.translatable("arise.screen.detail.souls", souls()),
-				width / 2, top + 102, COLOR_SOULS);
+				width / 2, top + 138, COLOR_SOULS);
 	}
 }

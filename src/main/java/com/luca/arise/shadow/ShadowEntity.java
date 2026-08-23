@@ -8,6 +8,8 @@ import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.fx.ModSounds;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -22,13 +24,14 @@ import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
+import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
@@ -54,11 +57,26 @@ import net.minecraft.world.level.storage.ValueOutput;
  *
  * <p>Questa entità non è la fonte di verità: lo è la {@link ShadowData} nell'attachment del
  * giocatore. Se muore o viene richiamata, l'entità sparisce e i dati restano.
+ *
+ * <p>Un solo tipo di entità per quattro modi di combattere: l'{@link ShadowArchetype archetipo} non
+ * è una sottoclasse ma un dato sincronizzato, e i goal lo leggono. È la stessa scelta di §3.4 del
+ * design — un archetipo scalato invece di una copia del mob — portata un passo più in là: un
+ * modello solo da disegnare, quattro comportamenti da far vedere.
  */
 public class ShadowEntity extends TamableAnimal {
 
 	/** Il colore va sincronizzato al client per poter tingere il modello: dato synched. */
 	private static final EntityDataAccessor<Integer> DATA_COLOR =
+			SynchedEntityData.defineId(ShadowEntity.class, EntityDataSerializers.INT);
+
+	/**
+	 * L'archetipo, come indice dell'enum.
+	 *
+	 * <p>Sincronizzato e non tenuto in un campo del server: il client ne ha bisogno per l'aura
+	 * — un Mago e un Colosso non devono sfrigolare allo stesso modo — e i goal ne hanno bisogno
+	 * prima che {@code applyData} finisca. Un solo posto dove sta scritto, letto da entrambi i lati.
+	 */
+	private static final EntityDataAccessor<Integer> DATA_ARCHETYPE =
 			SynchedEntityData.defineId(ShadowEntity.class, EntityDataSerializers.INT);
 
 	private UUID shadowId;
@@ -71,6 +89,7 @@ public class ShadowEntity extends TamableAnimal {
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 		super.defineSynchedData(builder);
 		builder.define(DATA_COLOR, ShadowData.DEFAULT_COLOR);
+		builder.define(DATA_ARCHETYPE, ShadowArchetype.GUARD.ordinal());
 	}
 
 	public int getColor() {
@@ -79,6 +98,36 @@ public class ShadowEntity extends TamableAnimal {
 
 	public void setColor(int color) {
 		this.entityData.set(DATA_COLOR, color);
+	}
+
+	/** L'archetipo di quest'ombra. Mai {@code null}: un indice fuori scala vale Guardia. */
+	public ShadowArchetype archetype() {
+		ShadowArchetype[] values = ShadowArchetype.values();
+		int index = this.entityData.get(DATA_ARCHETYPE);
+		return index < 0 || index >= values.length ? ShadowArchetype.GUARD : values[index];
+	}
+
+	public void setArchetype(ShadowArchetype archetype) {
+		this.entityData.set(DATA_ARCHETYPE, archetype.ordinal());
+	}
+
+	/**
+	 * Il punto che quest'ombra deve tenere, o {@code null} se deve seguire.
+	 *
+	 * <p>Non è un campo dell'entità ma una lettura dell'ordine in corso del proprietario: l'ordine
+	 * vale per l'esercito intero, e tenerne una copia per ombra vorrebbe dire quattro copie da
+	 * aggiornare insieme.
+	 */
+	public BlockPos holdPost() {
+		if (!(this.getOwner() instanceof ServerPlayer owner)) {
+			return null;
+		}
+
+		return ShadowManager.orders(owner).hold().orElse(null);
+	}
+
+	public boolean isHolding() {
+		return holdPost() != null;
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
@@ -95,12 +144,56 @@ public class ShadowEntity extends TamableAnimal {
 	protected void registerGoals() {
 		this.goalSelector.addGoal(0, new FloatGoal(this));
 		this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
-		this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.2, true));
-		// Segue da vicino ma non incolla: 8 blocchi di distanza massima, 3 per fermarsi.
-		this.goalSelector.addGoal(3, new FollowOwnerGoal(this, 1.15, 8.0F, 3.0F));
-		this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.0));
-		this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F));
-		this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+
+		// La provocazione del Colosso non ha flag: non muove e non guarda, quindi può girare
+		// insieme a qualunque altra cosa l'ombra stia facendo.
+		this.goalSelector.addGoal(1, new ShadowGoals.Taunt(this));
+
+		// Tornare al posto ordinato viene prima di combattere, ed è il solo modo perché "tenete
+		// la posizione" voglia dire qualcosa: un'ombra che insegue un mob per trenta blocchi e non
+		// torna più ha ricevuto un ordine che il gioco ha ignorato. Dentro il raggio questo goal
+		// non parte nemmeno, quindi la mischia lì dentro resta normale.
+		this.goalSelector.addGoal(2, new ShadowGoals.Hold(this));
+
+		// I tre goal d'archetipo stanno alla stessa priorità perché si escludono a vicenda: nessuna
+		// ombra è insieme Bestia e Mago. La lancia prende lo sguardo e la ritirata il movimento,
+		// così un Mago mira e indietreggia nello stesso momento.
+		this.goalSelector.addGoal(3, new LeapAtTargetGoal(this, 0.4F) {
+			@Override
+			public boolean canUse() {
+				return archetype() == ShadowArchetype.BEAST && super.canUse();
+			}
+		});
+		this.goalSelector.addGoal(3, new ShadowGoals.Lance(this));
+		this.goalSelector.addGoal(3, new ShadowGoals.KeepDistance(this));
+
+		// Sotto la lancia: finché il Mago ha il bersaglio a tiro e in vista, lo sguardo è occupato
+		// e la mischia non parte. È esattamente quello che deve succedere — e quando il bersaglio
+		// sparisce dietro un muro la lancia molla, e il Mago va a cercarselo come tutti gli altri.
+		this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.2, true));
+		this.goalSelector.addGoal(5, new ShadowGoals.Interpose(this));
+
+		// Segue da vicino ma non incolla: 8 blocchi di distanza massima, 3 per fermarsi. E non
+		// segue affatto quando c'è un ordine di tenere la posizione, o i due si azzufferebbero
+		// sul controllo del movimento e l'ombra oscillerebbe fra il posto e il Monarca.
+		this.goalSelector.addGoal(6, new FollowOwnerGoal(this, 1.15, 8.0F, 3.0F) {
+			@Override
+			public boolean canUse() {
+				return !isHolding() && super.canUse();
+			}
+
+			@Override
+			public boolean canContinueToUse() {
+				return !isHolding() && super.canContinueToUse();
+			}
+		});
+
+		this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0));
+		this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
+		this.goalSelector.addGoal(9, new RandomLookAroundGoal(this));
+
+		// Un ordine esplicito batte tutto il resto, postura compresa: priorità zero.
+		this.targetSelector.addGoal(0, new ShadowGoals.Focus(this));
 
 		this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
 		this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
@@ -121,20 +214,13 @@ public class ShadowEntity extends TamableAnimal {
 	 * serve un ostile che stia dando la caccia al proprietario — è la lettura di "attaccano quando
 	 * vengo attaccato" che scatta anche <em>prima</em> che il colpo arrivi. In passiva niente.
 	 *
-	 * <p>Restano intoccabili in ogni postura: il proprietario, gli altri giocatori, le altre ombre
-	 * e gli animali addomesticati dallo stesso giocatore. Un esercito che sbrana il tuo lupo non è
-	 * una meccanica, è un bug.
+	 * <p>Restano intoccabili in ogni postura il proprietario, gli altri giocatori, le altre ombre e
+	 * gli animali addomesticati dallo stesso giocatore: la regola sta in
+	 * {@link ShadowGoals#isProtected}, in un posto solo perché la usano anche i goal.
 	 */
 	private boolean shouldEngage(LivingEntity target) {
-		if (!(this.getOwner() instanceof ServerPlayer owner) || target == owner) {
-			return false;
-		}
-
-		if (target instanceof Player || target instanceof ShadowEntity) {
-			return false;
-		}
-
-		if (target instanceof OwnableEntity ownable && ownable.getOwner() == owner) {
+		if (!(this.getOwner() instanceof ServerPlayer owner)
+				|| ShadowGoals.isProtected(target, owner)) {
 			return false;
 		}
 
@@ -153,24 +239,50 @@ public class ShadowEntity extends TamableAnimal {
 	/**
 	 * Scrive negli attributi dell'entità le statistiche derivate dai dati dell'ombra.
 	 *
+	 * <p>Tre sorgenti si sommano qui, ed è l'unico posto in cui succede:
+	 * <ol>
+	 *   <li>l'<strong>ombra</strong> — mob d'origine, livello e archetipo, cioè
+	 *       {@code data.maxHealth} e {@code data.attackDamage};
+	 *   <li>l'<strong>aura di comando</strong> — quanto la rendono più forte i Comandanti che ha
+	 *       accanto in campo. Moltiplicativa, e non si conta da sola;
+	 *   <li>il <strong>dono del Monarca</strong> — una frazione della vita e del danno del
+	 *       giocatore, additiva. È il motivo per cui la prima ombra estratta non diventa inutile:
+	 *       nel manhwa la forza dell'esercito <em>è</em> la forza di chi lo comanda.
+	 * </ol>
+	 *
+	 * <p>L'aura la calcola {@link ShadowManager#auraFor} invece di arrivare come argomento: così
+	 * nessuna delle chiamate sparse per il gestore può dimenticarsela e lasciare un'ombra
+	 * silenziosamente più debole delle sue sorelle.
+	 *
 	 * @param healToFull vero all'evocazione; falso quando l'ombra sale di livello mentre combatte,
 	 *                   dove la vita guadagnata si aggiunge ma quella persa non si recupera
 	 */
 	public void applyData(ShadowData data, ServerPlayer owner, boolean healToFull) {
 		ShadowConfig config = AriseConfig.get().shadows();
+		ShadowConfig.Legion legion = config.legion();
+		ShadowConfig.Archetype tuning = data.archetype().tuning(legion);
+		ShadowManager.Aura aura = ShadowManager.auraFor(owner, data.id());
 
 		this.shadowId = data.id();
 		this.setOwner(owner);
 		this.setTame(true, false);
+		this.setArchetype(data.archetype());
 		this.setCustomName(Component.translatable("arise.shadow.entity_name",
-				data.displayName(), data.rank(config).label(), data.level()));
+				data.displayName(), data.grade(config).label(), data.level()));
 
 		float healthBefore = this.getMaxHealth();
 
-		setAttribute(Attributes.MAX_HEALTH, data.maxHealth(config));
-		setAttribute(Attributes.ATTACK_DAMAGE, data.attackDamage(config));
-		setAttribute(Attributes.MOVEMENT_SPEED, config.movementSpeed());
-		setAttribute(Attributes.FOLLOW_RANGE, config.followRange());
+		double health = data.maxHealth(config) * (1.0 + aura.health())
+				+ owner.getMaxHealth() * legion.monarchHealthShare();
+		double damage = data.attackDamage(config) * (1.0 + aura.damage())
+				+ owner.getAttributeValue(Attributes.ATTACK_DAMAGE) * legion.monarchDamageShare();
+
+		setAttribute(Attributes.MAX_HEALTH, health);
+		setAttribute(Attributes.ATTACK_DAMAGE, damage);
+		setAttribute(Attributes.MOVEMENT_SPEED, config.movementSpeed() * tuning.speed());
+		setAttribute(Attributes.FOLLOW_RANGE, config.followRange() * tuning.followRange());
+		setAttribute(Attributes.SCALE, tuning.scale());
+		setAttribute(Attributes.KNOCKBACK_RESISTANCE, tuning.knockbackResistance());
 		setColor(data.color());
 
 		if (healToFull) {
@@ -187,8 +299,7 @@ public class ShadowEntity extends TamableAnimal {
 		}
 	}
 
-	private void setAttribute(net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute,
-			double value) {
+	private void setAttribute(Holder<Attribute> attribute, double value) {
 		AttributeInstance instance = this.getAttribute(attribute);
 		if (instance != null) {
 			instance.setBaseValue(value);
@@ -304,12 +415,15 @@ public class ShadowEntity extends TamableAnimal {
 		if (shadowId != null) {
 			output.store("ShadowId", UUIDUtil.CODEC, shadowId);
 		}
+
+		output.store("Archetype", ShadowArchetype.CODEC, archetype());
 	}
 
 	@Override
 	protected void readAdditionalSaveData(ValueInput input) {
 		super.readAdditionalSaveData(input);
 		this.shadowId = input.read("ShadowId", UUIDUtil.CODEC).orElse(null);
+		setArchetype(input.read("Archetype", ShadowArchetype.CODEC).orElse(ShadowArchetype.GUARD));
 	}
 
 	@Override
@@ -330,7 +444,10 @@ public class ShadowEntity extends TamableAnimal {
 
 	/**
 	 * Un'ombra non attacca il suo padrone né le altre ombre dello stesso padrone, e in postura
-	 * passiva non attacca nessuno.
+	 * passiva non attacca nessuno — a meno che non le sia stato ordinato.
+	 *
+	 * <p>L'eccezione dell'ordine conta: indicare un bersaglio e vedere l'esercito ignorarti perché
+	 * la postura è passiva sarebbe la definizione di comando che non comanda.
 	 */
 	@Override
 	public boolean canAttack(LivingEntity target) {
@@ -338,9 +455,14 @@ public class ShadowEntity extends TamableAnimal {
 			return false;
 		}
 
-		if (this.getOwner() instanceof ServerPlayer owner
-				&& ShadowManager.stance(owner) == ShadowStance.PASSIVE) {
-			return false;
+		if (this.getOwner() instanceof ServerPlayer owner) {
+			boolean ordered = ShadowManager.orders(owner).focus()
+					.map(focus -> focus.equals(target.getUUID()))
+					.orElse(false);
+
+			if (!ordered && ShadowManager.stance(owner) == ShadowStance.PASSIVE) {
+				return false;
+			}
 		}
 
 		if (target instanceof ShadowEntity other && other.getOwner() == this.getOwner()) {

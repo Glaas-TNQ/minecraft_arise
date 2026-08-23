@@ -12,6 +12,7 @@ import com.luca.arise.gate.GateRegistry;
 import com.luca.arise.gate.GateTheme;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.quest.PlayerQuests;
+import com.luca.arise.shadow.ShadowArchetype;
 import com.luca.arise.shadow.ShadowArmy;
 import com.luca.arise.shadow.ShadowData;
 import com.luca.arise.shadow.ShadowStance;
@@ -85,8 +86,8 @@ class PersistenceTest {
 	@DisplayName("un'ombra sopravvive al salvataggio, nome e colore compresi")
 	void shadowSurvives() {
 		ShadowData plain = new ShadowData(UUID.randomUUID(),
-				Identifier.withDefaultNamespace("wither_skeleton"), 1, 0L, 20.0, 11.0,
-				Optional.empty(), ShadowData.DEFAULT_COLOR);
+				Identifier.withDefaultNamespace("wither_skeleton"), ShadowArchetype.GUARD,
+				1, 0L, 20.0, 11.0, Optional.empty(), ShadowData.DEFAULT_COLOR);
 
 		roundTrip(ShadowData.CODEC, plain, "un'ombra appena estratta");
 
@@ -104,8 +105,9 @@ class PersistenceTest {
 
 		for (int i = 0; i < 12; i++) {
 			army = army.with(new ShadowData(UUID.randomUUID(),
-					Identifier.withDefaultNamespace("zombie"), i + 1, i * 7L,
-					20.0 + i, 3.0 + i * 0.5, Optional.of("Ombra " + i), 0x4FC3F7));
+					Identifier.withDefaultNamespace("zombie"),
+					ShadowArchetype.values()[i % ShadowArchetype.values().length],
+					i + 1, i * 7L, 20.0 + i, 3.0 + i * 0.5, Optional.of("Ombra " + i), 0x4FC3F7));
 		}
 
 		roundTrip(ShadowArmy.CODEC, army, "un esercito di dodici");

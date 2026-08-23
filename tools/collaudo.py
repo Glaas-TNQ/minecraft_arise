@@ -192,6 +192,8 @@ DYNAMIC = [
     ("arise.machine.", "workshop/MachineKind.java", [".hint"]),
     ("arise.city.", "city/City.java", [""]),
     ("arise.stance.", "shadow/ShadowStance.java", [""]),
+    ("arise.archetype.", "shadow/ShadowArchetype.java", ["", ".desc"]),
+    ("arise.grade.", "shadow/ShadowGrade.java", [""]),
     ("arise.gem.type.", "gem/GemType.java", [""]),
     ("arise.gem.effect.", "gem/GemType.java", [""]),
     ("arise.ability.", "ability/Ability.java", [""]),
