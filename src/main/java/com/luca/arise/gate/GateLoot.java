@@ -140,10 +140,7 @@ public final class GateLoot {
 	 * statistica metterli, resta intatta e sta gia' nella schermata di stato.
 	 */
 	private static void scroll(ServerPlayer player, int points) {
-		PlayerProgress progress = player.getAttachedOrCreate(ModAttachments.PROGRESS);
-		player.setAttached(ModAttachments.PROGRESS,
-				progress.withUnspentPoints(progress.unspentPoints() + points));
-		ProgressManager.applyAttributes(player);
+		ProgressManager.addPoints(player, points);
 	}
 
 	/**

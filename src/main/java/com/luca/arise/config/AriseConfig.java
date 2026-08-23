@@ -129,6 +129,11 @@ public record AriseConfig(
 		return hunter.gear();
 	}
 
+	/** La giornaliera e la Zona di Penalita'. */
+	public DailyConfig daily() {
+		return hunter.daily();
+	}
+
 	/** L'Abyss Shop, scorciatoia per la voce annidata. */
 	public ShopConfig shop() {
 		return hunter.shop();

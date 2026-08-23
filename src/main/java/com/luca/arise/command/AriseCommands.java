@@ -7,6 +7,7 @@ import com.luca.arise.city.City;
 import com.luca.arise.city.CityManager;
 import com.luca.arise.event.CityEvents;
 import com.luca.arise.config.GearConfig;
+import com.luca.arise.daily.DailyManager;
 import com.luca.arise.gate.Abyss;
 import com.luca.arise.gate.AbyssCompassItem;
 import com.luca.arise.gate.GateAffixes;
@@ -206,6 +207,14 @@ public final class AriseCommands {
 							.executes(context -> playerAction(context.getSource(),
 									player -> GateManager.descend(player,
 											IntegerArgumentType.getInteger(context, "profondita"))))));
+
+			// La giornaliera: leggerla, chiuderla, o farsi mandare subito nella Zona. Aspettare un
+			// tramonto per provare la penalita' costa dieci minuti di gioco fermo.
+			root.then(Commands.literal("daily")
+					.executes(context -> showDaily(context.getSource()))
+					.then(Commands.literal("penalty")
+							.requires(AriseCommands::canCheat)
+							.executes(context -> playerAction(context.getSource(), DailyManager::force))));
 
 			root.then(Commands.literal("compass")
 					.executes(context -> playerAction(context.getSource(), AbyssCompassItem::locate)));
@@ -523,6 +532,29 @@ public final class AriseCommands {
 
 		GateBreach.breach(level, nearest.position(), nearest.offer());
 		nearest.discard();
+		return 1;
+	}
+
+	/** La giornaliera in chat: quattro righe, una per obiettivo, col suo contatore. */
+	private static int showDaily(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		com.luca.arise.config.DailyConfig config = AriseConfig.get().daily();
+		com.luca.arise.daily.DailyQuest daily = DailyManager.get(player);
+
+		if (!config.enabled()) {
+			source.sendFailure(Component.translatable("arise.msg.daily.off"));
+			return 0;
+		}
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.daily.header",
+				daily.remaining(config)), false);
+
+		for (com.luca.arise.daily.DailyTask task : com.luca.arise.daily.DailyTask.values()) {
+			source.sendSuccess(() -> Component.translatable("arise.msg.daily.progress",
+					task.label(), daily.progress(task), task.target(config)), false);
+		}
+
 		return 1;
 	}
 

@@ -4,6 +4,8 @@ import com.luca.arise.ability.Ability;
 import com.luca.arise.ability.AbilityCooldowns;
 import com.luca.arise.config.AbilityConfig;
 import com.luca.arise.config.AriseConfig;
+import com.luca.arise.config.DailyConfig;
+import com.luca.arise.daily.DailyQuest;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.quest.PlayerQuests;
 import com.luca.arise.quest.Quest;
@@ -107,6 +109,26 @@ public class SystemHudElement implements HudElement {
 		lastLevel = level;
 	}
 
+	/**
+	 * Quanti obiettivi della giornata sono ancora aperti. Zero se e' chiusa, o se non e' mai stata
+	 * chiesta.
+	 *
+	 * <p>Il conto lo fa il client sui dati che gia' ha: la giornaliera e' sincronizzata verso il
+	 * proprietario come tutto il resto, e mandare in rete un numero che si ricava da quattro numeri
+	 * gia' presenti sarebbe un pacchetto per niente.
+	 */
+	private int openTasks() {
+		LocalPlayer player = Minecraft.getInstance().player;
+		DailyQuest daily = player == null ? null : player.getAttached(ModAttachments.DAILY);
+		DailyConfig config = AriseConfig.get().daily();
+
+		if (daily == null || !config.enabled() || daily.settled() || daily.day() < 0) {
+			return 0;
+		}
+
+		return daily.remaining(config);
+	}
+
 	private void drawPanel(GuiGraphicsExtractor graphics, Font font, PlayerProgress progress,
 			ShadowStance stance, ShadowOrders orders, PlayerQuests quests) {
 		long needed = AriseConfig.get().xpForNextLevel(progress.level());
@@ -119,10 +141,16 @@ public class SystemHudElement implements HudElement {
 		// mentre dura, o sembra un difetto.
 		Component order = orders == null ? null : orders.label();
 
-		// Righe: livello, soul coin, postura, più i punti da spendere, l'ordine in corso e
-		// l'incarico, ciascuno solo quando c'è.
+		// La giornaliera compare solo finche' e' aperta: chiusa, la riga sparisce da sola e il
+		// pannello torna com'era. Una riga che dicesse «4/4» tutto il pomeriggio sarebbe un
+		// promemoria di una cosa gia' fatta, che e' il modo piu' rapido di far smettere di leggere
+		// il pannello.
+		int daysOpen = openTasks();
+
+		// Righe: livello, soul coin, postura, più i punti da spendere, l'ordine in corso,
+		// l'incarico e la giornaliera, ciascuno solo quando c'è.
 		int lines = 3 + (progress.unspentPoints() > 0 ? 1 : 0) + (order == null ? 0 : 1)
-				+ (quest == null ? 0 : 1);
+				+ (quest == null ? 0 : 1) + (daysOpen > 0 ? 1 : 0);
 		int height = PADDING * 2 + font.lineHeight * lines + PADDING + BAR_HEIGHT;
 
 		graphics.fill(MARGIN, MARGIN, MARGIN + PANEL_WIDTH, MARGIN + height, COLOR_PANEL);
@@ -158,6 +186,12 @@ public class SystemHudElement implements HudElement {
 		if (quest != null) {
 			graphics.text(font, Component.translatable("arise.hud.quest", quest.title(),
 					quests.progress(), quest.amount()), MARGIN + PADDING, y, COLOR_QUEST);
+			y += font.lineHeight;
+		}
+
+		if (daysOpen > 0) {
+			graphics.text(font, Component.translatable("arise.hud.daily", 4 - daysOpen),
+					MARGIN + PADDING, y, COLOR_STANCE);
 			y += font.lineHeight;
 		}
 

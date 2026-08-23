@@ -2,6 +2,7 @@ package com.luca.arise.registry;
 
 import com.luca.arise.AriseMod;
 import com.luca.arise.ability.AbilityCooldowns;
+import com.luca.arise.daily.DailyQuest;
 import com.luca.arise.gate.AbyssRecord;
 import com.luca.arise.gate.GateRegistry;
 import com.luca.arise.gate.MobAffix;
@@ -227,6 +228,20 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.syncWith(AbyssRecord.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(AriseMod.id("abyss"));
+
+	/**
+	 * La giornata di un Cacciatore secondo il Sistema: quattro contatori e il giorno a cui vanno.
+	 *
+	 * <p>Persistente perche' il giorno finisce anche mentre il gioco e' chiuso, e {@code copyOnDeath}
+	 * perche' morire non deve azzerare una giornata quasi completa — sarebbe una penalita' pagata
+	 * due volte, e la penalita' e' gia' quella che c'e'.
+	 */
+	public static final AttachmentType<DailyQuest> DAILY = AttachmentRegistry.<DailyQuest>builder()
+			.initializer(() -> DailyQuest.NONE)
+			.persistent(DailyQuest.CODEC)
+			.copyOnDeath()
+			.syncWith(DailyQuest.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(AriseMod.id("daily"));
 
 	private ModAttachments() {
 	}

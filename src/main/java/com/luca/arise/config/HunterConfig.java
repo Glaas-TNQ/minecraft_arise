@@ -31,7 +31,9 @@ public record HunterConfig(
 		/** L'Officina delle Anime: macchinari, tratti, rese. */
 		WorkshopConfig workshop,
 		/** La prima ora: il risveglio, la Sala e i suggerimenti. */
-		AwakeningConfig awakening) {
+		AwakeningConfig awakening,
+		/** Ogni mattina: i quattro obiettivi, e cosa succede se la sera sono ancora aperti. */
+		DailyConfig daily) {
 
 	public static final Codec<HunterConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.INT.listOf().fieldOf("rank_levels").forGetter(HunterConfig::rankLevels),
@@ -39,13 +41,14 @@ public record HunterConfig(
 			ShopConfig.CODEC.fieldOf("shop").forGetter(HunterConfig::shop),
 			GemConfig.CODEC.fieldOf("gems").forGetter(HunterConfig::gems),
 			WorkshopConfig.CODEC.fieldOf("workshop").forGetter(HunterConfig::workshop),
-			AwakeningConfig.CODEC.fieldOf("awakening").forGetter(HunterConfig::awakening)
+			AwakeningConfig.CODEC.fieldOf("awakening").forGetter(HunterConfig::awakening),
+			DailyConfig.CODEC.fieldOf("daily").forGetter(HunterConfig::daily)
 	).apply(instance, HunterConfig::new));
 
 	public static final HunterConfig DEFAULT =
 			new HunterConfig(List.of(1, 10, 20, 35, 55, 80),
 					GearConfig.DEFAULT, ShopConfig.DEFAULT, GemConfig.DEFAULT,
-					WorkshopConfig.DEFAULT, AwakeningConfig.DEFAULT);
+					WorkshopConfig.DEFAULT, AwakeningConfig.DEFAULT, DailyConfig.DEFAULT);
 
 	public HunterConfig {
 		rankLevels = List.copyOf(rankLevels);

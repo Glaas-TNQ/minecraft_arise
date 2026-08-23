@@ -1,6 +1,7 @@
 package com.luca.arise;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -228,6 +229,55 @@ class ProgressTest {
 			assertTrue(seeds.add(com.luca.arise.gate.Abyss.seedFor(depth)),
 					"il gradino " + depth + " ripete il seme di un altro");
 		}
+	}
+
+	// ---------------------------------------------------------------- la giornaliera
+
+	@Test
+	@DisplayName("i contatori si fermano al bersaglio, e la giornata si chiude solo con tutti e quattro")
+	void dailyCountersStopAtTheTarget() {
+		var config = com.luca.arise.config.DailyConfig.DEFAULT;
+		var daily = com.luca.arise.daily.DailyQuest.forDay(3L);
+
+		assertEquals(4, daily.remaining(config), "all'alba sono tutti e quattro aperti");
+		assertFalse(daily.complete(config));
+
+		for (var task : com.luca.arise.daily.DailyTask.values()) {
+			// Il doppio del bersaglio: il contatore deve fermarsi, perche' il numero che il
+			// giocatore legge e' "cento su cento", non "duecento su cento".
+			daily = daily.with(task, task.target(config) * 2, config);
+			assertEquals(task.target(config), daily.progress(task),
+					task + ": il contatore deve fermarsi al bersaglio");
+		}
+
+		assertEquals(0, daily.remaining(config));
+		assertTrue(daily.complete(config), "con tutti e quattro pieni la giornata e' chiusa");
+	}
+
+	@Test
+	@DisplayName("chi non ha mai visto un'alba non ha una giornata da saldare")
+	void aFreshHunterOwesNothing() {
+		var none = com.luca.arise.daily.DailyQuest.NONE;
+
+		// Il giorno negativo e' il segnaposto di chi non ha mai giocato: mandarlo nella Zona di
+		// Penalita' al primo login sarebbe punirlo per una giornata che nessuno gli ha chiesto.
+		assertTrue(none.day() < 0, "il segnaposto deve essere riconoscibile");
+		assertFalse(none.settled());
+		assertEquals(0, none.progress(com.luca.arise.daily.DailyTask.BLOCKS));
+	}
+
+	@Test
+	@DisplayName("la giornata saldata resta saldata, e i contatori non si perdono")
+	void settlingKeepsTheCounters() {
+		var config = com.luca.arise.config.DailyConfig.DEFAULT;
+		var daily = com.luca.arise.daily.DailyQuest.forDay(7L)
+				.with(com.luca.arise.daily.DailyTask.BLOCKS, 40, config)
+				.withSettled();
+
+		assertTrue(daily.settled());
+		assertEquals(40, daily.progress(com.luca.arise.daily.DailyTask.BLOCKS),
+				"saldare non deve azzerare quello che era stato fatto");
+		assertEquals(7L, daily.day());
 	}
 
 	@Test

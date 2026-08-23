@@ -170,6 +170,24 @@ public final class ProgressManager {
 	}
 
 	/**
+	 * Punti statistica che arrivano da fuori la salita di livello.
+	 *
+	 * <p>Due sorgenti, oggi: le pergamene dei Gate e la giornata chiusa. Stava scritta a mano dentro
+	 * il bottino, e appena una seconda cosa ha avuto bisogno di dare punti la copia sarebbe
+	 * diventata una copia da tenere allineata — compreso il {@code applyAttributes} in fondo, che e'
+	 * la meta' facile da dimenticare e l'unica che si vede se manca.
+	 */
+	public static void addPoints(ServerPlayer player, int points) {
+		if (points <= 0) {
+			return;
+		}
+
+		PlayerProgress progress = get(player);
+		set(player, progress.withUnspentPoints(progress.unspentPoints() + points));
+		applyAttributes(player);
+	}
+
+	/**
 	 * Se questo Cacciatore ha raggiunto questa soglia.
 	 *
 	 * <p>Guarda i <strong>punti spesi</strong> e non il valore totale della statistica, ed e' una
