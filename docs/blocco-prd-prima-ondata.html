@@ -1,0 +1,693 @@
+<title>La prima ondata del PRD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--violet);
+    background: linear-gradient(180deg, rgba(142,107,255,0.10), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------------------------------------------------------------- avvisi */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice.hot { border-top-color: var(--bad); }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice p + p { margin-top: 10px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .notice.hot .tag { color: var(--bad); }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+  .step.good { color: var(--good); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .compare > div { background: var(--panel-soft); padding: 16px 18px; }
+  .compare .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .compare .before .tag { color: var(--muted); }
+  .compare .after .tag { color: var(--good); }
+  .compare p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .compare .after p { color: var(--text); }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 620px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td b { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  tr.service td:first-child b { color: var(--gold); }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  .map {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+    white-space: pre;
+  }
+  .caption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  /* ---------------------------------------------------------------- la catena */
+
+  .chain { margin-top: 20px; border: 1px solid var(--line); background: var(--panel); padding: 10px; }
+  .chain svg { display: block; width: 100%; height: auto; }
+  .chain .n { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: #8FA0B5; }
+  .chain .t { font-family: "Chakra Petch", sans-serif; font-size: 12px; font-weight: 600; fill: #E8F2FF; }
+  .chain .g { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; fill: #FFD54F; }
+  .chain .box { fill: #0E1522; stroke: #1F2C42; }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: 52px 0 0; }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · la prima ondata del PRD</p>
+    <h1>Dieci blocchi contro il silenzio</h1>
+    <p class="lede">Arise aveva finito di costruire i suoi sistemi e non aveva ancora cominciato a
+      costruire il suo <strong>gioco</strong>. La catena degli incarichi si chiudeva intorno al
+      livello venti con la frase «da qui in avanti il Sistema tace e guarda», e da lì il gioco
+      taceva davvero: settantacinque livelli, nessun obiettivo, nessuna sfida che scalasse, nessun
+      motivo per aprire il varco numero cinquanta dopo aver aperto il quarantanovesimo.</p>
+    <p class="lede">Prima un <strong>PRD</strong> — dodici lacune con l'evidenza nel codice, sette
+      principi, diciassette blocchi ordinati per valore diviso costo, e uno scope negativo scritto.
+      Poi dieci di quei diciassette.</p>
+
+    <p class="facts">
+      <span>blocchi <b>10 / 17</b></span>
+      <span>file nuovi <b>10</b></span>
+      <span>prove <b>87</b> (+18)</span>
+      <span>chiavi di lingua <b>795</b> (+91)</span>
+      <span>collaudo statico <b>pulito</b></span>
+      <span>server dedicato <b>mondo nuovo ×2</b></span>
+      <span>difetti trovati <b>5</b></span>
+    </p>
+  </header>
+
+  <div class="notice hot">
+    <span class="tag">Cosa è verificato, e cosa no</span>
+    <p>Tutti e dieci i blocchi compilano, passano le ottantasette prove, escono puliti dal collaudo
+      statico e fanno partire un server dedicato su un mondo vergine — due volte, all'inizio e alla
+      fine. <strong>Nessuno dei dieci è ancora stato visto girare in gioco</strong>, e secondo la
+      regola 3 del progetto questo vuol dire che nessuno dei dieci è finito.</p>
+    <p>La guida per chi collauda è <span class="mono">GUIDA-TESTER.html</span>, nella root. In fondo
+      ha sei prove mirate: sono le cose che un difetto romperebbe in silenzio.</p>
+  </div>
+
+  <section>
+    <h2><span class="step">0</span> Prima il documento</h2>
+    <p class="kicker">Perché un piano scritto vale più di dieci decisioni prese una alla volta.</p>
+
+    <p>Il PRD è nato da due letture. La prima è il codice: tutto, centosettantotto file, per contare
+      invece di stimare — la curva dei livelli chiede 1.234.987 XP per arrivare a cento, cioè
+      cinquantaseimila zombie, mentre la catena dei diciotto incarichi si chiude al livello venti.
+      La seconda è la ricerca: pratiche consolidate su progressione ARPG, dungeon procedurali,
+      economie di gioco, UX delle mod grandi e fedeltà al materiale d'origine.</p>
+
+    <div class="panel why">
+      <span class="tag">Le lacune che contano</span>
+      <p><strong>L1</strong> dopo l'ultimo incarico non c'è niente · <strong>L2</strong> il tetto
+        della sfida (Gate S, livello 80) sta sotto il tetto della progressione (livello 100) ·
+        <strong>L3</strong> la build non è una scelta: quattro statistiche lineari su dodici, nessun
+        respec · <strong>L4</strong> un Gate è sempre lo stesso Gate · <strong>L5</strong> il
+        combattimento non è leggibile: zero telegrafia in tutta la mod · <strong>L6</strong>
+        l'esercito è una collezione di trenta ombre di cui quattro servono · <strong>L7</strong> non
+        c'è niente da inseguire: un solo pezzo unico, e lo regala il quinto incarico.</p>
+    </div>
+
+    <p>C'è anche uno <strong>scope negativo</strong>, ed è la parte del documento che è costata di
+      più: niente Mana, niente gilde, niente generatore ciclico dei Gate. Le tre cose più
+      raccomandate dalla ricerca sono anche le tre più rischiose — il generatore ciclico riscrive
+      <span class="mono">GateLayout</span>, cioè il pezzo che oggi funziona — e prima vengono gli
+      obiettivi del varco, che danno la stessa varietà a un decimo del rischio.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">1</span> I varchi smettono di essere tutti uguali</h2>
+    <p class="kicker">Quattro blocchi sullo stesso posto, e nessuno tocca il generatore.</p>
+
+    <div class="compare">
+      <div class="before">
+        <span class="tag">Prima</span>
+        <p>Cinque-otto stanze quadrate uguali, sei temi che cambiano tre blocchi, mob vanilla presi
+          da una lista, un boss con la vita moltiplicata per sei. Un obiettivo solo: correre in
+          fondo. Ignorare un varco costava zero.</p>
+      </div>
+      <div class="after">
+        <span class="tag">Adesso</span>
+        <p>Tre obiettivi che cambiano la strada, sei affissi che chiedono comportamenti diversi, un
+          Sovrano a tre fasi che si vede arrivare, un varco su venti che si chiude alle spalle, e
+          uno su tre che se lo ignori esplode.</p>
+      </div>
+    </div>
+
+    <h3>B6 — perché ci sei entrato</h3>
+    <p>L'obiettivo si tira dal <strong>seme</strong>, come tutto il resto del preventivo, quindi il
+      pannello di analisi non può mentire — e ci sta per primo dopo il rango, perché è la voce che
+      decide come percorrerai il varco.</p>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Obiettivo</th><th>Cosa chiede</th><th>Come cambia la strada</th></tr></thead>
+        <tbody>
+          <tr><td>Il Sovrano</td><td>abbatti il guardiano</td><td>quello di sempre. Esce tre volte su quattro</td></tr>
+          <tr><td>Raccolta d'Essenza</td><td>tre quarti degli abitanti</td><td>si apre tutto, e il guardiano diventa facoltativo</td></tr>
+          <tr><td>La Caccia</td><td>il Sovrano, in quattro minuti</td><td>il contrario: ogni stanza ripulita è tempo che non hai</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Il Sovrano pesa quanto gli altri due insieme, e non è timidezza: è l'obiettivo che il gioco ti
+      ha insegnato, quello che vuoi quando hai in testa qualcos'altro. Una variazione che capita una
+      volta su due smette di essere una variazione.</p>
+
+    <div class="panel why">
+      <span class="tag">Il pagamento è uscito dalla morte del boss</span>
+      <p>Le fini adesso sono tre. Se il pagamento fosse restato attaccato a una, le altre due
+        avrebbero chiuso un varco senza ricompensarlo. Un insieme <span class="mono">COMPLETED</span>
+        garantisce che chi riempie la barra e poi uccide comunque il Sovrano venga pagato una volta
+        sola.</p>
+    </div>
+
+    <h3>B7 — il Sovrano ha tre fasi</h3>
+    <p>Un sacco di punti vita non è una sfida: è la stessa cosa di prima, più lunga. Tre fasi, e
+      <strong>nessuna aggiunge un attacco nuovo</strong>: aggiungono regole.</p>
+    <ul>
+      <li><strong>Fino ai due terzi</strong> — la martellata. Anello rosso sotto i piedi del
+        giocatore, un secondo e un quarto, poi il colpo cade lì. Sotto i suoi piedi e non sotto
+        quelli del boss: il cerchio deve comparire dove deve essere schivato.</li>
+      <li><strong>Sotto i due terzi</strong> — spazza le ombre. Non le distrugge: le fa cadere, e
+        cadere costa il minuto di recupero che l'Officina aveva già scritto. L'esercito smette di
+        essere un pilota automatico e diventa una risorsa che si consuma.</li>
+      <li><strong>Sotto un terzo</strong> — vede attraverso l'ombra e punta il Monarca. È la
+        lamentela classica delle build a evocazioni — i nemici che ignorano i minion — usata di
+        proposito, una volta per incontro, come meccanica invece che come difetto.</li>
+    </ul>
+
+    <h3>B8 — sei affissi, dal rango C in su</h3>
+    <p>Un mob per stanza, mai due affissi sullo stesso mob. Sono le due regole dure che vengono
+      dall'errore più documentato del genere, gli affissi elite di Diablo III, dove la lamentela
+      unanime riguarda quelli che <em>tolgono il controllo</em>. Qui nessuno dei sei nega l'input:
+      ognuno chiede un cambio di comportamento, e la contromisura è scritta sopra la testa del mob.</p>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Affisso</th><th>Cosa fa</th><th>Cosa fare</th></tr></thead>
+        <tbody>
+          <tr><td>Rapido</td><td>va la metà più veloce</td><td>non scappare in linea retta</td></tr>
+          <tr><td>Assetato</td><td>si cura a ogni colpo a segno</td><td>non farti colpire</td></tr>
+          <tr><td>Riflesso</td><td>rimanda parte del danno</td><td>colpi grossi e lenti, o le ombre</td></tr>
+          <tr><td>Divoratore d'Ombre</td><td>danno doppio contro le ombre</td><td>cambia squadra, o combattilo tu</td></tr>
+          <tr><td>Gelido</td><td>chi lo colpisce in mischia si rallenta</td><td>colpiscilo da lontano</td></tr>
+          <tr><td>Volatile</td><td>dove cade lascia uno scoppio</td><td>allontanati quando va giù</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Il più prezioso è <strong>Divoratore d'Ombre</strong>: è l'unico che rende la composizione
+      della squadra una decisione tattica invece della lista dei quattro più forti.</p>
+
+    <h3>B5 — il Gate Rosso</h3>
+    <p>Da fuori è identico a tutti gli altri. Il colore sta sull'entità e <strong>non</strong> nel
+      preventivo, ed è la differenza che fa funzionare tutto il blocco: il preventivo viaggia al
+      client per riempire il pannello, e se il colore stesse lì dentro un client modificato potrebbe
+      leggerlo. Il server lo sa, il pannello no.</p>
+    <ul>
+      <li><strong>Il Sigillo dell'Associazione smette di rispondere.</strong> È la prima volta in
+        tutta la mod che un oggetto del giocatore viene disattivato, e si nota: è così che il varco
+        dice di essersi chiuso senza doverlo ripetere in chat.</li>
+      <li><strong>Il gelo morde</strong> chi resta lontano da una fonte di calore. Il calore lo
+        porti tu — falò, magma, torce — e le lampade del tema non scaldano. La differenza fra luce
+        e calore è la lezione che questo varco insegna, ed è la prima volta che conta cosa ti sei
+        portato nello zaino invece di cosa hai addosso.</li>
+      <li><strong>Il bottino è doppio</strong>, ed è l'unica fonte di Iron.</li>
+    </ul>
+
+    <h3>B2 — il Dungeon Break</h3>
+    <p>Un gioco che premia solo chi agisce e non fa mai niente a chi non agisce ha una mappa che è un
+      elenco di attività facoltative, e un'attività facoltativa è una che si smette di fare. Un varco
+      su tre, alla scadenza, <strong>cede</strong>: riversa in superficie gli stessi mob che il
+      pannello aveva dichiarato, persistenti, entro quaranta blocchi.</p>
+
+    <div class="panel why">
+      <span class="tag">Il dado si tira alla nascita, non alla scadenza</span>
+      <p>È l'unico modo perché il preavviso sia onesto: un minuto prima il varco comincia a cedere e
+        lo dice a chi è entro duecento blocchi, e chi vuole può correre a chiuderlo. Un varco che
+        decidesse all'ultimo istante avrebbe dovuto mentire per quel minuto, o non avvisare affatto.
+        Senza preavviso una rottura è una tassa; con il preavviso è una decisione.</p>
+      <p>E <strong>gli NPC del mercato non muoiono</strong>. La minaccia deve costare tempo e
+        fastidio, mai contenuto: perdere per sempre il Cartografo perché si era disconnessi è
+        esattamente il genere di punizione che fa disinstallare una mod.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">2</span> L'esercito diventa una collezione</h2>
+    <p class="kicker">Sette ombre uniche, e la regola che le tiene tali.</p>
+
+    <p><strong>Un'ombra nominata non è statisticamente migliore. È unica in ciò che fa.</strong> È la
+      riga scritta in cima all'enum, ed è facile perderla di vista: se un giorno una delle sette
+      diventasse semplicemente «la più forte», avrebbe smesso di fare il suo lavoro.</p>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Ombra</th><th>Cosa fa che nessun'altra fa</th><th>Dove</th></tr></thead>
+        <tbody>
+          <tr><td>Igris</td><td>al grado di Maresciallo <em>dice una riga</em> quando lo evochi</td><td>primo varco di rango C</td></tr>
+          <tr><td>Iron</td><td>provoca al doppio: 24 blocchi invece di 12</td><td>solo dal Gate Rosso</td></tr>
+          <tr><td>Tank</td><td>non lo sposta niente, e annulla il gelo del Gate Rosso</td><td>Gelo, rango B+</td></tr>
+          <tr><td>Tusk</td><td>lancia d'ombra da 24 blocchi</td><td>Rovina, rango B+</td></tr>
+          <tr><td>Greed</td><td>raddoppia i soul coin mentre è in campo</td><td>Cenere, rango A+</td></tr>
+          <tr><td>Beru</td><td>cura il Monarca sotto metà vita</td><td>Sculk, rango S</td></tr>
+          <tr><td>Bellion</td><td>la sua aura vale per <em>tutto</em> l'esercito, non solo per chi è in campo</td><td>si eredita, a catena finita</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Bellion è l'unica cosa in tutta la mod che dia un motivo alle ventisei ombre che restano a
+      casa, e per questo non cade da nessun boss: arriva alla fine, da chi ha comandato prima di te.
+      Ognuna si ottiene una volta sola, e nessuna si può rinominare — Igris si chiama Igris.</p>
+
+    <p>L'infrastruttura c'era già tutta: archetipi, gradi, aure, colori, persistenza. Sono sette voci
+      in un enum, un campo opzionale su <span class="mono">ShadowData</span> e sette righe di
+      comportamento. È il blocco col miglior rapporto emozione/righe di codice dell'intero PRD.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">3</span> Spendere un punto diventa una decisione</h2>
+    <p class="kicker">Dodici soglie, e una barra che punta alla prossima invece che al tetto.</p>
+
+    <p>A livello sessanta un Cacciatore aveva speso centosettantasette punti e non era successo mai
+      niente: era solo diventato più grande. La cura consolidata non è abolire i punti — è
+      affiancarli a <strong>soglie con un effetto qualitativo</strong>.</p>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th></th><th>25</th><th>50</th><th>100</th></tr></thead>
+        <tbody>
+          <tr><td>Vitalità</td><td>la fame non uccide</td><td>le cadute brevi non fanno danno</td><td>un colpo letale ti lascia a mezzo cuore</td></tr>
+          <tr><td>Forza</td><td>+1 ombra in campo</td><td>le ombre colpiscono il 15% più forte</td><td>+1 ombra in campo</td></tr>
+          <tr><td>Resistenza</td><td>il fuoco non brucia</td><td>il veleno non tocca</td><td>nemmeno la lava</td></tr>
+          <tr><td>Agilità</td><td>correre annulla la caduta</td><td>il Passo d'ombra va metà più lontano</td><td>e si ricarica in metà tempo</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Perché rifiuti assoluti e non riduzioni</span>
+      <p>Fabric offre <span class="mono">ALLOW_DAMAGE</span>, che dice sì o no. Ridurre della metà
+        vorrebbe dire lasciar passare il colpo e ricucire la vita dopo, e si vedrebbe: la barra
+        scende e risale, lo schermo lampeggia rosso lo stesso, e il giocatore conclude che la sua
+        statistica non funziona. <strong>Una soglia che si vede funzionare vale più di una che
+        funziona meglio</strong> — e per questo costa cento punti, non venti.</p>
+    </div>
+
+    <p>Contano i <strong>punti spesi</strong> e non il valore totale della statistica:
+      l'equipaggiamento somma tantissimo, e una soglia raggiungibile indossando un anello sarebbe una
+      soglia che si perde togliendolo. Ciò che si è scelto resta scelto.</p>
+
+    <p>E la barra della schermata di stato non punta più al tetto. Il tetto è un numero che non
+      succede — arrivare a quattrocento in Vitalità non è un traguardo, è la fine della statistica.
+      Adesso punta alla prossima soglia, con scritto quanto manca e cosa dà.</p>
+
+    <h3>B10 — e la Pergamena del Rimpianto</h3>
+    <p>Non c'era modo di tornare indietro da una spesa, ed è la lacuna che nelle mod RPG i giocatori
+      segnalano più di qualunque altra. Trenta Monete d'Anima alla Cartoleria — tremila soul coin,
+      cinque Gate di rango C — e restituisce tutti i punti. Livello, esperienza, soul coin ed
+      esercito non si toccano: torna indietro solo ciò che era una decisione.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">4</span> Cinque difetti trovati</h2>
+    <p class="kicker">Tre leggendo il codice, uno rileggendo il proprio, uno dal collaudo statico.</p>
+
+    <div class="notice hot">
+      <span class="tag">Il peggiore</span>
+      <p><span class="mono">/arise gear</span> regalava un set di netherite incantato
+        <strong>a chiunque, senza permessi</strong>. Il nodo di debug si chiamava come quello vero, e
+        Brigadier, in <span class="mono">addChild</span>, sovrascrive l'<span class="mono">executes</span>
+        del nodo che trova <em>senza fonderne il requires</em>: restava il nodo senza permessi, con
+        l'azione di debug. Il corredo vanilla si chiama ora <span class="mono">/arise kit</span>.</p>
+    </div>
+
+    <ul class="check">
+      <li>La lore dell'ultimo incarico, in inglese, era la lettera <span class="mono">"W"</span> — un
+        segnaposto mai sostituito, sull'incarico che chiude la catena.</li>
+      <li>L'obiettivo della prima ombra nominava il tasto <b>R</b> a lettere, e tre righe in fondo
+        alle schermate facevano lo stesso. Chi rimappa leggeva istruzioni false.</li>
+      <li>Il tetto dell'estrazione era irraggiungibile: con 0,005 a livello servivano
+        centoquarantuno livelli su cento disponibili. Configurazione morta, e un Cacciatore al
+        massimo che falliva ancora un colpo su quattro senza alcun modo di migliorare.</li>
+      <li><strong>L'ultima difesa, scritta oggi, poteva togliere vita invece di salvarla.</strong>
+        Stava su <span class="mono">ALLOW_DAMAGE</span>, dove l'importo è il danno <em>prima</em> di
+        armatura e assorbimento: un colpo da venti su un Cacciatore con quindici cuori e un'armatura
+        di diamante non lo uccide affatto, ma lì sembrava letale — e la soglia gli avrebbe messo la
+        vita a mezzo cuore, bruciando dieci minuti di ricarica per farlo. Spostata su
+        <span class="mono">ALLOW_DEATH</span>, che risponde alla sola domanda che conta.</li>
+      <li>Il collaudo statico ha beccato tre nomi di file di suono vanilla inventati
+        (<span class="mono">entity/generic/explode1</span> non esiste,
+        <span class="mono">random/explode3</span> sì) prima che il gioco li suonasse a vuoto.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="step">5</span> Cosa resta fuori</h2>
+
+    <p>Sette blocchi su diciassette. Quattro sono contenuto nuovo — <strong>l'Abisso</strong> a
+      profondità infinita con cronometro e record, <strong>i Monarchi</strong> come catena finale,
+      <strong>l'esame di rango</strong>, <strong>la Quest Giornaliera</strong> con la Zona di
+      Penalità — e due sono infrastruttura: il <strong>Registro del Sistema</strong> (una guida
+      in-game agganciata a oggetti e schermate) e l'<strong>adottabilità</strong> (tag, interruttori
+      per sistema, meno keybind di default). Più il <strong>cubo benedetto o maledetto</strong>.</p>
+
+    <p>La lacuna <strong>L1</strong> — dopo il diciottesimo incarico non c'è niente — è stata solo
+      <em>ammorbidita</em>: il cinquantesimo varco non è più identico al quarantanovesimo, ma un
+      traguardo che ne apre un altro ancora non c'è, e quello è l'Abisso.</p>
+
+    <div class="panel why">
+      <span class="tag">Da provare, in questo ordine</span>
+      <ul class="check">
+        <li><span class="mono">/arise lab</span> — tutto sbloccato, sei varchi, quattro macchinari,
+          nove banconi, e nel barile due Pergamene del Rimpianto</li>
+        <li><span class="mono">/arise gate breach</span> vicino a un varco: l'anello si allarga
+          invece di stringersi, poi trenta creature in superficie</li>
+        <li><span class="mono">/arise gate red</span> — pianta un falò e cammina; togliti dal falò e
+          conta i secondi</li>
+        <li><span class="mono">/arise gate affix volatile</span> su un mob, poi uccidilo e resta
+          fermo: l'anello rosso deve lasciarti il tempo di uscire</li>
+        <li><span class="mono">/arise gate c</span> ripetuto: obiettivi diversi, e al primo
+          completato arriva Igris</li>
+        <li><span class="mono">/arise level 40</span> e <span class="mono">/arise spend endurance 25</span>,
+          poi mettiti nel fuoco. Poi <span class="mono">/arise respec</span> e riprova: deve tornare
+          a bruciare</li>
+        <li>Shift + il tasto Arise su un cadavere, tre volte: non deve consumarsi</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr>
+
+  <footer>
+    <p>Progetto Arise · Minecraft 26.2 · Fabric 0.19.3 · il piano è
+      <span class="mono">PRD-arise.md</span>, la guida per chi collauda è
+      <span class="mono">GUIDA-TESTER.html</span>.</p>
+    <p>Il ciclo precedente: <span class="mono">docs/blocco-mappa.html</span>.</p>
+  </footer>
+
+</div>

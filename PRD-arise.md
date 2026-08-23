@@ -725,28 +725,36 @@ Detto esplicitamente, perché uno scope negativo scritto vale più di dieci disc
 
 ## 6. L'ordine
 
-| # | Blocco | Costo | Dipende da |
+| # | Blocco | Costo | Stato |
 |---|---|---|---|
-| 1 | **B0** — le tre bugie | mezz'ora | — |
-| 2 | **B1** — estrazione: tetto e anteprima | mezz'ora | — |
-| 3 | **B10** — Pergamena del Rimpianto | due ore | — |
-| 4 | **B4** — le ombre che hanno un nome | mezza giornata | — |
-| 5 | **B2** — Dungeon Break | mezza giornata | — |
-| 6 | **B9** — le soglie | un giorno | — |
-| 7 | **B14** — il cubo | tre ore | — |
-| 8 | **B8** — affissi dei nemici | mezza giornata | — |
-| 9 | **B5** — il Gate Rosso | mezza giornata | B4 (Iron) |
-| 10 | **B6** — obiettivi del varco | un giorno | — |
-| 11 | **B7** — il Sovrano a tre fasi | un giorno | B8 |
-| 12 | **B12** — l'esame di rango | un giorno | B4 (Igris) |
-| 13 | **B11** — l'Abisso | un giorno | B8, B7 |
-| 14 | **B15** — il Registro del Sistema | due giorni | — |
-| 15 | **B16** — adottabilità | un giorno | — |
-| 16 | **B3** — Quest Giornaliera e Penalità | un giorno | — |
-| 17 | **B13** — i Monarchi | due giorni | B7, B11 |
+| 1 | **B0** — le tre bugie | mezz'ora | ✅ *da verificare in gioco* |
+| 2 | **B1** — estrazione: tetto e anteprima | mezz'ora | ✅ *da verificare in gioco* |
+| 3 | **B10** — Pergamena del Rimpianto | due ore | ✅ *da verificare in gioco* |
+| 4 | **B4** — le ombre che hanno un nome | mezza giornata | ✅ *da verificare in gioco* |
+| 5 | **B2** — Dungeon Break | mezza giornata | ✅ *da verificare in gioco* |
+| 6 | **B9** — le soglie | un giorno | ✅ *da verificare in gioco* |
+| 7 | **B8** — affissi dei nemici | mezza giornata | ✅ *da verificare in gioco* |
+| 8 | **B5** — il Gate Rosso | mezza giornata | ✅ *da verificare in gioco* |
+| 9 | **B6** — obiettivi del varco | un giorno | ✅ *da verificare in gioco* |
+| 10 | **B7** — il Sovrano a tre fasi | un giorno | ✅ *da verificare in gioco* |
+| 11 | **B14** — il cubo | tre ore | aperto |
+| 12 | **B12** — l'esame di rango | un giorno | aperto — Igris arriva intanto dal primo varco di rango C |
+| 13 | **B11** — l'Abisso | un giorno | aperto |
+| 14 | **B15** — il Registro del Sistema | due giorni | aperto |
+| 15 | **B16** — adottabilità | un giorno | aperto |
+| 16 | **B3** — Quest Giornaliera e Penalità | un giorno | aperto |
+| 17 | **B13** — i Monarchi | due giorni | aperto |
 
-I primi otto non dipendono da niente e si possono fare in qualunque ordine: sono stati messi per
-valore decrescente diviso costo crescente.
+**Dieci su diciassette**, in una sessione. Tutti e dieci compilano, passano 87 prove, escono puliti
+dal collaudo statico e fanno partire un server dedicato su un mondo nuovo — e **nessuno dei dieci
+e' ancora stato visto girare in gioco**, che secondo la regola 3 del progetto vuol dire che nessuno
+dei dieci e' finito.
+
+Delle sette lacune che restano, quattro (B11, B13, B12, B3) sono contenuto nuovo e due (B15, B16)
+sono infrastruttura. La lacuna **L1** — dopo il diciottesimo incarico non c'e' niente — e' stata
+solo *ammorbidita*: i varchi adesso hanno tre obiettivi, tre fasi di boss e sei affissi, quindi il
+cinquantesimo varco non e' piu' identico al quarantanovesimo. Ma un traguardo che ne apre un altro
+ancora non c'e', e quello e' B11.
 
 ---
 

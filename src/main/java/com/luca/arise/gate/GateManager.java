@@ -63,8 +63,11 @@ public final class GateManager {
 			ResourceKey.create(Registries.DIMENSION, AriseMod.id("gate"));
 
 	/** Un Gate aperto, con tutto ciò che serve a chiuderlo. */
+	/**
+	 * @param essenceTarget quante creature vanno abbattute, se l'obiettivo e' la Raccolta
+	 */
 	private record Instance(GateOffer offer, GateLayout layout, int originX, int originZ,
-			int regionIndex, UUID bossId, boolean red) {
+			int regionIndex, UUID bossId, boolean red, int essenceTarget) {
 
 		Rank rank() {
 			return offer.rank();
@@ -184,8 +187,13 @@ public final class GateManager {
 
 		UUID bossId = populate(gate, config, layout, offer, originX, originZ, random);
 
-		ACTIVE.put(player.getUUID(),
-				new Instance(offer, layout, originX, originZ, regionIndex, bossId, red));
+		// Il bersaglio si conta adesso, una volta sola. Chiederlo al preventivo a ogni uccisione
+		// vorrebbe dire rigenerare la pianta del varco a ogni mob che cade — un lavoro che
+		// nessuno vede e che si moltiplica per il numero di creature che ci sono dentro.
+		int essenceTarget = offer.objective().essenceTarget(offer.inhabitants(config));
+
+		ACTIVE.put(player.getUUID(), new Instance(offer, layout, originX, originZ, regionIndex,
+				bossId, red, essenceTarget));
 
 		// Il punto di ritorno prima del teletrasporto: se qualcosa va storto dopo, la via di casa
 		// è già scritta su disco.
@@ -398,7 +406,7 @@ public final class GateManager {
 			return;
 		}
 
-		int target = objective.essenceTarget(instance.offer().inhabitants(AriseConfig.get().gates()));
+		int target = instance.essenceTarget();
 		int slain = SLAIN.merge(player.getUUID(), 1, Integer::sum);
 
 		if (slain < target) {
