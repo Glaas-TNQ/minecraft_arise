@@ -7,6 +7,8 @@ import com.luca.arise.config.FxConfig;
 import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.fx.ModSounds;
+import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.progress.StatThreshold;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -285,8 +287,16 @@ public class ShadowEntity extends TamableAnimal {
 
 		double health = data.maxHealth(config) * (1.0 + aura.health())
 				+ owner.getMaxHealth() * legion.monarchHealthShare();
-		double damage = data.attackDamage(config) * (1.0 + aura.damage())
-				+ owner.getAttributeValue(Attributes.ATTACK_DAMAGE) * legion.monarchDamageShare();
+		// La soglia di mezzo in Forza non fa piu' forte il Monarca: fa piu' forte l'esercito. E'
+		// la lettura giusta della statistica in una mod dove chi comanda combatte poco — e rende
+		// i cinquanta punti una scelta diversa dai venticinque e dai cento, che danno posti.
+		double legionBonus = ProgressManager.reached(owner, StatThreshold.STRENGTH_LEGION)
+				? StatThreshold.LEGION_DAMAGE_BONUS
+				: 0.0;
+
+		double damage = (data.attackDamage(config) * (1.0 + aura.damage())
+				+ owner.getAttributeValue(Attributes.ATTACK_DAMAGE) * legion.monarchDamageShare())
+				* (1.0 + legionBonus);
 
 		setAttribute(Attributes.MAX_HEALTH, health);
 		setAttribute(Attributes.ATTACK_DAMAGE, damage);

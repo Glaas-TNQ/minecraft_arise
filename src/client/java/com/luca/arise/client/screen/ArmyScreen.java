@@ -10,6 +10,8 @@ import com.luca.arise.client.ui.AriseTheme;
 import com.luca.arise.client.ui.Glyphs;
 import com.luca.arise.client.ui.ListPanel;
 import com.luca.arise.config.AriseConfig;
+import com.luca.arise.progress.PlayerProgress;
+import com.luca.arise.progress.StatThreshold;
 import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.network.ShadowActionPayload;
 import com.luca.arise.registry.ModAttachments;
@@ -237,11 +239,28 @@ public class ArmyScreen extends AriseScreen {
 		return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
 	}
 
+	/**
+	 * Quante ombre stanno in campo per questo Cacciatore, secondo le sue soglie di Forza.
+	 *
+	 * <p>Il numero lo decide il server, ma la schermata deve poterlo <em>disegnare</em> senza
+	 * chiederlo: la stessa funzione pura di {@code StatThreshold} risponde a entrambi, e la
+	 * progressione qui e' gia' sincronizzata perche' l'HUD la usa.
+	 */
+	private int summonLimit() {
+		PlayerProgress progress = minecraft.player == null
+				? null
+				: minecraft.player.getAttached(ModAttachments.PROGRESS);
+
+		int base = AriseConfig.get().shadows().maxSummoned();
+
+		return progress == null ? base : StatThreshold.summonLimit(progress, base);
+	}
+
 	// ---------------------------------------------------------------- disegno
 
 	@Override
 	protected Component status() {
-		int cap = AriseConfig.get().shadows().maxSummoned();
+		int cap = summonLimit();
 		return Component.translatable("arise.screen.army.header", army().size(),
 				summoned().ids().size(), cap, squad().size());
 	}
@@ -349,7 +368,7 @@ public class ArmyScreen extends AriseScreen {
 		squadButton.setMessage(Component.translatable(inSquad
 				? "arise.screen.army.squad_out"
 				: "arise.screen.army.squad_in"));
-		squadButton.active = inSquad || squad().size() < config.maxSummoned();
+		squadButton.active = inSquad || squad().size() < summonLimit();
 
 		graphics.text(font, shadow.displayName(), left, y, AriseTheme.TEXT);
 		y += 15;

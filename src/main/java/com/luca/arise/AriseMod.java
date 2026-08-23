@@ -7,6 +7,7 @@ import com.luca.arise.event.GearEvents;
 import com.luca.arise.event.GemEvents;
 import com.luca.arise.event.ProgressEvents;
 import com.luca.arise.event.QuestEvents;
+import com.luca.arise.event.ThresholdEvents;
 import com.luca.arise.event.WorkshopEvents;
 import com.luca.arise.fx.ModSounds;
 import com.luca.arise.gate.GateSpawner;
@@ -54,6 +55,7 @@ public class AriseMod implements ModInitializer {
 		GemEvents.register();
 		QuestEvents.register();
 		WorkshopEvents.register();
+		ThresholdEvents.register();
 		GateSpawner.register();
 		AriseCommands.register();
 

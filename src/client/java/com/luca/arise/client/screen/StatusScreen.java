@@ -14,6 +14,7 @@ import com.luca.arise.gem.Gem;
 import com.luca.arise.network.SpendPointPayload;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.progress.Stat;
+import com.luca.arise.progress.StatThreshold;
 import com.luca.arise.registry.ModAttachments;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -38,15 +39,17 @@ import net.minecraft.network.chat.Component;
 public class StatusScreen extends AriseScreen {
 
 	private static final int PANEL_W = 400;
-	private static final int PANEL_H = 210;
+	private static final int PANEL_H = 234;
 	private static final int LEFT_W = 220;
 	/**
 	 * Alto quanto le tre righe che ci stanno dentro: nome, cosa produce, barra.
 	 *
-	 * <p>Era 26 quando le righe erano due. Un valore che non tiene conto di cio' che disegna e' il
-	 * modo piu' rapido di ritrovarsi la barra di una statistica appoggiata sul nome della prossima.
+	 * <p>Era 26 quando le righe erano due, 30 quando sono diventate tre. Adesso sono quattro — nome,
+	 * cosa produce, barra, quanto manca alla prossima soglia — e vale la stessa cosa di allora: un
+	 * valore che non tiene conto di cio' che disegna e' il modo piu' rapido di ritrovarsi la barra
+	 * di una statistica appoggiata sul nome della prossima.
 	 */
-	private static final int ROW = 30;
+	private static final int ROW = 36;
 
 	private final Map<Stat, Button> buttons = new EnumMap<>(Stat.class);
 
@@ -90,6 +93,19 @@ public class StatusScreen extends AriseScreen {
 		PlayerProgress progress = progress();
 		return Component.translatable("arise.screen.status.level", progress.level(),
 				progress.xp(), AriseConfig.get().xpForNextLevel(progress.level()));
+	}
+
+	/** L'ultima soglia gia' superata, o zero: e' il punto da cui la barra riparte. */
+	private static int previousStep(Stat stat, int points) {
+		int previous = 0;
+
+		for (StatThreshold threshold : StatThreshold.of(stat)) {
+			if (points >= threshold.points()) {
+				previous = threshold.points();
+			}
+		}
+
+		return previous;
 	}
 
 	@Override
@@ -143,8 +159,29 @@ public class StatusScreen extends AriseScreen {
 			graphics.text(font, gives, left, y + 10, AriseTheme.GOOD);
 			graphics.text(font, step, valueRight - font.width(step), y + 10, AriseTheme.DISABLED);
 
-			bar(graphics, left, y + 21, LEFT_W - 40, 2, cap <= 0 ? 0.0 : (double) points / cap,
-					AriseTheme.ACCENT_DEEP);
+			// La barra non punta piu' al tetto: punta alla prossima soglia, e dice cosa da'.
+			//
+			// Il tetto e' un numero che non succede: arrivare a quattrocento in Vitalita' non e' un
+			// traguardo, e' la fine della statistica. Una soglia invece e' un traguardo vicino con
+			// un nome, e vedere il lucchetto prima della chiave e' meta' del motivo per spendere
+			// il punto. Quando non ne restano, la barra torna a misurare il tetto — perche' a quel
+			// punto il tetto e' davvero l'unica cosa rimasta davanti.
+			StatThreshold next = StatThreshold.next(stat, points);
+
+			if (next == null) {
+				bar(graphics, left, y + 21, LEFT_W - 40, 2, cap <= 0 ? 0.0 : (double) points / cap,
+						AriseTheme.ACCENT_DEEP);
+			} else {
+				int previous = previousStep(stat, points);
+				double span = Math.max(1, next.points() - previous);
+
+				bar(graphics, left, y + 21, LEFT_W - 40, 2, (points - previous) / span,
+						AriseTheme.VIOLET);
+
+				Component toGo = Component.translatable("arise.screen.status.to_threshold",
+						next.points() - points, next.label());
+				graphics.text(font, toGo, left, y + 25, AriseTheme.VIOLET);
+			}
 
 			// Il riquadro al passaggio del mouse: la spiegazione lunga sta qui, dove non ruba
 			// spazio a nessuno e la trova chiunque si fermi un istante sulla riga che sta per

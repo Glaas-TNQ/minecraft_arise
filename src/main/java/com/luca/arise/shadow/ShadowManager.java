@@ -20,6 +20,7 @@ import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.quest.Unlock;
 import com.luca.arise.progress.Rank;
+import com.luca.arise.progress.StatThreshold;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.registry.ModEntities;
 import com.luca.arise.workshop.LooseSoul;
@@ -111,6 +112,19 @@ public final class ShadowManager {
 
 	public static int summonedCount(ServerPlayer player) {
 		return pruneSummoned(player).size();
+	}
+
+	/**
+	 * Quante ombre puo' tenere in campo <em>questo</em> Cacciatore.
+	 *
+	 * <p>Erano quattro per tutti, quanti sono gli archetipi, ed era un numero buono. Le soglie di
+	 * Forza lo rendono una scelta: cento punti spesi li' valgono due posti in piu', cioe' sei
+	 * ombre insieme — e sono cento punti che non sono andati in Vitalita'. E' la prima volta che
+	 * una statistica cambia <em>quante</em> cose puoi fare invece di quanto forte le fai.
+	 */
+	public static int summonLimit(ServerPlayer player) {
+		return StatThreshold.summonLimit(ProgressManager.get(player),
+				AriseConfig.get().shadows().maxSummoned());
 	}
 
 	// ---------------------------------------------------------------- estrazione
@@ -379,10 +393,10 @@ public final class ShadowManager {
 		}
 
 		Map<UUID, UUID> summoned = pruneSummoned(player);
-		int slots = config.maxSummoned() - summoned.size();
+		int slots = summonLimit(player) - summoned.size();
 
 		if (slots <= 0) {
-			return Component.translatable("arise.msg.shadow.summon_limit", config.maxSummoned());
+			return Component.translatable("arise.msg.shadow.summon_limit", summonLimit(player));
 		}
 
 		ShadowDowntime downtime = downtime(player);
@@ -489,8 +503,8 @@ public final class ShadowManager {
 			return Component.translatable("arise.msg.shadow.already_summoned");
 		}
 
-		if (summoned.size() >= config.maxSummoned()) {
-			return Component.translatable("arise.msg.shadow.summon_limit", config.maxSummoned());
+		if (summoned.size() >= summonLimit(player)) {
+			return Component.translatable("arise.msg.shadow.summon_limit", summonLimit(player));
 		}
 
 		long remaining = downtime(player).remaining(shadowId, player.level().getGameTime());
@@ -829,7 +843,7 @@ public final class ShadowManager {
 			return Component.translatable("arise.msg.shadow.unknown");
 		}
 
-		int capacity = AriseConfig.get().shadows().maxSummoned();
+		int capacity = summonLimit(player);
 		ShadowSquad current = squad(player);
 		ShadowSquad updated = current.toggled(shadowId, capacity);
 

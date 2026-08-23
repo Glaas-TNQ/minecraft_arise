@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.luca.arise.config.AriseConfig;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.progress.Stat;
+import com.luca.arise.progress.StatThreshold;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -71,6 +73,90 @@ class ProgressTest {
 
 		assertEquals(0, fresh.spentPoints());
 		assertEquals(fresh.unspentPoints(), fresh.withStatsReset().unspentPoints());
+	}
+
+	// ---------------------------------------------------------------- le soglie
+
+	@Test
+	@DisplayName("ogni statistica spendibile ha tre soglie, e stanno tutte sotto il suo tetto")
+	void everySpendableStatHasThresholds() {
+		var config = AriseConfig.createDefault();
+
+		for (Stat stat : Stat.SPENDABLE) {
+			var thresholds = StatThreshold.of(stat);
+
+			assertEquals(StatThreshold.STEPS.size(), thresholds.size(),
+					stat + " deve avere una soglia per ogni gradino");
+
+			int previous = 0;
+			for (var threshold : thresholds) {
+				assertTrue(threshold.points() > previous,
+						stat + ": le soglie devono salire, " + threshold + " no");
+				assertTrue(threshold.points() <= config.cap(stat),
+						threshold + " sta sopra il tetto di " + stat + ": nessuno la vedrebbe mai");
+				previous = threshold.points();
+			}
+		}
+	}
+
+	@Test
+	@DisplayName("nessuna statistica non spendibile porta soglie che nessuno potrebbe raggiungere")
+	void noThresholdsOnUnspendableStats() {
+		for (Stat stat : Stat.values()) {
+			if (Stat.SPENDABLE.contains(stat)) {
+				continue;
+			}
+
+			// Le altre otto arrivano solo dall'equipaggiamento, e una soglia raggiungibile
+			// indossando un anello sarebbe una soglia che si perde togliendolo.
+			assertTrue(StatThreshold.of(stat).isEmpty(),
+					stat + " non e' spendibile: non puo' avere soglie");
+		}
+	}
+
+	@Test
+	@DisplayName("la prossima soglia e' sempre quella giusta, e a un certo punto finiscono")
+	void nextThresholdWalksForward() {
+		assertEquals(StatThreshold.VITALITY_HUNGER, StatThreshold.next(Stat.VITALITY, 0));
+		assertEquals(StatThreshold.VITALITY_HUNGER, StatThreshold.next(Stat.VITALITY, 24));
+		assertEquals(StatThreshold.VITALITY_FALL, StatThreshold.next(Stat.VITALITY, 25));
+		assertEquals(StatThreshold.VITALITY_LAST_STAND, StatThreshold.next(Stat.VITALITY, 99));
+		assertEquals(null, StatThreshold.next(Stat.VITALITY, 100),
+				"a soglie finite la barra deve tornare a misurare il tetto");
+	}
+
+	@Test
+	@DisplayName("le soglie di Forza danno posti in campo, e solo quelle che li promettono")
+	void strengthThresholdsGrantSlots() {
+		int base = AriseConfig.createDefault().shadows().maxSummoned();
+		PlayerProgress progress = PlayerProgress.INITIAL.withLevel(100, 0L, 297);
+
+		assertEquals(base, StatThreshold.summonLimit(progress, base),
+				"senza punti spesi il tetto resta quello di tutti");
+
+		PlayerProgress first = progress.withStatIncreased(Stat.STRENGTH, 25);
+		assertEquals(base + 1, StatThreshold.summonLimit(first, base));
+
+		// La soglia di mezzo fa piu' forte l'esercito, non piu' grande: se desse un posto anche
+		// lei, i tre gradini di Forza direbbero tutti la stessa cosa.
+		PlayerProgress middle = progress.withStatIncreased(Stat.STRENGTH, 50);
+		assertEquals(base + 1, StatThreshold.summonLimit(middle, base),
+				"la soglia di mezzo non concede posti");
+
+		PlayerProgress full = progress.withStatIncreased(Stat.STRENGTH, 100);
+		assertEquals(base + 2, StatThreshold.summonLimit(full, base));
+	}
+
+	@Test
+	@DisplayName("il respec toglie anche le soglie: cio' che si e' scelto si puo' disfare")
+	void respecTakesTheThresholdsBack() {
+		int base = AriseConfig.createDefault().shadows().maxSummoned();
+		PlayerProgress full = PlayerProgress.INITIAL.withLevel(100, 0L, 297)
+				.withStatIncreased(Stat.STRENGTH, 100);
+
+		assertEquals(base + 2, StatThreshold.summonLimit(full, base));
+		assertEquals(base, StatThreshold.summonLimit(full.withStatsReset(), base),
+				"dopo il respec le soglie devono cadere insieme ai punti che le reggevano");
 	}
 
 	@Test

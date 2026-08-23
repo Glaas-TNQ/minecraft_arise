@@ -170,6 +170,18 @@ public final class ProgressManager {
 	}
 
 	/**
+	 * Se questo Cacciatore ha raggiunto questa soglia.
+	 *
+	 * <p>Guarda i <strong>punti spesi</strong> e non il valore totale della statistica, ed e' una
+	 * distinzione che conta: l'equipaggiamento somma tantissimo alle dodici statistiche, e una
+	 * soglia raggiungibile indossando un anello sarebbe una soglia che si perde togliendolo. Cio'
+	 * che si e' scelto resta scelto.
+	 */
+	public static boolean reached(ServerPlayer player, StatThreshold threshold) {
+		return get(player).stat(threshold.stat()) >= threshold.points();
+	}
+
+	/**
 	 * Restituisce tutti i punti spesi. Il livello, l'XP e i soul coin non si toccano.
 	 *
 	 * <p>Non c'era modo di tornare indietro da una spesa, ed e' la lacuna che nelle mod RPG i

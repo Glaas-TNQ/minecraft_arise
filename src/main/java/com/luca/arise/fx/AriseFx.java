@@ -288,6 +288,24 @@ public final class AriseFx {
 				config().scaled(10), 0.3, 0.1, 0.3, 0.02);
 	}
 
+	/**
+	 * L'ultima difesa e' intervenuta: un lampo dorato attorno a chi doveva morire.
+	 *
+	 * <p>Dorato e non rosso, e non e' una scelta di gusto: il rosso in questa mod significa
+	 * "qualcosa sta per farti male" (l'ordine in corso sull'HUD, l'anello del cedimento). Un colpo
+	 * a cui sei sopravvissuto e' l'opposto, e deve dirlo con l'altro colore.
+	 */
+	public static void lastStand(net.minecraft.world.level.Level world, Vec3 position) {
+		if (!(world instanceof ServerLevel level)) {
+			return;
+		}
+
+		FxConfig fx = config();
+		ring(level, position.add(0.0, 1.0, 0.0), 1.6, fx.scaled(30), dust(0xFFD54F, 1.4F), -0.4);
+		column(level, position, 2.4, fx.scaled(20), dust(0xFFD54F, 1.1F));
+		play(level, position, ModSounds.SYSTEM_LEVEL_UP, 0.9F, 1.4F);
+	}
+
 	/** Il boss entra in scena: si sente da tutta la stanza. */
 	public static void gateBoss(ServerLevel level, Vec3 position, Rank rank) {
 		FxConfig fx = config();

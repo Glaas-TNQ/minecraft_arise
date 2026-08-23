@@ -183,6 +183,7 @@ for key, (args, origin) in sorted(used_literal.items()):
 DYNAMIC = [
     ("arise.rank.", "progress/Rank.java", [""]),
     ("arise.stat.", "progress/Stat.java", ["", ".effect", ".desc"]),
+    ("arise.threshold.", "progress/StatThreshold.java", ["", ".desc"]),
     ("arise.quest.", "quest/Quest.java", ["", ".goal", ".lore", ".brief"]),
     ("arise.unlock.", "quest/Unlock.java", ["", ".hint"]),
     ("arise.herald.", "tutorial/HeraldPage.java", [""]),

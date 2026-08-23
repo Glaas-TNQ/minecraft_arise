@@ -7,6 +7,7 @@ import com.luca.arise.config.AbilityConfig;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.progress.StatThreshold;
 import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.quest.Unlock;
@@ -91,7 +92,7 @@ public final class AbilityManager {
 		// senza ombre da scambiare non deve costare trenta secondi di attesa.
 		if (result != null) {
 			player.setAttached(ModAttachments.COOLDOWNS,
-					cooldowns.with(ability, now + config.cooldownTicks(ability)));
+					cooldowns.with(ability, now + cooldownFor(player, ability, config)));
 			QuestManager.advance(player, Objective.USE_ABILITY);
 			return result;
 		}
@@ -112,6 +113,24 @@ public final class AbilityManager {
 	 * <p>Avanza mezzo blocco alla volta verificando che l'ingombro del giocatore ci stia: passare
 	 * attraverso le pareti sarebbe comodo dentro un Gate e rovinerebbe ogni dungeon.
 	 */
+	/**
+	 * Quanto dura la ricarica di quest'abilita' per questo Cacciatore.
+	 *
+	 * <p>La terza soglia di Agilita' dimezza quella del Passo d'ombra, e solo quella: dimezzarle
+	 * tutte trasformerebbe una statistica di movimento in uno sconto generale, che e' esattamente
+	 * il genere di bonus che non si nota e non fa scegliere niente.
+	 */
+	private static int cooldownFor(ServerPlayer player, Ability ability, AbilityConfig config) {
+		int base = config.cooldownTicks(ability);
+
+		if (ability == Ability.SHADOW_STEP
+				&& ProgressManager.reached(player, StatThreshold.AGILITY_STEP_HASTE)) {
+			return Math.max(1, base / 2);
+		}
+
+		return base;
+	}
+
 	private static Component shadowStep(ServerPlayer player, AbilityConfig config) {
 		Vec3 direction = player.getLookAngle().multiply(1.0, 0.0, 1.0).normalize();
 		if (direction.lengthSqr() < 1.0E-4) {
@@ -121,7 +140,14 @@ public final class AbilityManager {
 		Vec3 from = player.position();
 		Vec3 best = from;
 
-		for (double distance = 0.5; distance <= config.dashDistance(); distance += 0.5) {
+		// La seconda soglia di Agilita' allunga il balzo di meta'. Il muro lo ferma lo stesso: si
+		// arriva piu' lontano, non si attraversa di piu'.
+		double reach = config.dashDistance()
+				* (1.0 + (ProgressManager.reached(player, StatThreshold.AGILITY_STEP_REACH)
+						? StatThreshold.STEP_REACH_BONUS
+						: 0.0));
+
+		for (double distance = 0.5; distance <= reach; distance += 0.5) {
 			Vec3 candidate = from.add(direction.scale(distance));
 			AABB box = player.getBoundingBox().move(candidate.subtract(from));
 
