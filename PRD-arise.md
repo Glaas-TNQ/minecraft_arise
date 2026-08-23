@@ -738,20 +738,27 @@ Detto esplicitamente, perché uno scope negativo scritto vale più di dieci disc
 | 9 | **B6** — obiettivi del varco | un giorno | ✅ *da verificare in gioco* |
 | 10 | **B7** — il Sovrano a tre fasi | un giorno | ✅ *da verificare in gioco* |
 | 11 | **B14** — il cubo | tre ore | ✅ *da verificare in gioco* |
-| 12 | **B12** — l'esame di rango | un giorno | aperto — Igris arriva intanto dal primo varco di rango C |
+| 12 | **B12** — l'esame di rango | un giorno | ◐ *la cerimonia c'e' (titolo, caselle aperte, messaggio a tutti al rango S); l'esame vero — Esaminatore, arena, ondate — resta aperto. Igris intanto arriva dal primo varco di rango C* |
 | 13 | **B11** — l'Abisso | un giorno | ✅ *da verificare in gioco* |
 | 14 | **B15** — il Registro del Sistema | due giorni | aperto |
 | 15 | **B16** — adottabilità | un giorno | ◐ *tag e ricarica della config fatti; interruttori per sistema e menu radiale aperti* |
 | 16 | **B3** — Quest Giornaliera e Penalità | un giorno | ✅ *da verificare in gioco* |
 | 17 | **B13** — i Monarchi | due giorni | aperto |
+| 18 | **Fuori PRD** — `/arise doctor` | un'ora | ✅ *verificato da console* |
 
-**Tredici su diciassette e mezzo**, in due sessioni. Tutti compilano, passano 94 prove, escono puliti
-dal collaudo statico e fanno partire un server dedicato su un mondo nuovo — e **niente di tutto
-questo e' ancora stato visto girare in gioco**, che secondo la regola 3 del progetto vuol dire che
-niente di tutto questo e' finito.
+**Tredici su diciassette, piu' due meta'**, in due sessioni. Tutti compilano, passano 96 prove,
+escono puliti dal collaudo statico e fanno partire un server dedicato su un mondo nuovo — e **quasi
+niente di tutto questo e' ancora stato visto girare in gioco**, che secondo la regola 3 del progetto
+vuol dire che quasi niente di tutto questo e' finito.
 
-Restano **B13** (i Monarchi), **B12** (l'esame di rango), **B15** (il Registro del Sistema), e la
-meta' aperta di **B16** — gli interruttori per sistema e il menu radiale.
+Restano **B13** (i Monarchi), **B15** (il Registro del Sistema), la meta' aperta di **B16** — gli
+interruttori per sistema e il menu radiale — e la meta' aperta di **B12**, che e' l'esame vero.
+
+**Una cosa e' stata aggiunta fuori dal PRD**, ed e' la sola verificata: `/arise doctor`, la scheda
+che si incolla in una segnalazione. Non e' un contenuto di gioco, e infatti non chiude nessuna
+lacuna. E' pero' l'unica riga di codice scritta in queste due sessioni che serva a *questa* sera —
+diciassette blocchi da provare e una sola persona a provarli, e ogni segnalazione che parte da uno
+stato completo e' un'ora risparmiata a entrambi.
 
 La lacuna **L1** — dopo il diciottesimo incarico non c'e' niente — e' **chiusa** due volte:
 l'Abisso e' il traguardo che ne apre un altro, e la Quest Giornaliera e' quello che il Sistema chiede

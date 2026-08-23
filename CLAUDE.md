@@ -243,6 +243,8 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
      `unzip -l ~/.gradle/caches/fabric-loom/26.2/minecraft-common.jar | grep NomeClasse`, e per le
      firme `javap -cp minecraft-common.jar net.minecraft....`. Sono due secondi e tolgono ogni
      dubbio;
+   - **`ResourceKey.location()` non esiste piu'**: e' `identifier()`. Il nome di una dimensione si
+     legge con `level.dimension().identifier()`;
    - **`ChatFormatting` non espone piu' il suo colore**: niente `getColor()`, niente `isFormat()`.
      Un enum che deve anche riempire dei pixel tiene la coppia — la formattazione e un ARGB scritto
      a mano — come fanno `Rank` e `ShadowGrade`;
@@ -443,7 +445,7 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       sul bordo per ciò che sta fuori. Indice dei varchi `GateRegistry` riconciliato; `/arise map`,
       `/arise gate list` — *compilato, da verificare in gioco*
 
-- [ ] **B-PRD** — la prima ondata del `PRD-arise.md`: **tredici blocchi e mezzo su diciassette** contro il
+- [ ] **B-PRD** — la prima ondata del `PRD-arise.md`: **tredici blocchi e due meta' su diciassette** contro il
       silenzio dopo il diciottesimo incarico. **B0** le tre istruzioni che mentivano a chi rimappa,
       **B1** il tetto dell'estrazione reso raggiungibile e `shift+R` che guarda il cadavere senza
       consumarlo, **B10** la Pergamena del Rimpianto (respec), **B4** le sette ombre con un nome
@@ -451,13 +453,21 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       soglie delle statistiche, **B8** i sei affissi dei nemici, **B5** il Gate Rosso, **B6** i tre
       obiettivi del varco, **B7** il Sovrano a tre fasi, **B14** il Cubo dell'Abisso, **B11**
       l'Abisso a profondita' infinita, **B3** la Quest Giornaliera con la Zona di Penalita', piu'
-      **dodici advancement** con i toast, i **tag** e `/arise config reload` — *compilato, 94 prove
-      verdi, collaudo pulito, server verde su mondo nuovo ×7; **niente di tutto questo e' ancora
+      **dodici advancement** con i toast, i **tag**, `/arise config reload` e la meta' cerimoniale
+      di **B12** — il rango che smette di cambiare di nascosto: titolo, suono, elenco delle caselle
+      aperte, e al rango S un messaggio a tutti quelli collegati — *compilato, 96 prove verdi,
+      collaudo pulito, server verde su mondo nuovo ×9; **quasi niente di tutto questo e' ancora
       stato visto girare in gioco***
 
-      Restano fuori: **B13** i Monarchi, **B12** l'esame di rango, **B15** il Registro del Sistema,
-      e la meta' aperta di **B16** (interruttori per sistema, menu radiale). La consegna sta in
-      `docs/blocco-prd-prima-ondata.html`.
+      Restano fuori: **B13** i Monarchi, **B15** il Registro del Sistema, la meta' aperta di **B16**
+      (interruttori per sistema, menu radiale) e l'esame vero di **B12** (Esaminatore, arena,
+      ondate). La consegna sta in `docs/blocco-prd-prima-ondata.html`.
+
+- [x] **`/arise doctor`** — la scheda del Cacciatore in undici righe: versione, livello e rango,
+      dimensione e coordinate, punto della catena, sblocchi concessi e chiusi, esercito ed evocate,
+      giornaliera, varchi in piedi, percorso di `arise.json`, piu' tre righe che distinguono uno
+      stato lecito da un difetto. Senza `requires`: non cambia niente, e su un server chi ha un
+      problema di solito non e' chi ha i permessi — **verificato** da console su mondo nuovo
 
 Aggiorna questa lista quando una fase è **verificata in gioco**, non quando compila.
 

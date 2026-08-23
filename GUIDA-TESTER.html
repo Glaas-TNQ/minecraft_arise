@@ -387,6 +387,10 @@ guardi una cosa sola, guarda queste.</p>
     <li><b><code>/arise config reload</code></b> — taratura dei numeri senza riavviare.</li>
     <li><b>La Pergamena del Rimpianto</b> — il respec. → <a href="#roba">roba</a></li>
     <li><b>Shift + <kbd>R</kbd></b> — guarda il cadavere prima di bruciarlo. → <a href="#esercito">l'esercito</a></li>
+    <li><b>Il rango non cambia più di nascosto</b> — titolo, suono, e l'elenco di cosa ti si è
+    aperto. Al rango S lo sanno tutti quelli collegati. → <a href="#rango">qui sotto</a></li>
+    <li><b><code>/arise doctor</code></b> — la scheda da incollare in una segnalazione.
+    → <a href="#segnalare">in fondo</a></li>
     <li><b>Tre istruzioni che mentivano</b> a chi rimappa i tasti — corrette.</li>
   </ol>
 </div>
@@ -470,6 +474,28 @@ mob affissi nella stessa stanza. Il nome sopra la testa lo dice, e ognuno ha una
 </div>
 <p style="color: var(--muted); font-size: 14.5px;">Per provarli:
 <code>/arise gate affix &lt;nome&gt;</code> li mette addosso al mob più vicino.</p>
+
+<h3 id="rango">Il rango, che ora si fa sentire</h3>
+
+<p>Il rango di Cacciatore — <b>E, D, C, B, A, S</b> — si è sempre ricavato dal livello. Il problema
+era che <em>non lo diceva nessuno</em>: al livello venti diventavi di rango C e non succedeva niente.
+Nessun messaggio, tre caselle di equipaggiamento che si aprivano in silenzio, e varchi più duri che
+comparivano attorno senza spiegazione.</p>
+
+<p>Adesso la promozione ha la sua scena: un titolo a schermo, un suono, tre anelli nel colore del
+rango, e <b>l'elenco di cosa ti si è aperto</b> — perché una ricompensa che va scoperta per caso non
+è una ricompensa. Il <b>rango S</b> ha una scena in più: un messaggio a <em>tutti</em> quelli
+collegati. Se giochi da solo lo vedrai comunque, ma è pensato per un server.</p>
+
+<div class="panel">
+  <p class="callout-title">Come provarlo senza macinare venti livelli</p>
+  <p><code>/arise level 20</code>. Anche il comando di debug annuncia — è l'unico modo di vedere la
+  scena in due secondi. <code>/arise level 1</code> invece <em>non</em> deve annunciare niente:
+  una retrocessione da debug con la fanfara sarebbe una bugia.</p>
+</div>
+
+<p style="color: var(--muted); font-size: 14.5px;">La metà che manca è l'esame vero — un Esaminatore
+all'Associazione, l'arena, le ondate. Quella è per la prossima volta: oggi il livello basta ancora.</p>
 
 <h3 id="giornaliera">La Quest Giornaliera</h3>
 <p>Ogni alba il Sistema chiede quattro cose. Sono i cento flessioni, cento addominali, cento squat e
@@ -1242,6 +1268,7 @@ attivi.</p>
 /arise daily                      i quattro contatori della giornata
 /arise daily penalty              ti manda subito nella Zona di Penalità
 /arise config reload              rilegge arise.json senza riavviare
+/arise doctor                     la scheda: tutto il tuo stato in undici righe
 /arise fx &lt;effetto&gt;               riproduce uno dei 15 effetti
 /arise spawn &lt;tipo&gt; [1-64]        evoca entità in cerchio</code></pre>
 
@@ -1288,15 +1315,27 @@ che ti serviamo.</p>
   <li><b>La penalità</b>: <code>/arise daily penalty</code>, poi fatti uccidere apposta. Devi
   ripartire dal centro a metà vita, e il cronometro deve ricominciare da capo — <em>non</em> devi
   morire, né perdere niente.</li>
+  <li><b>Il rango</b>: <code>/arise level 20</code>. Devi vedere il titolo, sentire il suono, e
+  leggere in chat quali caselle si sono aperte. Poi <code>/arise level 1</code>: <em>non</em> deve
+  dire niente. Poi <code>/arise level 60</code> per il rango S — quel messaggio va a tutti.</li>
   <li><b>L'Abisso</b>: <code>/arise abyss</code>, chiudi il primo gradino, riprova. Deve dirti che il
   secondo ti è aperto, e <em>non</em> deve lasciarti saltare al quinto. Poi <code>/arise abyss 5</code>
   quando ci arrivi: da lì ogni stanza ha un mob con un affisso.</li>
 </ul>
 
 <div class="panel gold">
-  <p class="callout-title">Una segnalazione utile</p>
-  <p>Cosa stavi facendo, cosa ti aspettavi, cosa è successo. Poi: <b>versione del mondo</b>
-  (nuovo o vecchio?), <b>singleplayer o server</b>, e se c'è un errore in chat o nel log
+  <p class="callout-title" id="segnalare">Una segnalazione utile</p>
+  <p><b>Prima di tutto: <code>/arise doctor</code></b>, e incolla quello che risponde. Sono undici
+  righe — versione, livello e rango, dove sei, a che punto della catena, quali sistemi ti sono stati
+  concessi e quali no, esercito ed evocate, la giornaliera, i varchi in piedi, e il percorso esatto
+  di <code>arise.json</code>. È tutto quello che serve per capire un difetto senza doverti fare
+  cinque domande. Funziona anche senza permessi: non cambia niente, legge e basta.</p>
+  <p>Le ultime righe a volte fanno una diagnosi invece di riferire un numero — «la catena è finita,
+  quindi il Sistema non ha più niente da dire», «l'esercito è al limite, le estrazioni verranno
+  rifiutate». Sono tre stati leciti che <em>sembrano</em> difetti: se ne leggi uno, quello lì non
+  serve segnalarlo.</p>
+  <p>Poi il resto: cosa stavi facendo, cosa ti aspettavi, cosa è successo. <b>Mondo nuovo o
+  vecchio?</b>, <b>singleplayer o server</b>, e se c'è un errore in chat o nel log
   (<code>run/logs/latest.log</code>) incollane le righe. Uno screenshot vale più di tre paragrafi.</p>
 </div>
 
