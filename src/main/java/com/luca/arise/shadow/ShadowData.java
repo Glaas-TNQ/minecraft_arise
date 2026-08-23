@@ -27,10 +27,25 @@ import net.minecraft.world.entity.EntityType;
  * ritoccare il bilanciamento in config riscala l'intero esercito senza migrazioni.
  */
 public record ShadowData(UUID id, Identifier sourceType, ShadowArchetype archetype, int level, long xp,
-		double baseMaxHealth, double baseAttackDamage, Optional<String> customName, int color) {
+		double baseMaxHealth, double baseAttackDamage, Optional<String> customName, int color,
+		Optional<NamedShadow> named) {
 
 	/** Colore predefinito: il nero-blu della texture, cioè "nessuna tinta". */
 	public static final int DEFAULT_COLOR = 0xFFFFFF;
+
+	/**
+	 * L'ombra qualunque: nove argomenti, come e' sempre stato.
+	 *
+	 * <p>Le ombre nominate sono sette in tutto e nascono da un punto solo — {@link NamedShadow#create()}
+	 * — mentre le altre nascono da un cadavere, da un'anima arruolata o da una prova. Obbligare
+	 * dodici punti di costruzione a scrivere {@code Optional.empty()} per un campo che riguarda
+	 * sette casi su tutti sarebbe rumore, e il rumore si legge male.
+	 */
+	public ShadowData(UUID id, Identifier sourceType, ShadowArchetype archetype, int level, long xp,
+			double baseMaxHealth, double baseAttackDamage, Optional<String> customName, int color) {
+		this(id, sourceType, archetype, level, xp, baseMaxHealth, baseAttackDamage, customName, color,
+				Optional.empty());
+	}
 
 	public static final Codec<ShadowData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			UUIDUtil.CODEC.fieldOf("id").forGetter(ShadowData::id),
@@ -47,7 +62,10 @@ public record ShadowData(UUID id, Identifier sourceType, ShadowArchetype archety
 			Codec.DOUBLE.fieldOf("attack_damage").forGetter(ShadowData::baseAttackDamage),
 			// Opzionali: le ombre estratte prima di questi campi si caricano senza migrazioni.
 			Codec.STRING.optionalFieldOf("custom_name").forGetter(ShadowData::customName),
-			Codec.INT.optionalFieldOf("color", DEFAULT_COLOR).forGetter(ShadowData::color)
+			Codec.INT.optionalFieldOf("color", DEFAULT_COLOR).forGetter(ShadowData::color),
+			// Opzionale come tutti gli altri campi arrivati dopo: un esercito salvato prima che le
+			// ombre nominate esistessero si rilegge intero, e nessuna delle sue ombre e' nominata.
+			NamedShadow.CODEC.optionalFieldOf("named").forGetter(ShadowData::named)
 	).apply(instance, ShadowData::new));
 
 	/**
@@ -57,6 +75,12 @@ public record ShadowData(UUID id, Identifier sourceType, ShadowArchetype archety
 	 * di un'altra mod resta corretta anche se quella mod cambia le sue traduzioni.
 	 */
 	public Component displayName() {
+		// Un'ombra nominata porta il suo nome e nessun altro, anche se il grado consentirebbe di
+		// ribattezzarla: Igris si chiama Igris. E' l'unico posto in cui il nome non e' una scelta.
+		if (named.isPresent()) {
+			return named.get().label();
+		}
+
 		return customName
 				.filter(name -> !name.isBlank())
 				.<Component>map(Component::literal)
@@ -74,24 +98,24 @@ public record ShadowData(UUID id, Identifier sourceType, ShadowArchetype archety
 	public ShadowData withName(String name) {
 		String trimmed = name == null ? "" : name.trim();
 		return new ShadowData(id, sourceType, archetype, level, xp, baseMaxHealth, baseAttackDamage,
-				trimmed.isEmpty() ? Optional.empty() : Optional.of(trimmed), color);
+				trimmed.isEmpty() ? Optional.empty() : Optional.of(trimmed), color, named);
 	}
 
 	public ShadowData withColor(int newColor) {
 		return new ShadowData(id, sourceType, archetype, level, xp, baseMaxHealth, baseAttackDamage,
-				customName, newColor);
+				customName, newColor, named);
 	}
 
 	/** Cambia archetipo. Serve solo ai comandi di prova: in gioco lo decide il cadavere. */
 	public ShadowData withArchetype(ShadowArchetype newArchetype) {
 		return new ShadowData(id, sourceType, newArchetype, level, xp, baseMaxHealth, baseAttackDamage,
-				customName, color);
+				customName, color, named);
 	}
 
 	/** Sale di un livello senza passare dall'esperienza: è quello che si compra coi soul coin. */
 	public ShadowData withLevelUp() {
 		return new ShadowData(id, sourceType, archetype, level + 1, 0L, baseMaxHealth, baseAttackDamage,
-				customName, color);
+				customName, color, named);
 	}
 
 	/**
@@ -186,6 +210,6 @@ public record ShadowData(UUID id, Identifier sourceType, ShadowArchetype archety
 		}
 
 		return new ShadowData(id, sourceType, archetype, newLevel, newXp, baseMaxHealth, baseAttackDamage,
-				customName, color);
+				customName, color, named);
 	}
 }

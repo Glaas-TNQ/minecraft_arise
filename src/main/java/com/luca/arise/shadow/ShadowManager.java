@@ -14,6 +14,7 @@ import java.util.function.UnaryOperator;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.fx.Overlay;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
@@ -311,6 +312,62 @@ public final class ShadowManager {
 		return best;
 	}
 
+	// ---------------------------------------------------------------- le nominate
+
+	/**
+	 * Consegna una delle sette ombre nominate, se il giocatore non ce l'ha gia'.
+	 *
+	 * <p>Non passa dall'estrazione e non tira nessun dado: una nominata o si e' guadagnata o no.
+	 * Non rispetta nemmeno il tetto dell'esercito — arrivano da condizioni che si incontrano una
+	 * volta sola in tutta la partita, e perderne una perche' quel giorno c'erano sei ombre in
+	 * elenco sarebbe la cosa piu' crudele che questa mod possa fare.
+	 *
+	 * <p>Annuncia da sola, e con la regia giusta: un titolo a schermo e una riga che dice cosa
+	 * quell'ombra fa di diverso. Una nominata che arrivasse in silenzio in fondo a un elenco
+	 * sarebbe indistinguibile da un'estrazione fortunata.
+	 *
+	 * @return vero se l'ombra e' entrata adesso, falso se il giocatore l'aveva gia'
+	 */
+	public static boolean grantNamed(ServerPlayer player, NamedShadow which) {
+		ShadowArmy army = army(player);
+
+		if (army.hasNamed(which)) {
+			return false;
+		}
+
+		ShadowData shadow = which.create();
+		setArmy(player, army.with(shadow));
+
+		AriseFx.extractionSuccess(player.level(), player.position(),
+				shadow.rank(AriseConfig.get().shadows()));
+
+		Overlay.title(player, Component.translatable("arise.title.named_joined"), which.label());
+		player.sendSystemMessage(Component.translatable("arise.msg.shadow.named_joined",
+				which.label(), which.description()));
+
+		return true;
+	}
+
+	/** Vero se questa nominata e' gia' nell'esercito del giocatore. */
+	public static boolean hasNamed(ServerPlayer player, NamedShadow which) {
+		return army(player).hasNamed(which);
+	}
+
+	/** Vero se questa nominata e' <em>in campo</em> adesso: e' cio' che conta per Greed e Beru. */
+	public static boolean isNamedSummoned(ServerPlayer player, NamedShadow which) {
+		Map<UUID, UUID> summoned = SUMMONED.get(player.getUUID());
+
+		if (summoned == null || summoned.isEmpty()) {
+			return false;
+		}
+
+		ShadowArmy army = army(player);
+
+		return summoned.keySet().stream()
+				.map(id -> army.find(id).orElse(null))
+				.anyMatch(shadow -> shadow != null && shadow.named().orElse(null) == which);
+	}
+
 	// ---------------------------------------------------------------- evocazione
 
 	public static Component summon(ServerPlayer player) {
@@ -512,7 +569,28 @@ public final class ShadowManager {
 
 		summoned.put(shadow.id(), entity.getUUID());
 		AriseFx.summon(level, entity.position(), shadow.color());
+		speak(player, shadow);
 		return true;
+	}
+
+	/**
+	 * Igris parla, quando e' abbastanza cresciuto. Nient'altro nell'esercito dice mai niente.
+	 *
+	 * <p>Una riga sola, e solo dal grado di Maresciallo in su, che vuol dire dopo molte ore. E'
+	 * una battuta di dialogo e non una meccanica, ed e' esattamente per questo che vale: in una
+	 * mod dove trenta ombre sono numeri in un elenco, una che a un certo punto risponde smette di
+	 * essere un numero.
+	 */
+	private static void speak(ServerPlayer player, ShadowData shadow) {
+		NamedShadow named = shadow.named().orElse(null);
+
+		if (named != NamedShadow.IGRIS
+				|| shadow.grade(AriseConfig.get().shadows()).ordinal() < ShadowGrade.MARSHAL.ordinal()) {
+			return;
+		}
+
+		player.sendSystemMessage(Component.translatable("arise.msg.shadow.named_speaks",
+				named.label(), named.line()));
 	}
 
 	private static void despawn(ServerPlayer player, UUID entityId) {
@@ -884,16 +962,31 @@ public final class ShadowManager {
 	 * pacchetto di sincronia a meta' di un'operazione che non e' ancora finita.
 	 */
 	public static Aura auraFor(ServerPlayer owner, UUID exclude) {
-		Map<UUID, UUID> summoned = SUMMONED.get(owner.getUUID());
-
-		if (summoned == null || summoned.isEmpty()) {
-			return Aura.NONE;
-		}
-
 		ShadowConfig config = AriseConfig.get().shadows();
 		ShadowArmy army = army(owner);
 		double damage = 0.0;
 		double health = 0.0;
+
+		// Bellion comanda da casa. E' l'unica eccezione alla regola "conta solo chi e' in campo", ed
+		// e' anche l'unica cosa in tutta la mod che dia un senso alle ventisei ombre che restano
+		// nell'esercito senza uscire mai: il Gran Maresciallo le tiene tutte, non le quattro che
+		// hanno un posto. Per questo si eredita alla fine e non cade da nessun boss.
+		ShadowData bellion = army.shadows().stream()
+				.filter(shadow -> shadow.named().orElse(null) == NamedShadow.BELLION)
+				.filter(shadow -> !shadow.id().equals(exclude))
+				.findFirst()
+				.orElse(null);
+
+		if (bellion != null) {
+			damage += bellion.auraDamage(config);
+			health += bellion.auraHealth(config);
+		}
+
+		Map<UUID, UUID> summoned = SUMMONED.get(owner.getUUID());
+
+		if (summoned == null || summoned.isEmpty()) {
+			return damage == 0.0 && health == 0.0 ? Aura.NONE : new Aura(damage, health);
+		}
 
 		for (UUID shadowId : summoned.keySet()) {
 			if (shadowId.equals(exclude)) {
@@ -901,7 +994,11 @@ public final class ShadowManager {
 			}
 
 			ShadowData other = army.find(shadowId).orElse(null);
-			if (other == null) {
+
+			// Bellion e' gia' stato contato sopra: se e' anche in campo, la sua aura non vale due
+			// volte. E' il genere di doppio conteggio che non da' nessun errore e che si nota solo
+			// come "le ombre sono piu' forti di quanto dice la schermata".
+			if (other == null || other.named().orElse(null) == NamedShadow.BELLION) {
 				continue;
 			}
 
@@ -1039,6 +1136,13 @@ public final class ShadowManager {
 
 		if (current.isEmpty()) {
 			return Component.translatable("arise.msg.shadow.unknown");
+		}
+
+		// Igris si chiama Igris. Le sette nominate sono l'unico posto della mod in cui il nome non
+		// e' una scelta del giocatore, ed e' proprio quello a renderle personaggi invece che pedine.
+		if (current.get().named().isPresent()) {
+			return Component.translatable("arise.msg.shadow.named_keeps_name",
+					current.get().displayName());
 		}
 
 		ShadowGrade grade = current.get().grade(config);

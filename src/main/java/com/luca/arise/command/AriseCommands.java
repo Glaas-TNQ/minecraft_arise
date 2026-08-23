@@ -40,6 +40,7 @@ import com.luca.arise.shop.ShopOffer;
 import com.luca.arise.shop.ShopStock;
 import com.luca.arise.shadow.ShadowData;
 import com.luca.arise.registry.ModAttachments;
+import com.luca.arise.shadow.NamedShadow;
 import com.luca.arise.shadow.ShadowManager;
 import com.luca.arise.shadow.ShadowSquad;
 import com.luca.arise.shadow.ShadowStance;
@@ -326,7 +327,7 @@ public final class AriseCommands {
 			root.then(Commands.literal("leave")
 					.executes(context -> playerAction(context.getSource(), GateManager::leave)));
 
-			root.then(Commands.literal("shadows")
+			LiteralArgumentBuilder<CommandSourceStack> shadows = Commands.literal("shadows")
 					.executes(context -> listShadows(context.getSource()))
 					.then(Commands.literal("clear")
 							.requires(AriseCommands::canCheat)
@@ -340,7 +341,20 @@ public final class AriseCommands {
 									.executes(context -> clearSquad(context.getSource()))))
 					.then(Commands.literal("orders")
 							.then(Commands.literal("clear")
-									.executes(context -> clearOrders(context.getSource())))));
+									.executes(context -> clearOrders(context.getSource()))));
+
+			// Le sette nominate a comando. Beru si prende dal Sovrano di un varco Sculk di rango S:
+			// senza questo, provarla vorrebbe dire arrivare al livello ottanta prima.
+			LiteralArgumentBuilder<CommandSourceStack> named = Commands.literal("named")
+					.requires(AriseCommands::canCheat);
+
+			for (NamedShadow which : NamedShadow.values()) {
+				named.then(Commands.literal(which.getSerializedName())
+						.executes(context -> grantNamed(context.getSource(), which)));
+			}
+
+			shadows.then(named);
+			root.then(shadows);
 
 			DebugCommands.addTo(root, registryAccess);
 
@@ -410,6 +424,19 @@ public final class AriseCommands {
 		ServerPlayer player = source.getPlayerOrException();
 		ProgressManager.reset(player);
 		source.sendSuccess(() -> Component.translatable("arise.msg.reset"), true);
+		return 1;
+	}
+
+	private static int grantNamed(CommandSourceStack source, NamedShadow which)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+
+		if (!ShadowManager.grantNamed(player, which)) {
+			source.sendFailure(Component.translatable("arise.msg.shadow.named_keeps_name",
+					which.label()));
+			return 0;
+		}
+
 		return 1;
 	}
 

@@ -81,6 +81,16 @@ public class ShadowEntity extends TamableAnimal {
 
 	private UUID shadowId;
 
+	/**
+	 * Quale delle sette ombre nominate e' questa, o {@code null} se e' una qualunque.
+	 *
+	 * <p>Un campo e non un dato sincronizzato: le tre cose che il nome cambia — quanto lontano
+	 * provoca Iron, da dove tira Tusk, chi cura Beru — succedono tutte sul server, e il client non
+	 * ha nessun bisogno di saperlo. Quello che il client deve vedere, il nome e il colore, arriva
+	 * gia' dal {@code CustomName} e da {@code DATA_COLOR}.
+	 */
+	private NamedShadow named;
+
 	public ShadowEntity(EntityType<? extends ShadowEntity> type, Level level) {
 		super(type, level);
 	}
@@ -264,6 +274,7 @@ public class ShadowEntity extends TamableAnimal {
 		ShadowManager.Aura aura = ShadowManager.auraFor(owner, data.id());
 
 		this.shadowId = data.id();
+		this.named = data.named().orElse(null);
 		this.setOwner(owner);
 		this.setTame(true, false);
 		this.setArchetype(data.archetype());
@@ -282,7 +293,11 @@ public class ShadowEntity extends TamableAnimal {
 		setAttribute(Attributes.MOVEMENT_SPEED, config.movementSpeed() * tuning.speed());
 		setAttribute(Attributes.FOLLOW_RANGE, config.followRange() * tuning.followRange());
 		setAttribute(Attributes.SCALE, tuning.scale());
-		setAttribute(Attributes.KNOCKBACK_RESISTANCE, tuning.knockbackResistance());
+		// Tank non si sposta: uno pieno, non lo 0,6 del Colosso qualunque. In un gioco dove ogni
+		// colpo spinge indietro, un'ombra che resta dov'e' e' una pedina che si puo' piazzare — ed
+		// e' l'unica cosa che quell'ombra fa di diverso, quindi deve essere assoluta.
+		setAttribute(Attributes.KNOCKBACK_RESISTANCE,
+				named == NamedShadow.TANK ? 1.0 : tuning.knockbackResistance());
 		setColor(data.color());
 
 		if (healToFull) {
@@ -310,6 +325,16 @@ public class ShadowEntity extends TamableAnimal {
 		return shadowId;
 	}
 
+	/** L'ombra nominata che questa entita' rappresenta, o {@code null}. */
+	public NamedShadow named() {
+		return named;
+	}
+
+	/** Vero se questa entita' e' quella delle sette nominate che le si passa. */
+	public boolean is(NamedShadow which) {
+		return named == which;
+	}
+
 	@Override
 	public void tick() {
 		super.tick();
@@ -317,6 +342,13 @@ public class ShadowEntity extends TamableAnimal {
 		if (this.level().isClientSide()) {
 			spawnAura();
 			return;
+		}
+
+		// Beru guarda il Monarca invece del nemico, ed e' l'unica che lo fa. Il suo battito e' piu'
+		// fitto di quello di pulizia qui sotto perche' una cura che arriva ogni due secondi e' una
+		// cura che arriva sempre tardi.
+		if (named == NamedShadow.BERU) {
+			tendTheMonarch();
 		}
 
 		// Le ombre non sopravvivono all'assenza del proprietario: se il giocatore esce, l'entità
@@ -341,6 +373,38 @@ public class ShadowEntity extends TamableAnimal {
 		if (this.tickCount > 40 && !ShadowManager.isSummoned(owner, this.getUUID())) {
 			this.discard();
 		}
+	}
+
+	/**
+	 * Beru cura il Monarca sceso sotto meta' vita: un cuore ogni cinque secondi, non una fontana.
+	 *
+	 * <p>Il Re delle Formiche e' l'unica ombra che guarda chi la comanda invece di chi ha davanti,
+	 * e in una mod senza classi di supporto e' la classe di supporto. La soglia a meta' vita non e'
+	 * decorativa: sopra, il giocatore non deve nemmeno accorgersi che Beru c'e'; sotto, deve
+	 * accorgersene subito.
+	 *
+	 * <p>Non cura se stessa e non cura le altre ombre: quelle cadono e si riprendono in un minuto,
+	 * che e' gia' la loro rete. Curare tutti farebbe di Beru il motivo per non giocare bene.
+	 */
+	private void tendTheMonarch() {
+		if (this.tickCount % NamedShadow.BERU_INTERVAL != 0
+				|| !(this.getOwner() instanceof ServerPlayer owner)) {
+			return;
+		}
+
+		if (owner.getHealth() >= owner.getMaxHealth() * NamedShadow.BERU_THRESHOLD
+				|| owner.getHealth() <= 0.0F) {
+			return;
+		}
+
+		// La cura arriva solo se Beru puo' vedere chi cura: da mezzo mondo di distanza sarebbe una
+		// rigenerazione passiva travestita da ombra.
+		if (this.distanceToSqr(owner) > NamedShadow.BERU_REACH * NamedShadow.BERU_REACH) {
+			return;
+		}
+
+		owner.heal(NamedShadow.BERU_HEAL);
+		AriseFx.namedBoon(this.level(), owner.position(), this.getColor());
 	}
 
 	/**
@@ -417,6 +481,12 @@ public class ShadowEntity extends TamableAnimal {
 		}
 
 		output.store("Archetype", ShadowArchetype.CODEC, archetype());
+
+		// Il nome si risalva perche' un chunk ricaricato non rifa' applyData: senza, Iron tornerebbe
+		// a provocare a dodici blocchi finche' qualcuno non lo richiama e lo rievoca.
+		if (named != null) {
+			output.store("Named", NamedShadow.CODEC, named);
+		}
 	}
 
 	@Override
@@ -424,6 +494,7 @@ public class ShadowEntity extends TamableAnimal {
 		super.readAdditionalSaveData(input);
 		this.shadowId = input.read("ShadowId", UUIDUtil.CODEC).orElse(null);
 		setArchetype(input.read("Archetype", ShadowArchetype.CODEC).orElse(ShadowArchetype.GUARD));
+		this.named = input.read("Named", NamedShadow.CODEC).orElse(null);
 	}
 
 	@Override

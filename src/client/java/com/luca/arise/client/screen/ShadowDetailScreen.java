@@ -249,9 +249,19 @@ public class ShadowDetailScreen extends AriseScreen {
 
 		int after = chip(graphics, shadow.archetype().label(), left, top + 54,
 				shadow.archetype().color());
-		chip(graphics, grade.label(), after + 4, top + 54, grade.color());
+		int afterGrade = chip(graphics, grade.label(), after + 4, top + 54, grade.color());
 
-		graphics.text(font, shadow.archetype().description(), left, top + 70, COLOR_DIM);
+		// Una nominata porta anche il suo chip, e la riga sotto dice cosa fa <em>lei</em> invece di
+		// cosa fa il suo archetipo. E' l'unico posto in cui il giocatore puo' leggere perche' Iron
+		// vale un posto in squadra anche quando ci sono ombre piu' forti.
+		if (shadow.named().isPresent()) {
+			chip(graphics, shadow.named().get().label(), afterGrade + 4, top + 54,
+					shadow.named().get().color());
+		}
+
+		graphics.text(font, shadow.named().map(named -> (Component) named.description())
+						.orElseGet(() -> shadow.archetype().description()),
+				left, top + 70, COLOR_DIM);
 		graphics.text(font, grade.commands()
 						? Component.translatable("arise.screen.detail.grade_commands",
 								String.format("%.0f", shadow.auraDamage(config) * 100.0))

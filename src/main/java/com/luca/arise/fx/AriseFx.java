@@ -65,6 +65,22 @@ public final class AriseFx {
 		play(level, corpse, ModSounds.ABILITY_CAST, 0.5F, 0.6F);
 	}
 
+	/**
+	 * Il dono di un'ombra nominata: un anello sottile del suo colore, e niente altro.
+	 *
+	 * <p>Deliberatamente piccolo. Beru cura ogni cinque secondi finche' il Monarca sta male, e un
+	 * effetto grosso ripetuto dodici volte in un minuto smetterebbe di dire "sta succedendo
+	 * qualcosa di buono" e comincerebbe a dire "non riesco a vedere il nemico".
+	 */
+	public static void namedBoon(net.minecraft.world.level.Level world, Vec3 position, int color) {
+		if (!(world instanceof ServerLevel level)) {
+			return;
+		}
+
+		ring(level, position.add(0.0, 0.2, 0.0), 0.7, config().scaled(10), dust(color, 0.8F), 0.05);
+		play(level, position, ModSounds.SOUL_ENLIST, 0.4F, 1.6F);
+	}
+
 	/** L'estrazione fallisce: fumo che si spegne, nessun trionfo. */
 	public static void extractionFailed(ServerLevel level, Vec3 corpse) {
 		level.sendParticles(ParticleTypes.SMOKE, corpse.x(), corpse.y() + 0.5, corpse.z(),

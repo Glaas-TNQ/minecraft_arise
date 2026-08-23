@@ -93,7 +93,12 @@ public final class ShadowGoals {
 				return;
 			}
 
-			double radius = behaviour.tauntRadius();
+			// Iron provoca al doppio: dodici blocchi diventano ventiquattro, ed e' la differenza
+			// fra tenere una stanza e tenere una sala. E' anche l'unica risposta seria al difetto
+			// classico delle build a evocazioni — i nemici che ignorano i minion e corrono in
+			// faccia a chi li comanda.
+			double radius = behaviour.tauntRadius()
+					* (shadow.is(NamedShadow.IRON) ? NamedShadow.IRON_TAUNT_FACTOR : 1.0);
 			List<Mob> stolen = level.getEntitiesOfClass(Mob.class,
 					shadow.getBoundingBox().inflate(radius),
 					mob -> mob != shadow && mob.getTarget() == owner && mob.canAttack(shadow));
@@ -132,6 +137,21 @@ public final class ShadowGoals {
 			setFlags(EnumSet.of(Goal.Flag.LOOK));
 		}
 
+		/**
+		 * Da quanto lontano tira questo Mago.
+		 *
+		 * <p>Ventiquattro per Tusk invece di sedici. Otto blocchi non sembrano molti finche' non si
+		 * nota che sono la differenza fra colpire dall'ingresso di una sala e doverci entrare.
+		 *
+		 * <p>Un metodo e non un valore letto due volte: la portata serve sia a decidere se
+		 * ingaggiare sia a decidere se il colpo arriva, e se i due numeri divergessero il Mago
+		 * prenderebbe la mira su qualcosa che non puo' colpire — e resterebbe fermo, perche' questo
+		 * goal occupa lo sguardo.
+		 */
+		private double lanceRange(ShadowConfig.Behaviour behaviour) {
+			return shadow.is(NamedShadow.TUSK) ? NamedShadow.TUSK_LANCE_RANGE : behaviour.lanceRange();
+		}
+
 		@Override
 		public boolean canUse() {
 			if (shadow.archetype() != ShadowArchetype.MAGE) {
@@ -144,8 +164,10 @@ public final class ShadowGoals {
 			// La linea di vista sta qui e non solo nel colpo, ed e' importante: questo goal occupa
 			// lo sguardo, e finche' occupa lo sguardo la mischia non puo' partire. Un Mago che
 			// "prende la mira" su un bersaglio dietro a un muro resterebbe fermo per sempre.
+			double range = lanceRange(behaviour);
+
 			return target != null && target.isAlive()
-					&& shadow.distanceToSqr(target) <= behaviour.lanceRange() * behaviour.lanceRange()
+					&& shadow.distanceToSqr(target) <= range * range
 					&& shadow.getSensing().hasLineOfSight(target);
 		}
 

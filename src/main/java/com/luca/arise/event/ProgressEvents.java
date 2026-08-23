@@ -14,6 +14,7 @@ import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.quest.Unlock;
 import com.luca.arise.shadow.ShadowEntity;
+import com.luca.arise.shadow.NamedShadow;
 import com.luca.arise.shadow.ShadowManager;
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
@@ -78,8 +79,15 @@ public final class ProgressEvents {
 				// i soul coin. Il tetto lo ha gia' applicato GemManager, qui si legge e basta.
 				long xp = Math.round(ProgressManager.xpFor(victim)
 						* (1.0 + GemManager.effect(player, GemType.AMETHYST)));
+				// Greed e' l'unica ombra che paga invece di combattere, e per farlo deve essere
+				// in campo: chi la tiene in squadra sta rinunciando a un posto di potenza per una
+				// scelta economica, ed e' esattamente la decisione che deve costare qualcosa.
+				double greed = ShadowManager.isNamedSummoned(player, NamedShadow.GREED)
+						? NamedShadow.GREED_SOUL_FACTOR
+						: 1.0;
+
 				long souls = Math.round(AriseConfig.get().soulsFor(victim.getMaxHealth())
-						* (1.0 + GemManager.effect(player, GemType.SAPPHIRE)));
+						* (1.0 + GemManager.effect(player, GemType.SAPPHIRE)) * greed);
 
 				ProgressManager.addXp(player, xp);
 				ProgressManager.addSouls(player, souls);

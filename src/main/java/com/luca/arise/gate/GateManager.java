@@ -13,6 +13,8 @@ import com.luca.arise.fx.AriseFx;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
+import com.luca.arise.shadow.NamedShadow;
+import com.luca.arise.shadow.ShadowManager;
 import com.luca.arise.quest.Unlock;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModAttachments;
@@ -320,7 +322,39 @@ public final class GateManager {
 		// a sapere se lo zaino era pieno.
 		GateLoot.award(player, instance.rank()).forEach(player::sendSystemMessage);
 
+		awardNamedShadow(player, instance);
+
 		openExit(player, instance);
+	}
+
+	/**
+	 * Se questo varco era <em>quel</em> varco, il Sovrano lascia una delle ombre nominate.
+	 *
+	 * <p>Cinque delle sette si prendono qui, e ognuna ha una condizione che il gioco non produce
+	 * per caso: un tema preciso e un rango minimo. Non e' bottino — non c'e' nessun tiro di dado —
+	 * ed e' voluto: un'ombra che il giocatore puo' <em>andare a cercare</em> vale piu' di una che
+	 * gli capita. Chi vuole Beru sa cosa deve fare, e sa che gli serviranno mesi.
+	 *
+	 * <p>Le altre due non passano da qui. Igris arriva dall'esame di rango, Bellion si eredita alla
+	 * fine della catena: sono le due che segnano un passaggio invece di premiare una battaglia.
+	 */
+	private static void awardNamedShadow(ServerPlayer player, Instance instance) {
+		GateTheme theme = instance.offer().theme();
+		Rank rank = instance.rank();
+
+		NamedShadow prize = switch (theme) {
+			case FROST -> rank.ordinal() >= Rank.B.ordinal() ? NamedShadow.TANK : null;
+			case RUIN -> rank.ordinal() >= Rank.B.ordinal() ? NamedShadow.TUSK : null;
+			case ASH -> rank.ordinal() >= Rank.A.ordinal() ? NamedShadow.GREED : null;
+			case SCULK -> rank == Rank.S ? NamedShadow.BERU : null;
+			// Iron esce solo da un varco sigillato, e i varchi sigillati non esistono ancora: il
+			// caso c'e' perche' la tabella sia completa, non perche' oggi produca qualcosa.
+			case VOID, DEPTHS -> null;
+		};
+
+		if (prize != null) {
+			ShadowManager.grantNamed(player, prize);
+		}
 	}
 
 	/**

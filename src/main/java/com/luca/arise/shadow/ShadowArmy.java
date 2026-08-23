@@ -34,6 +34,18 @@ public record ShadowArmy(List<ShadowData> shadows) {
 		return shadows.isEmpty();
 	}
 
+	/**
+	 * Vero se questa nominata e' gia' nell'esercito.
+	 *
+	 * <p>Le sette si ottengono <strong>una volta sola</strong>, e questo e' il posto dove si
+	 * controlla. Non e' una rifinitura: due Bellion sommerebbero due volte l'aura che vale per tutto
+	 * l'esercito, e la condizione che li concede — la caduta del Sovrano di un varco con quel tema e
+	 * quel rango — e' ripetibile quante volte si vuole.
+	 */
+	public boolean hasNamed(NamedShadow which) {
+		return shadows.stream().anyMatch(shadow -> shadow.named().orElse(null) == which);
+	}
+
 	public Optional<ShadowData> find(UUID id) {
 		return shadows.stream().filter(shadow -> shadow.id().equals(id)).findFirst();
 	}

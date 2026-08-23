@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import com.google.gson.JsonElement;
 import com.luca.arise.config.ShadowConfig;
+import com.luca.arise.shadow.NamedShadow;
 import com.luca.arise.shadow.ShadowArchetype;
 import com.luca.arise.shadow.ShadowArmy;
 import com.luca.arise.shadow.ShadowData;
@@ -278,5 +279,81 @@ class ShadowLegionTest {
 
 		assertFalse(ShadowConfig.Behaviour.DEFAULT.casterSet().isEmpty(),
 				"senza lanciatori in elenco non nascerebbe mai un Mago");
+	}
+
+	// ---------------------------------------------------------------- le nominate
+
+	@Test
+	@DisplayName("ogni ombra nominata nasce coerente con se stessa")
+	void namedShadowsAreWellFormed() {
+		for (NamedShadow which : NamedShadow.values()) {
+			ShadowData shadow = which.create();
+
+			assertEquals(which, shadow.named().orElse(null),
+					which + " deve sapere di essere se stessa");
+			assertEquals(which.archetype(), shadow.archetype(),
+					which + " deve nascere con l'archetipo dichiarato");
+			assertEquals(which.color(), shadow.color());
+			assertTrue(shadow.level() > 1,
+					which + " non e' un'ombra qualunque: non puo' nascere al livello uno");
+			assertTrue(shadow.baseMaxHealth() > 0.0 && shadow.baseAttackDamage() > 0.0);
+
+			// Il nome e' fisso e non passa da customName: chi lo cercasse li' lo troverebbe vuoto e
+			// concluderebbe, sbagliando, che l'ombra non ha nome.
+			assertTrue(shadow.customName().isEmpty(),
+					which + " porta il nome dell'enum, non un nome scritto addosso");
+		}
+	}
+
+	@Test
+	@DisplayName("due nominate diverse non si confondono, e la stessa non entra due volte")
+	void namedShadowsAreUnique() {
+		ShadowArmy army = ShadowArmy.EMPTY
+				.with(NamedShadow.IGRIS.create())
+				.with(NamedShadow.BERU.create());
+
+		assertTrue(army.hasNamed(NamedShadow.IGRIS));
+		assertTrue(army.hasNamed(NamedShadow.BERU));
+		assertFalse(army.hasNamed(NamedShadow.BELLION),
+				"un esercito non deve credere di avere un'ombra che non ha");
+
+		// E' il controllo che impedisce a un varco Sculk di rango S rifatto dieci volte di produrre
+		// dieci Beru. La condizione che le concede e' ripetibile; l'ombra no.
+		assertTrue(ShadowArmy.EMPTY.with(NamedShadow.IGRIS.create()).hasNamed(NamedShadow.IGRIS));
+	}
+
+	@Test
+	@DisplayName("una nominata sopravvive al salvataggio, e una qualunque resta senza nome")
+	void namedSurvivesDisk() {
+		ShadowData igris = NamedShadow.IGRIS.create();
+		ShadowData plain = new ShadowData(UUID.randomUUID(),
+				Identifier.withDefaultNamespace("zombie"), ShadowArchetype.GUARD, 3, 0L,
+				30.0, 6.0, Optional.empty(), ShadowData.DEFAULT_COLOR);
+
+		roundTrip(ShadowData.CODEC, igris, "Igris");
+		roundTrip(ShadowData.CODEC, plain, "un'ombra qualunque");
+
+		// L'asimmetria e' il punto: il campo e' opzionale, quindi un esercito salvato prima che le
+		// nominate esistessero si rilegge intero e nessuna delle sue ombre e' nominata.
+		assertTrue(plain.named().isEmpty(),
+				"un'ombra estratta da un cadavere non deve risultare nominata");
+	}
+
+	@Test
+	@DisplayName("il grado e il livello di una nominata restano quelli di un'ombra normale")
+	void namedShadowsPlayByTheSameRules() {
+		ShadowConfig config = ShadowConfig.DEFAULT;
+		ShadowData beru = NamedShadow.BERU.create();
+
+		// La regola che tiene in piedi tutto il blocco: una nominata e' unica in cio' che fa, non
+		// migliore nei numeri. Se un giorno saltasse le regole del grado, sarebbe solo la piu'
+		// forte — e la collezione tornerebbe a essere una lista ordinata per potenza.
+		assertEquals(beru.grade(config), ShadowGrade.fromPower(beru.effectivePower(config),
+				config.legion().gradeThresholds()));
+
+		ShadowData levelled = beru.withLevelUp();
+		assertEquals(beru.level() + 1, levelled.level());
+		assertEquals(NamedShadow.BERU, levelled.named().orElse(null),
+				"salire di livello non deve far perdere il nome");
 	}
 }
