@@ -8,6 +8,8 @@ import com.luca.arise.city.CityManager;
 import com.luca.arise.event.CityEvents;
 import com.luca.arise.config.GearConfig;
 import com.luca.arise.gate.AbyssCompassItem;
+import com.luca.arise.gate.GateBreach;
+import com.luca.arise.gate.GateEntity;
 import com.luca.arise.gate.GateManager;
 import com.luca.arise.gate.GateRecord;
 import com.luca.arise.gate.GateRegistry;
@@ -56,6 +58,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 
 /**
  * Comandi di debug e di gioco.
@@ -158,6 +161,11 @@ public final class AriseCommands {
 			// dalla console, senza un client davanti.
 			gate.then(Commands.literal("list")
 					.executes(context -> listGates(context.getSource())));
+			// Un varco su tre cede alla scadenza, e la scadenza e' a cinque minuti: senza questo,
+			// provare il Dungeon Break vorrebbe dire restare fermi in un prato sperando nel dado.
+			gate.then(Commands.literal("breach")
+					.requires(AriseCommands::canCheat)
+					.executes(context -> breachNearest(context.getSource())));
 			root.then(gate);
 
 			// Legge la stessa cosa dell'oggetto in mano, senza doverlo craftare per verificarla.
@@ -424,6 +432,29 @@ public final class AriseCommands {
 		ServerPlayer player = source.getPlayerOrException();
 		ProgressManager.reset(player);
 		source.sendSuccess(() -> Component.translatable("arise.msg.reset"), true);
+		return 1;
+	}
+
+	/** Fa cedere subito il varco piu' vicino, senza aspettare che scada. */
+	private static int breachNearest(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		ServerLevel level = player.level();
+
+		GateEntity nearest = level.getEntitiesOfClass(GateEntity.class,
+						player.getBoundingBox().inflate(GateBreach.COMMAND_REACH),
+						gate -> gate.offer() != null).stream()
+				.min(java.util.Comparator.comparingDouble(gate ->
+						gate.position().distanceToSqr(player.position())))
+				.orElse(null);
+
+		if (nearest == null) {
+			source.sendFailure(Component.translatable("arise.msg.gate.varco_gone"));
+			return 0;
+		}
+
+		GateBreach.breach(level, nearest.position(), nearest.offer());
+		nearest.discard();
 		return 1;
 	}
 

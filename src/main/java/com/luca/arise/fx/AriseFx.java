@@ -254,6 +254,40 @@ public final class AriseFx {
 		play(level, position, ModSounds.SHADOW_RECALL, 0.6F, 0.6F);
 	}
 
+	/**
+	 * Il varco comincia a cedere: l'anello si allarga invece di stringersi.
+	 *
+	 * <p>La direzione e' l'informazione. Ogni altro anello della mod converge verso il centro —
+	 * un'evocazione, un'estrazione, una chiusura sono tutte cose che <em>raccolgono</em>. Questo si
+	 * apre, ed e' l'unico: significa che sta per uscire qualcosa.
+	 */
+	public static void gateBreaching(ServerLevel level, Vec3 position, int color) {
+		FxConfig fx = config();
+		ring(level, position.add(0.0, 0.4, 0.0), 1.4, fx.scaled(22), dust(0xE86A6A, 1.2F), 0.25);
+		ring(level, position.add(0.0, 1.4, 0.0), 1.0, fx.scaled(16), dust(color, 1.0F), 0.2);
+		play(level, position, ModSounds.GATE_BREACHING, 1.0F, 0.7F);
+	}
+
+	/** Il varco cede: colonna, onda a terra, e il rosso che copre il colore del rango. */
+	public static void gateBreak(ServerLevel level, Vec3 position, int color) {
+		FxConfig fx = config();
+
+		column(level, position, 5.0, fx.scaled(48), dust(0xE86A6A, 1.6F));
+		ring(level, position, 2.0, fx.scaled(32), dust(0xE86A6A, 1.4F), 0.6);
+		ring(level, position.add(0.0, 0.2, 0.0), 4.0, fx.scaled(40), dust(color, 1.1F), 0.8);
+
+		level.sendParticles(ParticleTypes.LARGE_SMOKE, position.x(), position.y() + 1.0, position.z(),
+				fx.scaled(40), 1.2, 1.0, 1.2, 0.05);
+
+		play(level, position, ModSounds.GATE_BREACH, 1.2F, 0.6F);
+	}
+
+	/** Una creatura esce dal varco ceduto: fumo sotto i piedi, niente di piu'. */
+	public static void gateBreachMob(ServerLevel level, Vec3 position) {
+		level.sendParticles(ParticleTypes.SMOKE, position.x(), position.y() + 0.2, position.z(),
+				config().scaled(10), 0.3, 0.1, 0.3, 0.02);
+	}
+
 	/** Il boss entra in scena: si sente da tutta la stanza. */
 	public static void gateBoss(ServerLevel level, Vec3 position, Rank rank) {
 		FxConfig fx = config();

@@ -55,6 +55,16 @@ public class GateEntity extends Entity {
 	/** Tick rimasti prima di svanire. Conta alla rovescia, così si salva e si riprende com'era. */
 	private int remainingTicks;
 
+	/**
+	 * Se questo varco, alla scadenza, cedera' invece di richiudersi.
+	 *
+	 * <p>Deciso alla nascita e non allo scadere, ed e' l'unico modo perche' il preavviso possa
+	 * essere onesto: un varco che tirasse il dado all'ultimo istante dovrebbe aver mentito per il
+	 * minuto precedente, o non avvisare affatto. Si salva col resto, cosi' un riavvio non
+	 * trasforma una minaccia annunciata in una porta che si chiude in silenzio.
+	 */
+	private boolean willBreach;
+
 	public GateEntity(EntityType<? extends GateEntity> type, Level level) {
 		super(type, level);
 		this.noPhysics = true;
@@ -81,6 +91,8 @@ public class GateEntity extends Entity {
 	public void configure(GateOffer offer, int lifetimeTicks) {
 		this.offer = offer;
 		this.remainingTicks = lifetimeTicks;
+		this.willBreach = GateBreach.canBreach(this.level())
+				&& GateBreach.rollWillBreach(this.level().getRandom());
 		this.setCustomName(Component.translatable("arise.gate.varco_name",
 				offer.rank().label(), offer.theme().label()));
 		this.setCustomNameVisible(true);
@@ -103,9 +115,20 @@ public class GateEntity extends Entity {
 		}
 
 		if (offer == null || --remainingTicks <= 0) {
-			AriseFx.gateVarcoClosed(level, this.position(), tint());
+			// Il varco e' scaduto. Che cosa vuol dire lo aveva deciso alla nascita: o si richiude
+			// senza lasciare traccia, o cede e riversa fuori quello che c'era dentro.
+			if (offer != null && willBreach) {
+				GateBreach.breach(level, this.position(), offer);
+			} else {
+				AriseFx.gateVarcoClosed(level, this.position(), tint());
+			}
+
 			this.discard();
 			return;
+		}
+
+		if (willBreach && offer != null) {
+			GateBreach.warn(level, this.position(), offer.rank(), remainingTicks);
 		}
 
 		if (this.tickCount % REGISTRY_INTERVAL == 1) {
@@ -188,6 +211,7 @@ public class GateEntity extends Entity {
 		if (offer != null) {
 			output.store("Offer", GateOffer.CODEC, offer);
 			output.putInt("Remaining", remainingTicks);
+			output.putBoolean("WillBreach", willBreach);
 		}
 	}
 
@@ -195,5 +219,6 @@ public class GateEntity extends Entity {
 	protected void readAdditionalSaveData(ValueInput input) {
 		this.offer = input.read("Offer", GateOffer.CODEC).orElse(null);
 		this.remainingTicks = input.getIntOr("Remaining", 0);
+		this.willBreach = input.getBooleanOr("WillBreach", false);
 	}
 }

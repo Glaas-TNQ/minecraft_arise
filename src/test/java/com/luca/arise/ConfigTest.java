@@ -149,6 +149,27 @@ class ConfigTest {
 	}
 
 	@Test
+	@DisplayName("un varco che cede riversa quello che avresti dovuto affrontare comunque")
+	void breachIsProportionate() {
+		var gates = AriseConfig.createDefault().gates();
+		var spawn = gates.spawn();
+
+		assertTrue(spawn.breakChance() > 0.0 && spawn.breakChance() < 1.0,
+				"a uno la rottura diventa un promemoria, a zero il mondo torna senza conseguenze");
+		assertTrue(spawn.breakWarningTicks() > 0 && spawn.breakWarningTicks() < spawn.lifetimeTicks(),
+				"il preavviso deve stare dentro la vita del varco, o non e' un preavviso");
+
+		int previous = 0;
+		for (com.luca.arise.progress.Rank rank : com.luca.arise.progress.Rank.values()) {
+			int wave = gates.mobsPerRoom(rank) * spawn.breakWaves();
+
+			assertTrue(wave >= previous, "un varco di rango piu' alto non puo' riversare di meno");
+			assertTrue(wave > 0, "un varco che cede senza far uscire niente non e' ceduto");
+			previous = wave;
+		}
+	}
+
+	@Test
 	@DisplayName("il cantiere delle citta' ha un tetto di tempo, non solo di blocchi")
 	void cityBuildingIsBounded() {
 		var cities = AriseConfig.createDefault().cities();

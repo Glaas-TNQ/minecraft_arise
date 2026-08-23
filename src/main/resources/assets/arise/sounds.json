@@ -1,387 +1,417 @@
 {
-  "shadow.arise": {
-    "subtitle": "arise.subtitle.shadow_arise",
-    "sounds": [
-      {
-        "name": "minecraft:mob/warden/emerge",
-        "volume": 0.9,
-        "pitch": 0.8
-      }
-    ]
-  },
-  "shadow.refused": {
-    "subtitle": "arise.subtitle.shadow_refused",
-    "sounds": [
-      {
-        "name": "minecraft:mob/warden/listening_1",
-        "volume": 0.7,
-        "pitch": 0.7
-      },
-      {
-        "name": "minecraft:mob/warden/listening_3",
-        "volume": 0.7,
-        "pitch": 0.7
-      },
-      {
-        "name": "minecraft:mob/warden/listening_5",
-        "volume": 0.7,
-        "pitch": 0.7
-      }
-    ]
-  },
-  "shadow.summon": {
-    "subtitle": "arise.subtitle.shadow_summon",
-    "sounds": [
-      {
-        "name": "minecraft:mob/evocation_illager/prepare_summon",
-        "volume": 0.8,
-        "pitch": 0.7
-      }
-    ]
-  },
-  "shadow.recall": {
-    "subtitle": "arise.subtitle.shadow_recall",
-    "sounds": [
-      {
-        "name": "minecraft:block/respawn_anchor/deplete1",
-        "volume": 0.7,
-        "pitch": 0.8
-      },
-      {
-        "name": "minecraft:block/respawn_anchor/deplete2",
-        "volume": 0.7,
-        "pitch": 0.8
-      }
-    ]
-  },
-  "shadow.ambient": {
-    "subtitle": "arise.subtitle.shadow_ambient",
-    "sounds": [
-      {
-        "name": "minecraft:mob/warden/tendril_clicks_1",
-        "volume": 0.35,
-        "pitch": 0.8
-      },
-      {
-        "name": "minecraft:mob/warden/tendril_clicks_3",
-        "volume": 0.35,
-        "pitch": 0.8
-      },
-      {
-        "name": "minecraft:mob/warden/tendril_clicks_5",
-        "volume": 0.35,
-        "pitch": 0.8
-      },
-      {
-        "name": "minecraft:mob/warden/tendril_clicks_6",
-        "volume": 0.35,
-        "pitch": 0.8
-      }
-    ]
-  },
-  "shadow.hurt": {
-    "subtitle": "arise.subtitle.shadow_hurt",
-    "sounds": [
-      {
-        "name": "minecraft:mob/allay/hurt1",
-        "volume": 0.7,
-        "pitch": 0.6
-      },
-      {
-        "name": "minecraft:mob/allay/hurt2",
-        "volume": 0.7,
-        "pitch": 0.6
-      }
-    ]
-  },
-  "shadow.death": {
-    "subtitle": "arise.subtitle.shadow_death",
-    "sounds": [
-      {
-        "name": "minecraft:mob/vex/death1",
-        "volume": 0.8,
-        "pitch": 0.6
-      },
-      {
-        "name": "minecraft:mob/vex/death2",
-        "volume": 0.8,
-        "pitch": 0.6
-      }
-    ]
-  },
-  "shadow.order": {
-    "subtitle": "arise.subtitle.shadow_order",
-    "sounds": [
-      {
-        "name": "minecraft:mob/warden/tendril_clicks_1",
-        "volume": 0.8,
-        "pitch": 1.3
-      },
-      {
-        "name": "minecraft:mob/warden/tendril_clicks_3",
-        "volume": 0.8,
-        "pitch": 1.3
-      }
-    ]
-  },
-  "shadow.lance": {
-    "subtitle": "arise.subtitle.shadow_lance",
-    "sounds": [
-      {
-        "name": "minecraft:mob/evocation_illager/cast1",
-        "volume": 0.7,
-        "pitch": 1.4
-      },
-      {
-        "name": "minecraft:mob/evocation_illager/cast2",
-        "volume": 0.7,
-        "pitch": 1.4
-      }
-    ]
-  },
-  "shadow.taunt": {
-    "subtitle": "arise.subtitle.shadow_taunt",
-    "sounds": [
-      {
-        "name": "minecraft:mob/warden/sonic_boom1",
-        "volume": 0.7,
-        "pitch": 0.6
-      }
-    ]
-  },
-  "system.level_up": {
-    "subtitle": "arise.subtitle.level_up",
-    "sounds": [
-      {
-        "name": "minecraft:block/beacon/activate",
-        "volume": 0.9,
-        "pitch": 1.0
-      }
-    ]
-  },
-  "system.rank_up": {
-    "subtitle": "arise.subtitle.rank_up",
-    "sounds": [
-      {
-        "name": "minecraft:block/vault/activate",
-        "volume": 0.9,
-        "pitch": 1.0
-      }
-    ]
-  },
-  "gate.open": {
-    "subtitle": "arise.subtitle.gate_open",
-    "sounds": [
-      {
-        "name": "minecraft:portal/trigger",
-        "volume": 0.7,
-        "pitch": 0.6
-      }
-    ]
-  },
-  "gate.ambience": {
-    "subtitle": "arise.subtitle.gate_ambience",
-    "sounds": [
-      {
-        "name": "minecraft:mob/warden/heartbeat_1",
-        "volume": 0.5,
-        "pitch": 0.75
-      },
-      {
-        "name": "minecraft:mob/warden/heartbeat_2",
-        "volume": 0.5,
-        "pitch": 0.75
-      },
-      {
-        "name": "minecraft:mob/warden/heartbeat_3",
-        "volume": 0.5,
-        "pitch": 0.75
-      },
-      {
-        "name": "minecraft:mob/warden/heartbeat_4",
-        "volume": 0.5,
-        "pitch": 0.75
-      }
-    ]
-  },
-  "gate.boss": {
-    "subtitle": "arise.subtitle.gate_boss",
-    "sounds": [
-      {
-        "name": "minecraft:mob/wither/spawn",
-        "volume": 1.0,
-        "pitch": 0.8
-      }
-    ]
-  },
-  "gate.clear": {
-    "subtitle": "arise.subtitle.gate_clear",
-    "sounds": [
-      {
-        "name": "minecraft:item/totem/use_totem",
-        "volume": 0.9,
-        "pitch": 1.1
-      }
-    ]
-  },
-  "ability.cast": {
-    "subtitle": "arise.subtitle.ability_cast",
-    "sounds": [
-      {
-        "name": "minecraft:mob/evocation_illager/cast1",
-        "volume": 0.7,
-        "pitch": 0.8
-      },
-      {
-        "name": "minecraft:mob/evocation_illager/cast2",
-        "volume": 0.7,
-        "pitch": 0.8
-      }
-    ]
-  },
-  "ability.domain": {
-    "subtitle": "arise.subtitle.ability_domain",
-    "sounds": [
-      {
-        "name": "minecraft:block/conduit/activate",
-        "volume": 0.9,
-        "pitch": 0.7
-      }
-    ]
-  },
   "ability.authority": {
-    "subtitle": "arise.subtitle.ability_authority",
     "sounds": [
       {
         "name": "minecraft:mob/warden/sonic_boom1",
-        "volume": 0.8,
-        "pitch": 1.2
+        "pitch": 1.2,
+        "volume": 0.8
       },
       {
         "name": "minecraft:mob/warden/sonic_boom3",
-        "volume": 0.8,
-        "pitch": 1.2
+        "pitch": 1.2,
+        "volume": 0.8
       }
-    ]
+    ],
+    "subtitle": "arise.subtitle.ability_authority"
   },
-  "shop.open": {
-    "subtitle": "arise.subtitle.shop_open",
+  "ability.cast": {
     "sounds": [
       {
-        "name": "minecraft:ui/toast/in",
-        "volume": 0.7,
-        "pitch": 1.1
-      }
-    ]
-  },
-  "shop.deal": {
-    "subtitle": "arise.subtitle.shop_deal",
-    "sounds": [
-      {
-        "name": "minecraft:block/vault/insert",
-        "volume": 0.8,
-        "pitch": 1.0
-      }
-    ]
-  },
-  "shop.refresh": {
-    "subtitle": "arise.subtitle.shop_refresh",
-    "sounds": [
-      {
-        "name": "minecraft:block/amethyst/shimmer",
-        "volume": 0.7,
-        "pitch": 0.9
-      }
-    ]
-  },
-  "system.awakening": {
-    "subtitle": "arise.subtitle.system_awakening",
-    "sounds": [
-      {
-        "name": "minecraft:block/end_portal/endportal",
-        "volume": 1.0,
-        "pitch": 1.0
-      }
-    ]
-  },
-  "quest.completed": {
-    "subtitle": "arise.subtitle.quest_completed",
-    "sounds": [
-      {
-        "name": "minecraft:ui/toast/challenge_complete",
-        "volume": 0.7,
-        "pitch": 1.0
-      }
-    ]
-  },
-  "machine.work": {
-    "subtitle": "arise.subtitle.machine_work",
-    "sounds": [
-      {
-        "name": "minecraft:block/vault/insert",
-        "volume": 0.5,
-        "pitch": 1.5
-      }
-    ]
-  },
-  "machine.done": {
-    "subtitle": "arise.subtitle.machine_done",
-    "sounds": [
-      {
-        "name": "minecraft:block/amethyst/shimmer",
-        "volume": 0.7,
-        "pitch": 1.1
+        "name": "minecraft:mob/evocation_illager/cast1",
+        "pitch": 0.8,
+        "volume": 0.7
       },
       {
-        "name": "minecraft:block/vault/activate",
-        "volume": 0.5,
-        "pitch": 1.3
+        "name": "minecraft:mob/evocation_illager/cast2",
+        "pitch": 0.8,
+        "volume": 0.7
       }
-    ]
+    ],
+    "subtitle": "arise.subtitle.ability_cast"
   },
-  "soul.fuse": {
-    "subtitle": "arise.subtitle.soul_fuse",
+  "ability.domain": {
     "sounds": [
       {
         "name": "minecraft:block/conduit/activate",
-        "volume": 0.8,
-        "pitch": 0.9
-      },
-      {
-        "name": "minecraft:mob/evocation_illager/prepare_summon",
-        "volume": 0.6,
-        "pitch": 1.2
+        "pitch": 0.7,
+        "volume": 0.9
       }
-    ]
+    ],
+    "subtitle": "arise.subtitle.ability_domain"
   },
-  "soul.enlist": {
-    "subtitle": "arise.subtitle.soul_enlist",
+  "gate.ambience": {
     "sounds": [
       {
-        "name": "minecraft:mob/warden/emerge",
-        "volume": 0.5,
-        "pitch": 1.4
+        "name": "minecraft:mob/warden/heartbeat_1",
+        "pitch": 0.75,
+        "volume": 0.5
       },
       {
-        "name": "minecraft:block/beacon/activate",
-        "volume": 0.5,
-        "pitch": 1.3
+        "name": "minecraft:mob/warden/heartbeat_2",
+        "pitch": 0.75,
+        "volume": 0.5
+      },
+      {
+        "name": "minecraft:mob/warden/heartbeat_3",
+        "pitch": 0.75,
+        "volume": 0.5
+      },
+      {
+        "name": "minecraft:mob/warden/heartbeat_4",
+        "pitch": 0.75,
+        "volume": 0.5
       }
-    ]
+    ],
+    "subtitle": "arise.subtitle.gate_ambience"
+  },
+  "gate.boss": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/wither/spawn",
+        "pitch": 0.8,
+        "volume": 1.0
+      }
+    ],
+    "subtitle": "arise.subtitle.gate_boss"
+  },
+  "gate.breach": {
+    "sounds": [
+      {
+        "name": "minecraft:random/explode3",
+        "pitch": 0.5,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:mob/wither/death",
+        "pitch": 0.6,
+        "volume": 0.9
+      }
+    ],
+    "subtitle": "arise.subtitle.gate_breach"
+  },
+  "gate.breaching": {
+    "sounds": [
+      {
+        "name": "minecraft:portal/travel",
+        "pitch": 0.5,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:mob/warden/heartbeat_1",
+        "pitch": 0.6,
+        "volume": 0.9
+      }
+    ],
+    "subtitle": "arise.subtitle.gate_breaching"
+  },
+  "gate.clear": {
+    "sounds": [
+      {
+        "name": "minecraft:item/totem/use_totem",
+        "pitch": 1.1,
+        "volume": 0.9
+      }
+    ],
+    "subtitle": "arise.subtitle.gate_clear"
+  },
+  "gate.open": {
+    "sounds": [
+      {
+        "name": "minecraft:portal/trigger",
+        "pitch": 0.6,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "arise.subtitle.gate_open"
   },
   "gear.drop": {
-    "subtitle": "arise.subtitle.gear_drop",
     "sounds": [
       {
         "name": "minecraft:block/amethyst/shimmer",
-        "volume": 0.8,
-        "pitch": 1.2
+        "pitch": 1.2,
+        "volume": 0.8
       },
       {
         "name": "minecraft:block/vault/insert",
-        "volume": 0.6,
-        "pitch": 1.1
+        "pitch": 1.1,
+        "volume": 0.6
       }
-    ]
+    ],
+    "subtitle": "arise.subtitle.gear_drop"
+  },
+  "machine.done": {
+    "sounds": [
+      {
+        "name": "minecraft:block/amethyst/shimmer",
+        "pitch": 1.1,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:block/vault/activate",
+        "pitch": 1.3,
+        "volume": 0.5
+      }
+    ],
+    "subtitle": "arise.subtitle.machine_done"
+  },
+  "machine.work": {
+    "sounds": [
+      {
+        "name": "minecraft:block/vault/insert",
+        "pitch": 1.5,
+        "volume": 0.5
+      }
+    ],
+    "subtitle": "arise.subtitle.machine_work"
+  },
+  "quest.completed": {
+    "sounds": [
+      {
+        "name": "minecraft:ui/toast/challenge_complete",
+        "pitch": 1.0,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "arise.subtitle.quest_completed"
+  },
+  "shadow.ambient": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/warden/tendril_clicks_1",
+        "pitch": 0.8,
+        "volume": 0.35
+      },
+      {
+        "name": "minecraft:mob/warden/tendril_clicks_3",
+        "pitch": 0.8,
+        "volume": 0.35
+      },
+      {
+        "name": "minecraft:mob/warden/tendril_clicks_5",
+        "pitch": 0.8,
+        "volume": 0.35
+      },
+      {
+        "name": "minecraft:mob/warden/tendril_clicks_6",
+        "pitch": 0.8,
+        "volume": 0.35
+      }
+    ],
+    "subtitle": "arise.subtitle.shadow_ambient"
+  },
+  "shadow.arise": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/warden/emerge",
+        "pitch": 0.8,
+        "volume": 0.9
+      }
+    ],
+    "subtitle": "arise.subtitle.shadow_arise"
+  },
+  "shadow.death": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/vex/death1",
+        "pitch": 0.6,
+        "volume": 0.8
+      },
+      {
+        "name": "minecraft:mob/vex/death2",
+        "pitch": 0.6,
+        "volume": 0.8
+      }
+    ],
+    "subtitle": "arise.subtitle.shadow_death"
+  },
+  "shadow.hurt": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/allay/hurt1",
+        "pitch": 0.6,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:mob/allay/hurt2",
+        "pitch": 0.6,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "arise.subtitle.shadow_hurt"
+  },
+  "shadow.lance": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/evocation_illager/cast1",
+        "pitch": 1.4,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:mob/evocation_illager/cast2",
+        "pitch": 1.4,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "arise.subtitle.shadow_lance"
+  },
+  "shadow.order": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/warden/tendril_clicks_1",
+        "pitch": 1.3,
+        "volume": 0.8
+      },
+      {
+        "name": "minecraft:mob/warden/tendril_clicks_3",
+        "pitch": 1.3,
+        "volume": 0.8
+      }
+    ],
+    "subtitle": "arise.subtitle.shadow_order"
+  },
+  "shadow.recall": {
+    "sounds": [
+      {
+        "name": "minecraft:block/respawn_anchor/deplete1",
+        "pitch": 0.8,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:block/respawn_anchor/deplete2",
+        "pitch": 0.8,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "arise.subtitle.shadow_recall"
+  },
+  "shadow.refused": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/warden/listening_1",
+        "pitch": 0.7,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:mob/warden/listening_3",
+        "pitch": 0.7,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:mob/warden/listening_5",
+        "pitch": 0.7,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "arise.subtitle.shadow_refused"
+  },
+  "shadow.summon": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/evocation_illager/prepare_summon",
+        "pitch": 0.7,
+        "volume": 0.8
+      }
+    ],
+    "subtitle": "arise.subtitle.shadow_summon"
+  },
+  "shadow.taunt": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/warden/sonic_boom1",
+        "pitch": 0.6,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "arise.subtitle.shadow_taunt"
+  },
+  "shop.deal": {
+    "sounds": [
+      {
+        "name": "minecraft:block/vault/insert",
+        "pitch": 1.0,
+        "volume": 0.8
+      }
+    ],
+    "subtitle": "arise.subtitle.shop_deal"
+  },
+  "shop.open": {
+    "sounds": [
+      {
+        "name": "minecraft:ui/toast/in",
+        "pitch": 1.1,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "arise.subtitle.shop_open"
+  },
+  "shop.refresh": {
+    "sounds": [
+      {
+        "name": "minecraft:block/amethyst/shimmer",
+        "pitch": 0.9,
+        "volume": 0.7
+      }
+    ],
+    "subtitle": "arise.subtitle.shop_refresh"
+  },
+  "soul.enlist": {
+    "sounds": [
+      {
+        "name": "minecraft:mob/warden/emerge",
+        "pitch": 1.4,
+        "volume": 0.5
+      },
+      {
+        "name": "minecraft:block/beacon/activate",
+        "pitch": 1.3,
+        "volume": 0.5
+      }
+    ],
+    "subtitle": "arise.subtitle.soul_enlist"
+  },
+  "soul.fuse": {
+    "sounds": [
+      {
+        "name": "minecraft:block/conduit/activate",
+        "pitch": 0.9,
+        "volume": 0.8
+      },
+      {
+        "name": "minecraft:mob/evocation_illager/prepare_summon",
+        "pitch": 1.2,
+        "volume": 0.6
+      }
+    ],
+    "subtitle": "arise.subtitle.soul_fuse"
+  },
+  "system.awakening": {
+    "sounds": [
+      {
+        "name": "minecraft:block/end_portal/endportal",
+        "pitch": 1.0,
+        "volume": 1.0
+      }
+    ],
+    "subtitle": "arise.subtitle.system_awakening"
+  },
+  "system.level_up": {
+    "sounds": [
+      {
+        "name": "minecraft:block/beacon/activate",
+        "pitch": 1.0,
+        "volume": 0.9
+      }
+    ],
+    "subtitle": "arise.subtitle.level_up"
+  },
+  "system.rank_up": {
+    "sounds": [
+      {
+        "name": "minecraft:block/vault/activate",
+        "pitch": 1.0,
+        "volume": 0.9
+      }
+    ],
+    "subtitle": "arise.subtitle.rank_up"
   }
 }

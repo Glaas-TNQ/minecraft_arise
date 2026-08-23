@@ -65,6 +65,10 @@ public final class ModSounds {
 	public static final SoundEvent GATE_AMBIENCE = create("gate.ambience");
 	public static final SoundEvent GATE_BOSS = create("gate.boss");
 	public static final SoundEvent GATE_CLEAR = create("gate.clear");
+	/** Il varco che comincia a cedere: un minuto prima che ceda davvero. */
+	public static final SoundEvent GATE_BREACHING = create("gate.breaching");
+	/** Il varco che cede. E' il suono piu' grosso della mod dopo il risveglio. */
+	public static final SoundEvent GATE_BREACH = create("gate.breach");
 
 	// ---- l'Abyss Shop
 	/** La finestra del Sistema che si apre. */
