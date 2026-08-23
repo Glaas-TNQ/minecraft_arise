@@ -446,6 +446,12 @@ public final class LabBuilder {
 		// direzione e poi cento nell'altra, e senza queste sono due mondi diversi.
 		contents.add(new ItemStack(ModItems.REGRET_SCROLL, 2));
 
+		// Un cubo per rango: la scelta fra benedetto e maledetto si capisce solo aprendone due
+		// dello stesso rango in due modi diversi, uno dopo l'altro.
+		for (Rank rank : Rank.values()) {
+			contents.add(com.luca.arise.gate.AbyssCubeItem.of(rank).copyWithCount(2));
+		}
+
 		return contents;
 	}
 

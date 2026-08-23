@@ -368,6 +368,33 @@ public final class AriseFx {
 		play(level, position, ModSounds.SHADOW_HURT, 0.35F, 1.8F);
 	}
 
+	/**
+	 * Un Cubo dell'Abisso si apre. Due effetti diversi, perche' sono due scelte diverse.
+	 *
+	 * <p>Il benedetto sale, dorato e ordinato. Il maledetto si allarga a terra, viola, e non fa
+	 * rumore di festa: quello che ne esce non serve adesso, e l'effetto non deve promettere che
+	 * serva.
+	 */
+	public static void cubeOpened(net.minecraft.world.level.Level world, Vec3 position, Rank rank,
+			boolean cursed) {
+		if (!(world instanceof ServerLevel level)) {
+			return;
+		}
+
+		FxConfig fx = config();
+
+		if (cursed) {
+			ring(level, position.add(0.0, 0.2, 0.0), 1.8, fx.scaled(28), dust(0x8E6BFF, 1.2F), 0.3);
+			ring(level, position.add(0.0, 0.2, 0.0), 1.0, fx.scaled(18), dust(rank.color(), 1.0F), 0.2);
+			play(level, position, ModSounds.SHOP_OPEN, 0.8F, 0.6F);
+			return;
+		}
+
+		column(level, position, 2.2, fx.scaled(26), dust(0xFFD54F, 1.2F));
+		ring(level, position.add(0.0, 1.0, 0.0), 1.2, fx.scaled(20), dust(rank.color(), 1.0F), -0.2);
+		play(level, position, ModSounds.SHOP_DEAL, 0.9F, 1.2F);
+	}
+
 	/** Il boss entra in scena: si sente da tutta la stanza. */
 	public static void gateBoss(ServerLevel level, Vec3 position, Rank rank) {
 		FxConfig fx = config();

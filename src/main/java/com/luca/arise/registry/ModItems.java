@@ -8,6 +8,7 @@ import java.util.function.Function;
 import com.luca.arise.AriseMod;
 import com.luca.arise.city.AssociationSealItem;
 import com.luca.arise.gate.AbyssCompassItem;
+import com.luca.arise.gate.AbyssCubeItem;
 import com.luca.arise.progress.RegretScrollItem;
 import com.luca.arise.workshop.BlueprintItem;
 import com.luca.arise.workshop.MachineKind;
@@ -80,6 +81,15 @@ public final class ModItems {
 	 * <p>Impilabile fino a quattro, a differenza del Sigillo e della Bussola, perche' non e' una
 	 * chiave: e' un consumabile, e chi ne compra tre lo fa apposta. Vedi {@link RegretScrollItem}.
 	 */
+	/**
+	 * Il Cubo dell'Abisso: ogni varco chiuso ne lascia uno, e si apre in due modi.
+	 *
+	 * <p>Impilabile a sedici: se ne accumulano, ed e' voluto — chi ne tiene cinque da parte sta
+	 * aspettando di salire di rango prima di aprirli maledetti. Vedi {@link AbyssCubeItem}.
+	 */
+	public static final Item ABYSS_CUBE =
+			register("abyss_cube", Rarity.UNCOMMON, 16, AbyssCubeItem::new);
+
 	public static final Item REGRET_SCROLL =
 			register("regret_scroll", Rarity.RARE, 4, RegretScrollItem::new);
 

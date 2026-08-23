@@ -1,6 +1,7 @@
 package com.luca.arise.registry;
 
 import com.luca.arise.AriseMod;
+import com.luca.arise.gate.AbyssCube;
 import com.luca.arise.gear.GearPiece;
 import com.luca.arise.workshop.Catalyst;
 import com.luca.arise.workshop.LooseSoul;
@@ -59,6 +60,20 @@ public final class ModComponents {
 			DataComponentType.<Catalyst>builder()
 					.persistent(Catalyst.CODEC)
 					.networkSynchronized(Catalyst.STREAM_CODEC)
+					.build());
+
+	/**
+	 * Il rango di un Cubo dell'Abisso. Un campo, come il catalizzatore, e per la stessa ragione.
+	 *
+	 * <p>Il cubo non contiene niente: tira nel momento in cui lo si apre. Salvare il contenuto
+	 * vorrebbe dire poterlo guardare, e un cubo che si puo' sbirciare smette di essere una scelta.
+	 */
+	public static final DataComponentType<AbyssCube> ABYSS_CUBE = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
+			AriseMod.id("abyss_cube"),
+			DataComponentType.<AbyssCube>builder()
+					.persistent(AbyssCube.CODEC)
+					.networkSynchronized(AbyssCube.STREAM_CODEC)
 					.build());
 
 	private ModComponents() {

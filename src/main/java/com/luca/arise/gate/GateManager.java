@@ -21,6 +21,7 @@ import com.luca.arise.quest.Unlock;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.registry.ModEntities;
+import com.luca.arise.workshop.WorkshopManager;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -471,6 +472,12 @@ public final class GateManager {
 			GateLoot.award(player, instance.rank()).forEach(player::sendSystemMessage);
 			ShadowManager.grantNamed(player, NamedShadow.IRON);
 		}
+
+		// Un cubo per varco chiuso, sempre. Non e' bottino a probabilita': e' la scelta che chiude
+		// la run, e una scelta che a volte non ti viene offerta non e' una scelta ricorrente.
+		WorkshopManager.give(player, AbyssCubeItem.of(instance.rank()));
+		player.sendSystemMessage(Component.translatable("arise.msg.cube.found",
+				instance.rank().label()));
 
 		awardNamedShadow(player, instance);
 

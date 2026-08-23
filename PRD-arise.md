@@ -737,7 +737,7 @@ Detto esplicitamente, perché uno scope negativo scritto vale più di dieci disc
 | 8 | **B5** — il Gate Rosso | mezza giornata | ✅ *da verificare in gioco* |
 | 9 | **B6** — obiettivi del varco | un giorno | ✅ *da verificare in gioco* |
 | 10 | **B7** — il Sovrano a tre fasi | un giorno | ✅ *da verificare in gioco* |
-| 11 | **B14** — il cubo | tre ore | aperto |
+| 11 | **B14** — il cubo | tre ore | ✅ *da verificare in gioco* |
 | 12 | **B12** — l'esame di rango | un giorno | aperto — Igris arriva intanto dal primo varco di rango C |
 | 13 | **B11** — l'Abisso | un giorno | aperto |
 | 14 | **B15** — il Registro del Sistema | due giorni | aperto |
@@ -745,13 +745,13 @@ Detto esplicitamente, perché uno scope negativo scritto vale più di dieci disc
 | 16 | **B3** — Quest Giornaliera e Penalità | un giorno | aperto |
 | 17 | **B13** — i Monarchi | due giorni | aperto |
 
-**Dieci su diciassette**, in una sessione. Tutti e dieci compilano, passano 87 prove, escono puliti
-dal collaudo statico e fanno partire un server dedicato su un mondo nuovo — e **nessuno dei dieci
-e' ancora stato visto girare in gioco**, che secondo la regola 3 del progetto vuol dire che nessuno
-dei dieci e' finito.
+**Undici su diciassette**, in una sessione. Tutti e undici compilano, passano 87 prove, escono puliti
+dal collaudo statico e fanno partire un server dedicato su un mondo nuovo — e **nessuno degli
+undici e' ancora stato visto girare in gioco**, che secondo la regola 3 del progetto vuol dire che
+nessuno degli undici e' finito.
 
-Delle sette lacune che restano, quattro (B11, B13, B12, B3) sono contenuto nuovo e due (B15, B16)
-sono infrastruttura. La lacuna **L1** — dopo il diciottesimo incarico non c'e' niente — e' stata
+Delle sei che restano, quattro (B11, B13, B12, B3) sono contenuto nuovo e due (B15, B16) sono
+infrastruttura. La lacuna **L1** — dopo il diciottesimo incarico non c'e' niente — e' stata
 solo *ammorbidita*: i varchi adesso hanno tre obiettivi, tre fasi di boss e sei affissi, quindi il
 cinquantesimo varco non e' piu' identico al quarantanovesimo. Ma un traguardo che ne apre un altro
 ancora non c'e', e quello e' B11.
