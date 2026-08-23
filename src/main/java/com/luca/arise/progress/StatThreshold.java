@@ -68,7 +68,13 @@ public enum StatThreshold {
 	/** I tre gradini, uguali per tutte e quattro. */
 	public static final List<Integer> STEPS = List.of(25, 50, 100);
 
-	/** Quanto oltre le cadute cominciano di nuovo a fare male, in blocchi. */
+	/**
+	 * Fino a quanto <strong>danno</strong> una caduta viene perdonata. Non blocchi: danno.
+	 *
+	 * <p>La distinzione conta perche' in Minecraft il danno da caduta e' l'altezza meno tre, quindi
+	 * sei di danno sono nove blocchi di caduta — e chi legge "sei" pensando ai blocchi tara la
+	 * soglia alla meta' di quello che credeva.
+	 */
 	public static final float FALL_FORGIVEN = 6.0F;
 
 	/** Quanto piu' forte colpiscono le ombre di un Monarca che ha superato la seconda soglia. */

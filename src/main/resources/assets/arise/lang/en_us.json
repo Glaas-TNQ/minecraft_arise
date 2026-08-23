@@ -723,7 +723,7 @@
   "arise.threshold.strength_legion": "The Monarch's weight",
   "arise.threshold.strength_legion.desc": "Your shadows strike 15% harder.",
   "arise.threshold.vitality_fall": "Sure footing",
-  "arise.threshold.vitality_fall.desc": "Short falls do no damage at all.",
+  "arise.threshold.vitality_fall.desc": "Falls of less than nine blocks do no damage at all.",
   "arise.threshold.vitality_hunger": "Endurance of the body",
   "arise.threshold.vitality_hunger.desc": "Hunger no longer kills you.",
   "arise.threshold.vitality_last_stand": "Last stand",

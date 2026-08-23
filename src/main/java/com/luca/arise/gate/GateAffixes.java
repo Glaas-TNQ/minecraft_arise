@@ -58,6 +58,14 @@ public final class GateAffixes {
 	 * sbaglio, e smetterebbe di farla il giorno in cui l'assegnazione cambia.
 	 */
 	public static void apply(Mob mob, MobAffix affix) {
+		// Un mob che ha gia' un affisso non ne prende un secondo, ed e' la prima delle due regole
+		// dure. Vale anche per il comando di prova: applicare Rapido due volte allo stesso mob gli
+		// moltiplicherebbe la velocita' per due e un quarto, e sarebbe un numero che nessuno ha
+		// scelto.
+		if (of(mob) != null) {
+			return;
+		}
+
 		mob.setAttached(ModAttachments.MOB_AFFIX, affix);
 
 		// Il nome sopra la testa e' meta' dell'affisso: un mob che si cura colpendo senza dirlo

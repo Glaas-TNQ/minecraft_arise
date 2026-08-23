@@ -723,7 +723,7 @@
   "arise.threshold.strength_legion": "Il peso del Monarca",
   "arise.threshold.strength_legion.desc": "Le tue ombre colpiscono il 15% più forte.",
   "arise.threshold.vitality_fall": "Passo sicuro",
-  "arise.threshold.vitality_fall.desc": "Le cadute brevi non fanno alcun danno.",
+  "arise.threshold.vitality_fall.desc": "Le cadute sotto i nove blocchi non fanno alcun danno.",
   "arise.threshold.vitality_hunger": "Tenuta del corpo",
   "arise.threshold.vitality_hunger.desc": "La fame non ti uccide più.",
   "arise.threshold.vitality_last_stand": "Ultima difesa",
