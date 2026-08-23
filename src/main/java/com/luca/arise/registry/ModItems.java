@@ -8,6 +8,7 @@ import java.util.function.Function;
 import com.luca.arise.AriseMod;
 import com.luca.arise.city.AssociationSealItem;
 import com.luca.arise.gate.AbyssCompassItem;
+import com.luca.arise.progress.RegretScrollItem;
 import com.luca.arise.workshop.BlueprintItem;
 import com.luca.arise.workshop.MachineKind;
 
@@ -72,6 +73,15 @@ public final class ModItems {
 	 */
 	public static final Item ASSOCIATION_SEAL =
 			register("association_seal", Rarity.RARE, 1, AssociationSealItem::new);
+
+	/**
+	 * La Pergamena del Rimpianto: restituisce i punti statistica spesi.
+	 *
+	 * <p>Impilabile fino a quattro, a differenza del Sigillo e della Bussola, perche' non e' una
+	 * chiave: e' un consumabile, e chi ne compra tre lo fa apposta. Vedi {@link RegretScrollItem}.
+	 */
+	public static final Item REGRET_SCROLL =
+			register("regret_scroll", Rarity.RARE, 4, RegretScrollItem::new);
 
 	private ModItems() {
 	}

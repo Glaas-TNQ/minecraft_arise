@@ -442,6 +442,10 @@ public final class LabBuilder {
 
 		contents.add(ModItems.coins(64));
 
+		// Due pergamene: provare le soglie delle statistiche vuol dire spendere cento punti in una
+		// direzione e poi cento nell'altra, e senza queste sono due mondi diversi.
+		contents.add(new ItemStack(ModItems.REGRET_SCROLL, 2));
+
 		return contents;
 	}
 

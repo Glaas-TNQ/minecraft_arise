@@ -112,6 +112,12 @@ public final class AriseCommands {
 					.requires(AriseCommands::canCheat)
 					.executes(context -> reset(context.getSource())));
 
+			// Il respec senza pergamena. In gioco costa trenta monete alla Cartoleria, e deve
+			// costare: qui serve a provare le soglie e i tetti senza rifare quaranta livelli.
+			root.then(Commands.literal("respec")
+					.requires(AriseCommands::canCheat)
+					.executes(context -> respec(context.getSource())));
+
 			root.then(Commands.literal("arise").executes(context -> playerAction(context.getSource(),
 					ShadowManager::extract)));
 			root.then(Commands.literal("summon").executes(context -> playerAction(context.getSource(),
@@ -405,6 +411,18 @@ public final class AriseCommands {
 		ProgressManager.reset(player);
 		source.sendSuccess(() -> Component.translatable("arise.msg.reset"), true);
 		return 1;
+	}
+
+	private static int respec(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		int returned = ProgressManager.respec(player);
+
+		source.sendSuccess(() -> returned > 0
+				? Component.translatable("arise.msg.respec.done", returned)
+				: Component.translatable("arise.msg.respec.nothing"), true);
+
+		return returned;
 	}
 
 	/** Le azioni restituiscono già il messaggio giusto: qui si inoltra e basta. */

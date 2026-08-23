@@ -83,6 +83,13 @@ public final class ShopkeeperTrades {
 				sellStack(offers, 32, blueprint(MachineKind.CRUCIBLE), SCARCE);
 				sellStack(offers, 40, blueprint(MachineKind.FORGE), SCARCE);
 				sellStack(offers, 48, blueprint(MachineKind.WELL), SCARCE);
+				// La Pergamena del Rimpianto sta qui e non all'Abyss Shop per due ragioni. La
+				// prima e' che il Cartografo vende disegni e progetti, e una pergamena e' la cosa
+				// piu' vicina a un progetto che si possa scrivere su un Cacciatore. La seconda e'
+				// che il prezzo dev'essere fisso e leggibile: chi ha sbagliato la spesa deve poter
+				// contare quanto gli costa rimediare, non tirarlo a sorte a ogni rotazione.
+				// Trenta monete sono tremila soul coin, cioe' cinque Gate di rango C.
+				sellStack(offers, 30, new ItemStack(ModItems.REGRET_SCROLL), SCARCE);
 				sell(offers, 3, Items.HOPPER, 4, COMMON);
 				sell(offers, 2, Items.CAULDRON, 2, COMMON);
 				sell(offers, 3, Items.FURNACE, 4, COMMON);

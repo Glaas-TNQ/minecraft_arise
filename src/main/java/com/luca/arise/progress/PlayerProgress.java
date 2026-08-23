@@ -64,4 +64,25 @@ public record PlayerProgress(int level, long xp, int unspentPoints, Map<Stat, In
 		updated.merge(stat, amount, Integer::sum);
 		return new PlayerProgress(level, xp, unspentPoints - amount, updated, souls);
 	}
+
+	/** Quanti punti sono stati spesi in tutto, su tutte le statistiche. */
+	public int spentPoints() {
+		int total = 0;
+		for (int value : stats.values()) {
+			total += value;
+		}
+		return total;
+	}
+
+	/**
+	 * Svuota tutte le statistiche e restituisce i punti al non speso.
+	 *
+	 * <p>Il totale dei punti — spesi piu' non spesi — <strong>non cambia</strong>, ed e' l'unica
+	 * proprieta' che questa operazione deve garantire: un respec che regalasse o mangiasse punti
+	 * sarebbe un difetto silenzioso, perche' nessuno tiene il conto a mano di quanti ne ha avuti in
+	 * cento livelli.
+	 */
+	public PlayerProgress withStatsReset() {
+		return new PlayerProgress(level, xp, unspentPoints + spentPoints(), Map.of(), souls);
+	}
 }

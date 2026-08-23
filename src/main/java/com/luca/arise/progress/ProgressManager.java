@@ -169,6 +169,37 @@ public final class ProgressManager {
 		return null;
 	}
 
+	/**
+	 * Restituisce tutti i punti spesi. Il livello, l'XP e i soul coin non si toccano.
+	 *
+	 * <p>Non c'era modo di tornare indietro da una spesa, ed e' la lacuna che nelle mod RPG i
+	 * giocatori segnalano piu' di qualunque altra: chi ha messo trenta punti in Agilita' a livello
+	 * quaranta e poi ha scoperto i Gate non aveva nessuna strada davanti se non ricominciare.
+	 *
+	 * <p>Non costa niente <em>qui</em>: costa la Pergamena, che si compra. Il prezzo sta dove si
+	 * puo' guardare prima di pagarlo — dietro il bancone della Cartoleria — invece che dentro un
+	 * messaggio che compare a cose fatte.
+	 *
+	 * @return quanti punti sono tornati indietro, zero se non c'era niente da restituire
+	 */
+	public static int respec(ServerPlayer player) {
+		PlayerProgress progress = get(player);
+		int returned = progress.spentPoints();
+
+		if (returned <= 0) {
+			return 0;
+		}
+
+		set(player, progress.withStatsReset());
+
+		// L'ordine conta: prima si scrive lo stato, poi si riscrivono gli attributi. Al contrario,
+		// i modificatori verrebbero calcolati sulle statistiche vecchie e resterebbero addosso
+		// finche' la riconciliazione dei cinque tick non se ne accorge — un quarto di secondo in
+		// cui il giocatore ha i punti in mano e anche i loro effetti.
+		applyAttributes(player);
+		return returned;
+	}
+
 	public static void reset(ServerPlayer player) {
 		set(player, PlayerProgress.INITIAL);
 		applyAttributes(player);
