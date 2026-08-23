@@ -16,6 +16,7 @@ import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.fx.Overlay;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.progress.AriseAdvancements;
 import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.quest.Unlock;
@@ -266,6 +267,7 @@ public final class ShadowManager {
 
 		setArmy(player, army.with(shadow));
 
+		AriseAdvancements.award(player, AriseAdvancements.FIRST_SHADOW);
 		AriseFx.extractionSuccess(level, best.position(), shadow.rank(config));
 		QuestManager.advance(player, Objective.EXTRACT);
 
@@ -367,6 +369,7 @@ public final class ShadowManager {
 		AriseFx.extractionSuccess(player.level(), player.position(),
 				shadow.rank(AriseConfig.get().shadows()));
 
+		AriseAdvancements.award(player, AriseAdvancements.NAMED_SHADOW);
 		Overlay.title(player, Component.translatable("arise.title.named_joined"), which.label());
 		player.sendSystemMessage(Component.translatable("arise.msg.shadow.named_joined",
 				which.label(), which.description()));
@@ -694,6 +697,13 @@ public final class ShadowManager {
 
 		entity.applyData(shadow, player, false);
 		celebrate(player.level(), entity.position(), before, shadow, config);
+
+		// Il traguardo guarda il grado e non il livello: un Gran Maresciallo e' un'ombra che ha
+		// combattuto abbastanza da comandarne altre quattro, e il livello da solo non lo dice.
+		if (shadow.grade(config) == ShadowGrade.GRAND_MARSHAL
+				&& before.grade(config) != ShadowGrade.GRAND_MARSHAL) {
+			AriseAdvancements.award(player, AriseAdvancements.GRAND_MARSHAL);
+		}
 	}
 
 	/**

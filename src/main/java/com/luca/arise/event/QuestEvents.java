@@ -3,6 +3,7 @@ package com.luca.arise.event;
 import com.luca.arise.city.CityManager;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.progress.AriseAdvancements;
 import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.tutorial.AwakeningManager;
@@ -66,6 +67,7 @@ public final class QuestEvents {
 
 				if (CityManager.atAssociation(player, radius)) {
 					QuestManager.advance(player, Objective.VISIT_CITY);
+					AriseAdvancements.award(player, AriseAdvancements.ASSOCIATION);
 				}
 			}
 		});

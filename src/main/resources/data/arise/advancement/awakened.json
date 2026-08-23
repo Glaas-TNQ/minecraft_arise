@@ -1,0 +1,23 @@
+{
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:nether_star"
+    },
+    "title": {
+      "translate": "arise.advancement.awakened"
+    },
+    "description": {
+      "translate": "arise.advancement.awakened.desc"
+    },
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "minecraft:gui/advancements/backgrounds/nether"
+  },
+  "sends_telemetry_event": false
+}

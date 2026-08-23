@@ -13,6 +13,7 @@ import com.luca.arise.config.SpawnConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.fx.Overlay;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.progress.AriseAdvancements;
 import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.shadow.NamedShadow;
@@ -541,6 +542,12 @@ public final class GateManager {
 		ProgressManager.addSouls(player, souls);
 
 		QuestManager.advance(player, Objective.CLEAR_GATE);
+		AriseAdvancements.award(player, AriseAdvancements.FIRST_GATE);
+
+		if (instance.red()) {
+			AriseAdvancements.award(player, AriseAdvancements.RED_GATE);
+		}
+
 		AriseFx.gateClear(player, instance.rank());
 		player.sendSystemMessage(Component.translatable("arise.msg.gate.cleared",
 				instance.rank().label(), xp, souls));
@@ -561,6 +568,12 @@ public final class GateManager {
 			Abyss.completed(player, instance.depth(),
 							player.level().getGameTime() - instance.startedAt())
 					.forEach(player::sendSystemMessage);
+
+			AriseAdvancements.award(player, AriseAdvancements.ABYSS);
+
+			if (instance.depth() >= 10) {
+				AriseAdvancements.award(player, AriseAdvancements.ABYSS_TEN);
+			}
 		}
 
 		// Un cubo per varco chiuso, sempre. Non e' bottino a probabilita': e' la scelta che chiude

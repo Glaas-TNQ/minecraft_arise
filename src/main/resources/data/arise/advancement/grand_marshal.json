@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:netherite_sword"
+    },
+    "title": {
+      "translate": "arise.advancement.grand_marshal"
+    },
+    "description": {
+      "translate": "arise.advancement.grand_marshal.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "sends_telemetry_event": false,
+  "parent": "arise:named_shadow"
+}

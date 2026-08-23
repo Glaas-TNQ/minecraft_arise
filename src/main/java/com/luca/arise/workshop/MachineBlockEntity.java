@@ -12,6 +12,7 @@ import com.luca.arise.fx.AriseFx;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.quest.Objective;
+import com.luca.arise.progress.AriseAdvancements;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.registry.ModBlocks;
 
@@ -546,6 +547,12 @@ public class MachineBlockEntity extends BaseContainerBlockEntity
 
 		if (player != null) {
 			QuestManager.advance(player, objective, amount);
+
+			// Il primo giro di un macchinario e' il momento in cui l'Officina smette di essere
+			// quattro blocchi in un baule e diventa una cosa che gira da sola.
+			if (objective == Objective.MACHINE_WORK) {
+				AriseAdvancements.award(player, AriseAdvancements.WORKSHOP);
+			}
 		}
 	}
 

@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "arise:abyss_compass"
+    },
+    "title": {
+      "translate": "arise.advancement.first_gate"
+    },
+    "description": {
+      "translate": "arise.advancement.first_gate.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "sends_telemetry_event": false,
+  "parent": "arise:awakened"
+}

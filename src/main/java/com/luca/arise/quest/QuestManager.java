@@ -8,6 +8,7 @@ import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.GearRoll;
 import com.luca.arise.gear.GearUnique;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.progress.AriseAdvancements;
 import com.luca.arise.shadow.NamedShadow;
 import com.luca.arise.shadow.ShadowManager;
 import com.luca.arise.progress.Rank;
@@ -159,6 +160,7 @@ public final class QuestManager {
 		// ventisei ombre che non escono mai: e' il "hai finito" reso visibile.
 		if (quest.grants() == Unlock.MASTERY) {
 			ShadowManager.grantNamed(player, NamedShadow.BELLION);
+			AriseAdvancements.award(player, AriseAdvancements.MASTERY);
 		}
 
 		announceNext(player);
@@ -219,7 +221,9 @@ public final class QuestManager {
 		// E poi ci si sveglia altrove. Prenotato e non eseguito: siamo dentro l'evento che sta
 		// ancora decidendo cosa fare di quel colpo, e non e' il posto da cui si cambia dimensione
 		// a un giocatore. Vedi AwakeningManager.
-		AwakeningManager.schedule(player);
+				AriseAdvancements.award(player, AriseAdvancements.AWAKENED);
+				AwakeningManager.schedule(player);
+
 		return true;
 	}
 

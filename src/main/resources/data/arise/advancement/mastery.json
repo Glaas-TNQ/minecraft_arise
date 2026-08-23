@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "arise:soul_coin"
+    },
+    "title": {
+      "translate": "arise.advancement.mastery"
+    },
+    "description": {
+      "translate": "arise.advancement.mastery.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "sends_telemetry_event": false,
+  "parent": "arise:awakened"
+}

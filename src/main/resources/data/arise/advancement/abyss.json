@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "arise:abyss_cube"
+    },
+    "title": {
+      "translate": "arise.advancement.abyss"
+    },
+    "description": {
+      "translate": "arise.advancement.abyss.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "sends_telemetry_event": false,
+  "parent": "arise:mastery"
+}

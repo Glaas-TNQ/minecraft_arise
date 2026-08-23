@@ -7,6 +7,7 @@ import com.luca.arise.config.GateConfig;
 import com.luca.arise.config.SpawnConfig;
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.fx.Overlay;
+import com.luca.arise.progress.AriseAdvancements;
 import com.luca.arise.progress.Rank;
 
 import net.minecraft.ChatFormatting;
@@ -121,6 +122,11 @@ public final class GateBreach {
 				player.sendSystemMessage(line);
 				Overlay.title(player, Component.translatable("arise.title.gate_breached"),
 						Component.translatable("arise.subtitle.gate_breached"));
+
+				// Il traguardo va a chi era li' a vederlo, non a chi ha lasciato aperto il varco
+				// dall'altra parte del mondo: e' un traguardo che dice «ho visto una cosa», non
+				// «ho sbagliato qualcosa».
+				AriseAdvancements.award(player, AriseAdvancements.GATE_BREAKER);
 			}
 		}
 

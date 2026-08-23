@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:redstone_block"
+    },
+    "title": {
+      "translate": "arise.advancement.red_gate"
+    },
+    "description": {
+      "translate": "arise.advancement.red_gate.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "sends_telemetry_event": false,
+  "parent": "arise:first_gate"
+}

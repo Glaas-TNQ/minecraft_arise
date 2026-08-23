@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "granted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "minecraft:crying_obsidian"
+    },
+    "title": {
+      "translate": "arise.advancement.abyss_ten"
+    },
+    "description": {
+      "translate": "arise.advancement.abyss_ten.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": true
+  },
+  "sends_telemetry_event": false,
+  "parent": "arise:abyss"
+}
