@@ -313,24 +313,34 @@ public final class AriseFx {
 	}
 
 	/**
-	 * Il Volatile e' caduto e sta per scoppiare: l'anello rosso a terra.
+	 * <strong>L'anello rosso a terra: sta per arrivare un danno ad area, spostati.</strong>
 	 *
 	 * <p>E' il primo dei tre segnali di preavviso della mod, e da qui in avanti significa sempre e
-	 * solo <strong>danno ad area, spostati</strong>. Il colore non cambia mai e il segnale non si
-	 * riusa per altro: e' quello che permette di imparare una regola una volta sola.
+	 * solo questo. Non si riusa per altro, non cambia colore, non cambia forma: e' quello che
+	 * permette di impararlo una volta sola e riconoscerlo per il resto della partita — dal
+	 * Volatile che cade in una stanza qualunque alla martellata del Sovrano.
 	 */
-	public static void affixVolatileFuse(ServerLevel level, Vec3 centre, double radius) {
-		FxConfig fx = config();
-		ring(level, centre.add(0.0, 0.1, 0.0), radius, fx.scaled(36), dust(0xE86A6A, 1.2F), 0.0);
+	public static void telegraph(ServerLevel level, Vec3 centre, double radius) {
+		ring(level, centre.add(0.0, 0.1, 0.0), radius, config().scaled(36), dust(0xE86A6A, 1.2F), 0.0);
 		play(level, centre, ModSounds.GATE_BREACHING, 0.7F, 1.6F);
 	}
 
-	/** E lo scoppio. */
-	public static void affixVolatileBlast(ServerLevel level, Vec3 centre, double radius) {
+	/** E il colpo, quando cade dove l'anello aveva detto. */
+	public static void telegraphStrike(ServerLevel level, Vec3 centre, double radius) {
 		FxConfig fx = config();
 		ring(level, centre.add(0.0, 0.2, 0.0), radius, fx.scaled(40), dust(0xE86A6A, 1.5F), 0.4);
 		column(level, centre, 2.0, fx.scaled(20), dust(0xFFD54F, 1.2F));
+		level.sendParticles(ParticleTypes.EXPLOSION, centre.x(), centre.y() + 0.5, centre.z(),
+				1, 0.0, 0.0, 0.0, 0.0);
 		play(level, centre, ModSounds.GATE_BREACH, 0.8F, 1.4F);
+	}
+
+	/** Il Sovrano cambia fase: un colpo di gong e la colonna del suo rango. */
+	public static void bossPhase(ServerLevel level, Vec3 position, Rank rank) {
+		FxConfig fx = config();
+		column(level, position, 4.0, fx.scaled(40), dust(rank.color(), 1.5F));
+		ring(level, position, 3.0, fx.scaled(30), dust(rank.color(), 1.2F), 0.5);
+		play(level, position, ModSounds.GATE_BOSS, 1.0F, 0.7F);
 	}
 
 	/**

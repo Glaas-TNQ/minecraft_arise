@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.gate.DelayedStrike;
 import com.luca.arise.gate.GateAffixes;
 import com.luca.arise.fx.Overlay;
 import com.luca.arise.progress.ProgressManager;
@@ -73,7 +74,7 @@ public final class ThresholdEvents {
 		// Un solo battito per il server, non uno per mondo: la coda degli scoppi porta il proprio
 		// mondo dentro ogni voce, e cosi' non serve chiedersi in quale dimensione si sta girando.
 		ServerTickEvents.END_SERVER_TICK.register(
-				server -> GateAffixes.tick(server.overworld().getGameTime()));
+				server -> DelayedStrike.tick(server.overworld().getGameTime()));
 	}
 
 	/** Falso se una delle soglie difensive del giocatore rifiuta questo colpo. */

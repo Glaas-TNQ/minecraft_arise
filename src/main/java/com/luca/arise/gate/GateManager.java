@@ -510,11 +510,12 @@ public final class GateManager {
 			// Un Volatile caduto un istante prima dell'uscita aveva ancora il suo scoppio in coda,
 			// e sarebbe maturato in una stanza che non esiste piu'. Non farebbe male a nessuno —
 			// non c'e' nessuno — ma resterebbe in memoria per sempre, una voce per ogni run.
-			GateAffixes.forget(gate);
+			DelayedStrike.forget(gate);
 		}
 
 		USED_REGIONS.remove(instance.regionIndex());
 		BOSS_GREETED.remove(player.getUUID());
+		GateBoss.forget(player.getUUID());
 	}
 
 	/**
@@ -543,6 +544,13 @@ public final class GateManager {
 
 		if (instance.red()) {
 			bite(player);
+		}
+
+		// Il Sovrano batte dentro il battito del giocatore che lo sta combattendo: non ha un tick
+		// suo, e cosi' non ne consuma nessuno quando nella sua sala non c'e' nessuno.
+		if (player.level() instanceof ServerLevel gate) {
+			GateBoss.tick(player, GateBoss.find(gate, instance.bossId()), instance.rank(),
+					GateBoss.reach(config));
 		}
 
 		if (player.getRandom().nextFloat() < AMBIENCE_CHANCE) {

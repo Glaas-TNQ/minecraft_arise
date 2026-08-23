@@ -1,14 +1,11 @@
 package com.luca.arise.gate;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import com.luca.arise.fx.AriseFx;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.shadow.ShadowEntity;
 
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -18,7 +15,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -34,12 +30,6 @@ import net.minecraft.world.phys.Vec3;
  * a ogni battito, ed e' vuota per tutta la partita tranne il secondo dopo che un Volatile cade.
  */
 public final class GateAffixes {
-
-	/** Uno scoppio in attesa: dove, quando, e in quale mondo. */
-	private record Pending(ServerLevel level, Vec3 position, long atTick) {
-	}
-
-	private static final List<Pending> PENDING = new ArrayList<>();
 
 	private GateAffixes() {
 	}
@@ -162,61 +152,19 @@ public final class GateAffixes {
 		}
 	}
 
-	/** Quando un Volatile cade, mette in conto lo scoppio e lo annuncia. */
+	/**
+	 * Quando un Volatile cade, mette lo scoppio in conto.
+	 *
+	 * <p>Il preavviso non lo disegna questa: lo disegna {@link DelayedStrike#schedule}, ed e' il
+	 * punto di averlo estratto — nessuno che programmi un colpo ad area puo' dimenticarsi
+	 * l'anello, perche' non e' una sua responsabilita'.
+	 */
 	public static void onDeath(LivingEntity victim) {
 		if (of(victim) != MobAffix.VOLATILE || !(victim.level() instanceof ServerLevel level)) {
 			return;
 		}
 
-		Vec3 where = victim.position();
-
-		AriseFx.affixVolatileFuse(level, where, MobAffix.VOLATILE_RADIUS);
-		PENDING.add(new Pending(level, where, level.getGameTime() + MobAffix.VOLATILE_FUSE));
-	}
-
-	// ---------------------------------------------------------------- il battito
-
-	/**
-	 * Gli scoppi in attesa che sono maturati.
-	 *
-	 * <p>Gira una volta per battito del server e per la stragrande maggioranza della partita non
-	 * fa niente, perche' la lista e' vuota. E' il prezzo minimo per avere un secondo di preavviso,
-	 * e il preavviso e' l'intera differenza fra questo affisso e una punizione arbitraria.
-	 */
-	public static void tick(long gameTime) {
-		if (PENDING.isEmpty()) {
-			return;
-		}
-
-		PENDING.removeIf(pending -> {
-			if (gameTime < pending.atTick()) {
-				return false;
-			}
-
-			detonate(pending.level(), pending.position());
-			return true;
-		});
-	}
-
-	private static void detonate(ServerLevel level, Vec3 where) {
-		AriseFx.affixVolatileBlast(level, where, MobAffix.VOLATILE_RADIUS);
-
-		AABB area = new AABB(where, where).inflate(MobAffix.VOLATILE_RADIUS);
-
-		// Non tocca i mob: un affisso che uccide i suoi compagni farebbe del Volatile la cosa
-		// migliore che possa capitare in una stanza affollata, che e' l'opposto di una minaccia.
-		for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, area,
-				entity -> entity instanceof net.minecraft.world.entity.player.Player
-						|| entity instanceof ShadowEntity)) {
-			target.hurtServer(level, level.damageSources().magic(), MobAffix.VOLATILE_DAMAGE);
-		}
-
-		level.sendParticles(ParticleTypes.EXPLOSION, where.x(), where.y() + 0.5, where.z(),
-				1, 0.0, 0.0, 0.0, 0.0);
-	}
-
-	/** Dimentica gli scoppi in attesa in questo mondo: serve alla chiusura di un'istanza. */
-	public static void forget(ServerLevel level) {
-		PENDING.removeIf(pending -> pending.level() == level);
+		DelayedStrike.schedule(level, victim.position(), MobAffix.VOLATILE_RADIUS,
+				MobAffix.VOLATILE_DAMAGE, MobAffix.VOLATILE_FUSE);
 	}
 }
