@@ -1,0 +1,666 @@
+<title>Quello che il gioco non diceva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--violet);
+    background: linear-gradient(180deg, rgba(142,107,255,0.10), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------------------------------------------------------------- avvisi */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice.hot { border-top-color: var(--bad); }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice p + p { margin-top: 10px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .notice.hot .tag { color: var(--bad); }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+  .step.good { color: var(--good); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .compare > div { background: var(--panel-soft); padding: 16px 18px; }
+  .compare .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .compare .before .tag { color: var(--muted); }
+  .compare .after .tag { color: var(--good); }
+  .compare p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .compare .after p { color: var(--text); }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 620px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td b { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  tr.service td:first-child b { color: var(--gold); }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  .map {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+    white-space: pre;
+  }
+  .caption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  /* ---------------------------------------------------------------- la catena */
+
+  .chain { margin-top: 20px; border: 1px solid var(--line); background: var(--panel); padding: 10px; }
+  .chain svg { display: block; width: 100%; height: auto; }
+  .chain .n { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: #8FA0B5; }
+  .chain .t { font-family: "Chakra Petch", sans-serif; font-size: 12px; font-weight: 600; fill: #E8F2FF; }
+  .chain .g { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; fill: #FFD54F; }
+  .chain .box { fill: #0E1522; stroke: #1F2C42; }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: 52px 0 0; }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocco P2</p>
+    <h1>Quello che il gioco non diceva</h1>
+    <p class="lede">Otto difetti, tutti trovati <strong>giocando</strong>. Nessuno di questi dava un errore,
+      nessuno compariva nel collaudo statico, e tutti e otto erano lì da diversi blocchi. Tre erano bug veri —
+      uno arrivava a salvare dati sbagliati su disco — e cinque erano la stessa cosa detta in modi diversi:
+      il gioco sapeva qualcosa che al giocatore non diceva.</p>
+    <p class="facts">
+      <span><b>8</b> difetti chiusi</span>
+      <span><b>3</b> file nuovi</span>
+      <span><b>652</b> chiavi</span>
+      <span><b>60</b> prove verdi</span>
+      <span><b>0</b> eccezioni al boot</span>
+    </p>
+  </header>
+
+  <div class="notice">
+    <span class="tag">La lezione di questo giro</span>
+    <p>Il blocco precedente si chiudeva dicendo che ventuno blocchi non erano mai stati giocati e che
+      <em>il debito di verifica è l'unico che matura interessi</em>. Un'ora di partita ha prodotto otto
+      segnalazioni, di cui una — le ombre duplicate — stava scrivendo entità fantasma nel salvataggio a ogni
+      viaggio. <strong>Nessuna prova automatica le avrebbe prese tutte</strong>: quattro sì, e ora ci sono;
+      le altre quattro sono cose che si vedono solo con gli occhi.</p>
+  </div>
+
+  <section>
+    <h2><span class="step">1</span> Il primo regalo non si poteva indossare</h2>
+    <p class="kicker">Gli orecchini a rango E — e l'incarico dopo chiedeva di indossare qualcosa.</p>
+
+    <p>L'incarico che apre l'equipaggiamento regalava un pezzo <code>rollAny</code>: pescato fra
+      <b>tutti e quattordici</b> gli slot. Ma gli slot del Cacciatore si aprono col rango — orecchini a C,
+      mantello a B, collana ad A, talismano a S — quindi <strong>una volta su due</strong> il regalo finiva
+      in una casella che a rango E non esiste ancora. E l'incarico immediatamente successivo chiede di
+      indossare un pezzo: la catena si fermava su un oggetto che si poteva solo guardare.</p>
+
+    <div class="compare">
+      <div class="before">
+        <span class="tag">Prima</span>
+        <p>Un pezzo a caso di rango E. Poteva essere un anello (bene), un elmo (bene), o un paio di orecchini
+          che si indossano quindici livelli dopo (fine della catena).</p>
+      </div>
+      <div class="after">
+        <span class="tag">Adesso</span>
+        <p><b>L'Occhio dell'Oscurità</b>: un elmo, sempre lo stesso, che chiunque può mettersi dal primo
+          minuto. +2 armatura, +2 cuori, e <b>visione notturna</b> finché è in testa.</p>
+      </div>
+    </div>
+
+    <p>È il primo pezzo <em>unico</em> della mod: non si tira, si riceve. I suoi numeri però non sono scritti
+      a mano — sono <em>quote</em> del budget che la config assegna a quel rango e a quello slot, quindi chi
+      abbassa <span class="mono">base_power</span> abbassa anche l'Occhio. Vale un quinto in più di un pezzo
+      normale del suo rango: è quello che lo rende un regalo invece di un oggetto con un nome più bello.</p>
+
+    <div class="panel why">
+      <span class="tag">Perché due modificatori e non quattro</span>
+      <p>Il budget di un elmo di rango E è dieci punti di potenza, e un pezzo tirato li mette tutti su una
+        statistica sola. Il primo tentativo li spalmava su tre — armatura, fortuna, velocità d'attacco — e
+        usciva <em>+0,24 di fortuna</em> e <em>+1,8% di velocità</em>: numeri che nessuno legge, su un regalo
+        che sembrava più debole di un elmo qualunque pur costando di più. Due quote grosse, due numeri tondi.</p>
+    </div>
+
+    <p>La regola generale è cambiata con lui: <code>rollUsable</code> per i premi, <code>rollAny</code> per il
+      bottino. Un pezzo che non puoi ancora mettere, trovato in un varco, è una promessa; consegnato da un
+      incarico, è un difetto. Una prova nuova tira cinquecento premi per ogni rango e pretende che ognuno
+      finisca in una casella aperta.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">2</span> Otto quadrati grigi</h2>
+    <p class="kicker">Il selettore del colore delle ombre, invisibile da due blocchi.</p>
+
+    <p>Le pastiglie di colore erano dipinte, e sopra ognuna c'era un bottone trasparente per raccogliere il
+      clic. Solo che il corpo di ogni schermata di Arise si disegna dentro <code>extractBackground</code> —
+      <strong>prima</strong> dei widget — e un bottone di vanilla il suo sfondo grigio lo disegna eccome. Il
+      risultato è nello screenshot che me l'ha segnalato: otto quadrati identici, e l'unico segno visibile è
+      il trattino della selezione, che cade appena <em>sotto</em> il bottone.</p>
+
+    <pre><code><span class="c">// il commento che c'era, e che descriveva l'intenzione, non il risultato</span>
+// La pastiglia di colore va disegnata sopra il bottone: il bottone è solo
+// la zona cliccabile, il colore è l'informazione.</code></pre>
+
+    <p>Adesso le pastiglie non sono widget: si disegnano, e il clic si risolve con tre righe di aritmetica —
+      la stessa decisione già presa per le righe delle liste nel blocco C3, e per lo stesso motivo. Quello che
+      si vede e quello che si clicca sono calcolati dallo stesso numero, quindi non possono scollarsi. In più
+      il bordo si accende al passaggio del mouse, che prima non poteva.</p>
+  </section>
+
+  <section>
+    <h2><span class="step violet">3</span> Le ombre che si moltiplicavano</h2>
+    <p class="kicker">Il difetto peggiore del giro: scriveva entità fantasma nel salvataggio.</p>
+
+    <p>«4 ombre evocate», e nell'acqua ce n'erano dieci. Il meccanismo, una volta trovato, è lineare e vale
+      la pena scriverlo per intero perché è una <strong>classe</strong> di difetto, non un caso:</p>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Passo</th><th>Cosa succede</th></tr></thead>
+        <tbody>
+          <tr><td><b>1</b></td><td>Evochi quattro ombre nell'Overworld: quattro entità vere.</td></tr>
+          <tr><td><b>2</b></td><td>Entri in un varco. Le entità <em>restano dov'erano</em>: nessuno le porta con te.</td></tr>
+          <tr><td><b>3</b></td><td>Il loro chunk si scarica. Da quel momento <code>getEntityInAnyDimension</code> risponde «non c'è».</td></tr>
+          <tr><td><b>4</b></td><td>L'elenco delle evocazioni le dimentica — sono «morte», per quanto ne sa.</td></tr>
+          <tr><td><b>5</b></td><td>Premi G: ne nascono quattro nuove.</td></tr>
+          <tr><td><b>6</b></td><td>Torni in zona, il chunk si ricarica, e le prime quattro sono ancora lì. Otto.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="notice hot">
+      <span class="tag">La regola generale</span>
+      <p>Le entità di un chunk in cui non c'è nessuno <strong>non esistono, per chi le cerca</strong>.
+        <code>getBlockState</code> carica il chunk e risponde giusto; <code>getEntitiesOfClass</code> e
+        <code>getEntity</code> rispondono «vuoto» anche se quell'entità è salvata su disco a un metro di
+        distanza. È lo stesso difetto che nel blocco precedente aggiungeva un Araldo a ogni avvio del server:
+        <em>due volte in due giorni</em>, in due sistemi che non si conoscono.</p>
+    </div>
+
+    <p>La correzione è doppia, e la seconda metà è quella che conta:</p>
+    <ul>
+      <li><b>Cambiare dimensione richiama l'esercito.</b> Un aggancio a
+        <span class="mono">AFTER_PLAYER_CHANGE_LEVEL</span> smonta le evocazioni <em>nel mondo di partenza</em>,
+        dove sono ancora raggiungibili perché il giocatore ci era appena dentro.</li>
+      <li><b>Un'ombra che non risulta più evocata si toglie di mezzo da sola.</b> Ogni due secondi ogni ombra
+        chiede «risulto ancora nell'esercito di qualcuno?», e se la risposta è no si dissolve. Questo copre
+        anche i casi che nessun aggancio prende — un riavvio del server, un comando, un chunk tornato a
+        caricarsi tardi — e ha ripulito da solo le ombre già sparse nel tuo mondo.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="step">4</span> Chiusi dentro il varco</h2>
+    <p class="kicker">C'era una porta, ma era una riga di chat scorsa via dieci minuti prima.</p>
+
+    <p>Il modo di uscire esisteva: <span class="mono">/arise leave</span>, scritto nel messaggio di
+      completamento. Ma chi ha appena abbattuto il guardiano si guarda intorno e cerca <em>qualcosa</em>, non
+      si ricorda un comando: non trovando niente, la conclusione ragionevole è di essere rimasti chiusi
+      dentro.</p>
+
+    <p>Adesso, quando il guardiano cade, nella sua sala compare la <b>via di casa</b>: una pietra magnetica su
+      un lastrico di vetro con la luce sotto. Si vede da tutta la stanza, vanilla la conosce già come «il punto
+      a cui si torna», e si tocca invece di ricordarsela. Il messaggio di completamento non nomina più nessun
+      comando.</p>
+  </section>
+
+  <section>
+    <h2><span class="step gold">5</span> Cinque città irraggiungibili</h2>
+    <p class="kicker">Una rete di viaggio il cui primo nodo non si raggiungeva.</p>
+
+    <p>Il viaggio fra Associazioni esisteva, allo Sportello — <em>dentro</em> ogni città. Le città stanno a
+      duecentomila blocchi dallo spawn e a quindicimila l'una dall'altra: per usare la rete bisognava già
+      essere sulla rete. La prima traversata era a piedi, e ogni ritorno pure.</p>
+
+    <p>L'incarico che concede il viaggio adesso consegna anche l'oggetto che lo rende raggiungibile: il
+      <b>Sigillo dell'Associazione</b>. Clic destro, ovunque nel mondo, per sempre — con cinque minuti di
+      attesa fra un viaggio e l'altro, contati dal tempo di ricarica di vanilla, quello che disegna la
+      spazzola grigia sulla casella. Nessun numero da ricordare, nessuna schermata da aprire per sapere quando
+      sarà pronto.</p>
+
+    <div class="panel why">
+      <span class="tag">Perché la ricarica parte all'apertura dell'elenco</span>
+      <p>E non alla partenza. Chiudere il pannello senza scegliere niente è comunque un'informazione che si è
+        chiesta al Sistema: consultare la rete a costo zero, una volta al secondo, sarebbe una bussola gratuita
+        per cinque punti fissi del mondo.</p>
+    </div>
+
+    <p class="caption">La texture del Sigillo è generata dal codice, sedici per sedici: anello d'oro con la
+      luce da nord-ovest, campo blu notte, runa azzurra al centro.</p>
+  </section>
+
+  <section>
+    <h2><span class="step violet">6</span> Gli incarichi davano tutto per scontato</h2>
+    <p class="kicker">«Ho un Progetto nell'inventario. E adesso?»</p>
+
+    <p>La catena diceva <em>cosa</em> fare e nient'altro. «Fai finire un ciclo a un macchinario» — con in mano
+      un Progetto che non spiegava da nessuna parte di essere un <strong>ingrediente</strong>, e senza una riga
+      che dicesse che il macchinario si costruisce al banco da lavoro. Chi lo sapeva già non ne aveva bisogno;
+      per tutti gli altri era una porta senza maniglia.</p>
+
+    <p>Ogni incarico ha adesso due righe in più, e sono due cose diverse:</p>
+
+    <div class="compare">
+      <div class="before">
+        <span class="tag">Il racconto — perché il Sistema lo chiede</span>
+        <p><em>«Un'anima che non combatte può lavorare. È la differenza fra un Monarca e un becchino.»</em></p>
+      </div>
+      <div class="after">
+        <span class="tag">Le istruzioni — dove si preme</span>
+        <p>«Costruisci il Richiamo d'Anime al banco da lavoro — la ricetta è appena comparsa nel tuo libro —
+          piazzalo e mettici dentro un'Anima Errante. Il Progetto si consuma.»</p>
+      </div>
+    </div>
+
+    <p>Trentasei righe nuove, due per ognuno dei diciotto incarichi, in italiano e in inglese. Arrivano in chat
+      quando l'incarico comincia e restano nella schermata degli incarichi, dove la chat invece scorre via.
+      Quelle che parlano di comandi non nominano nessuna lettera: passano da <code>Component.keybind</code>, e
+      il client scrive il tasto che <em>tu</em> hai configurato.</p>
+
+    <h3>E il Progetto adesso parla</h3>
+    <p>Tre righe nel suo tooltip — cosa fa la macchina che descrive, che è un ingrediente, e che si consuma —
+      più la cosa che conta davvero: <strong>ricevere un Progetto apre la sua ricetta nel libro delle
+      ricette</strong>. Il tooltip serve a sapere che la ricetta esiste; il libro la mostra e la compila con un
+      clic. Il nome della ricetta si ricava da quello del Progetto togliendo il prefisso, così non c'è una
+      tabella in più da tenere allineata a mano.</p>
+  </section>
+
+  <section>
+    <h2><span class="step gold">7</span> Le statistiche non dicevano cosa fanno</h2>
+    <p class="kicker">«Aumento la forza e non vedo aumentare il danno. O almeno, non lo leggo da nessuna parte.»</p>
+
+    <p>Funzionava: la forza diventava danno da mischia, e l'attributo si aggiornava. Semplicemente non era
+      scritto in nessun punto del gioco. «Forza 12/400» sono due numeri che non rispondono all'unica domanda
+      che si ha davanti a un bottone «+».</p>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Dove</th><th>Cosa dice adesso</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Nella riga della statistica</b></td>
+            <td>Cosa hanno prodotto i punti spesi e cosa produrrebbe il prossimo:
+              <span class="mono">+4,80 danno da mischia</span> · <span class="mono">+0,40 a punto</span>.</td>
+          </tr>
+          <tr>
+            <td><b>Passandoci sopra</b></td>
+            <td>Un riquadro con il parametro del gioco, cosa cambia in partita, quanto vale un punto, quanto
+              arriva dai punti, quanto dall'equipaggiamento e il totale. Tutte e dodici, non solo le quattro
+              spendibili.</td>
+          </tr>
+          <tr>
+            <td><b>Nella colonna delle sorgenti</b></td>
+            <td>Il nome della statistica <em>e</em> il parametro che quel numero è:
+              «Forza · danno da mischia — 5,80».</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Nel farlo è emerso un difetto secondario: gli obiettivi <em>assoluti</em> («arriva al livello 3»)
+      ripassavano dal contatore ogni due secondi per conto del battito del server, riscrivendo il dato e
+      mandando un pacchetto di sincronizzazione ogni volta, per sempre. Adesso, se il numero non è cambiato,
+      non succede niente.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">8</span> Lo spazio dimensionale rimbalzava</h2>
+    <p class="kicker">Due sistemi che si litigavano lo stesso oggetto.</p>
+
+    <p>Shift+clic su un pezzo nello spazio dimensionale lo mandava nell'inventario. La spazzolata automatica —
+      quella che tiene in ordine raccogliendo l'equipaggiamento sparso — lo riportava dentro un attimo dopo. A
+      schermo il clic sembrava non fare niente, e l'unico modo di mettersi un elmo era parcheggiarlo sulla
+      barra rapida (l'unica zona che la spazzolata non tocca) e poi trascinarlo a mano nell'inventario di
+      vanilla.</p>
+
+    <p>Adesso shift+clic fa la cosa ovvia, in tutte e tre le direzioni:</p>
+    <ul>
+      <li><b>dallo spazio dimensionale</b> → si <em>indossa</em>. Se è un elmo, una corazza, gambe, stivali o
+        un'arma va nella casella di vanilla che gli spetta, purché sia libera; se è un accessorio va nella sua
+        casella del Cacciatore;</li>
+      <li><b>da addosso</b> → torna nello spazio dimensionale, e solo se è pieno finisce nell'inventario;</li>
+      <li><b>dall'inventario</b> → prima si prova a indossarlo, poi a riporlo.</li>
+    </ul>
+
+    <p>Sostituire d'ufficio quello che si ha già addosso, no: un clic che toglie qualcosa senza dirlo è
+      peggio di un clic che non fa niente. E accanto all'etichetta «Spazio dimensionale» c'è adesso scritto
+      come si usa, perché prima l'unico modo di scoprirlo era provarlo.</p>
+  </section>
+
+  <section>
+    <h2>Cosa guardare</h2>
+    <p class="kicker">In ordine di quanto è probabile che sia ancora storto.</p>
+
+    <ul class="check">
+      <li>Le pastiglie del colore, nel dettaglio di un'ombra: otto colori diversi, bordo acceso sotto il
+        mouse, trattino bianco sotto quello scelto.</li>
+      <li>Evocare, entrare in un varco, uscire, rievocare: il conto deve restare quello. Le ombre in più che
+        girano nel tuo mondo devono sparire da sole entro due secondi da quando le vedi.</li>
+      <li>Abbattere un guardiano e cercare la pietra nella sua sala. Toccarla riporta a casa.</li>
+      <li>Il Sigillo: clic destro lontano da tutto, scegliere una città, e la spazzola grigia sulla casella
+        per cinque minuti.</li>
+      <li>La schermata di stato a scala GUI 4: le tre righe per statistica non devono accavallarsi, e il
+        riquadro al passaggio del mouse deve stare dentro lo schermo.</li>
+      <li>La schermata degli incarichi: racconto e istruzioni sotto la descrizione. Se un incarico ne mostra
+        solo uno dei due, è il controllo dello spazio che ha tagliato — e vuol dire che il pannello va alzato
+        ancora.</li>
+      <li>Un Progetto in mano: tre righe di tooltip, e la ricetta nel libro (tasto delle ricette, in alto a
+        sinistra nel banco da lavoro).</li>
+      <li>Shift+clic su un elmo nello spazio dimensionale: deve finire in testa.</li>
+    </ul>
+
+    <hr>
+
+    <div class="verify">
+      <span class="tag">Verificato senza aprire il gioco</span>
+      <p>Sessanta prove verdi — sei nuove, fra cui quella che tira cinquecento premi per rango e pretende che
+        ogni pezzo finisca in una casella aperta, e quella che scrive e rilegge un pezzo unico. Collaudo
+        statico pulito su 652 chiavi in due lingue: gli incarichi senza racconto o senza istruzioni, e le
+        statistiche senza descrizione, adesso lo fanno fallire. Server avviato pulito, zero eccezioni, config
+        vecchia che si fonde con le due voci nuove senza un errore.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>Arise · blocco P2 — otto difetti, tutti trovati giocando.<br>
+      Il collaudo statico e le prove prendono quello che è scritto male. Il resto lo prende una partita.</p>
+  </footer>
+
+</div>

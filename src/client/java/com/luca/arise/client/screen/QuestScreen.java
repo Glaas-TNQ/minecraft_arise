@@ -7,6 +7,7 @@ import com.luca.arise.client.ui.AriseTheme;
 import com.luca.arise.client.ui.Glyphs;
 import com.luca.arise.client.ui.ListPanel;
 import com.luca.arise.quest.PlayerQuests;
+import com.luca.arise.gear.GearUnique;
 import com.luca.arise.quest.Quest;
 import com.luca.arise.registry.ModAttachments;
 
@@ -28,7 +29,7 @@ import net.minecraft.network.chat.Component;
 public class QuestScreen extends AriseScreen {
 
 	private static final int PANEL_W = 400;
-	private static final int PANEL_H = 210;
+	private static final int PANEL_H = 232;
 	private static final int LIST_W = 190;
 
 	private final ListPanel<Quest> list = new ListPanel<>(AriseTheme.ROW_HEIGHT);
@@ -126,6 +127,26 @@ public class QuestScreen extends AriseScreen {
 		}
 	}
 
+	/**
+	 * Un paragrafo mandato a capo, se c'e' spazio.
+	 *
+	 * <p>Il controllo non e' pignoleria: il pannello e' alto quanto e' alto, e un incarico che
+	 * regala anime, equipaggiamento <em>e</em> due paragrafi ci arriva vicino. Meglio un paragrafo
+	 * che manca — sta comunque in chat quando l'incarico comincia — di un paragrafo che esce dal
+	 * riquadro e finisce sopra ai bottoni.
+	 */
+	private int paragraph(GuiGraphicsExtractor graphics, Component text, int left, int right, int y,
+			int color) {
+		int lines = font.split(text, right - left).size();
+
+		if (y + lines * 11 > bodyBottom() - 40) {
+			return y;
+		}
+
+		graphics.textWithWordWrap(font, text, left, y, right - left, color);
+		return y + lines * 11 + 6;
+	}
+
 	private void drawDetail(GuiGraphicsExtractor graphics) {
 		int left = bodyLeft() + LIST_W + 12;
 		int right = bodyRight();
@@ -152,8 +173,12 @@ public class QuestScreen extends AriseScreen {
 		divider(graphics, left, right, y);
 		y += 7;
 
-		graphics.textWithWordWrap(font, quest.description(), left, y, right - left, AriseTheme.MUTED);
-		y += 11 * font.split(quest.description(), right - left).size() + 8;
+		graphics.textWithWordWrap(font, quest.description(), left, y, right - left, AriseTheme.TEXT);
+		y += 11 * font.split(quest.description(), right - left).size() + 6;
+
+		// Il perche' e il come, sotto al cosa. In chat scorrono via; qui restano.
+		y = paragraph(graphics, quest.lore(), left, right, y, AriseTheme.DISABLED);
+		y = paragraph(graphics, quest.brief(), left, right, y, AriseTheme.ACCENT);
 
 		if (now) {
 			bar(graphics, left, y, right - left, 3,
@@ -178,6 +203,28 @@ public class QuestScreen extends AriseScreen {
 			keyValue(graphics, Component.translatable("arise.screen.quest.gear"),
 					Component.translatable("arise.rank." + quest.gearRank()), left, right, y,
 					AriseTheme.GOLD);
+			y += 12;
+		}
+
+		// Il pezzo unico ha una riga sua: senza, l'unico incarico che regala un oggetto con un nome
+		// proprio era anche l'unico che non prometteva niente.
+		GearUnique unique = quest.unique() == null ? null : GearUnique.byName(quest.unique());
+
+		if (unique != null) {
+			keyValue(graphics, Component.translatable("arise.screen.quest.gear"),
+					unique.label(), left, right, y, AriseTheme.GOLD);
+			y += 12;
+		}
+
+		// Come si usa quello che questo incarico ha dato, ma solo per gli incarichi gia' fatti: su
+		// uno ancora da venire sarebbe la spiegazione di una cosa che non si ha.
+		//
+		// Il controllo sullo spazio non e' una precauzione teorica: il pannello dei dettagli e'
+		// alto quanto e' alto, e un incarico che dia anime, equipaggiamento e una descrizione lunga
+		// ci arriva vicino. Meglio una riga che manca di una riga che esce dal riquadro.
+		if (done && y + 22 <= bodyBottom()) {
+			Component hint = quest.grants().hint();
+			graphics.textWithWordWrap(font, hint, left, y + 4, right - left, AriseTheme.MUTED);
 		}
 	}
 }

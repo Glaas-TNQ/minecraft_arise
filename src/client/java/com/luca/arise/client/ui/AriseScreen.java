@@ -104,6 +104,14 @@ public abstract class AriseScreen extends Screen {
 	 * Un pannello dipinto li' dentro finisce <strong>sopra i bottoni</strong> e li nasconde — i
 	 * bottoni restano cliccabili, ma invisibili, che e' il modo peggiore di rompere una schermata.
 	 * Disegnando qui, l'ordine diventa quello giusto: sfondo, telaio, corpo, e i widget sopra tutto.
+	 *
+	 * <p><strong>Il rovescio della medaglia vale per chi scrive {@link #content}</strong>, e ha gia'
+	 * rotto una schermata: tutto quello che {@code content} disegna finisce <em>sotto</em> i widget.
+	 * Le pastiglie del colore, nel dettaglio di un'ombra, erano dipinte qui e cliccabili grazie a
+	 * otto bottoni trasparenti messi sopra — e in gioco si vedevano otto quadrati grigi identici,
+	 * perche' un bottone di vanilla il suo sfondo lo disegna eccome. Quando una cosa dev'essere
+	 * <em>vista</em> e <em>cliccata</em>, si disegna in {@code content} e il click si risolve con
+	 * l'aritmetica in {@code mouseClicked}, come per le righe di {@link ListPanel}.
 	 */
 	@Override
 	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {

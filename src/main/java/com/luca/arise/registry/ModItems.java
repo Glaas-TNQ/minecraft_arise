@@ -3,7 +3,12 @@ package com.luca.arise.registry;
 import java.util.EnumMap;
 import java.util.Map;
 
+import java.util.function.Function;
+
 import com.luca.arise.AriseMod;
+import com.luca.arise.city.AssociationSealItem;
+import com.luca.arise.gate.AbyssCompassItem;
+import com.luca.arise.workshop.BlueprintItem;
 import com.luca.arise.workshop.MachineKind;
 
 import net.minecraft.core.Registry;
@@ -53,6 +58,21 @@ public final class ModItems {
 	public static final Item BLUEPRINT_FORGE = blueprint(MachineKind.FORGE);
 	public static final Item BLUEPRINT_WELL = blueprint(MachineKind.WELL);
 
+	/**
+	 * La Bussola dell'Abisso: punta al varco piu' vicino invece che a un nord fisso. La logica sta
+	 * in {@link AbyssCompassItem}; qui e' solo la registrazione, come ogni altro item della mod.
+	 */
+	public static final Item ABYSS_COMPASS = register("abyss_compass", Rarity.UNCOMMON, 1, AbyssCompassItem::new);
+
+	/**
+	 * Il Sigillo dell'Associazione: apre la rete di viaggio ovunque ci si trovi.
+	 *
+	 * <p>Raro e in copia unica, come la Bussola: non e' un oggetto da accumulare, e' una chiave.
+	 * Lo consegna l'incarico che concede il viaggio fra le citta'. Vedi {@link AssociationSealItem}.
+	 */
+	public static final Item ASSOCIATION_SEAL =
+			register("association_seal", Rarity.RARE, 1, AssociationSealItem::new);
+
 	private ModItems() {
 	}
 
@@ -77,16 +97,22 @@ public final class ModItems {
 	private static Item blueprint(MachineKind kind) {
 		// Rari, e non per vanita': un Progetto e' l'unica cosa che sta fra un giocatore e un
 		// macchinario, quindi deve saltare all'occhio in un baule pieno di roba.
-		Item item = register("blueprint_" + kind.path(), Rarity.RARE, 16);
+		Item item = register("blueprint_" + kind.path(), Rarity.RARE, 16,
+				properties -> new BlueprintItem(properties, kind));
 		BLUEPRINTS.put(kind, item);
 		return item;
 	}
 
 	private static Item register(String path, Rarity rarity, int stackSize) {
+		return register(path, rarity, stackSize, Item::new);
+	}
+
+	private static Item register(String path, Rarity rarity, int stackSize,
+			Function<Item.Properties, Item> factory) {
 		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, AriseMod.id(path));
 
 		return Registry.register(BuiltInRegistries.ITEM, key,
-				new Item(new Item.Properties()
+				factory.apply(new Item.Properties()
 						.rarity(rarity)
 						.stacksTo(stackSize)
 						.setId(key)));

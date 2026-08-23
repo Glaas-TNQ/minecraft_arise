@@ -139,6 +139,11 @@ public record AriseConfig(
 		return hunter.gems();
 	}
 
+	/** La prima ora di gioco, scorciatoia per la voce annidata. */
+	public AwakeningConfig awakening() {
+		return hunter.awakening();
+	}
+
 	/** L'Officina delle Anime, scorciatoia per la voce annidata. */
 	public WorkshopConfig workshop() {
 		return hunter.workshop();

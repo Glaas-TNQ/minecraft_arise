@@ -123,6 +123,21 @@ public final class CityPlan {
 		return List.copyOf(fills);
 	}
 
+	/**
+	 * La sola spianata: plinto, aria sopra e suolo, senza niente costruito.
+	 *
+	 * <p>E' il pezzo che il generatore del mondo posa <em>prima</em> della vegetazione. Gli alberi
+	 * vanilla nascono solo dove sotto c'e' terra o erba: su un marciapiede non attecchiscono, e
+	 * cosi' nessuno sporge nel chunk accanto dove la citta' e' gia' finita. Il resto della citta'
+	 * arriva con {@link #of} all'ultimo passo della generazione, quando strutture e vegetazione
+	 * hanno gia' fatto quello che dovevano e non possono piu' sovrascrivere niente.
+	 */
+	public static List<Fill> terraceOnly(City city, CityConfig config, int baseY) {
+		List<Fill> fills = new ArrayList<>();
+		terrace(fills, city, Grid.of(city, config), baseY);
+		return List.copyOf(fills);
+	}
+
 	/** Quanto dista il monumento dalla piazza: tre isolati, o quanto ce ne sta prima del bordo. */
 	private static int landmarkOffset(City city, Grid grid) {
 		int radius = city.landmark().radius();

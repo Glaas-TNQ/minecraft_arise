@@ -41,6 +41,15 @@ public class GateEntity extends Entity {
 	/** Ogni quanto il varco si fa sentire. */
 	private static final int SOUND_INTERVAL = 120;
 
+	/**
+	 * Ogni quanto il varco si annota nell'indice della mappa.
+	 *
+	 * <p>Al primo tick e poi ogni cinque secondi: la prima volta per esistere sulla mappa, le
+	 * successive per tenere aggiornato il tempo che resta. Scrivere a ogni tick sarebbe un
+	 * attachment riscritto venti volte al secondo per niente.
+	 */
+	private static final int REGISTRY_INTERVAL = 100;
+
 	private GateOffer offer;
 
 	/** Tick rimasti prima di svanire. Conta alla rovescia, così si salva e si riprende com'era. */
@@ -99,6 +108,10 @@ public class GateEntity extends Entity {
 			return;
 		}
 
+		if (this.tickCount % REGISTRY_INTERVAL == 1) {
+			GateRegistry.update(this);
+		}
+
 		if (this.tickCount % PARTICLE_INTERVAL == 0) {
 			AriseFx.gateVarco(level, this.position(), tint());
 		}
@@ -131,6 +144,20 @@ public class GateEntity extends Entity {
 		}
 
 		return InteractionResult.SUCCESS;
+	}
+
+	/**
+	 * Quando il varco sparisce davvero — attraversato, rifiutato, scaduto — esce anche dall'indice
+	 * della mappa. Quando invece il suo chunk si scarica non sparisce: dorme, e l'indice è proprio
+	 * il modo in cui la mappa continua a saperlo.
+	 */
+	@Override
+	public void remove(RemovalReason reason) {
+		if (reason.shouldDestroy() && this.level() instanceof ServerLevel level) {
+			GateRegistry.forget(level.getServer(), this.getUUID());
+		}
+
+		super.remove(reason);
 	}
 
 	/** Attraversabile: è un varco, non un muro. */

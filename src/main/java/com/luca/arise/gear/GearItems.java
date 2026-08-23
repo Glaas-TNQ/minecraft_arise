@@ -119,7 +119,9 @@ public final class GearItems {
 			stack.set(DataComponents.DYED_COLOR, new DyedItemColor(Rank.E.color() & 0xFFFFFF));
 		}
 
-		if (piece.rank() == Rank.S) {
+		// Il luccichio dice "questo non e' un pezzo qualunque", e sono due i casi in cui e' vero:
+		// il rango piu' alto, e i pezzi unici — che di rango possono essere anche i piu' bassi.
+		if (piece.rank() == Rank.S || piece.unique().isPresent()) {
 			stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
 		}
 

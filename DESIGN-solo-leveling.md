@@ -289,6 +289,17 @@ trasferimento fra due schermate — fattibile, ma va scritto.
 > mantello, collana, talismano, orecchini, anelli. Il §8.4 sugli sblocchi vale ancora, ed è per
 > quelle.
 
+> **Revisione (texture dell'Officina e Bussola dell'Abisso).** I quattro macchinari, i quattro
+> Progetti e la Moneta d'Anima hanno adesso texture proprie — palette "Abisso" (violetto del
+> vuoto, ciano dell'anima, bronzo) invece dei prestiti da sculk/respawn anchor/blast furnace — e la
+> Bussola dell'Abisso (`arise:abyss_compass`) è arrivata come primo attrezzo indipendente
+> dall'equipaggiamento: punta al varco più vicino leggendo `GateRegistry`, non un nord fisso.
+>
+> **Sono immagini disegnate da un'IA**, in violazione diretta della regola Modrinth citata al §6.5
+> e alla base della decisione qui sopra. Luca ne è stato avvisato esplicitamente e ha scelto di
+> procedere comunque. Se e quando la mod dovesse pubblicarsi su Modrinth, queste texture (e questa
+> nota) vanno riviste per prime.
+
 ### 8.2 Le sorgenti di statistica si sommano prima di diventare modificatori
 
 Oggi ogni `Stat` ha un modificatore con id fisso, rimpiazzato a ogni ricalcolo (regola §6 di
@@ -387,6 +398,44 @@ catena, perché è così che ci si arriva.
 Il risveglio si completa arrivando a un passo dalla morte. Si intercetta in `ALLOW_DEATH`, che è
 l'unico evento capace di dire *no, questa morte non avviene*: rianimare dopo il fatto sarebbe stato
 visibile — schermata di morte, inventario a terra, punto di respawn.
+
+### 9.1.1 La Sala del Risveglio
+
+Il colpo che non uccide non lascia più il giocatore dov'era. Dopo poco più di due secondi di cecità
+— il tempo di chiudere la tenda — si compare in una **stanza sola**, in fondo alla dimensione dei
+varchi, a ovest dell'origine dove nessuna istanza di Gate arriverà mai. All'altro capo c'è
+l'**Araldo del Sistema**, e i quattordici blocchi in mezzo sono tutta la scenografia che serve: si
+cammina verso qualcuno invece di trovarselo addosso.
+
+L'Araldo dice **sei pagine, una per clic**: dove sei, cos'è il Sistema, come funziona la catena, che
+tasti servono, cosa arriva dopo, e infine ti rimanda esattamente da dove sei stato portato via — con
+qualche secondo di protezione, perché la cosa che ti stava uccidendo è ancora lì. Le pagine che
+parlano di comandi non nominano nessuna lettera: passano `Component.keybind`, e il client scrive il
+tasto che quel giocatore ha davvero configurato.
+
+Tre vincoli hanno deciso l'implementazione, e ognuno è costato un difetto per essere trovato:
+
+1. **il teletrasporto non avviene dentro `ALLOW_DEATH`**. Quell'evento scatta mentre Minecraft sta
+   ancora decidendo cosa fare del colpo: il risveglio si *prenota*, e un battito del server lo
+   esegue qualche tick dopo;
+2. **la stanza nasce con il mondo**, come le città, e non al momento del bisogno: tremila blocchi
+   posati nel tick in cui il giocatore sta per morire sono l'istante peggiore dell'intera partita
+   per fermare il server;
+3. **l'Araldo si controlla un secondo dopo l'arrivo**, non prima. Le entità di un chunk in cui non
+   c'è nessuno non esistono per chi le cerca: cercarlo in una sala vuota risponde sempre "non c'è",
+   e ne metteva un secondo a ogni avvio del server.
+
+### 9.1.2 Ogni sistema dice come si usa
+
+La catena consegnava i sistemi uno alla volta e ne annunciava il nome — *Sbloccato: l'esercito
+d'ombra* — poi lasciava indovinare che c'è un tasto, che va premuto vicino a un cadavere, e che il
+cadavere dev'essere fresco. Adesso ogni `Unlock` ha una riga che dice **dove si preme**, mostrata
+nell'istante in cui il sistema arriva e ripetuta nella schermata degli incarichi. È la metà che
+mancava: senza, un incarico che concede qualcosa è un premio da cercare su internet.
+
+Per lo stesso motivo il contatore dell'incarico in corso compare **sopra la hotbar** a ogni scatto:
+quindici uccisioni senza nessun segno che stessero servendo a qualcosa erano quindici uccisioni al
+buio, e il riquadro dell'HUD sta in alto a sinistra — cioè non dove si guarda mentre si combatte.
 
 ### 9.2 Lo stato è un numero
 
@@ -553,6 +602,31 @@ ancora capendo dove guardare.
 Il momento giusto e' **l'avvio del server**. Su un mondo nuovo e' letteralmente la creazione del
 mondo; su un mondo che le ha gia', il controllo di esistenza costa cinque letture e non fa niente.
 Nessuna bandiera da salvare: la prova che una citta' esiste resta la citta' stessa.
+
+**Rivisto (blocco M):** anche l'avvio del server era tardi. Il cantiere a budget metteva venti
+minuti a tirare su cinque citta', e il giocatore era gia' dentro. Ora le citta' sono una
+**feature del generatore**, come un villaggio: ogni chunk del loro perimetro nasce gia' costruito,
+in due passate — la spianata al primo passo della decorazione, cosi' la vegetazione vanilla non
+trova terra su cui piantare alberi che sporgerebbero nel chunk accanto; la citta' intera
+all'ultimo passo, sopra qualunque struttura vanilla capitata li'. Costo all'avvio: zero. Il
+cantiere a budget resta per ricostruire a comando e per i mondi i cui chunk laggiu' erano gia'
+stati generati prima della mod. La pianta e' una sola, condivisa (`CityPlans`), perche' due
+piante calcolate per conto proprio darebbero una citta' sfalsata di un gradino a ogni bordo di chunk.
+
+### 11.2b La mappa del mondo
+
+Due sistemi che non si parlavano — le citta', blocchi a duecentomila blocchi, e i varchi, entita'
+a cento — diventano sulla mappa la stessa cosa: un segno con una posizione. Il problema e' la
+scala: nessuna inquadratura mostra bene entrambi. La mappa si apre **su chi la guarda**, a una
+scala in cui i varchi attorno si leggono, e tutto cio' che sta fuori — le citta', sempre — resta
+sul bordo come una freccia con la distanza. Rotella per la scala, trascinare per spostarsi, un
+bottone per il mondo intero.
+
+I varchi stanno in un **indice** (`GateRegistry`, attachment persistente dell'Overworld), non
+perche' il mondo non sappia contarli — chi apre un varco continua a contarli nel mondo — ma perche'
+un varco rimasto indietro in un chunk scaricato non si puo' interrogare, ed e' esattamente quello
+che la mappa serve a ritrovare. L'indice e' un appunto, non la verita': si riconcilia a ogni
+lettura (chunk sveglio e varco assente → voce tolta), e un varco che dorme lo dice.
 
 E le citta' crescono: **da 320 a 512 blocchi di lato**, cioe' due volte e mezzo la superficie.
 E' il numero che governa tutto il resto — isolati, quartieri, distanza fra un monumento e il

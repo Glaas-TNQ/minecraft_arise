@@ -236,8 +236,8 @@ public final class GateSpawner {
 		AriseFx.gateVarcoDistant(player);
 	}
 
-	/** Il punto cardinale, in ottavi. */
-	private static Component direction(Vec3 from, Vec3 to) {
+	/** Il punto cardinale, in ottavi. Pacchetto-visibile: se ne serve anche {@link AbyssCompassItem}. */
+	static Component direction(Vec3 from, Vec3 to) {
 		double dx = to.x() - from.x();
 		double dz = to.z() - from.z();
 

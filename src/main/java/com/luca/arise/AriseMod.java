@@ -18,6 +18,7 @@ import com.luca.arise.registry.ModItems;
 import com.luca.arise.registry.ModComponents;
 import com.luca.arise.registry.ModMenus;
 import com.luca.arise.registry.ModEntities;
+import com.luca.arise.registry.ModFeatures;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -42,6 +43,8 @@ public class AriseMod implements ModInitializer {
 		ModMenus.init();
 		ModEntities.init();
 		ModSounds.init();
+		// Le citta' nascono con i chunk: la feature va nel registro prima che il mondo si carichi.
+		ModFeatures.init();
 		// Prima dei giocatori: registra l'equipaggiamento fra le sorgenti di statistica.
 		GearManager.init();
 		ModPayloads.register();

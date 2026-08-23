@@ -1,0 +1,724 @@
+<title>Dove va Arise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--violet);
+    background: linear-gradient(180deg, rgba(142,107,255,0.10), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------------------------------------------------------------- avvisi */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice.hot { border-top-color: var(--bad); }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice p + p { margin-top: 10px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .notice.hot .tag { color: var(--bad); }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+  .step.good { color: var(--good); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .compare > div { background: var(--panel-soft); padding: 16px 18px; }
+  .compare .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .compare .before .tag { color: var(--muted); }
+  .compare .after .tag { color: var(--good); }
+  .compare p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .compare .after p { color: var(--text); }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 620px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td b { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  tr.service td:first-child b { color: var(--gold); }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  .map {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+    white-space: pre;
+  }
+  .caption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  /* ---------------------------------------------------------------- la catena */
+
+  .chain { margin-top: 20px; border: 1px solid var(--line); background: var(--panel); padding: 10px; }
+  .chain svg { display: block; width: 100%; height: auto; }
+  .chain .n { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: #8FA0B5; }
+  .chain .t { font-family: "Chakra Petch", sans-serif; font-size: 12px; font-weight: 600; fill: #E8F2FF; }
+  .chain .g { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; fill: #FFD54F; }
+  .chain .box { fill: #0E1522; stroke: #1F2C42; }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: 52px 0 0; }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · dove andare adesso</p>
+    <h1>Sette direzioni</h1>
+    <p class="lede">Il progetto ha <strong>ventinove blocchi</strong> nella lista di stato e
+      <strong>otto</strong> con la spunta. Non è un giudizio sul codice — è il fatto più importante da cui
+      partire per decidere cosa fare dopo. Qui ci sono sette strade, con quello che costano davvero, quello
+      che rischiano, e la ragione per cui sceglieresti una invece delle altre.</p>
+    <p class="facts">
+      <span><b>168</b> file Java</span>
+      <span><b>578</b> chiavi</span>
+      <span><b>54</b> prove</span>
+      <span><b>18</b> incarichi</span>
+      <span><b>8</b> blocchi verificati</span>
+      <span><b>21</b> mai visti in gioco</span>
+    </p>
+  </header>
+
+  <div class="notice hot">
+    <span class="tag">Il conto onesto</span>
+    <p>Ventuno blocchi sono marcati <em>«compilato, da verificare in gioco»</em>: F6 e F7 da quando esistono
+      le abilità, tutta la serie B, tutta la C, l'equipaggiamento, l'Officina, il mercato, le città nel seme,
+      la mappa, e da oggi la Sala del Risveglio. Compilano, passano il collaudo statico, girano su un server
+      che non lancia eccezioni. <strong>Nessuno li ha mai giocati.</strong></p>
+    <p>Questo non rende il codice sbagliato: rende <em>sconosciuto</em> il suo stato. E ogni blocco nuovo
+      costruito sopra a venti non verificati aumenta il numero di posti in cui cercare quando qualcosa non
+      funzionerà.</p>
+  </div>
+
+  <section>
+    <h2>La scelta in una tabella</h2>
+    <p class="kicker">Sette direzioni, e cosa ognuna compra davvero.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Direzione</th><th>Costo</th><th>Cosa compra</th><th>Rischio se la rimandi</th></tr>
+        </thead>
+        <tbody>
+          <tr class="service">
+            <td><b>1 · Il debito di verifica</b></td>
+            <td>1–2 sessioni di gioco</td>
+            <td>Sapere cosa funziona davvero</td>
+            <td>Alto e composto: cresce a ogni blocco nuovo</td>
+          </tr>
+          <tr class="service">
+            <td><b>2 · Gli NPC che si moltiplicano</b></td>
+            <td>Mezza sessione</td>
+            <td>Un difetto confermato, cercato dove si ripete</td>
+            <td>Alto: salva i mondi, in silenzio</td>
+          </tr>
+          <tr>
+            <td><b>3 · L'esercito che sembra un esercito</b></td>
+            <td>2–3 sessioni</td>
+            <td>Il cuore di Solo Leveling, che oggi è il pezzo più povero</td>
+            <td>Nessuno tecnico. È il gioco che resta piatto</td>
+          </tr>
+          <tr>
+            <td><b>4 · Il Monarca in combattimento</b></td>
+            <td>2 sessioni</td>
+            <td>Quattro abilità su cento livelli diventano dieci</td>
+            <td>Il livello 40 non dà più niente di nuovo</td>
+          </tr>
+          <tr>
+            <td><b>5 · La voce della mod</b></td>
+            <td>1–2 sessioni + asset</td>
+            <td>43 suoni vanilla diventano suoni tuoi</td>
+            <td>Nessuno. Ma è ciò che separa «una mod» da «quella mod»</td>
+          </tr>
+          <tr>
+            <td><b>6 · Due Cacciatori</b></td>
+            <td>3+ sessioni</td>
+            <td>Il multigiocatore, che oggi non esiste per costruzione</td>
+            <td>Cresce: ogni sistema nuovo va poi rifatto per due</td>
+          </tr>
+          <tr>
+            <td><b>7 · Dopo la maestria</b></td>
+            <td>2–3 sessioni</td>
+            <td>Una ragione per giocare dopo il diciottesimo incarico</td>
+            <td>Basso finché nessuno arriva in fondo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step good">1</span> Il debito di verifica</h2>
+    <p class="kicker">La direzione che consiglierei per prima, e non è quella divertente.</p>
+
+    <p>Il CLAUDE.md dice <em>«La compilazione non è una verifica»</em> e ha ragione, ma la lista di stato dice
+      che negli ultimi quindici blocchi quella regola non è stata applicata. Il risultato è che oggi nessuno
+      sa se l'equipaggiamento cade davvero per terra, se i macchinari macinano, se il mercato ha i venditori,
+      se la mappa disegna. Sono tutte cose che si scoprono in venti minuti di gioco <em>a testa</em>.</p>
+
+    <div class="panel why">
+      <span class="tag">Perché è più urgente di quanto sembri</span>
+      <p>Un difetto trovato nella sessione in cui è stato scritto costa dieci minuti. Lo stesso difetto
+        trovato quindici blocchi dopo costa un'ora, perché prima bisogna capire quale dei quindici lo ha
+        introdotto. <strong>Il debito di verifica è l'unico che matura interessi.</strong> E questa sessione
+        ne ha appena dato un esempio: l'Araldo duplicato non era un caso limite — era la prima volta che
+        qualcuno guardava.</p>
+    </div>
+
+    <h3>Cosa costruirei per rendere la verifica economica</h3>
+    <ul>
+      <li><b>Il mondo di collaudo.</b> <span class="mono">/arise lab</span> esiste già e arreda una stanza
+        con tutti i sistemi accesi. Manca il gradino prima: un mondo con le cinque città già visitate, un
+        personaggio di livello 40, l'esercito pieno e l'inventario carico. Un comando che lo prepari, e ogni
+        verifica futura parte da lì invece che da un mondo nuovo.</li>
+      <li><b>I comandi da console non funzionano</b> in questo ambiente di sviluppo — fallisce anche
+        <span class="mono">list</span>, che è di Minecraft. Vale mezz'ora capire perché: senza, ogni prova
+        richiede di aprire il client e giocare, e con quella mezz'ora si aprirebbe la strada a
+        <em>verificare via script</em> (avvia, esegui, leggi il log) tutto ciò che non è grafica.</li>
+      <li><b>Leggere il mondo salvato.</b> Il trucco usato oggi per la Sala — avviare, fermare, leggere le
+        region con venti righe di Python — funziona per qualunque cosa che finisca in blocchi o entità:
+        città, macchinari, bottino a terra, NPC. Vale la pena farne uno strumento in
+        <span class="mono">tools/</span> accanto a <span class="mono">collaudo.py</span>.</li>
+      <li><b>Una checklist per blocco.</b> Le pagine di consegna in <span class="mono">docs/</span> ce
+        l'hanno già in fondo, ognuna. Vanno raccolte in un elenco solo, e spuntate.</li>
+    </ul>
+
+    <div class="verify">
+      <span class="tag">Scegli questa se</span>
+      <p>Vuoi tornare a una situazione in cui «fatto» vuol dire qualcosa. È anche la direzione che rende più
+        rapide tutte le altre sei — e l'unica che, mentre la percorri, ti fa <em>giocare</em> alla tua mod,
+        che dopo venti blocchi non è un dettaglio.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">2</span> Gli NPC che si moltiplicano</h2>
+    <p class="kicker">Un difetto confermato una volta, che vive probabilmente in un secondo posto.</p>
+
+    <p>Oggi ho confermato — leggendo le region, non teorizzando — che l'Araldo veniva duplicato a ogni avvio
+      del server. La causa è generale: <strong>le entità di un chunk in cui non c'è nessuno non esistono, per
+      chi le cerca.</strong> <code>getBlockState</code> carica il chunk e risponde giusto;
+      <code>getEntitiesOfClass</code> risponde «vuoto» anche se quell'entità è salvata su disco a un metro di
+      distanza. Chi ripopola in base a quella risposta, duplica.</p>
+
+    <p>La stessa forma esatta sta in <span class="mono">NpcManager.populate</span>, chiamato da
+      <span class="mono">CityManager.travel</span> <em>nello stesso tick</em> in cui il giocatore viene
+      teletrasportato in città:</p>
+
+    <pre><code><span class="c">// CityManager.travel, riga 436</span>
+player.teleportTo(level, x, y, z, Set.of(), 180.0F, 0.0F, true);
+<span class="c">// ...e subito dopo, nello stesso tick:</span>
+NpcManager.populate(level, city, (int) y);   <span class="c">← occupied() puo' rispondere "vuoto"</span></code></pre>
+
+    <p>Il commento lì accanto dice che i chunk sono caricati perché è appena arrivato un giocatore, ed è vero
+      per i <em>blocchi</em>. Per le entità il caricamento è un'altra cosa e arriva dopo. Se succede, ogni
+      viaggio in città aggiunge <strong>nove</strong> venditori sopra i nove che c'erano.</p>
+
+    <div class="panel why">
+      <span class="tag">Come verificarlo in dieci minuti, senza giocare</span>
+      <p>Viaggiare in una città due volte, fermare il server, e contare le entità
+        <code>arise:shopkeeper</code> nelle region dell'Overworld con lo script già scritto oggi. Nove è
+        giusto; diciotto è il difetto. <em>Nel mondo di sviluppo attuale non c'è ancora nessun venditore
+        salvato</em> — nessuno ha mai messo piede in una città — quindi la prova parte pulita.</p>
+    </div>
+
+    <p>La correzione è quella già applicata alla Sala: separare «costruisci» da «controlla chi c'è», e fare
+      il secondo un secondo dopo, con un conto alla rovescia. Vale la pena farne una regola sola in un posto
+      solo, invece di due copie: qualcosa come <span class="mono">EntityCensus.after(player, ticks, azione)</span>,
+      usata sia dal mercato che dalla Sala.</p>
+
+    <div class="verify">
+      <span class="tag">Scegli questa se</span>
+      <p>Preferisci sistemare una classe di difetto mentre è ancora fresca in testa. È mezza sessione, e i
+        difetti che salvano dati sbagliati su disco sono gli unici che il giocatore non può disfare.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step violet">3</span> L'esercito che sembra un esercito</h2>
+    <p class="kicker">Il cuore di Solo Leveling è oggi il sistema meno approfondito della mod.</p>
+
+    <p>Un'ombra di rango S e una di rango E si comportano <strong>esattamente allo stesso modo</strong>: la
+      differenza è tutta nei numeri degli attributi e nel colore. L'IA è quella vanilla di un lupo
+      addomesticato:</p>
+
+    <pre><code>FloatGoal · SitWhenOrderedToGoal · MeleeAttackGoal(1.2)
+FollowOwnerGoal(1.15, 8.0, 3.0) · WaterAvoidingRandomStroll · LookAtPlayer
+OwnerHurtByTarget · OwnerHurtTarget · HurtByTarget · NearestAttackableTarget</code></pre>
+
+    <p>Conseguenze concrete: l'ombra estratta da uno scheletro <em>corre addosso</em> al nemico invece di
+      tirargli le frecce; venti ombre evocate sono venti lupi che si accalcano sullo stesso bersaglio; le tre
+      posture (aggressiva, difensiva, passiva) sono l'unico comando che esiste; e un esercito da cinquanta
+      non si dispone, si ammassa.</p>
+
+    <h3>Cosa costruirei</h3>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Pezzo</th><th>Cosa cambia</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>I ruoli</b></td>
+            <td>L'origine dell'ombra decide come combatte: scheletro → arciere (tiene la distanza), zombie →
+              fante, ragno → assalitore che aggira, golem → scudo che intercetta chi punta il Monarca. È il
+              cambiamento con il rapporto resa/costo più alto di tutta questa lista.</td>
+          </tr>
+          <tr>
+            <td><b>Le formazioni</b></td>
+            <td>L'esercito ha già una schermata e i soul coin; manca il posto in cui stare. Cuneo, cerchio,
+              linea: tre disposizioni calcolate attorno al Monarca, ricalcolate quando si muove.</td>
+          </tr>
+          <tr>
+            <td><b>Il comando puntato</b></td>
+            <td>Un tasto che manda l'esercito <em>dove guardi</em> invece che addosso a ciò che colpisci.
+              Senza, una postura aggressiva è tutto o niente.</td>
+          </tr>
+          <tr>
+            <td><b>I generali</b></td>
+            <td>Nel webtoon l'esercito ha dei nomi. Un'ombra di rango A+ che comanda un gruppetto, con un
+              bonus a chi la segue, dà una ragione per non congedare le vecchie.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="verify">
+      <span class="tag">Scegli questa se</span>
+      <p>Vuoi che la mod <em>si senta</em> come la storia da cui viene. È anche la direzione con più rischio
+        di prestazioni — cinquanta entità con pathfinding proprio — quindi va fatta con un tetto e un occhio
+        al tempo di tick.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step violet">4</span> Il Monarca in combattimento</h2>
+    <p class="kicker">Quattro abilità distribuite su cento livelli.</p>
+
+    <p>Le abilità si aprono ai livelli <b>5, 10, 20 e 30</b>. Dal trentunesimo in poi salire di livello dà
+      punti statistica e nient'altro: settanta livelli senza una capacità nuova. E i boss dei Gate sono mob
+      vanilla con vita e danno moltiplicati — un boss di rango S è uno zombie che picchia forte.</p>
+
+    <h3>Due mezze giornate distinte</h3>
+    <ul>
+      <li><b>Le abilità</b>, da quattro a otto o dieci, distribuite fino al livello 80, con almeno un paio
+        che non siano danno: un'evocazione istantanea dell'intero esercito, un'estrazione di massa dopo una
+        battaglia, una marcatura che le ombre seguono. I tempi di ricarica sono già in config, e la barra
+        dell'HUD disegna già le caselle spente col livello richiesto.</li>
+      <li><b>I boss</b>, con una meccanica per rango invece di un moltiplicatore: uno che evoca, uno che
+        divide la stanza, uno che va colpito quando è scoperto. Il pannello di analisi del varco già
+        annuncia <em>chi</em> è il boss: da lì a promettere anche <em>cosa fa</em> il passo è corto.</li>
+    </ul>
+
+    <div class="verify">
+      <span class="tag">Scegli questa se</span>
+      <p>Nelle prove ti sei accorto che dopo il livello 30 combattere è sempre uguale. È la direzione che si
+        vede di più in una singola partita.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step gold">5</span> La voce della mod</h2>
+    <p class="kicker">Ventisei eventi sonori, quarantatré voci, zero file tuoi.</p>
+
+    <p>Tutti i suoni di Arise puntano a file di Minecraft con il prefisso <span class="mono">minecraft:</span>.
+      È stata una decisione giusta — il sistema è già completo, i sottotitoli tradotti, e il giorno in cui
+      arriva un <span class="mono">.ogg</span> vero si cambia una riga — ma è una decisione che aspetta da
+      dieci blocchi. Oggi il risveglio, l'estrazione di un'ombra e l'apertura di un varco suonano come cose
+      che il giocatore ha già sentito mille volte.</p>
+
+    <p>Insieme all'audio, la parte visiva che manca davvero: le ombre sono il modello umanoide vanilla in
+      translucido, e le città hanno cinque tavolozze ma un solo carattere architettonico.</p>
+
+    <div class="panel why">
+      <span class="tag">Perché è più strategica di quanto sembri</span>
+      <p>Ogni sistema di questa mod è già stato costruito almeno una volta da qualcun altro, su 1.20.1. Quello
+        che nessuno può copiare è come <em>suona</em> il momento in cui il Sistema ti sceglie. È l'unica
+        direzione che non aggiunge righe di logica e cambia comunque l'impressione di tutto.</p>
+    </div>
+
+    <div class="verify">
+      <span class="tag">Scegli questa se</span>
+      <p>Hai voglia di lavorare su qualcosa di percettivo invece che di strutturale — e sei disposto a
+        procurare o generare venti file audio, che è la parte che il codice non può fare da solo.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">6</span> Due Cacciatori</h2>
+    <p class="kicker">Il multigiocatore oggi non manca: non esiste per costruzione.</p>
+
+    <p>Le istanze dei varchi sono una mappa <code>UUID → Instance</code>: un varco è di un giocatore, e chi
+      entra nello stesso varco di un amico non lo trova. Gli attachment si sincronizzano
+      <span class="mono">targetOnly</span>, quindi nessuno vede il livello o l'esercito di nessun altro. Il
+      bottino, i soul coin e le città sono tutti per-giocatore.</p>
+
+    <p>Trasformarlo è lavoro vero — un party, un'istanza condivisa con più punti di ritorno, il bottino da
+      dividere, e la scelta se il rango del varco lo decide il più forte o il più debole — ma è anche il tipo
+      di lavoro che diventa più caro ogni volta che si aggiunge un sistema nuovo pensato per uno solo.</p>
+
+    <div class="verify">
+      <span class="tag">Scegli questa se</span>
+      <p>Hai in mente di giocarci con qualcuno. Altrimenti è la direzione da rimandare più a lungo, purché
+        sapendo che si sta rimandando.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">7</span> Dopo la maestria</h2>
+    <p class="kicker">Il diciottesimo incarico apre <em>«non manca più niente»</em>, e poi il Sistema tace.</p>
+
+    <p>La catena finisce, i sei ranghi finiscono a S, il livello finisce a 100. Chi arriva lì ha ancora i
+      varchi da chiudere e l'Officina da far girare, ma non ha più nessun obiettivo che qualcuno gli
+      proponga. Le direzioni possibili sono quelle classiche del genere, e la mod ha già i pezzi per tutte:
+      incarichi giornalieri dall'Associazione, varchi di rango doppio con una ricompensa che vale il rischio,
+      i Monarchi come nemici finali con un'estrazione che non è come le altre, e un rango oltre la S che si
+      guadagna una volta sola.</p>
+
+    <div class="verify">
+      <span class="tag">Scegli questa se</span>
+      <p>Le verifiche ti portano fino in fondo alla catena e ti accorgi che lì finisce. Prima di allora è
+        difficile progettare bene un finale per un gioco che nessuno ha ancora giocato per intero.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Le cose piccole</h2>
+    <p class="kicker">Mezz'ora in tutto, da fare all'inizio di qualunque direzione.</p>
+
+    <ul class="check">
+      <li>Il design dice che le uccisioni <em>prima</em> del risveglio contano per la catena, e un commento in
+        <span class="mono">ProgressEvents</span> lo ripete. Nel codice non è vero: la catena è sequenziale e il
+        primo incarico aspetta la morte, quindi quelle uccisioni non contano. Va corretto il documento o il
+        codice — oggi si contraddicono.</li>
+      <li><span class="mono">ShopkeeperServices</span> si presenta come «i quattro banconi che non vendono
+        niente»: adesso sono cinque, con l'Araldo.</li>
+      <li>Il dettaglio della schermata degli incarichi mostra il suggerimento solo se ci sta nel pannello —
+        va guardato a scala GUI 4, dove lo spazio è meno.</li>
+      <li>Il secondo Araldo rimasto nel mondo di sviluppo sparisce al primo ingresso nella Sala, ma vale la pena
+        confermarlo guardando.</li>
+      <li>Il <span class="mono">ServerStartMixin</span> è vuoto da F0 e inietta in
+        <span class="mono">loadLevel</span> senza fare niente: o serve a qualcosa, o è un mixin in meno da
+        mantenere.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Come sceglierei io</h2>
+
+    <p>Se dovessi decidere da solo, l'ordine sarebbe: <b>2</b> perché è mezza sessione su un difetto già
+      confermato e che scrive su disco; poi <b>1</b>, che è la direzione con l'interesse composto e che
+      restituisce il controllo su tutto il resto; poi <b>3</b>, perché è il pezzo che la mod promette dal
+      titolo e non ha ancora mantenuto.</p>
+
+    <p>Le altre quattro sono tutte legittime, ma <em>guadagnano</em> ad arrivare dopo le verifiche: le
+      abilità nuove si progettano meglio dopo aver combattuto con le quattro che ci sono, il suono si
+      disegna meglio dopo aver sentito dove manca, e un finale si scrive meglio dopo aver percorso la
+      strada che ci porta.</p>
+
+    <hr>
+
+    <p><span class="mono">docs/direzioni.html</span> — questa pagina sta anche nel repo, così la prossima
+      sessione la trova senza doverla cercare. Le pagine di consegna dei blocchi precedenti stanno accanto,
+      e ognuna ha in fondo la sua lista di cose da guardare.</p>
+  </section>
+
+  <footer>
+    <p>Arise · 29 blocchi, 8 con la spunta.<br>
+      La domanda non è quale direzione sia la migliore: è quale ti farà aprire il gioco più spesso.</p>
+  </footer>
+
+</div>

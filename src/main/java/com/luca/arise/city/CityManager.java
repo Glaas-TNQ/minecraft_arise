@@ -21,15 +21,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.phys.Vec3;
 
 /**
  * Costruzione, riconoscimento e viaggio fra le città.
+ *
+ * <p>Le città <strong>nascono con il mondo</strong>: sono una feature del generatore
+ * ({@link CityFeature}), e ogni chunk del loro perimetro viene al mondo già costruito. Il cantiere
+ * a budget che sta qui sotto ({@link CityBuild}) è rimasto per due casi: ricostruire una città con
+ * un comando, e i mondi i cui chunk laggiù erano stati generati <em>prima</em> che la mod
+ * esistesse — dove il generatore non passerà più, e qualcuno deve pur posare i blocchi.
  *
  * <p>Non c'è nessun file di salvataggio delle città, ed è voluto: la prova che una città esiste è
  * la città stessa — si guarda se al centro della sua Associazione c'è la pietra segnaposto. Un
@@ -97,13 +100,12 @@ public final class CityManager {
 	// ---------------------------------------------------------------- mondo già pronto
 
 	/**
-	 * Tira su le città che mancano, all'avvio del server.
+	 * Verifica all'avvio che le cinque città ci siano, e tira su quelle che mancano.
 	 *
-	 * <p><strong>Su un mondo nuovo questo <em>è</em> la creazione del mondo</strong>, ed è il
-	 * momento giusto. Prima si costruiva alla prima entrata di un giocatore, e il risultato era che
-	 * chi apriva un mondo nuovo si trovava addosso un contatore di avanzamento mentre stava ancora
-	 * capendo dove guardare. Su un mondo che le città ce le ha già, questo controllo costa cinque
-	 * letture e non fa niente.
+	 * <p>Su un mondo nuovo non manca mai niente: il chunk del centro viene generato da questa
+	 * stessa lettura, e il generatore ci posa dentro l'Associazione col suo segnaposto. È la rete di
+	 * sicurezza per i mondi dove laggiù il terreno esisteva già prima della mod — lì il generatore
+	 * non passa più, e resta il cantiere a budget di una volta. Costa cinque letture.
 	 *
 	 * <p>Nessuna bandiera salvata da nessuna parte: la prova che una città esiste resta la città
 	 * stessa. Una bandiera prima o poi finirebbe in disaccordo col mondo, e in silenzio.
@@ -117,7 +119,9 @@ public final class CityManager {
 		int started = setup(server, null);
 
 		if (started > 0) {
-			AriseMod.LOGGER.info("Mondo nuovo: {} città da costruire.", started);
+			AriseMod.LOGGER.info("Città assenti dal terreno già generato: {} da costruire.", started);
+		} else {
+			AriseMod.LOGGER.info("Le cinque città sono al loro posto.");
 		}
 	}
 
@@ -183,17 +187,17 @@ public final class CityManager {
 	/**
 	 * Prende in carico la prossima città della coda.
 	 *
-	 * <p>La pianta si calcola qui e non quando la città viene messa in coda: leggere il terreno
-	 * costa la generazione di qualche chunk a duecentomila blocchi dallo spawn, e farlo cinque
-	 * volte tutte insieme sarebbe esattamente la scossa che la coda esiste per evitare.
+	 * <p>La pianta è la stessa che usa il generatore del mondo ({@link CityPlans}): così una città
+	 * ricostruita a mano combacia blocco per blocco con i chunk che il generatore ha già fatto o
+	 * farà. Due piante calcolate per conto proprio, anche solo con una quota diversa, darebbero
+	 * una città sfalsata di un gradino lungo il bordo di ogni chunk.
 	 */
 	private static void start(MinecraftServer server, City city) {
 		ServerLevel level = server.overworld();
 		CityConfig config = AriseConfig.get().cities();
-		int baseY = groundLevel(level, config, city);
-		RandomSource random = RandomSource.create(city.index() * 31L + 7L);
-
-		List<Fill> fills = CityPlan.of(city, config, baseY, random);
+		CityPlans.Planned planned = CityPlans.of(level, city);
+		int baseY = planned.baseY();
+		List<Fill> fills = planned.fills();
 
 		RUNNING.put(city, new CityBuild(level, city, fills, baseY));
 		ANNOUNCED.put(city, 0);
@@ -203,42 +207,6 @@ public final class CityManager {
 
 		message(server, city, Component.translatable("arise.msg.city.building", city.label(),
 				config.centreX(city), config.centreZ(city)));
-	}
-
-	/**
-	 * La quota su cui posare la città.
-	 *
-	 * <p>Si campiona il terreno su una griglia di venticinque punti e si prende la media. Il solo
-	 * centro basterebbe se il mondo fosse piatto; con quattro angoli soli una collina in mezzo
-	 * sposta la media di parecchio. Su cinquecento blocchi di lato la differenza fra una città
-	 * posata bene e una mezza sepolta sta tutta qui.
-	 *
-	 * <p><strong>Si chiede al generatore, non al mondo.</strong> {@code level.getHeight} legge la
-	 * mappa delle altezze di un chunk, e per leggerla il chunk deve <em>esistere</em>: venticinque
-	 * campioni sparsi su mezzo chilometro erano venticinque chunk generati di colpo, cioè tredici
-	 * secondi di server fermo prima ancora di posare un blocco. {@code getBaseHeight} interroga il
-	 * rumore del generatore e risponde senza costruire niente.
-	 */
-	private static int groundLevel(ServerLevel level, CityConfig config, City city) {
-		int x0 = config.cityX(city);
-		int z0 = config.cityZ(city);
-		int step = Math.max(1, (config.size() - 1) / 4);
-		int sum = 0;
-		int samples = 0;
-
-		ChunkGenerator generator = level.getChunkSource().getGenerator();
-		RandomState randomState = level.getChunkSource().randomState();
-
-		for (int dx = 0; dx <= 4; dx++) {
-			for (int dz = 0; dz <= 4; dz++) {
-				sum += generator.getBaseHeight(x0 + dx * step, z0 + dz * step,
-						Heightmap.Types.WORLD_SURFACE_WG, level, randomState);
-				samples++;
-			}
-		}
-
-		// Mai sotto il livello del mare: una città sul fondale sarebbe un acquario.
-		return Math.max(level.getSeaLevel() + 1, sum / samples);
 	}
 
 	/** Un passo della costruzione in corso, e il turno della prossima. Chiamato a ogni battito. */
@@ -340,14 +308,28 @@ public final class CityManager {
 	/**
 	 * La posizione del segnaposto.
 	 *
-	 * <p>La quota non è nota senza rileggere il terreno, quindi si cerca la pietra in una finestra
-	 * verticale attorno alla quota probabile invece che in un punto solo. Costa qualche lettura in
-	 * più una volta sola, e rende il riconoscimento indipendente da come era fatto il terreno il
-	 * giorno in cui la città è stata costruita.
+	 * <p>Si guarda <em>prima</em> dove la pianta dice che sta: la quota viene dal generatore
+	 * ({@link CityPlans#groundLevel}), che risponde senza toccare il mondo, e il segnaposto sta a
+	 * {@link CityPlan#markerHeight()} sopra. È la stessa pianta con cui la città è stata generata o
+	 * costruita, quindi di norma è lì.
+	 *
+	 * <p>Se non c'è, si cerca in una finestra verticale attorno alla quota del terreno: serve per
+	 * le città tirate su da una versione che calcolava la quota in un altro modo. Ma attenzione a
+	 * <strong>come</strong> si chiede quella quota: {@code level.getHeight} risponde {@code minY}
+	 * se il chunk non è caricato, e la finestra finiva attorno al livello del mare — Madrid, a
+	 * quota 81, risultava assente a ogni avvio e veniva rimessa in cantiere. Qui il chunk è già
+	 * stato caricato dalla prima lettura, quindi la risposta è vera.
 	 */
 	private static BlockPos markerPos(CityConfig config, City city, ServerLevel level) {
 		int x = config.centreX(city);
 		int z = config.centreZ(city);
+
+		BlockPos planned = new BlockPos(x, CityPlans.of(level, city).baseY() + CityPlan.markerHeight(), z);
+		if (level.getBlockState(planned).is(CityPlan.marker().getBlock())) {
+			return planned;
+		}
+
+		// Il chunk ora e' caricato: la quota del terreno e' quella vera.
 		int probable = Math.max(level.getSeaLevel() + 1,
 				level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z));
 
@@ -358,7 +340,7 @@ public final class CityManager {
 			}
 		}
 
-		return new BlockPos(x, probable, z);
+		return planned;
 	}
 
 	/** Le città che esistono davvero, per la schermata di viaggio. */
@@ -459,6 +441,7 @@ public final class CityManager {
 	/** All'arresto del server le costruzioni a metà non hanno senso di sopravvivere in memoria. */
 	public static void clear() {
 		autoBuildChecked = false;
+		CityPlans.clear();
 		RUNNING.clear();
 		QUEUE.clear();
 		REQUESTERS.clear();

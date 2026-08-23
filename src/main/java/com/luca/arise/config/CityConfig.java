@@ -53,18 +53,30 @@ public record CityConfig(
 		 */
 		int msPerTick,
 		/**
-		 * Se le città si tirano su da sole la prima volta che qualcuno entra in un mondo.
+		 * Se all'avvio del server si verifica che le città ci siano, e si costruiscono quelle che
+		 * mancano.
 		 *
-		 * <p>Acceso di default: un mondo dove le cinque Associazioni non esistono è un mondo dove
-		 * metà dei sistemi non ha un posto dove succedere. Chi le vuole costruire quando decide lui
-		 * lo spegne qui, e resta {@code /arise city build}.
+		 * <p>Le città nascono con i chunk, quindi su un mondo nuovo qui non c'è niente da fare. È
+		 * la rete di sicurezza per i mondi dove quel terreno esisteva già prima della mod: lì il
+		 * generatore non passa più, e il cantiere a budget le posa blocco per blocco. Chi le vuole
+		 * costruire quando decide lui lo spegne qui, e resta {@code /arise city build}.
 		 */
 		boolean autoBuild,
 		/** Il Quartiere del Mercato: le nove botteghe e la Moneta d'Anima. */
-		MarketConfig market) {
+		MarketConfig market,
+		/**
+		 * Quanto si aspetta fra due usi del Sigillo dell'Associazione.
+		 *
+		 * <p>Cinque minuti. Le citta' stanno a duecentomila blocchi dallo spawn e a quindicimila
+		 * l'una dall'altra: senza un modo di raggiungerle il viaggio fra Associazioni e' una rete
+		 * il cui primo nodo non si raggiunge, e con un modo <em>istantaneo</em> il mondo smette di
+		 * avere distanze. L'attesa e' cio' che tiene in piedi tutte e due le cose.
+		 */
+		int sealCooldownTicks) {
 
 	public static final CityConfig DEFAULT =
-			new CityConfig(200000, 200000, 15000, 512, 32, 6, 60000, 8, true, MarketConfig.DEFAULT);
+			new CityConfig(200000, 200000, 15000, 512, 32, 6, 60000, 8, true, MarketConfig.DEFAULT,
+					6000);
 
 	public static final Codec<CityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.INT.fieldOf("origin_x").forGetter(CityConfig::originX),
@@ -76,7 +88,8 @@ public record CityConfig(
 			Codec.INT.fieldOf("blocks_per_tick").forGetter(CityConfig::blocksPerTick),
 			Codec.INT.fieldOf("ms_per_tick").forGetter(CityConfig::msPerTick),
 			Codec.BOOL.fieldOf("auto_build").forGetter(CityConfig::autoBuild),
-			MarketConfig.CODEC.fieldOf("market").forGetter(CityConfig::market)
+			MarketConfig.CODEC.fieldOf("market").forGetter(CityConfig::market),
+			Codec.INT.fieldOf("seal_cooldown_ticks").forGetter(CityConfig::sealCooldownTicks)
 	).apply(instance, CityConfig::new));
 
 	/** L'angolo nord-ovest della città. */

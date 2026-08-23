@@ -3,6 +3,7 @@ package com.luca.arise.quest;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.StringRepresentable;
 
 /**
@@ -79,5 +80,35 @@ public enum Unlock implements StringRepresentable {
 	/** Il messaggio da mostrare a chi prova a usare un sistema che non ha ancora. */
 	public Component refusal() {
 		return Component.translatable("arise.msg.locked", label());
+	}
+
+	/**
+	 * La riga che dice <em>come si usa</em>, mostrata nell'istante in cui il sistema si apre.
+	 *
+	 * <p>E' la meta' che mancava. La catena degli incarichi consegnava i sistemi uno alla volta e
+	 * annunciava il nome di quello appena arrivato — "Sbloccato: l'esercito d'ombra" — e poi
+	 * lasciava il giocatore a indovinare che c'e' un tasto, che va premuto vicino a un cadavere, e
+	 * che il cadavere deve essere fresco. Un incarico che concede qualcosa senza dire dove si preme
+	 * e' un premio che va cercato su internet.
+	 *
+	 * <p>Dove serve, il tasto arriva da {@link Component#keybind}: cosi' la riga dice il tasto che
+	 * quel giocatore ha davvero, non quello che avevamo in mente noi.
+	 */
+	public MutableComponent hint() {
+		return switch (this) {
+			case STATS -> Component.translatable("arise.unlock." + name + ".hint", key("status"));
+			case ARMY -> Component.translatable("arise.unlock." + name + ".hint",
+					key("extract"), key("army"));
+			case ABILITIES -> Component.translatable("arise.unlock." + name + ".hint",
+					key("ability_1"), key("ability_4"));
+			case GEAR -> Component.translatable("arise.unlock." + name + ".hint", key("gear"));
+			case GATES -> Component.translatable("arise.unlock." + name + ".hint", key("map"));
+			case SHOP -> Component.translatable("arise.unlock." + name + ".hint", key("shop"));
+			default -> Component.translatable("arise.unlock." + name + ".hint");
+		};
+	}
+
+	private static Component key(String mapping) {
+		return Component.keybind("key.arise." + mapping);
 	}
 }

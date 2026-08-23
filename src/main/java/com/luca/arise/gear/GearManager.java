@@ -20,6 +20,7 @@ import com.luca.arise.registry.ModAttachments;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -47,6 +48,9 @@ import net.minecraft.world.item.ItemStack;
  * salterebbe.
  */
 public final class GearManager {
+
+	/** Quanto dura l'effetto di un pezzo unico prima di essere rinnovato. Vedi {@link #auras}. */
+	private static final int AURA_TICKS = 240;
 
 	/** Le caselle di vanilla in cui un nostro pezzo puo' finire. */
 	private static final List<EquipmentSlot> VANILLA_SLOTS = List.of(
@@ -460,9 +464,30 @@ public final class GearManager {
 		sweep(player);
 		enforce(player);
 
-		int count = worn(player).size();
-		if (count > 0) {
-			QuestManager.advance(player, Objective.EQUIP, count);
+		List<GearPiece> worn = worn(player);
+
+		if (!worn.isEmpty()) {
+			QuestManager.advance(player, Objective.EQUIP, worn.size());
+			auras(player, worn);
+		}
+	}
+
+	/**
+	 * Gli effetti dei pezzi unici, rinnovati a ogni battito.
+	 *
+	 * <p>Rinnovare invece di applicare una volta e' l'unico modo che regge tutti i casi in cui un
+	 * pezzo smette di essere addosso — tolto, perso, ritirato alla morte, sostituito da uno
+	 * migliore — senza dover intercettare nessuno di quei momenti. La durata e' poco piu' del
+	 * doppio della soglia oltre la quale la visione notturna comincia a lampeggiare: cosi' non
+	 * lampeggia mai mentre l'elmo e' in testa, e lampeggia per qualche secondo appena lo si toglie,
+	 * che e' esattamente il modo in cui il gioco dice "sta finendo".
+	 */
+	private static void auras(ServerPlayer player, List<GearPiece> worn) {
+		for (GearPiece piece : worn) {
+			piece.unique()
+					.map(GearUnique::aura)
+					.ifPresent(aura -> player.addEffect(new MobEffectInstance(aura, AURA_TICKS, 0,
+							true, false, true)));
 		}
 	}
 

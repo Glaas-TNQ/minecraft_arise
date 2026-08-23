@@ -210,7 +210,24 @@ public class ShadowEntity extends TamableAnimal {
 
 		// Le ombre non sopravvivono all'assenza del proprietario: se il giocatore esce, l'entità
 		// se ne va e i dati restano nell'esercito. Evita eserciti orfani che vagano nel mondo.
-		if (this.tickCount % 40 == 0 && !(this.getOwner() instanceof ServerPlayer)) {
+		if (this.tickCount % 40 != 0) {
+			return;
+		}
+
+		if (!(this.getOwner() instanceof ServerPlayer owner)) {
+			this.discard();
+			return;
+		}
+
+		// E non sopravvivono nemmeno all'essere state dimenticate. Chi comanda l'esercito è
+		// l'elenco delle evocazioni vive, non le entità nel mondo: un'ombra che non compare più in
+		// quell'elenco è un residuo — di un viaggio fra dimensioni, di un riavvio del server, di un
+		// chunk tornato a caricarsi troppo tardi — e due copie della stessa ombra sono peggio di
+		// nessuna, perché il giocatore non sa quale delle due sta comandando.
+		//
+		// I primi due secondi sono di grazia: l'entità entra nel mondo un istante prima di essere
+		// scritta nell'elenco.
+		if (this.tickCount > 40 && !ShadowManager.isSummoned(owner, this.getUUID())) {
 			this.discard();
 		}
 	}

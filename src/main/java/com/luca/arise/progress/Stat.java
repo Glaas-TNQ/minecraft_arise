@@ -9,6 +9,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -107,6 +108,23 @@ public enum Stat implements StringRepresentable {
 
 	public String translationKey() {
 		return translationKey;
+	}
+
+	/**
+	 * Che cosa fa questa statistica, detto nei termini del gioco.
+	 *
+	 * <p>"Forza" non e' un'informazione: e' un'etichetta. Quello che il giocatore vuole sapere
+	 * davanti alla schermata di stato e' che la forza diventa <em>danno da mischia</em> — e senza
+	 * questa riga l'unico modo di scoprirlo era spendere un punto e andare a colpire qualcosa
+	 * contando i cuori.
+	 */
+	public Component effect() {
+		return Component.translatable(translationKey + ".effect");
+	}
+
+	/** Cosa cambia davvero, in partita: la riga che sta nel riquadro che compare passandoci sopra. */
+	public Component description() {
+		return Component.translatable(translationKey + ".desc");
 	}
 
 	/**

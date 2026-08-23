@@ -182,8 +182,10 @@ for key, (args, origin) in sorted(used_literal.items()):
 # Prefisso, enum da cui vengono i nomi, suffissi che il codice attacca in coda.
 DYNAMIC = [
     ("arise.rank.", "progress/Rank.java", [""]),
-    ("arise.quest.", "quest/Quest.java", ["", ".goal"]),
-    ("arise.unlock.", "quest/Unlock.java", [""]),
+    ("arise.stat.", "progress/Stat.java", ["", ".effect", ".desc"]),
+    ("arise.quest.", "quest/Quest.java", ["", ".goal", ".lore", ".brief"]),
+    ("arise.unlock.", "quest/Unlock.java", ["", ".hint"]),
+    ("arise.herald.", "tutorial/HeraldPage.java", [""]),
     ("arise.npc.", "npc/Shopkeeper.java", ["", ".greeting", ".shop"]),
     ("arise.soul.trait.", "workshop/SoulTrait.java", ["", ".desc"]),
     ("block.arise.", "workshop/MachineKind.java", [""]),
@@ -197,6 +199,7 @@ DYNAMIC = [
     ("arise.gear.affix.", "gear/GearAffix.java", [""]),
     ("arise.gear.base.", "gear/GearBase.java", [""]),
     ("arise.gear.slot.", "gear/GearSlot.java", [""]),
+    ("arise.gear.unique.", "gear/GearUnique.java", ["", ".lore"]),
     ("arise.landmark.", "city/Landmark.java", [""]),
 ]
 

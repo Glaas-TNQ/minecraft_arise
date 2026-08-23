@@ -3,6 +3,7 @@ package com.luca.arise.network;
 import com.luca.arise.ability.AbilityManager;
 import com.luca.arise.city.CityManager;
 import com.luca.arise.gate.GateEntity;
+import com.luca.arise.map.WorldMap;
 import com.luca.arise.gate.GateManager;
 import com.luca.arise.gem.GemManager;
 import com.luca.arise.progress.ProgressManager;
@@ -35,6 +36,7 @@ public final class ModPayloads {
 		PayloadTypeRegistry.clientboundPlay().register(GateOfferPayload.TYPE, GateOfferPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(CityListPayload.TYPE, CityListPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenScreenPayload.TYPE, OpenScreenPayload.STREAM_CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(MapPayload.TYPE, MapPayload.STREAM_CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(SpendPointPayload.TYPE, (payload, context) -> {
 			// Esecuzione esplicita sul thread del server: tocchiamo attributi e attachment, che
@@ -74,6 +76,8 @@ public final class ModPayloads {
 					case ABILITY_1, ABILITY_2, ABILITY_3, ABILITY_4 ->
 							AbilityManager.use(player, payload.action().ability());
 					case OPEN_GEAR -> null;
+					// La risposta e' la mappa; un messaggio arriva solo se non si puo' avere.
+					case OPEN_MAP -> WorldMap.open(player);
 				};
 
 				if (feedback == null) {

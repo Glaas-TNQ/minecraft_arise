@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -49,6 +50,10 @@ public class ShadowDetailScreen extends AriseScreen {
 
 	private EditBox nameBox;
 	private int lastFingerprint = Integer.MIN_VALUE;
+
+	/** Dove comincia la fila delle pastiglie: la calcola {@code layout}, la usano disegno e click. */
+	private int swatchLeft;
+	private int swatchTop;
 
 	public ShadowDetailScreen(UUID shadowId, Screen parent) {
 		super(Component.translatable("arise.screen.detail.title"), PANEL_WIDTH, PANEL_HEIGHT);
@@ -95,14 +100,12 @@ public class ShadowDetailScreen extends AriseScreen {
 				.bounds(left + PANEL_WIDTH - 66, top + 28, 66, 20)
 				.build());
 
-		int swatchTop = top + 74;
-		for (int i = 0; i < PALETTE.length; i++) {
-			int color = PALETTE[i];
-			addRenderableWidget(Button.builder(Component.literal(" "),
-							button -> sendColor(color))
-					.bounds(left + i * (SWATCH + 4), swatchTop, SWATCH, SWATCH)
-					.build());
-		}
+		// Le pastiglie non sono widget, ed e' la stessa decisione presa per le righe delle liste:
+		// il corpo della schermata si disegna nello *sfondo* (vedi AriseScreen), quindi qualunque
+		// bottone messo qui finisce sopra al colore e lo copre. Erano otto quadrati grigi
+		// identici, con l'unico segno visibile il trattino della selezione, che cade appena sotto.
+		swatchLeft = left;
+		swatchTop = top + 74;
 
 		int actionsTop = top + 120;
 		boolean maxLevel = shadow.isMaxLevel(config);
@@ -139,6 +142,42 @@ public class ShadowDetailScreen extends AriseScreen {
 	private void sendColor(int color) {
 		ClientPlayNetworking.send(new ShadowActionPayload(shadowId,
 				ShadowActionPayload.Action.RECOLOR, "", color));
+	}
+
+	/**
+	 * Su quale pastiglia cade questo punto, o {@code -1}.
+	 *
+	 * <p>Una riga di aritmetica al posto di otto widget: la stessa scelta delle liste, e con lo
+	 * stesso vantaggio — quello che si vede e quello che si clicca sono calcolati dallo stesso
+	 * numero, quindi non possono scollarsi.
+	 */
+	private int hitSwatch(double mouseX, double mouseY) {
+		if (mouseY < swatchTop || mouseY >= swatchTop + SWATCH) {
+			return -1;
+		}
+
+		int offset = (int) (mouseX - swatchLeft);
+		int stride = SWATCH + 4;
+		int index = offset / stride;
+
+		// Lo spazio fra due pastiglie non e' nessuna delle due.
+		if (offset < 0 || index >= PALETTE.length || offset % stride >= SWATCH) {
+			return -1;
+		}
+
+		return index;
+	}
+
+	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		int index = hitSwatch(event.x(), event.y());
+
+		if (index >= 0) {
+			sendColor(PALETTE[index]);
+			return true;
+		}
+
+		return super.mouseClicked(event, doubleClick);
 	}
 
 	@Override
@@ -198,14 +237,17 @@ public class ShadowDetailScreen extends AriseScreen {
 
 		// La pastiglia di colore va disegnata sopra il bottone: il bottone è solo la zona
 		// cliccabile, il colore è l'informazione.
-		int swatchTop = top + 74;
 		for (int i = 0; i < PALETTE.length; i++) {
-			int x = left + i * (SWATCH + 4);
-			graphics.fill(x + 4, swatchTop + 4, x + SWATCH - 4, swatchTop + SWATCH - 4,
-					0xFF000000 | PALETTE[i]);
+			int x = swatchLeft + i * (SWATCH + 4);
+			boolean chosen = PALETTE[i] == shadow.color();
+			boolean hovered = hitSwatch(mouseX, mouseY) == i;
 
-			if (PALETTE[i] == shadow.color()) {
-				graphics.horizontalLine(x + 2, x + SWATCH - 3, swatchTop + SWATCH, COLOR_TEXT);
+			graphics.fill(x, swatchTop, x + SWATCH, swatchTop + SWATCH, 0xFF000000 | PALETTE[i]);
+			graphics.outline(x, swatchTop, SWATCH, SWATCH,
+					chosen ? COLOR_TEXT : hovered ? COLOR_TITLE : AriseTheme.LINE);
+
+			if (chosen) {
+				graphics.horizontalLine(x + 2, x + SWATCH - 3, swatchTop + SWATCH + 2, COLOR_TEXT);
 			}
 		}
 

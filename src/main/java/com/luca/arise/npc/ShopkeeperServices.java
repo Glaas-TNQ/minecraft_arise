@@ -13,6 +13,7 @@ import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModItems;
+import com.luca.arise.tutorial.AwakeningManager;
 import com.luca.arise.workshop.WorkshopManager;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -49,6 +50,9 @@ public final class ShopkeeperServices {
 			case GATE_BROKER -> broker(player, npc, market);
 			case JEWELLER -> screen(player, npc, OpenScreenPayload.Screen.GEMS, Unlock.GEMS);
 			case CLERK -> clerk(player, npc, reverse);
+			// L'unico "servizio" che non vende, non apre pannelli e non chiede niente: dice una
+			// riga per volta, e all'ultima riapre la porta. Vedi AwakeningManager.
+			case HERALD -> AwakeningManager.talk(player);
 			default -> player.sendSystemMessage(role.greeting());
 		}
 	}

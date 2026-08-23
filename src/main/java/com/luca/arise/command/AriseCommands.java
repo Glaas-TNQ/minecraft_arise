@@ -1,26 +1,33 @@
 package com.luca.arise.command;
 
+import java.util.List;
 import java.util.function.Function;
 
 import com.luca.arise.city.City;
 import com.luca.arise.city.CityManager;
 import com.luca.arise.event.CityEvents;
 import com.luca.arise.config.GearConfig;
+import com.luca.arise.gate.AbyssCompassItem;
 import com.luca.arise.gate.GateManager;
+import com.luca.arise.gate.GateRecord;
+import com.luca.arise.gate.GateRegistry;
 import com.luca.arise.gate.GateSpawner;
+import com.luca.arise.map.MapProjection;
+import com.luca.arise.map.WorldMap;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.npc.NpcManager;
-import java.util.List;
 
 import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.GearRoll;
 import com.luca.arise.gear.GearSlot;
+import com.luca.arise.gear.GearUnique;
 import com.luca.arise.gem.GemManager;
 import com.luca.arise.gem.GemType;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.quest.PlayerQuests;
 import com.luca.arise.quest.Quest;
 import com.luca.arise.quest.QuestManager;
+import com.luca.arise.tutorial.AwakeningManager;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.CityConfig;
 import com.luca.arise.config.ShadowConfig;
@@ -43,6 +50,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.permissions.PermissionCheck;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -136,7 +145,25 @@ public final class AriseCommands {
 			gate.then(Commands.literal("spawn")
 					.requires(AriseCommands::canCheat)
 					.executes(context -> playerAction(context.getSource(), GateSpawner::spawnNow)));
+			// L'indice dei varchi com'e' scritto, voce per voce: e' il modo di verificare la mappa
+			// dalla console, senza un client davanti.
+			gate.then(Commands.literal("list")
+					.executes(context -> listGates(context.getSource())));
 			root.then(gate);
+
+			// Legge la stessa cosa dell'oggetto in mano, senza doverlo craftare per verificarla.
+			root.then(Commands.literal("compass")
+					.executes(context -> playerAction(context.getSource(), AbyssCompassItem::locate)));
+
+			root.then(Commands.literal("map")
+					.executes(context -> {
+						ServerPlayer player = context.getSource().getPlayerOrException();
+						Component refusal = WorldMap.open(player);
+						if (refusal != null) {
+							context.getSource().sendSuccess(() -> refusal, false);
+						}
+						return 1;
+					}));
 
 			LiteralArgumentBuilder<CommandSourceStack> city = Commands.literal("city");
 
@@ -189,7 +216,19 @@ public final class AriseCommands {
 
 				gearGive.then(node);
 			}
+			// I pezzi unici hanno un nodo loro: non hanno rango da scegliere, e sono l'unico modo
+			// di rimettersi in mano l'Occhio dell'Oscurita' senza rifare la catena da capo.
+			LiteralArgumentBuilder<CommandSourceStack> gearUnique = Commands.literal("unique")
+					.requires(AriseCommands::canCheat);
+
+			for (GearUnique unique : GearUnique.values()) {
+				gearUnique.then(Commands.literal(unique.getSerializedName())
+						.executes(context -> playerAction(context.getSource(), player ->
+								GearManager.grant(player, unique.piece(AriseConfig.get().gear())))));
+			}
+
 			gear.then(gearGive);
+			gear.then(gearUnique);
 
 			LiteralArgumentBuilder<CommandSourceStack> gearRoll = Commands.literal("roll")
 					.requires(AriseCommands::canCheat);
@@ -247,6 +286,25 @@ public final class AriseCommands {
 					.then(Commands.literal("reset")
 							.requires(AriseCommands::canCheat)
 							.executes(context -> playerAction(context.getSource(), QuestManager::reset))));
+
+			// Il ripasso e' per tutti, il rientro nella Sala no: rientrare vuol dire guarire e
+			// sparire da dove si era, che in mezzo a un combattimento e' una via di fuga.
+			root.then(Commands.literal("tutorial")
+					.executes(context -> playerAction(context.getSource(), AwakeningManager::recap))
+					.then(Commands.literal("leave")
+							.executes(context -> playerAction(context.getSource(), AwakeningManager::skip)))
+					.then(Commands.literal("start")
+							.requires(AriseCommands::canCheat)
+							.executes(context -> playerAction(context.getSource(), AwakeningManager::restart)))
+					// L'unico del gruppo che non chiede un giocatore: si scrive dalla console di un
+					// server per vedere se la Sala viene su, senza dover morire per arrivarci.
+					.then(Commands.literal("build")
+							.requires(AriseCommands::canCheat)
+							.executes(context -> {
+								Component built = AwakeningManager.build(context.getSource().getServer());
+								context.getSource().sendSuccess(() -> built, true);
+								return 1;
+							})));
 
 			root.then(Commands.literal("shop")
 					.executes(context -> listShop(context.getSource()))
@@ -338,6 +396,33 @@ public final class AriseCommands {
 	}
 
 	/** Le azioni restituiscono già il messaggio giusto: qui si inoltra e basta. */
+	/** L'indice dei varchi, riconciliato con il mondo: uno per riga, con distanza e stato. */
+	private static int listGates(CommandSourceStack source) {
+		MinecraftServer server = source.getServer();
+		List<GateRecord> gates = GateRegistry.reconciled(server);
+
+		if (gates.isEmpty()) {
+			source.sendSuccess(() -> Component.translatable("arise.msg.map.no_gates"), false);
+			return 1;
+		}
+
+		Vec3 from = source.getPosition();
+		for (GateRecord record : gates) {
+			int distance = (int) Math.round(MapProjection.distance(from.x(), from.z(),
+					record.pos().getX() + 0.5, record.pos().getZ() + 0.5));
+			boolean awake = GateRegistry.awake(server, record);
+			Component state = Component.translatable(awake
+					? "arise.msg.map.gate_awake" : "arise.msg.map.gate_asleep");
+
+			source.sendSuccess(() -> Component.translatable("arise.msg.map.gate_line",
+					record.rank().label(), record.theme().label(),
+					record.pos().getX(), record.pos().getY(), record.pos().getZ(),
+					distance, record.remainingTicks() / 20, state), false);
+		}
+
+		return gates.size();
+	}
+
 	private static int playerAction(CommandSourceStack source, Function<ServerPlayer, Component> action)
 			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
 		ServerPlayer player = source.getPlayerOrException();

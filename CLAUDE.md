@@ -189,6 +189,53 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
         `new TicketType(TicketType.NO_TIMEOUT, TicketType.FLAG_LOADING)` carica senza simulare e
         senza persistere. **I ticket vanno rimossi**, o si tiene in memoria mezzo mondo;
      3. **fermarsi da soli** quando `server.getAverageTickTimeNanos()` e' gia' sopra il battito.
+   - **mettere qualcosa nel mondo "dal seme"**: una `Feature<NoneFeatureConfiguration>` registrata
+     in `BuiltInRegistries.FEATURE`, la sua `configured_feature`/`placed_feature` in JSON sotto
+     `data/<ns>/worldgen/`, e l'aggancio ai biomi con
+     `BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), passo, chiave)`. Senza
+     modificatori di piazzamento la feature gira **una volta per chunk**, all'angolo del chunk; si
+     scrive **solo dentro quel chunk**. La vegetazione vanilla sporge nei chunk vicini: ciò che deve
+     restare pulito si spiana al passo `RAW_GENERATION` (gli alberi non nascono su un marciapiede)
+     e si completa a `TOP_LAYER_MODIFICATION`, dopo strutture e alberi. Ciò che la feature calcola
+     va in una cache thread-safe: i chunk nascono su più thread insieme;
+   - **`SavedDataType` pretende un `DataFixTypes` non nullo** in 26.2 (`readTagFromDisk` lo
+     chiama senza controllare): per un dato di mondo si usa un attachment persistente sul
+     `ServerLevel` (`level.getAttachedOrElse` / `setAttached`), come per i giocatori;
+   - `Entity.remove(RemovalReason)` è sovrascrivibile, e `reason.shouldDestroy()` distingue
+     "sparito davvero" da "chunk scaricato". `ServerLevel.isPositionEntityTicking(pos)` dice se
+     in quel punto le entità battono i tick: solo lì `getEntity(uuid) == null` vuol dire assente;
+   - **quello che una schermata di Arise disegna in `content(...)` finisce sotto i widget**: il
+     corpo si dipinge dentro `extractBackground`, quindi un `Button` messo sopra qualcosa di
+     disegnato la copre — il suo sfondo grigio non e' trasparente. Se una cosa dev'essere vista
+     *e* cliccata si disegna, e il click si risolve con l'aritmetica in `mouseClicked`, come le
+     righe di `ListPanel`. Le pastiglie del colore delle ombre sono state otto quadrati grigi
+     identici per due blocchi interi;
+   - **le entita' evocate non seguono chi cambia dimensione**, e restano dove sono: il chunk si
+     scarica, `getEntityInAnyDimension` risponde "non c'e'", l'elenco delle evocazioni le dimentica
+     e alla prossima chiamata ne nascono di nuove — mentre le vecchie aspettano sul disco. Serve un
+     aggancio a `ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL` (in 26.2 il nome ha
+     `Level`, non `World`) e un'entita' che si tolga di mezzo da sola quando non risulta piu'
+     evocata;
+   - `Screen.mouseDragged(MouseButtonEvent, double, double)`: lo spostamento conviene ricavarlo da
+     `event.x()/y()` rispetto all'ultima posizione, senza fidarsi dei due `double`;
+   - **le entita' di un chunk in cui non c'e' nessuno non esistono, per chi le cerca**:
+     `getEntitiesOfClass` su una regione senza giocatori risponde sempre "vuoto", anche se quelle
+     entita' sono salvate su disco. Il criterio di questa mod — *guarda il mondo invece di tenere un
+     registro* — vale per i blocchi, che `getBlockState` carica, ma **non** per le entita': quelle si
+     controllano solo con qualcuno li' dentro. Ripopolare in base a quella risposta duplica, e in
+     silenzio: la Sala del Risveglio si e' presa un Araldo in piu' a ogni avvio del server finche' il
+     controllo non e' stato spostato a un secondo dopo l'arrivo del giocatore;
+   - **un testo che nomina un tasto non deve nominare una lettera**: `Component.keybind("key.arise.status")`
+     viene risolto dal client col tasto che quel giocatore ha davvero configurato. Vale per i
+     suggerimenti dei sistemi e per il discorso dell'Araldo;
+   - **titolo a schermo e barra d'azione non hanno un metodo**: `ServerPlayer` non ha ne'
+     `displayClientMessage` ne' `showTitle`, si mandano i pacchetti (`ClientboundSetTitleTextPacket`,
+     `ClientboundSetSubtitleTextPacket`, `ClientboundSetTitlesAnimationPacket`,
+     `ClientboundSetActionBarTextPacket`). In Arise passano tutti da `fx/Overlay`, come i
+     particellari passano da `AriseFx`;
+   - **`optionalFieldOf(nome, default)` non scrive il campo** quando il valore e' quello di default:
+     una sezione di config nuova resta invisibile nel file, quindi non modificabile da chi non legge
+     il codice. Qui si usa `fieldOf`, e la tolleranza ai file vecchi la da' `AriseConfig.withDefaults`;
    - **leggere l'altezza del terreno senza generarlo**: `level.getHeight(...)` pretende il chunk;
      `level.getChunkSource().getGenerator().getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG,
      level, randomState())` interroga il rumore e risponde subito. Venticinque campioni sparsi su
@@ -313,5 +360,22 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
 - [ ] **E3** — La Via dell'Artigiano: nove incarichi nuovi (18 in tutto) che aprono l'Officina un
       pezzo per volta, e quattro Progetti consumati dalle ricette dei macchinari — *compilato,
       server verde, da verificare in gioco*
+- [ ] **M1** — Le città nel seme: feature di worldgen in due passate (`CityFeature`, `CityPlans`),
+      zero costo all'avvio, il cantiere a budget resta per ricostruzione e mondi vecchi —
+      *compilato, server verde su mondo nuovo, da verificare in gioco (viaggio in città)*
+- [ ] **P1** — La prima ora: il colpo che non uccide porta nella **Sala del Risveglio**, l'Araldo
+      spiega in sei pagine (una per clic), ogni sistema concesso dice anche **come si usa**, il
+      contatore dell'incarico compare sopra la hotbar, e il primo ingresso nel mondo saluta —
+      *compilato, server verde; Sala e Araldo verificati leggendo le region del mondo salvato; il
+      risveglio e il dialogo restano da verificare in gioco*
+- [ ] **P2** — Quello che il gioco non diceva: otto difetti trovati **giocando** e le loro
+      correzioni — il primo regalo che non si poteva indossare, le pastiglie del colore invisibili,
+      le ombre duplicate a ogni cambio di dimensione, nessuna uscita dal varco dopo il boss, le
+      citta' irraggiungibili (Sigillo dell'Associazione), gli incarichi senza lore ne' istruzioni,
+      le statistiche mute (tooltip + riga d'effetto), lo spazio dimensionale che rimbalzava i pezzi
+      invece di indossarli — *compilato, 60 prove verdi, server pulito; da riverificare in gioco*
+- [ ] **M2** — La mappa del mondo (tasto **M**): città, varchi aperti, tu; trascina/zoom, frecce
+      sul bordo per ciò che sta fuori. Indice dei varchi `GateRegistry` riconciliato; `/arise map`,
+      `/arise gate list` — *compilato, da verificare in gioco*
 
 Aggiorna questa lista quando una fase è **verificata in gioco**, non quando compila.

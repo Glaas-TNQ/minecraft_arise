@@ -34,6 +34,13 @@ public record AriseActionPayload(Action action) implements CustomPacketPayload {
 		 * solo chiederlo.
 		 */
 		OPEN_GEAR("open_gear"),
+		/**
+		 * Apre la mappa del mondo.
+		 *
+		 * <p>Come il menu: il contenuto lo sa solo il server — città a duecentomila blocchi, varchi
+		 * in chunk mai visti — quindi il tasto chiede, e la risposta è la mappa.
+		 */
+		OPEN_MAP("open_map"),
 		ABILITY_1("ability_1"),
 		ABILITY_2("ability_2"),
 		ABILITY_3("ability_3"),

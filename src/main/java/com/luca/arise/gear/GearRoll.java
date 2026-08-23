@@ -60,6 +60,37 @@ public final class GearRoll {
 	}
 
 	/**
+	 * Un pezzo che il Cacciatore puo' <em>davvero indossare adesso</em>.
+	 *
+	 * <p>Gli slot del Cacciatore si aprono col rango: orecchini a C, mantello a B, collana ad A,
+	 * talismano a S. {@link #rollAny} pesca fra tutti e quattordici, quindi un pezzo consegnato a
+	 * un Cacciatore di rango E finiva una volta su due in una casella che non esiste ancora.
+	 *
+	 * <p>Per il bottino di un varco quello va bene — un pezzo che non puoi ancora mettere e' una
+	 * promessa — ma per un <strong>regalo</strong> no, e per il regalo che precede l'incarico
+	 * "indossa un pezzo" e' un difetto: la catena si ferma su un oggetto che si puo' solo guardare.
+	 */
+	public static GearPiece rollUsable(GearConfig config, Rank rank, Rank hunterRank,
+			RandomSource random) {
+		List<GearSlot> open = new ArrayList<>();
+
+		for (GearSlot slot : GearSlot.values()) {
+			if (slot.capacity(hunterRank) > 0) {
+				open.add(slot);
+			}
+		}
+
+		// Le cinque caselle di vanilla sono sempre aperte, quindi la lista non e' mai vuota; il
+		// ripiego c'e' lo stesso, perche' una lista vuota qui sarebbe un'eccezione dentro la
+		// consegna di un premio.
+		if (open.isEmpty()) {
+			return rollAny(config, rank, random);
+		}
+
+		return roll(config, open.get(random.nextInt(open.size())), rank, random);
+	}
+
+	/**
 	 * Sceglie le statistiche, senza ripetizioni.
 	 *
 	 * <p>La prima estratta diventa il titolo del pezzo e prende la quota piu' grossa: e' quello che

@@ -105,8 +105,12 @@ public class HunterMenuScreen extends AbstractContainerScreen<HunterMenu> {
 				imageWidth - 8 - font.width(Component.translatable("arise.screen.hunter.rank",
 						menu.rank().label())), titleLabelY, AriseTheme.MUTED);
 
-		graphics.text(font, Component.translatable("arise.screen.hunter.dimensional"),
-				8, HunterMenu.DIMENSIONAL_Y - 11, AriseTheme.MUTED);
+		// L'etichetta dice cos'e' lo spazio dimensionale; la riga accanto dice come si tira fuori
+		// quello che c'e' dentro. Senza, l'unico modo di scoprire lo shift+clic era provarlo.
+		Component space = Component.translatable("arise.screen.hunter.dimensional");
+		graphics.text(font, space, 8, HunterMenu.DIMENSIONAL_Y - 11, AriseTheme.MUTED);
+		graphics.text(font, Component.translatable("arise.screen.hunter.equip_hint"),
+				8 + font.width(space) + 8, HunterMenu.DIMENSIONAL_Y - 11, AriseTheme.DISABLED);
 		graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, AriseTheme.MUTED);
 	}
 

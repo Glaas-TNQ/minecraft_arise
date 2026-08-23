@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "O": "minecraft:obsidian",
+    "S": "arise:soul_coin",
+    "C": "minecraft:compass"
+  },
+  "pattern": [
+    "OSO",
+    "SCS",
+    "OSO"
+  ],
+  "result": {
+    "id": "arise:abyss_compass"
+  }
+}

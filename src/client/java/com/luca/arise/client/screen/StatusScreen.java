@@ -1,6 +1,8 @@
 package com.luca.arise.client.screen;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import com.luca.arise.client.ui.AriseScreen;
@@ -16,6 +18,7 @@ import com.luca.arise.registry.ModAttachments;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.player.LocalPlayer;
@@ -35,11 +38,20 @@ import net.minecraft.network.chat.Component;
 public class StatusScreen extends AriseScreen {
 
 	private static final int PANEL_W = 400;
-	private static final int PANEL_H = 190;
+	private static final int PANEL_H = 210;
 	private static final int LEFT_W = 220;
-	private static final int ROW = 26;
+	/**
+	 * Alto quanto le tre righe che ci stanno dentro: nome, cosa produce, barra.
+	 *
+	 * <p>Era 26 quando le righe erano due. Un valore che non tiene conto di cio' che disegna e' il
+	 * modo piu' rapido di ritrovarsi la barra di una statistica appoggiata sul nome della prossima.
+	 */
+	private static final int ROW = 30;
 
 	private final Map<Stat, Button> buttons = new EnumMap<>(Stat.class);
+
+	/** La riga sotto il mouse in questo fotogramma. Si azzera a ogni disegno. */
+	private Stat hovered;
 
 	public StatusScreen() {
 		super(Component.translatable("arise.screen.status.title"), PANEL_W, PANEL_H);
@@ -94,6 +106,7 @@ public class StatusScreen extends AriseScreen {
 
 		AriseConfig config = AriseConfig.get();
 		PlayerProgress progress = progress();
+		hovered = null;
 		int left = bodyLeft();
 		int valueRight = left + LEFT_W - 40;
 
@@ -118,16 +131,78 @@ public class StatusScreen extends AriseScreen {
 			Component amount = Component.literal(points + "/" + cap);
 			graphics.text(font, amount, valueRight - font.width(amount), y, AriseTheme.MUTED);
 
-			bar(graphics, left, y + 11, LEFT_W - 40, 2, cap <= 0 ? 0.0 : (double) points / cap,
+			// La riga che mancava: cosa hanno prodotto i punti spesi, e cosa produrrebbe il
+			// prossimo. Senza, la schermata diceva "Forza 12/400" — due numeri che non rispondono
+			// alla sola domanda che si ha davanti a un bottone "+".
+			double perPoint = config.perPoint(stat);
+			Component gives = Component.translatable("arise.screen.status.gives",
+					stat.format(points * perPoint), stat.effect());
+			Component step = Component.translatable("arise.screen.status.per_point",
+					stat.format(perPoint));
+
+			graphics.text(font, gives, left, y + 10, AriseTheme.GOOD);
+			graphics.text(font, step, valueRight - font.width(step), y + 10, AriseTheme.DISABLED);
+
+			bar(graphics, left, y + 21, LEFT_W - 40, 2, cap <= 0 ? 0.0 : (double) points / cap,
 					AriseTheme.ACCENT_DEEP);
+
+			// Il riquadro al passaggio del mouse: la spiegazione lunga sta qui, dove non ruba
+			// spazio a nessuno e la trova chiunque si fermi un istante sulla riga che sta per
+			// premere.
+			if (mouseX >= left && mouseX <= valueRight && mouseY >= y - 3 && mouseY <= y + 20) {
+				hovered = stat;
+			}
 
 			y += ROW;
 		}
 
-		drawSources(graphics, player);
+		drawSources(graphics, player, mouseX, mouseY);
+
+		if (hovered != null) {
+			graphics.setComponentTooltipForNextFrame(font, explain(hovered, player), mouseX, mouseY);
+		}
 	}
 
-	private void drawSources(GuiGraphicsExtractor graphics, LocalPlayer player) {
+	/**
+	 * Cosa dice il riquadro di una statistica.
+	 *
+	 * <p>Quattro cose, nell'ordine in cui servono: che parametro del gioco e', cosa cambia in
+	 * partita, quanto vale un punto, e quanto se ne ha adesso — diviso fra quello che si e' speso e
+	 * quello che arriva dall'equipaggiamento. La domanda "a cosa serve l'agilita'" e quella "mi
+	 * conviene spendere qui" hanno risposte diverse, e questa lista risponde a entrambe.
+	 */
+	private List<Component> explain(Stat stat, LocalPlayer player) {
+		AriseConfig config = AriseConfig.get();
+		double perPoint = config.perPoint(stat);
+		double spent = progress().stat(stat) * perPoint;
+		double bonus = external(stat);
+
+		List<Component> lines = new ArrayList<>();
+		lines.add(Component.translatable(stat.translationKey()).withStyle(ChatFormatting.WHITE));
+		lines.add(stat.effect().copy().withStyle(ChatFormatting.AQUA));
+		lines.add(stat.description().copy().withStyle(ChatFormatting.GRAY));
+		lines.add(Component.empty());
+
+		if (stat.spendable()) {
+			lines.add(Component.translatable("arise.screen.status.tip_per_point",
+					stat.format(perPoint)).withStyle(ChatFormatting.DARK_GRAY));
+			lines.add(Component.translatable("arise.screen.status.tip_spent",
+					stat.format(spent)).withStyle(ChatFormatting.DARK_GRAY));
+		}
+
+		if (bonus != 0.0) {
+			lines.add(Component.translatable("arise.screen.status.tip_gear",
+					stat.format(bonus)).withStyle(ChatFormatting.DARK_GRAY));
+		}
+
+		lines.add(Component.translatable("arise.screen.status.tip_total",
+				String.format("%.2f", player.getAttributeValue(stat.attribute())))
+				.withStyle(ChatFormatting.DARK_GRAY));
+
+		return lines;
+	}
+
+	private void drawSources(GuiGraphicsExtractor graphics, LocalPlayer player, int mouseX, int mouseY) {
 		int left = bodyLeft() + LEFT_W + 10;
 		int right = bodyRight();
 		int y = bodyTop() + 6;
@@ -145,8 +220,16 @@ public class StatusScreen extends AriseScreen {
 				continue;
 			}
 
-			keyValue(graphics, Component.translatable(stat.translationKey()),
+			// Il nome della statistica e, di seguito e in grigio, il parametro del gioco che quel
+			// numero e': "Forza · danno da mischia — 5,80" si legge senza doverlo imparare.
+			keyValue(graphics, Component.translatable(stat.translationKey())
+							.append(Component.literal("  ").append(stat.effect())
+									.withStyle(ChatFormatting.DARK_GRAY)),
 					Component.literal(String.format("%.2f", total)), left, right, y, AriseTheme.TEXT);
+
+			if (mouseX >= left && mouseX <= right && mouseY >= y - 1 && mouseY <= y + 9) {
+				hovered = stat;
+			}
 
 			if (bonus != 0.0) {
 				Component from = Component.literal(stat.format(bonus));

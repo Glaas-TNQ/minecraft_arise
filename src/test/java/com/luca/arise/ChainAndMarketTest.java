@@ -150,11 +150,20 @@ class ChainAndMarketTest {
 	@Test
 	@DisplayName("le nove botteghe ci sono tutte, una per mestiere, e non si sovrappongono")
 	void everyShopHasItsPlaceAndKeepsIt() {
-		assertEquals(Shopkeeper.values().length, CityMarket.STALLS.size(),
-				"ogni mestiere deve avere la sua bottega");
+		// Non tutti i ruoli stanno in piazza: l'Araldo del Risveglio e' fatto della stessa classe
+		// degli altri ma vive in un'altra dimensione. Il conto e' su chi il mercato ce l'ha davvero,
+		// perche' il difetto da prendere qui e' "un mestiere senza bottega", non "un enum piu' lungo
+		// della lista".
+		long inTheMarket = java.util.Arrays.stream(Shopkeeper.values())
+				.filter(Shopkeeper::market)
+				.count();
+
+		assertEquals(inTheMarket, CityMarket.STALLS.size(),
+				"ogni mestiere di piazza deve avere la sua bottega");
 
 		Set<Shopkeeper> roles = new HashSet<>();
 		for (CityMarket.Stall stall : CityMarket.STALLS) {
+			assertTrue(stall.role().market(), stall.role() + " non sta in piazza, ma ha un bancone");
 			assertTrue(roles.add(stall.role()), stall.role() + " ha due botteghe");
 		}
 

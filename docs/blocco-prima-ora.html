@@ -1,0 +1,662 @@
+<title>La Sala del Risveglio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--violet);
+    background: linear-gradient(180deg, rgba(142,107,255,0.10), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------------------------------------------------------------- avvisi */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice.hot { border-top-color: var(--bad); }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice p + p { margin-top: 10px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .notice.hot .tag { color: var(--bad); }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+  .step.good { color: var(--good); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .compare > div { background: var(--panel-soft); padding: 16px 18px; }
+  .compare .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .compare .before .tag { color: var(--muted); }
+  .compare .after .tag { color: var(--good); }
+  .compare p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .compare .after p { color: var(--text); }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 620px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td b { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  tr.service td:first-child b { color: var(--gold); }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  .map {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+    white-space: pre;
+  }
+  .caption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  /* ---------------------------------------------------------------- la catena */
+
+  .chain { margin-top: 20px; border: 1px solid var(--line); background: var(--panel); padding: 10px; }
+  .chain svg { display: block; width: 100%; height: auto; }
+  .chain .n { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: #8FA0B5; }
+  .chain .t { font-family: "Chakra Petch", sans-serif; font-size: 12px; font-weight: 600; fill: #E8F2FF; }
+  .chain .g { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; fill: #FFD54F; }
+  .chain .box { fill: #0E1522; stroke: #1F2C42; }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: 52px 0 0; }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocco P1</p>
+    <h1>La Sala del Risveglio</h1>
+    <p class="lede">Il momento più importante della mod era <strong>una riga in chat</strong>: arrivavi a un
+      passo dalla fine, il Sistema ti salvava, e restavi esattamente dov'eri con un riquadro nuovo in alto a
+      sinistra e nessuna idea di cosa farne. Adesso il colpo che non uccide <strong>porta via</strong>. Più i
+      suggerimenti che dicono dove si preme, il contatore sopra la hotbar, e un difetto trovato leggendo il
+      mondo salvato invece che giocandoci.</p>
+    <p class="facts">
+      <span><b>7</b> file nuovi</span>
+      <span><b>6</b> pagine di dialogo</span>
+      <span><b>18</b> suggerimenti</span>
+      <span><b>88</b> chiavi di traduzione</span>
+      <span><b>5</b> prove nuove</span>
+      <span><b>54</b> prove verdi</span>
+    </p>
+  </header>
+
+  <div class="notice">
+    <span class="tag">Prima di riaprire il tuo mondo</span>
+    <p>Questo blocco cambia <strong>l'inizio</strong>, e l'inizio tu l'hai già passato. Un personaggio che ha
+      già il Sistema non vedrà niente di tutto questo: la Sala esiste, ma nessuno lo porterà mai lì.</p>
+    <p>Per vederla: <span class="mono">/arise quest reset</span> rimette al risveglio <em>e</em> riporta il
+      discorso dell'Araldo all'inizio — sono la stessa cosa, adesso. Per rileggere solo le parole senza
+      muoverti, <span class="mono">/arise tutorial</span>.</p>
+  </div>
+
+  <section>
+    <h2><span class="step">1</span> Cos'era la prima ora, davvero</h2>
+    <p class="kicker">Il difetto non era la mancanza di spiegazioni. Era che <em>non succedeva niente</em>.</p>
+
+    <p>Ho ripercorso la prima ora riga per riga, dal primo ingresso nel mondo al terzo incarico. Non c'era
+      un bug: c'erano quattro momenti in cui il gioco chiedeva al giocatore di indovinare.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Momento</th><th>Cosa vedevi</th><th>Cosa mancava</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Primo ingresso</b><br><span class="mono">JOIN</span></td>
+            <td>Una riga: «Incarico: Il risveglio».</td>
+            <td>Nessun segno che la mod fosse installata. Nessun riquadro, nessun oggetto, nessun tasto: la
+              conclusione ragionevole è che non abbia funzionato.</td>
+          </tr>
+          <tr>
+            <td><b>Il colpo mortale</b><br><span class="mono">ALLOW_DEATH</span></td>
+            <td>Vita piena, una riga in chat, l'HUD che compare.</td>
+            <td>La scena. Il momento che dà il titolo alla mod durava meno di un secondo e finiva nello
+              stesso posto in cui era cominciato.</td>
+          </tr>
+          <tr>
+            <td><b>Un sistema si apre</b><br><span class="mono">Sbloccato: …</span></td>
+            <td>Il nome di quello che è arrivato.</td>
+            <td>Dove si preme. «Sbloccato: l'esercito d'ombra» non dice che c'è un tasto, che va premuto
+              vicino a un cadavere, e che il cadavere dev'essere fresco.</td>
+          </tr>
+          <tr>
+            <td><b>Quindici uccisioni</b><br><span class="mono">Objective.KILL</span></td>
+            <td>Niente, fino alla quindicesima.</td>
+            <td>Il conto. Il riquadro con «7/15» sta in alto a sinistra, cioè non dove guardi mentre
+              combatti.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Perché non un tutorial classico</span>
+      <p>Perché la catena degli incarichi <em>è</em> già un tutorial, e funziona: un compito per volta, e
+        ognuno apre il sistema di cui parla il successivo. Quello che mancava non era una spiegazione in più
+        — era <strong>consegnare</strong> quello che la catena promette. Un momento in cui qualcosa arriva, e
+        una riga che dica cosa farne.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step violet">2</span> Una stanza in fondo alla dimensione dei varchi</h2>
+    <p class="kicker">Due secondi di buio, e ti svegli altrove.</p>
+
+    <p>Il colpo che avrebbe ucciso accende una <code>Blindness</code> di due secondi e mezzo — la tenda che si
+      chiude — e prenota il viaggio. Ti risvegli a un capo di una sala di diciannove blocchi di lato, con
+      l'Araldo del Sistema all'altro capo. I quattordici blocchi in mezzo sono tutta la scenografia che
+      serve: <strong>si cammina verso qualcuno</strong>, invece di trovarselo addosso.</p>
+
+    <pre class="map">                    vetrata sul vuoto
+        ██████████████████░░░░░████████████████
+        █                  ▓ A ▓               █   A  l'Araldo
+        █   ◈           ◈  ▓   ▓          ◈    █   ◈  lanterna a soffitto
+        █                                      █   ║  la vena di mattoni
+        █                  ║║║                 █   ✦  il cuore di vetro
+        █   ◈           ◈  ║✦║           ◈     █      con la luce sotto
+        █                  ║║║                 █
+        █                                      █   guscio: ardesia rinforzata
+        █   ◈           ◈  ▓ P ▓          ◈    █   P  dove compari tu
+        ████████████████████████████████████████</pre>
+    <p class="caption">arise:gate, a −4096 64 0 — a ovest dell'origine, dove nessuna istanza di varco arriverà mai.</p>
+
+    <p>Sta lì e non nell'Overworld per tre motivi che si tengono per mano: non c'è terreno da spianare, quindi
+      non c'è un posto sbagliato dove costruirla; non c'è cielo, quindi il buio attorno è gratis ed è
+      esattamente il buio che serve; e nessuno ci passa davanti per sbaglio, perché quella dimensione non ha
+      strade.</p>
+
+    <h3>Tre vincoli, ognuno pagato con un difetto</h3>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Vincolo</th><th>Cosa sarebbe successo</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Il teletrasporto non avviene dentro <span class="mono">ALLOW_DEATH</span></b></td>
+            <td>Quell'evento scatta mentre Minecraft sta ancora decidendo cosa fare di quel colpo. Cambiare
+              dimensione a un giocatore da lì dentro significa spostargli il mondo sotto i piedi a metà
+              calcolo. Il risveglio si <em>prenota</em>, e un battito del server lo esegue 45 tick dopo — che
+              è anche il motivo per cui c'è tempo per il buio.</td>
+          </tr>
+          <tr>
+            <td><b>La stanza nasce con il mondo</b></td>
+            <td>Come le città (blocco E1). Costruirla al momento del bisogno voleva dire tremila blocchi
+              posati nel tick in cui il giocatore sta per morire: l'istante peggiore dell'intera partita per
+              fermare il server.</td>
+          </tr>
+          <tr>
+            <td><b>L'Araldo si controlla un secondo <em>dopo</em> l'arrivo</b></td>
+            <td>Questo è costato un difetto vero. Vedi il punto 5.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">3</span> Sei pagine, un clic per volta</h2>
+    <p class="kicker">Finisce quando decidi tu, e non ricomincia.</p>
+
+    <p>L'Araldo dice una pagina per clic destro: dove sei, cos'è il Sistema, come funziona la catena, che
+      tasti servono, cosa arriva dopo, e infine ti riapre la porta. Un muro di testo tutto insieme si salta, e
+      chi lo salta resta senza sapere che esiste un tasto per gli incarichi; sei clic sono sei momenti in cui
+      chi legge <strong>decide di andare avanti</strong>. Chi ha già sentito tutto e ci ritorna riceve la
+      porta aperta, non il discorso da capo.</p>
+
+    <div class="panel why">
+      <span class="tag">I tasti si scrivono da soli</span>
+      <p>Le due pagine che parlano di comandi non nominano nessuna lettera. Passano
+        <code>Component.keybind("key.arise.extract")</code>, e il client sostituisce il tasto che
+        <em>quel</em> giocatore ha davvero configurato. Scrivere «premi R» è giusto finché qualcuno non
+        rimappa, e da quel momento in poi è una bugia che nessuno viene a correggere.</p>
+    </div>
+
+    <div class="compare">
+      <div class="before">
+        <span class="tag">Prima</span>
+        <p>«Sei arrivato a un passo dalla fine, e qualcosa ha risposto. Il Sistema è tuo.»<br><br>Poi il
+          silenzio, e un riquadro nuovo in alto a sinistra.</p>
+      </div>
+      <div class="after">
+        <span class="tag">Adesso</span>
+        <p>«Quello che uccidi non deve restare a terra. Quando il Sistema te lo concederà, <b>R</b> vicino a
+          un cadavere fresco ne prenderà l'ombra, <b>G</b> la chiamerà al tuo fianco e <b>J</b> ti farà
+          comandare l'esercito. È così che si smette di combattere da soli.»</p>
+      </div>
+    </div>
+
+    <p>All'ultima pagina il Sistema anticipa <b>50 soul coin</b> — serve a vedere il contatore muoversi una
+      volta — e ti rimanda esattamente da dove sei stato portato via, con quindici secondi di
+      <code>Resistance</code> e <code>Regeneration</code>. Non è generosità: il posto in cui stavi per morire
+      è ancora lì, e ci sarà anche la cosa che ti stava uccidendo. Senza la protezione, metà dei risvegli
+      finirebbe con una morte vera due secondi dopo la scena che spiega come si evita.</p>
+  </section>
+
+  <section>
+    <h2><span class="step gold">4</span> Ogni sistema dice dove si preme</h2>
+    <p class="kicker">La metà che mancava alla catena degli incarichi.</p>
+
+    <p>Diciotto sistemi, diciotto righe. Arrivano subito sotto a «Sbloccato: …», e restano nella schermata
+      degli incarichi per chi tre giorni dopo si chiede come si faceva.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Sistema</th><th>La riga che compare</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>le statistiche</b></td><td><b>K</b> apre la schermata di stato: i punti si spendono lì, uno alla volta.</td></tr>
+          <tr><td><b>l'esercito d'ombra</b></td><td><b>R</b> vicino a un cadavere fresco ne estrae l'ombra; <b>J</b> apre l'esercito.</td></tr>
+          <tr><td><b>i varchi</b></td><td>I varchi si aprono da soli vicino a te: fai clic per analizzarli prima di entrare, e <b>M</b> te li segna sulla mappa.</td></tr>
+          <tr class="service"><td><b>la Moneta d'Anima</b></td><td>Al Banco dell'Abisso: clic per coniare, shift+clic per riportarle indietro.</td></tr>
+          <tr class="service"><td><b>la maestria</b></td><td>Non manca più niente: da qui in avanti il Sistema tace e guarda.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>E il conto sopra la hotbar</h3>
+    <p>Ogni scatto di un incarico che si conta compare per un attimo sopra la hotbar — <span class="mono">Il
+      conto dei caduti 7/15</span> — invece che in chat, dove sarebbero quindici righe. Nel farlo è emerso
+      che gli obiettivi <em>assoluti</em> («arriva al livello 3») ripassavano dal contatore ogni due secondi
+      per conto del battito del server: adesso, se il numero non è cambiato, non si scrive niente. Erano una
+      scrittura del dato e un pacchetto di sincronizzazione ogni due secondi, per sempre.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">5</span> Il difetto dei due Araldi</h2>
+    <p class="kicker">Trovato leggendo le region del mondo salvato, non giocandoci.</p>
+
+    <p>Le prove da console non funzionano in questo ambiente di sviluppo — fallisce anche <span class="mono">list</span>,
+      che è di Minecraft — quindi non potevo chiedere al gioco cosa c'era nella Sala. Ho fatto l'opposto: ho
+      avviato il server, l'ho fermato, e ho <strong>letto i file della regione</strong> con venti righe di
+      Python. I materiali della Sala erano tutti lì, nei quattro file giusti attorno all'angolo, e l'Araldo
+      pure.</p>
+
+    <pre><code>== blocchi ==                              == entita' ==
+minecraft:reinforced_deepslate    4 chunk   arise:shopkeeper    r.-8.0.mca, chunk 0
+minecraft:polished_deepslate      4 chunk   arise.npc.herald    r.-8.0.mca, chunk 0
+minecraft:light_blue_stained_glass 4 chunk
+minecraft:crying_obsidian         2 chunk   <span class="c">← le due colonne, solo al fondo</span></code></pre>
+
+    <p>Poi ho riavviato una seconda volta, e il conto degli Araldi era <b>2</b>.</p>
+
+    <div class="notice hot">
+      <span class="tag">La causa</span>
+      <p>Le entità di un chunk in cui non c'è nessuno <strong>non esistono, per chi le cerca</strong>.
+        <code>getBlockState</code> carica il chunk, quindi «la stanza c'è già?» riceve la risposta giusta; ma
+        <code>getEntitiesOfClass</code> su una regione senza giocatori risponde sempre «vuoto», anche se
+        quell'entità è salvata su disco a un metro da lì.</p>
+      <p>Il criterio di questa mod — <em>guarda il mondo invece di tenere un registro</em> — vale per i
+        blocchi e <strong>non</strong> per le entità. Il ripopolamento del mercato se la cava perché avviene
+        con un giocatore lì; il mio avveniva all'avvio del server, in una stanza vuota, e ne aggiungeva uno a
+        ogni riavvio. In silenzio.</p>
+    </div>
+
+    <p>La correzione è una separazione: <code>ensureRoom</code> all'avvio del server, che tocca solo blocchi;
+      <code>ensureHerald</code> <em>un secondo dopo</em> che il giocatore è arrivato, quando la stanza è viva.
+      E in più il taglio dei doppioni, per i mondi dove il difetto è già passato — due Araldi identici a un
+      metro l'uno dall'altro sono peggio di nessun Araldo, perché ti chiedi quale sia quello giusto.</p>
+
+    <div class="verify">
+      <span class="tag">Verificato senza aprire il gioco</span>
+      <p>Server avviato quattro volte su un mondo esistente: nessuna eccezione di <span class="mono">arise</span>,
+        la Sala tirata su in un secondo, la config vecchia che si fonde con la sezione nuova senza un errore.
+        Le region del mondo salvato dicono che i sei materiali della Sala e l'Araldo ci sono, e dopo la
+        correzione il conto degli Araldi non sale più. Il collaudo statico è pulito su 578 chiavi, e le prove
+        sono 54 verdi — cinque nuove, fra cui quella che tiene la Sala lontana dai varchi: se un giorno
+        qualcuno spostasse <span class="mono">sanctum_x</span> sopra un'istanza, quella prova si accende prima
+        che succeda.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step good">6</span> Cosa resta da guardare in gioco</h2>
+    <p class="kicker">Un mondo nuovo, e i primi dieci minuti.</p>
+
+    <ul class="check">
+      <li>Al primo ingresso: il titolo <b>Arise</b> e due righe grigie che dicono che non c'è niente da fare.
+        Nessun riquadro dell'HUD.</li>
+      <li>Farsi quasi uccidere. Il buio deve arrivare <em>prima</em> del cambio di stanza: se vedi il salto,
+        <span class="mono">delay_ticks</span> e la cecità sono fuori fase.</li>
+      <li>Nella Sala: l'Araldo in fondo, la vena di mattoni che ci porta, il cuore di vetro che illumina il
+        centro. Nessun mob.</li>
+      <li>Sei clic destri sull'Araldo. Le pagine 4 e 5 devono nominare <b>i tuoi</b> tasti — provare a
+        rimappare <span class="mono">key.arise.status</span> e riaprire il discorso con
+        <span class="mono">/arise tutorial</span>.</li>
+      <li>All'ultima pagina: 50 soul coin sul contatore, ritorno esatto al punto in cui sei stato preso, e la
+        protezione addosso.</li>
+      <li>Disconnettersi <em>dentro</em> la Sala e rientrare: si deve restare lì, non venire rispediti a casa
+        dalla rete di sicurezza dei varchi.</li>
+      <li>Salire al livello 3 e uccidere quindici creature: il contatore sopra la hotbar deve muoversi solo
+        quando il numero cambia davvero.</li>
+      <li>A ogni «Sbloccato: …» deve seguire la riga grigia che dice dove si preme.</li>
+    </ul>
+
+    <hr>
+
+    <h3>I comandi</h3>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Comando</th><th>Cosa fa</th><th>Chi</th></tr></thead>
+        <tbody>
+          <tr><td><span class="mono">/arise tutorial</span></td><td>Ripassa tutte e sei le parole dell'Araldo, in chat, senza muoverti.</td><td>tutti</td></tr>
+          <tr><td><span class="mono">/arise tutorial leave</span></td><td>Fuori dalla Sala, discorso chiuso. È anche la via d'uscita se qualcosa va storto.</td><td>tutti</td></tr>
+          <tr><td><span class="mono">/arise tutorial start</span></td><td>Rientra nella Sala da capo.</td><td>gamemaster</td></tr>
+          <tr><td><span class="mono">/arise tutorial build</span></td><td>Tira su la Sala senza portarci nessuno. L'unico che non chiede un giocatore: si scrive dalla console di un server.</td><td>gamemaster</td></tr>
+          <tr><td><span class="mono">/arise quest reset</span></td><td>Rimette al risveglio, discorso dell'Araldo compreso.</td><td>gamemaster</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Le manopole</h3>
+    <p>Tutto sta in <span class="mono">config/arise.json</span>, sotto <span class="mono">hunter.awakening</span>.
+      <code>sanctum: false</code> riporta il risveglio a com'era — una riga in chat e il Sistema acceso;
+      <code>hints: false</code> spegne i suggerimenti per chi la mod la conosce a memoria. Le altre sono dove
+      sta la Sala, quanto è grande, quanto dura il buio e quanto la protezione al rientro.</p>
+  </section>
+
+  <footer>
+    <p>Arise · blocco P1 — la prima ora. Build verde, collaudo pulito, 54 prove.<br>
+      Il resto della catena non è cambiato: quello che questo blocco aggiunge è il momento in cui qualcosa
+      arriva, e la riga che dice cosa farne.</p>
+  </footer>
+
+</div>

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -44,9 +45,11 @@ import net.minecraft.world.item.component.TooltipProvider;
  *
  * @param sockets quante gemme il pezzo puo' reggere; lo decide il rango e non cambia mai piu'
  * @param gems    le gemme incastonate, al piu' {@code sockets}
+ * @param unique  il pezzo unico da cui viene, se non e' stato tirato a caso (vedi {@link GearUnique})
  */
 public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
-		Map<Stat, Double> stats, int sockets, List<Gem> gems) implements TooltipProvider {
+		Map<Stat, Double> stats, int sockets, List<Gem> gems,
+		Optional<GearUnique> unique) implements TooltipProvider {
 
 	public static final Codec<GearPiece> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			UUIDUtil.CODEC.fieldOf("id").forGetter(GearPiece::id),
@@ -56,7 +59,10 @@ public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
 			Codec.unboundedMap(Stat.CODEC, Codec.DOUBLE).fieldOf("stats").forGetter(GearPiece::stats),
 			Codec.INT.optionalFieldOf("sockets", 0).forGetter(GearPiece::sockets),
 			// Opzionale: i pezzi tirati prima che le gemme esistessero si caricano senza migrazioni.
-			Gem.CODEC.listOf().optionalFieldOf("gems", List.of()).forGetter(GearPiece::gems)
+			Gem.CODEC.listOf().optionalFieldOf("gems", List.of()).forGetter(GearPiece::gems),
+			// Opzionale come le gemme, e per lo stesso motivo: i pezzi salvati prima che i pezzi
+			// unici esistessero si rileggono senza migrazioni.
+			GearUnique.CODEC.optionalFieldOf("unique").forGetter(GearPiece::unique)
 	).apply(instance, GearPiece::new));
 
 	/** Per il componente dell'oggetto: niente registri di mezzo, solo enum, numeri e UUID. */
@@ -65,7 +71,7 @@ public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
 	/** Un pezzo appena tirato: incastonature vuote. */
 	public static GearPiece of(UUID id, GearBase base, Rank rank, GearAffix affix,
 			Map<Stat, Double> stats, int sockets) {
-		return new GearPiece(id, base, rank, affix, stats, sockets, List.of());
+		return new GearPiece(id, base, rank, affix, stats, sockets, List.of(), Optional.empty());
 	}
 
 	public GearPiece {
@@ -85,23 +91,31 @@ public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
 	public GearPiece withGem(Gem gem) {
 		List<Gem> updated = new ArrayList<>(gems);
 		updated.add(gem);
-		return new GearPiece(id, base, rank, affix, stats, sockets, updated);
+		return new GearPiece(id, base, rank, affix, stats, sockets, updated, unique);
 	}
 
 	public GearPiece withoutGem(UUID gemId) {
 		List<Gem> updated = new ArrayList<>(gems);
 		updated.removeIf(gem -> gem.id().equals(gemId));
-		return new GearPiece(id, base, rank, affix, stats, sockets, updated);
+		return new GearPiece(id, base, rank, affix, stats, sockets, updated, unique);
 	}
 
 	public GearSlot slot() {
 		return base.slot();
 	}
 
-	/** "Diadema del Corvo". La composizione passa dalla traduzione, non da una concatenazione. */
+	/**
+	 * "Diadema del Corvo". La composizione passa dalla traduzione, non da una concatenazione.
+	 *
+	 * <p>Un pezzo unico ha un nome proprio e se lo tiene: il colore lo distingue dal rango, perche'
+	 * un Occhio dell'Oscurita' di rango E non e' un pezzo di rango E qualunque e non deve leggersi
+	 * come tale.
+	 */
 	public Component displayName() {
-		return Component.translatable("arise.gear.name", base.label(), affix.label())
-				.withStyle(rank.chatColor());
+		return unique
+				.<Component>map(GearUnique::label)
+				.orElseGet(() -> Component.translatable("arise.gear.name", base.label(), affix.label())
+						.withStyle(rank.chatColor()));
 	}
 
 	/** Le righe dei modificatori, una per statistica, gia' formattate e tradotte. */
@@ -149,6 +163,9 @@ public record GearPiece(UUID id, GearBase base, Rank rank, GearAffix affix,
 			DataComponentGetter components) {
 		out.accept(Component.translatable("arise.gear.tooltip.rank", rank.label())
 				.withStyle(ChatFormatting.DARK_GRAY));
+
+		unique.ifPresent(value -> out.accept(value.lore()
+				.copy().withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC)));
 
 		statLines().forEach(out);
 

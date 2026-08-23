@@ -489,6 +489,56 @@ public final class ShadowManager {
 	}
 
 	/** All'uscita del giocatore le entità vanno rimosse: i dati bastano a ricostruirle. */
+	/**
+	 * Vero se questa entita' e' una delle evocazioni vive di questo giocatore.
+	 *
+	 * <p>Serve all'ombra stessa: un'entita' che non risulta piu' evocata e' un residuo, e deve
+	 * togliersi di mezzo da sola. Vedi {@code ShadowEntity.tick}.
+	 */
+	public static boolean isSummoned(ServerPlayer owner, UUID entityId) {
+		Map<UUID, UUID> summoned = SUMMONED.get(owner.getUUID());
+		return summoned != null && summoned.containsValue(entityId);
+	}
+
+	/**
+	 * Il giocatore ha cambiato mondo: l'esercito rientra.
+	 *
+	 * <p>E' la correzione di un difetto visto in gioco, e vale la pena scrivere come nasceva.
+	 * Le ombre evocate restavano nella dimensione da cui si usciva; il loro chunk si scaricava; da
+	 * quel momento {@code getEntityInAnyDimension} rispondeva "non c'e'" e
+	 * {@link #pruneSummoned} le toglieva dall'elenco. Alla successiva evocazione ne nascevano
+	 * altrettante nuove — e le vecchie erano ancora li', salvate su disco, pronte a ricomparire
+	 * appena il giocatore fosse tornato in zona. Un varco, dieci ombre.
+	 *
+	 * <p>Il richiamo si fa <em>qui</em> e non a ogni battito perche' qui le entita' sono ancora
+	 * raggiungibili: il mondo di partenza arriva come argomento, e i suoi chunk sono ancora
+	 * caricati nell'istante in cui l'evento scatta.
+	 */
+	public static void onLevelChange(ServerPlayer player, ServerLevel origin) {
+		Map<UUID, UUID> summoned = SUMMONED.get(player.getUUID());
+
+		if (summoned == null || summoned.isEmpty()) {
+			return;
+		}
+
+		int recalled = 0;
+		for (UUID entityId : summoned.values()) {
+			Entity entity = origin.getEntity(entityId);
+
+			if (entity != null) {
+				entity.discard();
+				recalled++;
+			}
+		}
+
+		summoned.clear();
+		syncSummoned(player, summoned);
+
+		if (recalled > 0) {
+			player.sendSystemMessage(Component.translatable("arise.msg.shadow.recalled_travel", recalled));
+		}
+	}
+
 	public static void onPlayerLeave(ServerPlayer player) {
 		Map<UUID, UUID> summoned = SUMMONED.remove(player.getUUID());
 

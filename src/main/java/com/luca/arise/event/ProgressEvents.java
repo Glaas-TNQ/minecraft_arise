@@ -16,13 +16,17 @@ import com.luca.arise.quest.Unlock;
 import com.luca.arise.shadow.ShadowEntity;
 import com.luca.arise.shadow.ShadowManager;
 
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 
 public final class ProgressEvents {
@@ -106,9 +110,28 @@ public final class ProgressEvents {
 			ProgressManager.applyAttributes(player);
 			GateManager.onPlayerJoin(player);
 		});
+		// Cambiare dimensione richiama l'esercito. Senza, le ombre restavano nel mondo di prima e
+		// diventavano copie: vedi ShadowManager.onLevelChange.
+		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) ->
+				ShadowManager.onLevelChange(player, origin));
+
 		ServerPlayerEvents.LEAVE.register(player -> {
 			ShadowManager.onPlayerLeave(player);
 			GateManager.onPlayerLeave(player);
+		});
+
+		// La via di casa di un varco: la pietra che compare quando il guardiano cade. Sta qui
+		// insieme all'altra regola della dimensione dei varchi — chi tocca cosa, e chi non puo'
+		// rompere niente — invece che dentro GateManager, che di eventi non ne registra.
+		UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+			if (level.isClientSide() || hand != InteractionHand.MAIN_HAND
+					|| !(player instanceof ServerPlayer serverPlayer)
+					|| !GateManager.isExit(level, hit.getBlockPos())) {
+				return InteractionResult.PASS;
+			}
+
+			serverPlayer.sendSystemMessage(GateManager.leave(serverPlayer));
+			return InteractionResult.SUCCESS;
 		});
 
 		// Nessuno scava dentro un Gate. Il deepslate rinforzato regge le esplosioni, ma un

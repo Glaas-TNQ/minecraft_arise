@@ -47,6 +47,9 @@ public final class AriseKeyMappings {
 	/** Apre l'Abyss Shop. Il negozio è una finestra del Sistema: si apre ovunque. */
 	public static final KeyMapping OPEN_SHOP = register("shop", GLFW.GLFW_KEY_O);
 
+	/** La mappa del mondo: citta' e varchi aperti. M, che vanilla lascia libero. */
+	public static final KeyMapping OPEN_MAP = register("map", GLFW.GLFW_KEY_M);
+
 	/** "Arise": estrae l'ombra dal cadavere più vicino. */
 	public static final KeyMapping EXTRACT = register("extract", GLFW.GLFW_KEY_R);
 
@@ -98,6 +101,9 @@ public final class AriseKeyMappings {
 			// un menu nasce sul server: il tasto puo' solo chiederlo. Il rifiuto per sistema non
 			// ancora sbloccato arriva da li'.
 			sendOnPress(OPEN_GEAR, AriseActionPayload.Action.OPEN_GEAR);
+
+			// Anche la mappa nasce sul server: il tasto chiede, e la risposta e' la schermata.
+			sendOnPress(OPEN_MAP, AriseActionPayload.Action.OPEN_MAP);
 
 			while (OPEN_SHOP.consumeClick()) {
 				// Il colpetto al server prima della schermata: il negozio si rigenera pigramente,

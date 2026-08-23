@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.google.gson.JsonElement;
+import com.luca.arise.gate.GateRecord;
+import com.luca.arise.gate.GateRegistry;
+import com.luca.arise.gate.GateTheme;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.quest.PlayerQuests;
 import com.luca.arise.shadow.ShadowArmy;
@@ -19,7 +22,9 @@ import com.luca.arise.progress.Rank;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -152,5 +157,32 @@ class PersistenceTest {
 
 		assertEquals(3, read.level());
 		assertEquals(List.of(), read.traits(), "senza tratti scritti, nessun tratto");
+	}
+
+	@Test
+	@DisplayName("l'indice dei varchi sopravvive al salvataggio, e si aggiorna per id")
+	void gateRegistrySurvives() {
+		UUID first = new UUID(11L, 22L);
+		UUID second = new UUID(33L, 44L);
+
+		GateRecord near = new GateRecord(first, Level.OVERWORLD, new BlockPos(120, 64, -40),
+				Rank.C, GateTheme.values()[0], 4800, 12345L);
+		GateRecord far = new GateRecord(second, Level.NETHER, new BlockPos(-3000, 70, 900),
+				Rank.S, GateTheme.values()[GateTheme.values().length - 1], 60, 99999L);
+
+		GateRegistry registry = GateRegistry.EMPTY.with(near).with(far);
+		roundTrip(GateRegistry.CODEC, registry, "l'indice dei varchi");
+		roundTrip(GateRecord.CODEC, near, "un varco annotato");
+
+		// Aggiornare lo stesso varco non lo duplica: lo sostituisce, dov'era.
+		GateRecord nearLater = new GateRecord(first, Level.OVERWORLD, new BlockPos(120, 64, -40),
+				Rank.C, GateTheme.values()[0], 3200, 14000L);
+		GateRegistry updated = registry.with(nearLater);
+		assertEquals(2, updated.gates().size());
+		assertEquals(3200, updated.gates().get(0).remainingTicks());
+
+		// Dimenticare toglie solo quello, e dimenticare uno sconosciuto non cambia niente.
+		assertEquals(List.of(far), updated.without(first).gates());
+		assertEquals(updated, updated.without(new UUID(5L, 5L)));
 	}
 }

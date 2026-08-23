@@ -43,18 +43,39 @@ public enum Shopkeeper implements StringRepresentable {
 	/** Il banco delle gemme, fuori dall'Associazione. */
 	JEWELLER("jeweller", "noor", false),
 	/** Viaggio fra le citta' e Abyss Shop. */
-	CLERK("clerk", "alex", false);
+	CLERK("clerk", "alex", false),
+
+	// --- chi non sta in nessuna piazza ---------------------------------------------------------
+	/**
+	 * L'Araldo del Sistema, nella Sala del Risveglio.
+	 *
+	 * <p>La decima voce di un enum che si chiama "chi sta dietro il bancone", e non e' una
+	 * forzatura: di questa classe serviva esattamente cio' che il mercato aveva gia' — qualcuno che
+	 * stia fermo dove lo si mette, invulnerabile, senza IA e senza despawn, disegnato con una skin
+	 * che c'e' gia'. Un'entita' nuova sarebbe stata un tipo, un renderer, un layer di modello e una
+	 * voce di registro per ottenere la stessa cosa.
+	 *
+	 * <p>La skin e' quella del Sensale, e va bene cosi': i due non si vedono mai insieme, perche'
+	 * uno sta in una piazza e l'altro in una stanza in fondo a un'altra dimensione.
+	 */
+	HERALD("herald", "kai", false, false);
 
 	public static final Codec<Shopkeeper> CODEC = StringRepresentable.fromEnum(Shopkeeper::values);
 
 	private final String name;
 	private final String skin;
 	private final boolean merchant;
+	private final boolean market;
 
 	Shopkeeper(String name, String skin, boolean merchant) {
+		this(name, skin, merchant, true);
+	}
+
+	Shopkeeper(String name, String skin, boolean merchant, boolean market) {
 		this.name = name;
 		this.skin = skin;
 		this.merchant = merchant;
+		this.market = market;
 	}
 
 	@Override
@@ -69,6 +90,18 @@ public enum Shopkeeper implements StringRepresentable {
 	/** Vero se apre la finestra di scambio invece di fare qualcosa. */
 	public boolean merchant() {
 		return merchant;
+	}
+
+	/**
+	 * Vero se sta dietro un bancone del Quartiere del Mercato.
+	 *
+	 * <p>Esiste per una riga sola, ed e' una riga che sarebbe stata un difetto vero: l'incarico
+	 * "parla con qualcuno dietro un bancone" avanza al clic su un NPC qualunque, e l'Araldo e' un
+	 * NPC. Senza questa distinzione il primo incarico della Via dell'Artigiano si completava
+	 * durante il tutorial, in una stanza che con il mercato non c'entra niente.
+	 */
+	public boolean market() {
+		return market;
 	}
 
 	/** Il nome sopra la testa: e' anche il titolo della finestra di scambio. */

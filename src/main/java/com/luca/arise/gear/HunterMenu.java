@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
@@ -126,11 +127,25 @@ public class HunterMenu extends AbstractContainerMenu {
 		ItemStack stack = slot.getItem();
 		ItemStack original = stack.copy();
 
-		if (index < DIMENSIONAL_END) {
-			if (!moveItemStackTo(stack, DIMENSIONAL_END, slots.size(), true)) {
+		if (index < ACCESSORY_END) {
+			// Da addosso: si toglie verso lo spazio dimensionale, e solo se e' pieno verso
+			// l'inventario. Il verso opposto — inventario per primo — mandava il pezzo in una
+			// casella da cui la spazzolata (GearManager.sweep) lo riportava qui dentro un attimo
+			// dopo, e a schermo sembrava che il clic non avesse fatto niente.
+			if (!moveItemStackTo(stack, ACCESSORY_END, DIMENSIONAL_END, false)
+					&& !moveItemStackTo(stack, DIMENSIONAL_END, slots.size(), true)) {
 				return ItemStack.EMPTY;
 			}
-		} else if (!moveItemStackTo(stack, 0, ACCESSORY_END, false)
+		} else if (index < DIMENSIONAL_END) {
+			// Dallo spazio dimensionale: <strong>si indossa</strong>. Era il difetto peggiore di
+			// tutto il menu — shift+clic buttava il pezzo nell'inventario, la spazzolata lo
+			// riportava dentro, e l'unico modo di mettersi un elmo era trascinarlo a mano dopo
+			// averlo parcheggiato sulla barra rapida.
+			if (!equip(player, stack) && !moveItemStackTo(stack, 0, ACCESSORY_END, false)
+					&& !moveItemStackTo(stack, DIMENSIONAL_END, slots.size(), true)) {
+				return ItemStack.EMPTY;
+			}
+		} else if (!equip(player, stack) && !moveItemStackTo(stack, 0, ACCESSORY_END, false)
 				&& !moveItemStackTo(stack, ACCESSORY_END, DIMENSIONAL_END, false)) {
 			return ItemStack.EMPTY;
 		}
@@ -150,6 +165,37 @@ public class HunterMenu extends AbstractContainerMenu {
 	 * <p>Il controllo sta qui e non nella schermata perche' e' il server a decidere (CLAUDE.md §4):
 	 * un client modificato che spedisse un click su una casella chiusa troverebbe comunque un no.
 	 */
+	/**
+	 * Mette il pezzo nella casella di vanilla che gli spetta, se e' libera.
+	 *
+	 * <p>Elmo, corazza, gambe, stivali e arma non hanno una casella <em>nostra</em>: le loro sono
+	 * quelle di sempre, e in questo menu non compaiono. Senza questo passaggio, shift+clic su un
+	 * elmo poteva solo spostarlo di contenitore — mai indossarlo — e per metterselo in testa
+	 * bisognava chiudere il menu, aprire l'inventario di vanilla e trascinarlo.
+	 *
+	 * <p>Solo se la casella e' vuota: sostituire d'ufficio quello che il giocatore ha addosso
+	 * sarebbe un clic che toglie qualcosa senza dirlo.
+	 *
+	 * @return vero se il pezzo e' stato indossato, e allora la pila di partenza e' svuotata
+	 */
+	private static boolean equip(Player player, ItemStack stack) {
+		GearPiece piece = GearItems.piece(stack);
+
+		if (piece == null || piece.slot().vanillaSlot() == null) {
+			return false;
+		}
+
+		EquipmentSlot target = piece.slot().vanillaSlot();
+
+		if (!player.getItemBySlot(target).isEmpty()) {
+			return false;
+		}
+
+		player.setItemSlot(target, stack.copy());
+		stack.setCount(0);
+		return true;
+	}
+
 	public static class AccessorySlot extends Slot {
 
 		private final GearSlot type;

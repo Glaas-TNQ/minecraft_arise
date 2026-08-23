@@ -5,9 +5,13 @@ import com.luca.arise.config.AriseConfig;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
+import com.luca.arise.tutorial.AwakeningManager;
+
+import com.luca.arise.AriseMod;
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
 import net.minecraft.server.level.ServerPlayer;
@@ -29,6 +33,13 @@ public final class QuestEvents {
 	}
 
 	public static void register() {
+		// La Sala del Risveglio nasce con il mondo, come le citta' (vedi CityEvents). Costruirla
+		// all'ultimo momento avrebbe voluto dire tremila blocchi posati nel tick in cui il
+		// giocatore sta per morire — l'istante peggiore dell'intera partita per fermare il server.
+		// Qui costa una stanza sola su un mondo nuovo, e una lettura su tutti gli altri.
+		ServerLifecycleEvents.SERVER_STARTED.register(server ->
+				AriseMod.LOGGER.info("{}", AwakeningManager.build(server).getString()));
+
 		// Il risveglio. ALLOW_DEATH e' l'unico evento che permette di dire "questa morte non
 		// avviene": intercettarla altrove significherebbe far morire il giocatore e poi rianimarlo,
 		// che si vede — schermata di morte, inventario a terra, punto di respawn.
@@ -59,8 +70,18 @@ public final class QuestEvents {
 			}
 		});
 
+		// Il battito del risveglio, a ogni tick e non ogni due secondi: e' un conto alla rovescia
+		// di poco piu' di due secondi, e arrotondarlo si vedrebbe. Costa il controllo di una mappa
+		// vuota, che e' quello che e' per il 99,99% della partita.
+		ServerTickEvents.END_SERVER_TICK.register(AwakeningManager::tick);
+
 		// All'ingresso si ricorda cosa si stava facendo: la catena non deve mai lasciare senza un
-		// compito, e dopo un riavvio nessuno si ricorda a che punto era.
-		ServerPlayerEvents.JOIN.register(QuestManager::announceNext);
+		// compito, e dopo un riavvio nessuno si ricorda a che punto era. Prima pero' si saluta chi
+		// non e' mai stato salutato, o il primo messaggio della mod sarebbe un incarico di cui non
+		// si sa niente.
+		ServerPlayerEvents.JOIN.register(player -> {
+			AwakeningManager.welcome(player);
+			QuestManager.announceNext(player);
+		});
 	}
 }

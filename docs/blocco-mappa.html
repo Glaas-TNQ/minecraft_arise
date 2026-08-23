@@ -1,0 +1,567 @@
+<title>La mappa e le città nel seme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--violet);
+    background: linear-gradient(180deg, rgba(142,107,255,0.10), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------------------------------------------------------------- avvisi */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice.hot { border-top-color: var(--bad); }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice p + p { margin-top: 10px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .notice.hot .tag { color: var(--bad); }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+  .step.good { color: var(--good); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .compare > div { background: var(--panel-soft); padding: 16px 18px; }
+  .compare .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .compare .before .tag { color: var(--muted); }
+  .compare .after .tag { color: var(--good); }
+  .compare p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .compare .after p { color: var(--text); }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 620px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td b { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  tr.service td:first-child b { color: var(--gold); }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  .map {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+    white-space: pre;
+  }
+  .caption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  /* ---------------------------------------------------------------- la catena */
+
+  .chain { margin-top: 20px; border: 1px solid var(--line); background: var(--panel); padding: 10px; }
+  .chain svg { display: block; width: 100%; height: auto; }
+  .chain .n { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: #8FA0B5; }
+  .chain .t { font-family: "Chakra Petch", sans-serif; font-size: 12px; font-weight: 600; fill: #E8F2FF; }
+  .chain .g { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; fill: #FFD54F; }
+  .chain .box { fill: #0E1522; stroke: #1F2C42; }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: 52px 0 0; }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocco M</p>
+    <h1>La mappa del mondo, e le città nel seme</h1>
+    <p class="lede">Due richieste, una risposta per ciascuna. Le città <strong>non si costruiscono più</strong>:
+      nascono con i chunk, come un villaggio, e al primo ingresso in un mondo nuovo ci sono già —
+      costo all'avvio zero. E c'è una <strong>mappa</strong> (tasto <b>M</b>) che tiene insieme le
+      cinque Associazioni a duecentomila blocchi e i varchi che si aprono a cento: si apre su di te,
+      e quello che sta fuori resta sul bordo come una freccia con la distanza.</p>
+
+    <p class="facts">
+      <span>file nuovi <b>9</b></span>
+      <span>file toccati <b>14</b></span>
+      <span>prove <b>48</b> (+10)</span>
+      <span>collaudo statico <b>pulito</b></span>
+      <span>server dedicato <b>mondo nuovo ×2</b></span>
+      <span>difetti latenti trovati <b>1</b></span>
+    </p>
+  </header>
+
+  <div class="notice">
+    <span class="tag">Cosa è verificato e cosa no</span>
+    <p>Le città nel seme sono state provate su un <strong>server dedicato, mondo vergine, nessun
+      giocatore</strong>: cinque piante calcolate sui thread del generatore, cinque segnaposto trovati
+      al primo avvio, e di nuovo al riavvio. È la prova che la feature gira e che il centro di ogni
+      città è al posto giusto. <em>Non</em> è la prova che la città intera sia bella da vedere: quella
+      si fa viaggiando (<span class="mono">/arise city go tokyo</span>).</p>
+    <p>La mappa compila, ha la sua geometria sul banco di prova e il suo codec di persistenza, ma è
+      una schermata: <strong>va aperta con gli occhi</strong>.</p>
+  </div>
+
+  <section>
+    <h2><span class="step">1</span> Le città nascono con i chunk</h2>
+    <p class="kicker">Prima: un cantiere a budget che partiva all'avvio del server e ci metteva venti
+      minuti. Adesso: una <em>feature</em> del generatore, e il cantiere resta per ricostruire.</p>
+
+    <p>Ogni chunk che cade nel perimetro di una città viene al mondo già costruito, nel momento in cui
+      il generatore lo produce — cioè quando qualcuno ci va, mai prima. <code>CityFeature</code> prende
+      la pianta della città (<code>CityPlans</code>, calcolata una volta sola per mondo e condivisa con
+      il cantiere, così le due strade combaciano blocco per blocco), la ritaglia sui sedici per sedici
+      del chunk e posa i volumi in ordine. Gira in <strong>due passate</strong>:</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Passata</th><th>Quando</th><th>Perché</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>La spianata</b><br><span class="mono">arise:city_terrace</span></td>
+            <td><span class="mono">RAW_GENERATION</span>, il primo passo della decorazione</td>
+            <td>Toglie la terra da sotto i piedi alla vegetazione vanilla: gli alberi nascono solo su
+              terra ed erba, e su un marciapiede non attecchiscono. Senza questa passata un albero a
+              metà chunk sporgerebbe nel chunk accanto, dove la città è magari già finita, e nessuno
+              tornerebbe a togliere le foglie</td>
+          </tr>
+          <tr>
+            <td><b>La città intera</b><br><span class="mono">arise:city</span></td>
+            <td><span class="mono">TOP_LAYER_MODIFICATION</span>, l'ultimo</td>
+            <td>Dopo di lei non passa più nessuno: un villaggio, una miniera, un pozzo capitati nel
+              perimetro vengono ricoperti. La spianata si rifà, perché nel frattempo qualcosa può
+              averci scavato dentro</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">Il difetto latente che è saltato fuori</span>
+      <p>Al primo avvio sul mondo vergine il server ha detto «<em>1 da costruire</em>». Non era la
+        feature: era <code>markerPos</code>, che cercava il segnaposto in una finestra verticale
+        attorno a <code>level.getHeight(...)</code> — e <code>Level.getHeight</code> risponde
+        <code>minY</code> se il chunk non è caricato. La finestra finiva attorno al livello del mare,
+        e <strong>Madrid, a quota 81, risultava assente a ogni avvio</strong> e veniva rimessa in
+        cantiere. Era così anche prima di questo blocco: il flusso nuovo l'ha solo reso visibile. Ora
+        si guarda prima dove la pianta dice che sta — quota dal generatore, che risponde senza toccare
+        il mondo — e la finestra resta come ripiego per città tirate su da versioni vecchie.</p>
+    </div>
+
+    <pre><code>[Worker-Main-6/INFO] (arise) Pianta di new_york calcolata: quota 65, 1222 volumi, angolo 200000 200000
+[Worker-Main-8/INFO] (arise) Pianta di tokyo calcolata: quota 64, 760 volumi, angolo 215000 200000
+[Worker-Main-11/INFO] (arise) Pianta di rome calcolata: quota 64, 1679 volumi, angolo 230000 200000
+[Worker-Main-4/INFO] (arise) Pianta di madrid calcolata: quota 81, 338 volumi, angolo 245000 200000
+[Worker-Main-5/INFO] (arise) Pianta di berlin calcolata: quota 68, 823 volumi, angolo 260000 200000
+[Server thread/INFO] (arise) Le cinque città sono al loro posto.</code></pre>
+
+    <p>I thread <span class="mono">Worker-Main</span> sono la firma: è il generatore che chiama la
+      feature, non il server che costruisce. E <code>exists()</code> all'avvio resta com'era, ma ora
+      è una rete di sicurezza per i mondi i cui chunk laggiù esistevano prima della mod — l'unico caso
+      in cui il cantiere a budget parte ancora da solo.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">2</span> La mappa</h2>
+    <p class="kicker">Tasto <b>M</b>, oppure <code>/arise map</code>. Si apre con i Gate, fuori da un Gate.</p>
+
+    <p>Il problema di questa mappa è la scala: nessuna inquadratura mostra bene un varco a cento
+      blocchi e una città a duecentomila. Quindi la mappa si apre <strong>su di te</strong>, a due
+      blocchi per pixel — circa ottocento blocchi di finestra, lo spazio in cui si aprono i varchi —
+      e tutto ciò che sta fuori è una freccia sul bordo con nome e distanza. Rotella per la scala,
+      trascinare per spostarsi, <em>Centra su di me</em> e <em>Tutto il mondo</em> per i due estremi.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Segno</th><th>Com'è</th><th>Passandoci sopra</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Tu</b></td><td>Punto chiaro con il verso in cui guardi</td><td>Coordinate</td></tr>
+          <tr><td><b>Varco</b></td><td>Rombo del colore del rango; spento se dorme in un chunk scaricato</td>
+            <td>Rango e tema, coordinate, distanza, tempo che resta — o «dorme», con il tempo dell'ultima volta</td></tr>
+          <tr><td><b>Città</b></td><td>Quadrato del suo colore, vuoto se non è ancora sorta; il nome sotto</td>
+            <td>Coordinate, distanza, sorta o no, il monumento</td></tr>
+          <tr><td><b>Reticolo</b></td><td>Potenze di due, mai più fitto di quaranta pixel; gli assi dello spawn più chiari; la scala in basso a destra</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>L'indice dei varchi</h3>
+    <p>Il generatore dei varchi diceva «nessuna contabilità: quanti ce ne sono si scopre guardando il
+      mondo», e resta vero per chi decide se aprirne un altro. Ma la mappa ha una domanda a cui il
+      mondo non risponde: dov'è il varco che si è aperto a centocinquanta blocchi e poi è rimasto
+      indietro? Il suo chunk è scaricato, l'entità dorme nel file della regione. Senza un appunto
+      preso quando era sveglia, sulla mappa non ci sarebbe — ed è esattamente il varco che la mappa
+      serve a ritrovare.</p>
+    <p><code>GateRegistry</code> è quell'appunto: attachment persistente dell'Overworld, una voce per
+      varco, scritta al primo tick e ogni cinque secondi, tolta quando il varco sparisce davvero
+      (<code>remove</code> con <code>shouldDestroy()</code> — attraversato, rifiutato, scaduto — non
+      quando il chunk si scarica). <strong>È un indice, non la verità</strong>: a ogni lettura si
+      riconcilia col mondo, e se un chunk simula le entità e il varco non c'è, la voce cade.</p>
+
+    <div class="panel">
+      <p><b>Perché un attachment e non <code>SavedData</code>.</b> In 26.2 <code>SavedDataType</code>
+        pretende un <code>DataFixTypes</code> non nullo — <code>readTagFromDisk</code> lo chiama senza
+        controllare — e passarne uno vanilla vorrebbe dire far girare i datafixer di un'altra cosa sui
+        nostri dati. L'attachment sul <code>ServerLevel</code> è la stessa API dei dati del giocatore,
+        con lo stesso codec: una regola in meno da imparare.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">3</span> Cosa c'è nel commit</h2>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>File</th><th>Cosa</th></tr></thead>
+        <tbody>
+          <tr><td><span class="mono">city/CityFeature.java</span> <em>nuovo</em></td><td>La feature, due passate, ritaglio sul chunk</td></tr>
+          <tr><td><span class="mono">city/CityPlans.java</span> <em>nuovo</em></td><td>Pianta per città, cache thread-safe, <code>groundLevel</code> spostato qui</td></tr>
+          <tr><td><span class="mono">registry/ModFeatures.java</span> <em>nuovo</em>, <span class="mono">data/arise/worldgen/…</span></td><td>Registrazione, configured/placed feature, aggancio ai biomi dell'Overworld</td></tr>
+          <tr><td><span class="mono">city/CityManager.java</span>, <span class="mono">CityPlan.java</span>, <span class="mono">CityConfig.java</span></td><td>Pianta condivisa, <code>terraceOnly</code>, <code>markerPos</code> corretto, documentazione</td></tr>
+          <tr><td><span class="mono">gate/GateRecord.java</span>, <span class="mono">gate/GateRegistry.java</span> <em>nuovi</em></td><td>L'indice dei varchi e il suo codec</td></tr>
+          <tr><td><span class="mono">gate/GateEntity.java</span>, <span class="mono">registry/ModAttachments.java</span></td><td>Annotazione al tick, cancellazione in <code>remove</code>; l'attachment <span class="mono">arise:gate_registry</span></td></tr>
+          <tr><td><span class="mono">map/MapProjection.java</span>, <span class="mono">map/WorldMap.java</span>, <span class="mono">network/MapPayload.java</span> <em>nuovi</em></td><td>Geometria (comune, provata), raccolta lato server, pacchetto</td></tr>
+          <tr><td><span class="mono">client/screen/MapScreen.java</span> <em>nuovo</em></td><td>La schermata sul telaio comune</td></tr>
+          <tr><td><span class="mono">AriseKeyMappings</span>, <span class="mono">ClientPayloads</span>, <span class="mono">ModPayloads</span>, <span class="mono">AriseActionPayload</span>, <span class="mono">AriseCommands</span></td><td>Tasto M, ricezione, azione <span class="mono">OPEN_MAP</span>, <code>/arise map</code> e <code>/arise gate list</code></td></tr>
+          <tr><td><span class="mono">lang/en_us.json</span>, <span class="mono">lang/it_it.json</span></td><td>Ventidue chiavi nuove, nelle due lingue</td></tr>
+          <tr><td><span class="mono">test/MapProjectionTest.java</span> <em>nuovo</em>, <span class="mono">PersistenceTest.java</span></td><td>Nove prove di geometria; il giro completo dell'indice dei varchi</td></tr>
+          <tr><td><span class="mono">CLAUDE.md</span>, <span class="mono">DESIGN-solo-leveling.md</span></td><td>Trappole 26.2 nuove (worldgen, SavedData, removal, mouseDragged); §11.2 rivisto e §11.2b; M1/M2 nello stato</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">4</span> Cosa resta fuori</h2>
+    <p class="kicker">La parte onesta.</p>
+
+    <div class="compare">
+      <div class="after">
+        <span class="tag">Fatto e provato</span>
+        <p>Le città nel seme, sul server. La geometria della mappa e il codec dell'indice sul banco
+          di prova. Collaudo statico pulito: chiavi, pacchetti, argomenti.</p>
+      </div>
+      <div class="before">
+        <span class="tag">Da guardare con gli occhi</span>
+        <p>La città intera vista da dentro (viaggiandoci): non solo il segnaposto. La schermata della
+          mappa: trascinare, zoom, frecce, riquadri. Un varco che si apre, compare sulla mappa, e
+          sparisce quando lo attraversi. Due cose note: il controllo all'avvio costa ancora quattro
+          secondi di server fermo (cinque chunk a duecentomila blocchi, com'era prima), e sul server
+          dedicato vuoto il cantiere a budget si ferma quando vanilla mette in pausa il mondo — ora che
+          le città nascono coi chunk, conta solo per le ricostruzioni.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="verify">
+    <span class="tag">Il prossimo passo, quando ti siedi a giocare</span>
+    <ul class="check">
+      <li>Mondo nuovo. <code>/arise quest skip</code> finché hai i Gate, poi <b>M</b>: la mappa si apre
+        su di te, cinque frecce sul bordo con i nomi delle città e «·&nbsp;200k» circa</li>
+      <li><code>/arise gate spawn</code> due o tre volte: i rombi compaiono; passaci sopra, leggi il tempo</li>
+      <li>Allontanati di trecento blocchi, riapri: i varchi rimasti indietro ci sono ancora, spenti («dorme»)</li>
+      <li>Attraversa un varco, esci, riapri: quel rombo non c'è più. <code>/arise gate list</code> lo conferma</li>
+      <li><code>/arise city go tokyo</code> (o <code>/arise hub</code>): l'Associazione, la piazza, le botteghe,
+        senza aspettare nessun cantiere. Guarda i bordi dei chunk: niente gradini, niente foglie sospese</li>
+      <li>Rotella e trascinamento sulla mappa: il punto sotto il mouse resta fermo quando cambi scala</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <footer>
+    <p>Progetto Arise · Minecraft 26.2 · Fabric 0.19.3 · <span class="mono">tools/collaudo.py</span>
+      e <span class="mono">src/test</span>.</p>
+    <p>Il ciclo precedente: <span class="mono">docs/blocco-collaudo.html</span>.</p>
+  </footer>
+
+</div>

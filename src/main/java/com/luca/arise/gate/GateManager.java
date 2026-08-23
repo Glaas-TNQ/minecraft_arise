@@ -18,6 +18,7 @@ import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.registry.ModEntities;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -33,6 +34,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -316,6 +319,56 @@ public final class GateManager {
 		// cosa si e' vinto. Ogni riga se la scrive il gestore che assegna il pezzo, che e' l'unico
 		// a sapere se lo zaino era pieno.
 		GateLoot.award(player, instance.rank()).forEach(player::sendSystemMessage);
+
+		openExit(player, instance);
+	}
+
+	/**
+	 * La via di casa, che compare dove il guardiano e' caduto.
+	 *
+	 * <p>C'era gia' — {@code /arise leave} — e non bastava: un comando scritto in una riga di chat
+	 * che nel frattempo e' scorsa via non e' una porta. Chi ha appena vinto si guarda intorno e
+	 * cerca <em>qualcosa</em>, e non trovando niente conclude di essere rimasto chiuso dentro.
+	 *
+	 * <p>Una pietra magnetica su un lastrico di vetro illuminato: la si vede da tutta la sala,
+	 * vanilla la conosce gia' come "il punto a cui si torna", e si tocca invece di ricordarsela.
+	 */
+	private static void openExit(ServerPlayer player, Instance instance) {
+		if (!(player.level() instanceof ServerLevel gate)) {
+			return;
+		}
+
+		GateConfig config = AriseConfig.get().gates();
+		Vec3 centre = roomCenter(config, instance.layout().bossRoom(),
+				instance.originX(), instance.originZ());
+
+		int x = (int) Math.floor(centre.x());
+		int z = (int) Math.floor(centre.z());
+		int floor = config.floorY();
+
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				// La luce sta *sotto* il vetro: dentro la sala si vede un lastrico che brilla, e
+				// non una lampada da guardare.
+				gate.setBlock(new BlockPos(x + dx, floor - 2, z + dz),
+						Blocks.SEA_LANTERN.defaultBlockState(), 2);
+				gate.setBlock(new BlockPos(x + dx, floor - 1, z + dz),
+						Blocks.STAINED_GLASS.pick(DyeColor.LIGHT_BLUE).defaultBlockState(), 2);
+			}
+		}
+
+		BlockPos stone = new BlockPos(x, floor, z);
+		gate.setBlock(stone, Blocks.LODESTONE.defaultBlockState(), 2);
+
+		AriseFx.gateVarcoOpened(gate, Vec3.atCenterOf(stone), instance.rank());
+		player.sendSystemMessage(Component.translatable("arise.msg.gate.exit_open")
+				.withStyle(net.minecraft.ChatFormatting.AQUA));
+	}
+
+	/** Vero se questo blocco e' la via di casa di un varco. */
+	public static boolean isExit(Level level, BlockPos pos) {
+		return level.dimension().equals(GATE_DIMENSION)
+				&& level.getBlockState(pos).is(Blocks.LODESTONE);
 	}
 
 	// ---------------------------------------------------------------- uscita
@@ -423,6 +476,13 @@ public final class GateManager {
 	 * salvano.
 	 */
 	public static void onPlayerJoin(ServerPlayer player) {
+		// La Sala del Risveglio sta in questa dimensione ma non e' un'istanza di nessuno: chi si e'
+		// disconnesso mentre parlava con l'Araldo deve ritrovarcisi, non essere rispedito a casa a
+		// meta' discorso.
+		if (com.luca.arise.tutorial.AwakeningManager.onJoin(player)) {
+			return;
+		}
+
 		if (isInGate(player) && !ACTIVE.containsKey(player.getUUID())) {
 			sendHome(player);
 			player.sendSystemMessage(Component.translatable("arise.msg.gate.recovered"));

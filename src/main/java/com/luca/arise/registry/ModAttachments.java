@@ -2,9 +2,11 @@ package com.luca.arise.registry;
 
 import com.luca.arise.AriseMod;
 import com.luca.arise.ability.AbilityCooldowns;
+import com.luca.arise.gate.GateRegistry;
 import com.luca.arise.gate.ReturnPoint;
 import com.luca.arise.gear.PlayerGear;
 import com.luca.arise.shop.ShopStock;
+import com.luca.arise.tutorial.PlayerTutorial;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.quest.PlayerQuests;
 import com.luca.arise.shadow.ShadowArmy;
@@ -137,6 +139,32 @@ public final class ModAttachments {
 			.initializer(() -> AbilityCooldowns.EMPTY)
 			.syncWith(AbilityCooldowns.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(AriseMod.id("cooldowns"));
+
+	/**
+	 * A che punto e' il giocatore con la prima ora: il saluto e il discorso dell'Araldo.
+	 *
+	 * <p>Persiste e sopravvive alla morte, come tutto il resto — un tutorial che ricomincia perche'
+	 * si e' morti sarebbe la definizione di fastidio. Non si sincronizza: il client non disegna
+	 * niente che dipenda da questo, perche' quello che l'Araldo dice arriva in chat e i tasti li
+	 * scrive il gioco da solo.
+	 */
+	public static final AttachmentType<PlayerTutorial> TUTORIAL = AttachmentRegistry.<PlayerTutorial>builder()
+			.initializer(() -> PlayerTutorial.INITIAL)
+			.persistent(PlayerTutorial.CODEC)
+			.copyOnDeath()
+			.buildAndRegister(AriseMod.id("tutorial"));
+
+	/**
+	 * L'indice dei varchi aperti, per la mappa. Sta sull'<em>Overworld</em>, non sul giocatore: un
+	 * varco è di tutti, e la mappa di chiunque lo deve mostrare.
+	 *
+	 * <p>Persistente e non sincronizzato: il client lo riceve già riconciliato, su richiesta, con
+	 * un pacchetto suo. Niente {@code copyOnDeath}: non è un dato del giocatore.
+	 */
+	public static final AttachmentType<GateRegistry> GATE_REGISTRY = AttachmentRegistry.<GateRegistry>builder()
+			.initializer(() -> GateRegistry.EMPTY)
+			.persistent(GateRegistry.CODEC)
+			.buildAndRegister(AriseMod.id("gate_registry"));
 
 	private ModAttachments() {
 	}

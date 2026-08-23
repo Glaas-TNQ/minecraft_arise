@@ -41,6 +41,8 @@ public record GateConfig(
 		double clearSoulsBase,
 		/** Per quanti tick un varco resta aperto prima di svanire da solo. */
 		int offerLifetimeTicks,
+		/** Attesa fra due usi della Bussola dell'Abisso. */
+		int compassCooldownTicks,
 		/** Chi popola le stanze, per rango. */
 		Map<Rank, List<Identifier>> mobs,
 		/** Chi può essere il boss, per rango. */
@@ -119,7 +121,7 @@ public record GateConfig(
 	}
 
 	public static final GateConfig DEFAULT = new GateConfig(
-			Shape.DEFAULT, 3, 1.5, 6.0, 2.0, 120.0, 1.8, 60.0, 6000,
+			Shape.DEFAULT, 3, 1.5, 6.0, 2.0, 120.0, 1.8, 60.0, 6000, 100,
 			defaultMobs(), defaultBosses(), SpawnConfig.DEFAULT, LootConfig.DEFAULT);
 
 	private static final Codec<Map<Rank, List<Identifier>>> MOB_TABLE =
@@ -135,6 +137,7 @@ public record GateConfig(
 			Codec.DOUBLE.fieldOf("clear_xp_per_rank").forGetter(GateConfig::clearXpPerRank),
 			Codec.DOUBLE.fieldOf("clear_souls_base").forGetter(GateConfig::clearSoulsBase),
 			Codec.INT.fieldOf("offer_lifetime_ticks").forGetter(GateConfig::offerLifetimeTicks),
+			Codec.INT.fieldOf("compass_cooldown_ticks").forGetter(GateConfig::compassCooldownTicks),
 			MOB_TABLE.fieldOf("mobs").forGetter(GateConfig::mobs),
 			MOB_TABLE.fieldOf("bosses").forGetter(GateConfig::bosses),
 			SpawnConfig.CODEC.fieldOf("spawn").forGetter(GateConfig::spawn),
