@@ -162,6 +162,13 @@ public final class DailyManager {
 		// spegnere `daily.enabled` mentre uno sconta — il battito usciva subito, e la penalita'
 		// diventava un ergastolo — e un teletrasporto arrivato da fuori. Tre cause, una regola:
 		// nell'elenco o fuori dalla Zona, mai nessuna delle due.
+		//
+		// Ha un rovescio dichiarato: `forget` svuota l'elenco quando qualcuno si disconnette, quindi
+		// uscire dal gioco durante la penalita' ora fa uscire anche dalla Zona. Non e' un buco
+		// lasciato per distrazione, e' il lato meno grave di una scelta a due lati — la giornata e'
+		// gia' saldata quando la penalita' parte, quindi non si ripete, e chi chiude il gioco per
+		// evitare otto minuti li ha comunque interrotti. Il rimedio vero e' rendere persistente la
+		// scadenza invece di tenerla in memoria, e non e' il lavoro di stasera.
 		if (PenaltyZone.contains(player) && !SURVIVING.containsKey(player.getUUID())) {
 			GateManager.sendHome(player);
 			return;
