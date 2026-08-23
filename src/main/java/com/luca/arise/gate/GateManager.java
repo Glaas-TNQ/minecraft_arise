@@ -261,6 +261,9 @@ public final class GateManager {
 	/** giocatore → a che tick di gioco scade la Caccia. Assente se questo varco non la chiede. */
 	private static final Map<UUID, Long> HUNT_DEADLINE = new HashMap<>();
 
+	/** Chi si e' gia' sentito dire che la Caccia e' scaduta. Serve a dirglielo una volta sola. */
+	private static final java.util.Set<UUID> HUNT_EXPIRED = new java.util.HashSet<>();
+
 	private static int allocateRegion() {
 		int index = 0;
 		while (USED_REGIONS.contains(index)) {
@@ -631,6 +634,7 @@ public final class GateManager {
 		COMPLETED.remove(player.getUUID());
 		SLAIN.remove(player.getUUID());
 		HUNT_DEADLINE.remove(player.getUUID());
+		HUNT_EXPIRED.remove(player.getUUID());
 	}
 
 	/**
@@ -692,9 +696,16 @@ public final class GateManager {
 		long left = deadline - player.level().getGameTime();
 
 		if (left <= 0) {
-			HUNT_DEADLINE.remove(player.getUUID());
-			player.sendSystemMessage(Component.translatable("arise.msg.gate.hunt_over")
-					.withStyle(net.minecraft.ChatFormatting.GRAY));
+			// La scadenza NON si toglie dalla mappa. Toglierla sembrava pulito e regalava il
+			// premio: complete() legge questa stessa mappa per decidere se il giocatore e' stato
+			// in tempo, e una voce assente vale "nessuna scadenza", cioe' sempre in tempo. Chi
+			// avesse lasciato scadere la caccia e poi ucciso il Sovrano con calma avrebbe preso
+			// il bonus della fretta. Si annuncia una volta sola, e la scadenza resta scritta.
+			if (HUNT_EXPIRED.add(player.getUUID())) {
+				player.sendSystemMessage(Component.translatable("arise.msg.gate.hunt_over")
+						.withStyle(net.minecraft.ChatFormatting.GRAY));
+			}
+
 			return;
 		}
 

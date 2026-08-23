@@ -92,7 +92,7 @@ public record GateOffer(Rank rank, long seed, GateTheme theme, int rooms, int ha
 
 		return new GateOffer(rank, seed, theme, layout.rooms().size(), halls, branches,
 				config.mobsFor(rank), boss, config.clearXp(rank), config.clearSouls(rank),
-				GateObjective.roll(random));
+				GateObjective.roll(random, rank));
 	}
 
 	/** La pianta promessa da questo preventivo. Ricostruirla è deterministico: è il punto. */

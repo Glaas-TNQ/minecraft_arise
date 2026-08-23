@@ -2,6 +2,8 @@ package com.luca.arise.gate;
 
 import com.mojang.serialization.Codec;
 
+import com.luca.arise.progress.Rank;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
@@ -102,14 +104,30 @@ public enum GateObjective implements StringRepresentable {
 	}
 
 	/**
+	 * Da quale rango in su un varco puo' chiedere qualcosa di diverso dal Sovrano.
+	 *
+	 * <p>Dal C, come gli affissi, e per la stessa ragione. I primi varchi che un Cacciatore vede
+	 * devono essere quelli che la catena degli incarichi gli ha appena insegnato: il settimo
+	 * incarico dice «chiudi un Gate abbattendone il custode», e un varco che al terzo livello gli
+	 * chiedesse di ripulire le stanze invece renderebbe falsa la frase e confusa la lezione.
+	 *
+	 * <p>La variazione arriva quando la regola base e' capita. E' progressive disclosure applicata
+	 * a un dungeon: prima si impara il gioco, poi le sue eccezioni.
+	 */
+	public static final int MIN_RANK_ORDINAL = 2;
+
+	/**
 	 * L'obiettivo di un varco, tirato dal suo seme.
 	 *
-	 * <p>Il Sovrano pesa il doppio degli altri due messi insieme. Non e' timidezza: e' l'obiettivo
-	 * che il giocatore conosce, quello che la catena degli incarichi gli ha insegnato, e quello che
-	 * vuole quando ha in testa qualcos'altro. Gli altri due sono la variazione, e una variazione
-	 * che capita una volta su due smette di essere tale.
+	 * <p>Il Sovrano pesa quanto gli altri due messi insieme. Non e' timidezza: e' l'obiettivo che il
+	 * giocatore conosce, e quello che vuole quando ha in testa qualcos'altro. Gli altri due sono la
+	 * variazione, e una variazione che capita una volta su due smette di essere tale.
 	 */
-	public static GateObjective roll(RandomSource random) {
+	public static GateObjective roll(RandomSource random, Rank rank) {
+		if (rank.ordinal() < MIN_RANK_ORDINAL) {
+			return SOVEREIGN;
+		}
+
 		int roll = random.nextInt(4);
 
 		return switch (roll) {

@@ -222,6 +222,33 @@ class ConfigTest {
 	}
 
 	@Test
+	@DisplayName("i primi varchi chiedono sempre il Sovrano, e quelli dopo no")
+	void variedObjectivesWaitForRankC() {
+		var gates = AriseConfig.createDefault().gates();
+
+		// Il settimo incarico dice «chiudi un Gate abbattendone il custode». Un varco che al terzo
+		// livello chiedesse di ripulire le stanze renderebbe falsa quella frase.
+		for (var rank : new com.luca.arise.progress.Rank[] {
+				com.luca.arise.progress.Rank.E, com.luca.arise.progress.Rank.D}) {
+			for (long seed = 0; seed < 40; seed++) {
+				assertEquals(com.luca.arise.gate.GateObjective.SOVEREIGN,
+						com.luca.arise.gate.GateOffer.roll(gates, rank, seed).objective(),
+						"rango " + rank + ", seme " + seed + ": troppo presto per una variazione");
+			}
+		}
+
+		// E dal C in su la variazione deve esistere davvero: un obiettivo che in quaranta semi non
+		// cambia mai e' un obiettivo che nessuno vedra'.
+		boolean varied = false;
+		for (long seed = 0; seed < 40 && !varied; seed++) {
+			varied = com.luca.arise.gate.GateOffer.roll(gates, com.luca.arise.progress.Rank.C, seed)
+					.objective() != com.luca.arise.gate.GateObjective.SOVEREIGN;
+		}
+
+		assertTrue(varied, "dal rango C in su gli obiettivi diversi devono capitare");
+	}
+
+	@Test
 	@DisplayName("lo stesso seme da' sempre lo stesso obiettivo: il pannello non puo' mentire")
 	void objectiveComesFromTheSeed() {
 		var gates = AriseConfig.createDefault().gates();
