@@ -200,6 +200,7 @@ DYNAMIC = [
     ("arise.gem.effect.", "gem/GemType.java", [""]),
     ("arise.ability.", "ability/Ability.java", [""]),
     ("arise.gate.theme.", "gate/GateTheme.java", [""]),
+    ("arise.affix.", "gate/MobAffix.java", ["", ".desc"]),
     ("arise.gear.affix.", "gear/GearAffix.java", [""]),
     ("arise.gear.base.", "gear/GearBase.java", [""]),
     ("arise.gear.slot.", "gear/GearSlot.java", [""]),

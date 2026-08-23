@@ -218,8 +218,14 @@ public final class GateManager {
 			};
 
 			for (int i = 0; i < count; i++) {
-				spawnIn(gate, config, entry.getKey(), kind, originX, originZ, random,
+				Mob spawned = spawnIn(gate, config, entry.getKey(), kind, originX, originZ, random,
 						mobs.get(random.nextInt(mobs.size())), 1.0, 1.0, null);
+
+				// Solo il primo di ogni stanza, ed e' cosi' che la regola «mai piu' di un mob con
+				// affisso per stanza» resta vera senza doverla ricordare da nessun'altra parte.
+				if (i == 0 && spawned != null) {
+					GateAffixes.apply(spawned, rank, random);
+				}
 			}
 		}
 
@@ -452,6 +458,11 @@ public final class GateManager {
 			GateConfig config = AriseConfig.get().gates();
 			removeMobs(gate, config, instance);
 			GateBuilder.clear(gate, config, instance.layout(), instance.originX(), instance.originZ());
+
+			// Un Volatile caduto un istante prima dell'uscita aveva ancora il suo scoppio in coda,
+			// e sarebbe maturato in una stanza che non esiste piu'. Non farebbe male a nessuno —
+			// non c'e' nessuno — ma resterebbe in memoria per sempre, una voce per ogni run.
+			GateAffixes.forget(gate);
 		}
 
 		USED_REGIONS.remove(instance.regionIndex());

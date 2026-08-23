@@ -5,11 +5,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.gate.GateAffixes;
 import com.luca.arise.fx.Overlay;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.StatThreshold;
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -57,6 +59,21 @@ public final class ThresholdEvents {
 
 			return allowed(player, source, amount);
 		});
+
+		// Gli affissi dei mob dei Gate stanno qui e non in un evento loro per una ragione sola: e'
+		// lo stesso colpo. Due gestori registrati sullo stesso evento vorrebbero dire due passate
+		// sulla stessa entita' a ogni danno del mondo, per una cosa che riguarda i mob di un varco.
+		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, base, taken, blocked) -> {
+			GateAffixes.onDamaged(entity, source.getEntity(), taken);
+			GateAffixes.onDealt(source.getEntity(), entity, taken);
+		});
+
+		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> GateAffixes.onDeath(entity));
+
+		// Un solo battito per il server, non uno per mondo: la coda degli scoppi porta il proprio
+		// mondo dentro ogni voce, e cosi' non serve chiedersi in quale dimensione si sta girando.
+		ServerTickEvents.END_SERVER_TICK.register(
+				server -> GateAffixes.tick(server.overworld().getGameTime()));
 	}
 
 	/** Falso se una delle soglie difensive del giocatore rifiuta questo colpo. */

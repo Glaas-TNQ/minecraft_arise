@@ -306,6 +306,33 @@ public final class AriseFx {
 		play(level, position, ModSounds.SYSTEM_LEVEL_UP, 0.9F, 1.4F);
 	}
 
+	/** Un affisso ha appena fatto la sua parte: un lampo breve del suo colore, e basta. */
+	public static void affixPulse(ServerLevel level, Vec3 position, int color) {
+		level.sendParticles(dust(color, 0.9F), position.x(), position.y() + 1.0, position.z(),
+				config().scaled(6), 0.3, 0.3, 0.3, 0.0);
+	}
+
+	/**
+	 * Il Volatile e' caduto e sta per scoppiare: l'anello rosso a terra.
+	 *
+	 * <p>E' il primo dei tre segnali di preavviso della mod, e da qui in avanti significa sempre e
+	 * solo <strong>danno ad area, spostati</strong>. Il colore non cambia mai e il segnale non si
+	 * riusa per altro: e' quello che permette di imparare una regola una volta sola.
+	 */
+	public static void affixVolatileFuse(ServerLevel level, Vec3 centre, double radius) {
+		FxConfig fx = config();
+		ring(level, centre.add(0.0, 0.1, 0.0), radius, fx.scaled(36), dust(0xE86A6A, 1.2F), 0.0);
+		play(level, centre, ModSounds.GATE_BREACHING, 0.7F, 1.6F);
+	}
+
+	/** E lo scoppio. */
+	public static void affixVolatileBlast(ServerLevel level, Vec3 centre, double radius) {
+		FxConfig fx = config();
+		ring(level, centre.add(0.0, 0.2, 0.0), radius, fx.scaled(40), dust(0xE86A6A, 1.5F), 0.4);
+		column(level, centre, 2.0, fx.scaled(20), dust(0xFFD54F, 1.2F));
+		play(level, centre, ModSounds.GATE_BREACH, 0.8F, 1.4F);
+	}
+
 	/** Il boss entra in scena: si sente da tutta la stanza. */
 	public static void gateBoss(ServerLevel level, Vec3 position, Rank rank) {
 		FxConfig fx = config();

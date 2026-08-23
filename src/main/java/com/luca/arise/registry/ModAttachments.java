@@ -3,6 +3,7 @@ package com.luca.arise.registry;
 import com.luca.arise.AriseMod;
 import com.luca.arise.ability.AbilityCooldowns;
 import com.luca.arise.gate.GateRegistry;
+import com.luca.arise.gate.MobAffix;
 import com.luca.arise.gate.ReturnPoint;
 import com.luca.arise.gear.PlayerGear;
 import com.luca.arise.shop.ShopStock;
@@ -32,6 +33,21 @@ public final class ModAttachments {
 	 *   <li>{@code syncWith(targetOnly)} — ogni client riceve solo i propri dati, non quelli altrui.
 	 * </ul>
 	 */
+	/**
+	 * L'affisso di un mob dentro un Gate. E' l'unico attachment che non sta su un giocatore.
+	 *
+	 * <p>Persistente perche' un Gate resta aperto finche' chi lo percorre non lo finisce, e in
+	 * mezzo un chunk puo' scaricarsi: un Assetato che smette di curarsi perche' il giocatore e'
+	 * uscito dalla stanza e poi e' tornato sarebbe un difetto invisibile — la difficolta'
+	 * cambierebbe senza che nessuno capisca perche'.
+	 *
+	 * <p>Non sincronizzato: cio' che il client deve vedere e' il nome sopra la testa, e quello e'
+	 * gia' un {@code CustomName}. Mandare l'affisso in rete non aggiungerebbe niente da disegnare.
+	 */
+	public static final AttachmentType<MobAffix> MOB_AFFIX = AttachmentRegistry.<MobAffix>builder()
+			.persistent(MobAffix.CODEC)
+			.buildAndRegister(AriseMod.id("mob_affix"));
+
 	public static final AttachmentType<PlayerProgress> PROGRESS = AttachmentRegistry.<PlayerProgress>builder()
 			.initializer(() -> PlayerProgress.INITIAL)
 			.persistent(PlayerProgress.CODEC)

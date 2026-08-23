@@ -8,6 +8,8 @@ import com.luca.arise.city.CityManager;
 import com.luca.arise.event.CityEvents;
 import com.luca.arise.config.GearConfig;
 import com.luca.arise.gate.AbyssCompassItem;
+import com.luca.arise.gate.GateAffixes;
+import com.luca.arise.gate.MobAffix;
 import com.luca.arise.gate.GateBreach;
 import com.luca.arise.gate.GateEntity;
 import com.luca.arise.gate.GateManager;
@@ -41,6 +43,7 @@ import com.luca.arise.shop.ShopManager;
 import com.luca.arise.shop.ShopOffer;
 import com.luca.arise.shop.ShopStock;
 import com.luca.arise.shadow.ShadowData;
+import com.luca.arise.shadow.ShadowEntity;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.shadow.NamedShadow;
 import com.luca.arise.shadow.ShadowManager;
@@ -57,6 +60,7 @@ import net.minecraft.server.permissions.PermissionCheck;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 
@@ -163,6 +167,17 @@ public final class AriseCommands {
 					.executes(context -> listGates(context.getSource())));
 			// Un varco su tre cede alla scadenza, e la scadenza e' a cinque minuti: senza questo,
 			// provare il Dungeon Break vorrebbe dire restare fermi in un prato sperando nel dado.
+			// Gli affissi compaiono solo dal rango C in su e uno per stanza: senza questo, provarli
+			// tutti e sei vorrebbe dire aprire una decina di varchi e sperare.
+			LiteralArgumentBuilder<CommandSourceStack> affix = Commands.literal("affix")
+					.requires(AriseCommands::canCheat);
+
+			for (MobAffix which : MobAffix.values()) {
+				affix.then(Commands.literal(which.getSerializedName())
+						.executes(context -> affixNearest(context.getSource(), which)));
+			}
+
+			gate.then(affix);
 			gate.then(Commands.literal("breach")
 					.requires(AriseCommands::canCheat)
 					.executes(context -> breachNearest(context.getSource())));
@@ -432,6 +447,36 @@ public final class AriseCommands {
 		ServerPlayer player = source.getPlayerOrException();
 		ProgressManager.reset(player);
 		source.sendSuccess(() -> Component.translatable("arise.msg.reset"), true);
+		return 1;
+	}
+
+	/**
+	 * Mette un affisso addosso al mob piu' vicino, per provarlo senza cercarlo.
+	 *
+	 * <p>Passa dallo stesso metodo che usa il generatore dei Gate, e non da una copia: se un
+	 * giorno l'assegnazione cambiasse, il comando direbbe ancora la verita'.
+	 */
+	private static int affixNearest(CommandSourceStack source, MobAffix which)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+
+		Mob target = player.level().getEntitiesOfClass(Mob.class,
+						player.getBoundingBox().inflate(16.0),
+						mob -> mob.isAlive() && !(mob instanceof ShadowEntity)).stream()
+				.min(java.util.Comparator.comparingDouble(mob ->
+						mob.distanceToSqr(player)))
+				.orElse(null);
+
+		if (target == null) {
+			source.sendFailure(Component.translatable("arise.msg.shadow.no_aim"));
+			return 0;
+		}
+
+		// Non passa dal tiro: chi chiede il Volatile vuole il Volatile. Il vincolo del rango C non
+		// si applica qui — e' una regola di generazione, non dell'affisso.
+		GateAffixes.apply(target, which);
+		source.sendSuccess(() -> which.nameFor(target.getType().getDescription()), false);
+
 		return 1;
 	}
 
