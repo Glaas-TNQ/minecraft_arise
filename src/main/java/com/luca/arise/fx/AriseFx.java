@@ -191,6 +191,28 @@ public final class AriseFx {
 		play(level, position, ModSounds.SYSTEM_RANK_UP, 0.8F, 1.0F);
 	}
 
+	/**
+	 * Il Cacciatore cambia rango. Piu' grosso di {@link #rankUp}, e deve esserlo.
+	 *
+	 * <p>Quello e' un'ombra che sale di grado, cosa che succede spesso e a decine di ombre. Questo
+	 * succede sei volte in tutta la partita. Tre anelli concentrici che si allargano, una colonna
+	 * nel colore del rango, e il suono a volume pieno.
+	 */
+	public static void hunterRankUp(ServerLevel level, Vec3 position, Rank rank) {
+		FxConfig fx = config();
+
+		for (int step = 0; step < 3; step++) {
+			ring(level, position.add(0.0, 0.3 + step * 0.7, 0.0), 1.2 + step * 0.9,
+					fx.scaled(26), dust(rank.color(), 1.4F), 0.12);
+		}
+
+		column(level, position, 4.0, fx.scaled(46), dust(rank.color(), 1.2F));
+		level.sendParticles(ParticleTypes.END_ROD, position.x(), position.y() + 1.2, position.z(),
+				fx.scaled(28), 0.5, 1.1, 0.5, 0.05);
+
+		play(level, position, ModSounds.SYSTEM_RANK_UP, 1.0F, 0.9F);
+	}
+
 	// ---------------------------------------------------------------- i Gate
 
 	/** L'ingresso in un Gate, dal lato di dentro. */

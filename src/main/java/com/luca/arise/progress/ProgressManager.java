@@ -3,12 +3,16 @@ package com.luca.arise.progress;
 import java.util.Map;
 
 import com.luca.arise.config.AriseConfig;
+import com.luca.arise.config.HunterConfig;
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.fx.Overlay;
+import com.luca.arise.gear.GearSlot;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.quest.Unlock;
 import com.luca.arise.registry.ModAttachments;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -77,11 +81,11 @@ public final class ProgressManager {
 		set(player, progress.withLevel(level, xp, points));
 
 		if (levelsGained > 0) {
-			onLevelUp(player, level, levelsGained * config.pointsPerLevel());
+			onLevelUp(player, progress.level(), level, levelsGained * config.pointsPerLevel());
 		}
 	}
 
-	private static void onLevelUp(ServerPlayer player, int newLevel, int pointsGained) {
+	private static void onLevelUp(ServerPlayer player, int oldLevel, int newLevel, int pointsGained) {
 		float healthBefore = player.getMaxHealth();
 		applyAttributes(player);
 		// La vita massima appena guadagnata viene regalata piena: salire di livello non deve
@@ -93,6 +97,66 @@ public final class ProgressManager {
 
 		player.sendSystemMessage(Component.translatable("arise.msg.level_up", newLevel, pointsGained));
 		AriseFx.levelUp(player);
+
+		announceRank(player, oldLevel, newLevel);
+	}
+
+	/**
+	 * Il rango che cambia. Prima non lo diceva nessuno.
+	 *
+	 * <p>Era il difetto piu' silenzioso della progressione: il rango si ricava dal livello, quindi al
+	 * livello venti un Cacciatore diventava di rango C e <em>non succedeva niente</em>. Nessun
+	 * messaggio, nessun suono, tre caselle di equipaggiamento che si aprivano senza che nessuno lo
+	 * dicesse, e varchi piu' duri che comparivano attorno senza spiegazione. Il rango e' l'identita'
+	 * del Cacciatore in tutta l'opera, ed era l'unica cosa della mod che cambiava di nascosto.
+	 *
+	 * <p>Adesso ha la sua scena: un titolo, un suono che si sente solo qui, e l'elenco di cosa si e'
+	 * aperto. Il rango <strong>S</strong> ha una scena in piu' — lo sanno tutti quelli collegati, che
+	 * e' il momento di gloria pubblica che il materiale d'origine costruisce e che in multiplayer
+	 * costa un messaggio.
+	 */
+	private static void announceRank(ServerPlayer player, int oldLevel, int newLevel) {
+		HunterConfig hunter = AriseConfig.get().hunter();
+		Rank before = hunter.rank(oldLevel);
+		Rank now = hunter.rank(newLevel);
+
+		// Solo in salita. `/arise level 1` da rango C e' una scena di debug, non una cerimonia: senza
+		// questa riga annuncerebbe la retrocessione con la fanfara, e col conto delle caselle aperte
+		// che viene negativo e quindi non viene detto affatto.
+		if (now.ordinal() <= before.ordinal()) {
+			return;
+		}
+
+		Overlay.title(player, Component.translatable("arise.title.hunter_rank", now.label()),
+				Component.translatable("arise.subtitle.hunter_rank"));
+
+		player.sendSystemMessage(Component.translatable("arise.msg.hunter_rank.up", now.label())
+				.withStyle(ChatFormatting.GOLD));
+
+		// Cosa si e' aperto. Senza questa riga il giocatore scopre le caselle nuove solo se apre il
+		// menu del Cacciatore per caso, e una ricompensa che va scoperta per caso non e' una
+		// ricompensa.
+		for (GearSlot slot : GearSlot.values()) {
+			int opened = slot.capacity(now) - slot.capacity(before);
+
+			if (opened > 0) {
+				player.sendSystemMessage(Component.translatable("arise.msg.hunter_rank.slot",
+						slot.label(), opened).withStyle(ChatFormatting.GRAY));
+			}
+		}
+
+		AriseFx.hunterRankUp(player.level(), player.position(), now);
+
+		if (now != Rank.S) {
+			return;
+		}
+
+		Component word = Component.translatable("arise.msg.hunter_rank.certified",
+				player.getDisplayName()).withStyle(ChatFormatting.GOLD);
+
+		for (ServerPlayer other : player.level().getServer().getPlayerList().getPlayers()) {
+			other.sendSystemMessage(word);
+		}
 	}
 
 	public static long souls(ServerPlayer player) {
@@ -128,6 +192,10 @@ public final class ProgressManager {
 		int points = (clamped - 1) * config.pointsPerLevel() - spentPoints(progress);
 		set(player, progress.withLevel(clamped, 0L, Math.max(0, points)));
 		applyAttributes(player);
+
+		// Anche il comando di debug annuncia il rango: e' il solo modo di vedere la scena senza
+		// macinare venti livelli, e chi collauda ha bisogno esattamente di quello.
+		announceRank(player, progress.level(), clamped);
 	}
 
 	public static int spentPoints(PlayerProgress progress) {

@@ -6,7 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.luca.arise.config.AriseConfig;
+import com.luca.arise.config.HunterConfig;
+import com.luca.arise.gear.GearSlot;
 import com.luca.arise.progress.PlayerProgress;
+import com.luca.arise.progress.Rank;
 import com.luca.arise.progress.Stat;
 import com.luca.arise.progress.StatThreshold;
 
@@ -292,5 +295,54 @@ class ProgressTest {
 		assertEquals(10, spent.stat(Stat.VITALITY));
 		assertTrue(progress != spent);
 		assertSame(PlayerProgress.INITIAL, PlayerProgress.INITIAL);
+	}
+
+	@Test
+	@DisplayName("ogni promozione di rango apre almeno una casella: il messaggio non deve mentire")
+	void everyRankOpensSomething() {
+		HunterConfig hunter = AriseConfig.createDefault().hunter();
+
+		// Il messaggio di promozione elenca cosa si e' aperto. Se un rango non aprisse niente,
+		// l'elenco sarebbe vuoto e la promozione suonerebbe come una scena senza contenuto.
+		for (Rank rank : Rank.values()) {
+			if (rank.ordinal() == 0) {
+				continue;
+			}
+
+			Rank previous = Rank.values()[rank.ordinal() - 1];
+			int opened = 0;
+
+			for (GearSlot slot : GearSlot.values()) {
+				opened += Math.max(0, slot.capacity(rank) - slot.capacity(previous));
+			}
+
+			assertTrue(opened > 0, "il rango " + rank + " non apre nessuna casella");
+		}
+
+		// E la scala dev'essere raggiungibile: il rango piu' alto entro il livello massimo.
+		assertEquals(Rank.values()[Rank.values().length - 1],
+				hunter.rank(AriseConfig.createDefault().maxLevel()),
+				"il rango piu' alto deve essere raggiungibile prima del livello massimo");
+	}
+
+	@Test
+	@DisplayName("il rango sale col livello e non scende mai")
+	void rankIsMonotonic() {
+		HunterConfig hunter = AriseConfig.createDefault().hunter();
+		int highest = 0;
+		int promotions = 0;
+
+		for (int level = 1; level <= AriseConfig.createDefault().maxLevel(); level++) {
+			int here = hunter.rank(level).ordinal();
+			assertTrue(here >= highest, "il rango e' sceso al livello " + level);
+
+			if (here > highest) {
+				promotions++;
+				highest = here;
+			}
+		}
+
+		// Sei promozioni: E parte gia' addosso, e da li' si sale fino a S.
+		assertEquals(Rank.values().length - 1, promotions);
 	}
 }
