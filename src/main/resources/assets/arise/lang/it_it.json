@@ -576,6 +576,8 @@
   "arise.screen.map.status": "%1$s varchi aperti · %2$s/%3$s citta'",
   "arise.screen.map.title": "Mappa del mondo",
   "arise.screen.map.you": "Tu",
+  "arise.screen.quest.abyss": "Abisso — profondità %1$s, record %2$s s. La %3$s ti è aperta.",
+  "arise.screen.quest.abyss_first": "Il Sistema tace. L'Abisso no: shift sul segnaposto dell'Associazione.",
   "arise.screen.quest.current": "In corso",
   "arise.screen.quest.done": "Fatto",
   "arise.screen.quest.gear": "Equipaggiamento",

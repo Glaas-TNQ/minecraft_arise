@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.luca.arise.client.ui.AriseScreen;
 import com.luca.arise.client.ui.AriseTheme;
+import com.luca.arise.gate.AbyssRecord;
 import com.luca.arise.client.ui.Glyphs;
 import com.luca.arise.client.ui.ListPanel;
 import com.luca.arise.quest.PlayerQuests;
@@ -99,6 +100,40 @@ public class QuestScreen extends AriseScreen {
 				drawQuest(g, quest, x, y, width));
 
 		drawDetail(graphics);
+		drawAbyss(graphics);
+	}
+
+	/**
+	 * A catena finita, cosa viene dopo.
+	 *
+	 * <p>Il diciottesimo incarico dice «da qui in avanti il Sistema tace e guarda», e per un intero
+	 * blocco di sviluppo quella frase era letteralmente vera: la schermata restava con diciotto
+	 * rombi verdi e nient'altro da leggere. Adesso al posto del silenzio c'e' una riga che dice dove
+	 * si scende, quanto in fondo si e' arrivati e in quanto tempo — cioe' il traguardo che ne apre
+	 * un altro, che e' l'unica cosa che mancava.
+	 *
+	 * <p>Compare <strong>solo</strong> a catena finita. Un giocatore al terzo incarico non deve
+	 * sapere che esiste un Abisso: saperlo gli darebbe una meta al posto del prossimo passo.
+	 */
+	private void drawAbyss(GuiGraphicsExtractor graphics) {
+		if (quests().index() < Quest.count() || minecraft == null || minecraft.player == null) {
+			return;
+		}
+
+		AbyssRecord record = minecraft.player.getAttached(ModAttachments.ABYSS);
+
+		if (record == null) {
+			record = AbyssRecord.NONE;
+		}
+
+		int y = bodyBottom() - 11;
+
+		Component line = record.deepest() <= 0
+				? Component.translatable("arise.screen.quest.abyss_first")
+				: Component.translatable("arise.screen.quest.abyss", record.deepest(),
+						Math.max(1L, record.bestTicks() / 20L), record.next());
+
+		graphics.text(font, line, bodyLeft(), y, AriseTheme.VIOLET);
 	}
 
 	private void drawQuest(GuiGraphicsExtractor graphics, Quest quest, int x, int y, int width) {

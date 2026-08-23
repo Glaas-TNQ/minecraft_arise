@@ -576,6 +576,8 @@
   "arise.screen.map.status": "%1$s open gates · %2$s/%3$s cities",
   "arise.screen.map.title": "World map",
   "arise.screen.map.you": "You",
+  "arise.screen.quest.abyss": "Abyss — depth %1$s, best %2$s s. Depth %3$s is open.",
+  "arise.screen.quest.abyss_first": "The System is silent. The Abyss is not: shift-click the Association stone.",
   "arise.screen.quest.current": "Current",
   "arise.screen.quest.done": "Done",
   "arise.screen.quest.gear": "Gear",
