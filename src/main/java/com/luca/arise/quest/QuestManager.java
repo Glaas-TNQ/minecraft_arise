@@ -8,6 +8,8 @@ import com.luca.arise.gear.GearPiece;
 import com.luca.arise.gear.GearRoll;
 import com.luca.arise.gear.GearUnique;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.shadow.NamedShadow;
+import com.luca.arise.shadow.ShadowManager;
 import com.luca.arise.progress.Rank;
 import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.tutorial.AwakeningManager;
@@ -149,6 +151,14 @@ public final class QuestManager {
 
 		if (player.level() instanceof ServerLevel level) {
 			AriseFx.questCompleted(level, player.position());
+		}
+
+		// Bellion non si estrae e non cade da nessun boss: si eredita. Arriva qui, alla fine della
+		// catena, insieme alla riga che dice che da adesso il Sistema tace — ed e' l'unica cosa
+		// che quel silenzio porta con se'. La sua aura vale per tutto l'esercito, comprese le
+		// ventisei ombre che non escono mai: e' il "hai finito" reso visibile.
+		if (quest.grants() == Unlock.MASTERY) {
+			ShadowManager.grantNamed(player, NamedShadow.BELLION);
 		}
 
 		announceNext(player);

@@ -396,6 +396,15 @@ public final class GateManager {
 		GateTheme theme = instance.offer().theme();
 		Rank rank = instance.rank();
 
+		// Igris arriva al primo varco di rango C, qualunque tema. Non e' un premio di percorso: e'
+		// il rango in cui il Cacciatore smette di essere uno che sopravvive ai varchi e comincia a
+		// chiuderli, e serve un'ombra che lo dica. Prima delle cinque legate al tema, perche' il
+		// rango C viene prima del B.
+		if (rank.ordinal() >= Rank.C.ordinal()
+				&& ShadowManager.grantNamed(player, NamedShadow.IGRIS)) {
+			return;
+		}
+
 		NamedShadow prize = switch (theme) {
 			case FROST -> rank.ordinal() >= Rank.B.ordinal() ? NamedShadow.TANK : null;
 			case RUIN -> rank.ordinal() >= Rank.B.ordinal() ? NamedShadow.TUSK : null;
