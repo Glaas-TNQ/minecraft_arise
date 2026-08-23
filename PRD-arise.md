@@ -745,7 +745,7 @@ Detto esplicitamente, perché uno scope negativo scritto vale più di dieci disc
 | 16 | **B3** — Quest Giornaliera e Penalità | un giorno | aperto |
 | 17 | **B13** — i Monarchi | due giorni | aperto |
 
-**Dodici su diciassette**, in una sessione. Tutti e dodici compilano, passano 92 prove, escono puliti
+**Dodici su diciassette**, in una sessione. Tutti e dodici compilano, passano 91 prove, escono puliti
 dal collaudo statico e fanno partire un server dedicato su un mondo nuovo — e **nessuno dei dodici
 e' ancora stato visto girare in gioco**, che secondo la regola 3 del progetto vuol dire che nessuno
 dei dodici e' finito.

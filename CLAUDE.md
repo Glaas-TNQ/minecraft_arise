@@ -280,6 +280,14 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
    - **il collaudo si tara sugli enum con il nome per primo**: `NOME("nome", ...)`. Un enum che
      mette il nome in seconda posizione non viene letto, e il collaudo lo dice — `MobAffix`,
      `NamedShadow` e `StatThreshold` sono nati con l'ordine sbagliato tutti e tre;
+   - **advancement**: stanno in `data/<ns>/advancement/` (singolare), il criterio
+     `minecraft:impossible` e' quello da usare per un traguardo che concede il codice, e la
+     concessione e' `player.getAdvancements().award(holder, "nome_criterio")` con l'holder preso da
+     `server.getAdvancements().get(id)`. Un advancement mancante deve restare silenzioso: e'
+     decorazione sopra una cosa che funziona;
+   - **`damageSources().magic()` sta nel tag `bypasses_armor`**. Un colpo ad area scritto con quello
+     ignora l'armatura, e con lei la Resistenza: `generic()` per un danno che l'armatura deve
+     attutire, `mobAttack(chi)` quando c'e' un colpevole;
    - **leggere l'altezza del terreno senza generarlo**: `level.getHeight(...)` pretende il chunk;
      `level.getChunkSource().getGenerator().getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG,
      level, randomState())` interroga il rumore e risponde subito. Venticinque campioni sparsi su
@@ -438,8 +446,9 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       (Igris, Iron, Tank, Tusk, Greed, Beru, Bellion), **B2** il Dungeon Break, **B9** le dodici
       soglie delle statistiche, **B8** i sei affissi dei nemici, **B5** il Gate Rosso, **B6** i tre
       obiettivi del varco, **B7** il Sovrano a tre fasi, **B14** il Cubo dell'Abisso, **B11**
-      l'Abisso a profondita' infinita — *compilato, 92 prove verdi, collaudo pulito, server verde su
-      mondo nuovo ×4; **nessuno dei dodici e' ancora stato visto girare in gioco***
+      l'Abisso a profondita' infinita, piu' **dodici advancement** con i toast — *compilato, 91 prove
+      verdi, collaudo pulito, server verde su mondo nuovo ×5; **niente di tutto questo e' ancora
+      stato visto girare in gioco***
 
       Restano fuori: **B13** i Monarchi, **B12** l'esame di rango, **B3** la Quest Giornaliera,
       **B15** il Registro del Sistema, **B16** l'adottabilita'. La consegna sta in
