@@ -742,7 +742,7 @@ Detto esplicitamente, perché uno scope negativo scritto vale più di dieci disc
 | 13 | **B11** — l'Abisso | un giorno | ✅ *da verificare in gioco* |
 | 14 | **B15** — il Registro del Sistema | due giorni | aperto |
 | 15 | **B16** — adottabilità | un giorno | ◐ *tag e ricarica della config fatti; interruttori per sistema e menu radiale aperti* |
-| 16 | **B3** — Quest Giornaliera e Penalità | un giorno | ✅ *da verificare in gioco* |
+| 16 | **B3** — Quest Giornaliera | un giorno | ◐ *la giornaliera c'e'; la **Zona di Penalita' e' stata costruita, provata e tolta** — vedi sotto* |
 | 17 | **B13** — i Monarchi | due giorni | aperto |
 | 18 | **Fuori PRD** — `/arise doctor` | un'ora | ✅ *verificato da console* |
 
@@ -753,6 +753,14 @@ vuol dire che quasi niente di tutto questo e' finito.
 
 Restano **B13** (i Monarchi), **B15** (il Registro del Sistema), la meta' aperta di **B16** — gli
 interruttori per sistema e il menu radiale — e la meta' aperta di **B12**, che e' l'esame vero.
+
+**E una cosa e' stata tolta dopo averla provata.** La Zona di Penalita' di B3 era completa —
+deserto sigillato, ondate, cronometro, nessuna perdita — ed e' stata rimossa al primo collaudo vero.
+Il motivo non e' la taratura: una penalita' che *sposta* non e' una conseguenza, e' un'interruzione,
+e l'interruzione arriva sempre nel momento sbagliato perche' il momento non lo sceglie chi gioca.
+Accorciarla da otto minuti a novantanove secondi la rendeva solo un'interruzione piu' breve. Resta
+la meta' che funzionava — il Sistema chiede e paga chi fa — e questo e' il **primo scope negativo
+scritto dopo il gioco invece che prima**, che vale piu' degli altri sette messi insieme.
 
 **Una cosa e' stata aggiunta fuori dal PRD**, ed e' la sola verificata: `/arise doctor`, la scheda
 che si incolla in una segnalazione. Non e' un contenuto di gioco, e infatti non chiude nessuna

@@ -89,12 +89,6 @@ public final class DailyEvents {
 			}
 		});
 
-		// Un colpo che ucciderebbe dentro la Zona di Penalita' non uccide: si riparte dal centro e
-		// il cronometro riparte da capo. Sta qui e non fra le soglie perche' e' un'altra domanda —
-		// quella risponde «questa statistica ti salva», questa «qui non si muore».
-		ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, damage) ->
-				!(entity instanceof ServerPlayer player) || !DailyManager.catchDeath(player));
-
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> forget(
 				handler.getPlayer().getUUID()));
 	}

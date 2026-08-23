@@ -243,6 +243,12 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
      `unzip -l ~/.gradle/caches/fabric-loom/26.2/minecraft-common.jar | grep NomeClasse`, e per le
      firme `javap -cp minecraft-common.jar net.minecraft....`. Sono due secondi e tolgono ogni
      dubbio;
+   - **gli attachment sincronizzati non tornano da soli al client**: il client li tiene sull'entita',
+     e morire o cambiare dimensione ne costruisce una nuova, che nasce vuota. Il server li rimanda
+     solo quando qualcuno li riscrive, quindi un dato che cambia di rado (gli incarichi) puo' non
+     tornare mai — e una schermata che dipende da quello resta vuota per sempre. `setAttached` non
+     confronta col valore vecchio, quindi **riscrivere lo stesso valore basta**: vedi
+     `ModAttachments.resync`, agganciata a `JOIN`, `AFTER_RESPAWN` e `AFTER_PLAYER_CHANGE_LEVEL`;
    - **`ResourceKey.location()` non esiste piu'**: e' `identifier()`. Il nome di una dimensione si
      legge con `level.dimension().identifier()`;
    - **`ChatFormatting` non espone piu' il suo colore**: niente `getColor()`, niente `isFormat()`.
@@ -452,7 +458,7 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       (Igris, Iron, Tank, Tusk, Greed, Beru, Bellion), **B2** il Dungeon Break, **B9** le dodici
       soglie delle statistiche, **B8** i sei affissi dei nemici, **B5** il Gate Rosso, **B6** i tre
       obiettivi del varco, **B7** il Sovrano a tre fasi, **B14** il Cubo dell'Abisso, **B11**
-      l'Abisso a profondita' infinita, **B3** la Quest Giornaliera con la Zona di Penalita', piu'
+      l'Abisso a profondita' infinita, **B3** la Quest Giornaliera (la Zona di Penalita' e' stata tolta dopo la prova), piu'
       **dodici advancement** con i toast, i **tag**, `/arise config reload` e la meta' cerimoniale
       di **B12** — il rango che smette di cambiare di nascosto: titolo, suono, elenco delle caselle
       aperte, e al rango S un messaggio a tutti quelli collegati — *compilato, 96 prove verdi,
@@ -468,6 +474,13 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
       giornaliera, varchi in piedi, percorso di `arise.json`, piu' tre righe che distinguono uno
       stato lecito da un difetto. Senza `requires`: non cambia niente, e su un server chi ha un
       problema di solito non e' chi ha i permessi — **verificato** da console su mondo nuovo
+
+- [x] **Il primo collaudo vero** — tre cose trovate giocando, e una tolta: **l'HUD spariva e non
+      tornava** (il client tiene gli attachment sull'entita', e morire o cambiare dimensione ne
+      costruisce una nuova che nasce vuota → `ModAttachments.resync` su join, respawn e cambio
+      dimensione, piu' il tasto <kbd>'</kbd> per nasconderlo e rimetterlo a mano), e la **Zona di
+      Penalita' e' stata rimossa** — una penalita' che sposta e' un'interruzione, e l'interruzione
+      arriva sempre nel momento sbagliato
 
 Aggiorna questa lista quando una fase è **verificata in gioco**, non quando compila.
 

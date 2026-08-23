@@ -908,6 +908,56 @@
 
   <hr>
 
+  <section>
+    <h2><span class="step">12</span> Il primo collaudo vero</h2>
+    <p class="kicker">Due sessioni di codice, un'ora di gioco. L'ora di gioco ha vinto.</p>
+
+    <p>Tutto quello che sta sopra è stato compilato, provato al banco, passato al collaudo statico e
+      fatto girare su un server dedicato. Poi qualcuno ci ha giocato per un'ora, e in quell'ora sono
+      uscite tre cose che nessuno dei quattro controlli poteva vedere.</p>
+
+    <div class="notice hot">
+      <span class="tag">Il pannello spariva, e non tornava</span>
+      <p>Il difetto peggiore, e il più istruttivo. Il client tiene i dati del Sistema
+        <strong>sull'entità del giocatore</strong>, e morire o cambiare dimensione ne costruisce una
+        nuova che nasce vuota. Il server li rimanda solo quando qualcosa li riscrive: per il livello
+        basta un mob ucciso, ma il pannello ha bisogno anche degli <em>incarichi</em>, che possono
+        non cambiare per ore. Da qui l'«ogni tanto» e il «non torna più»: erano la stessa cosa.</p>
+      <p>La cura è riscrivere ogni valore con sé stesso nei tre momenti in cui il client si
+        ricostruisce — entrata, risveglio, cambio di dimensione.
+        <span class="mono">setAttached</span> non confronta col valore vecchio, quindi riscrivere lo
+        stesso oggetto manda comunque il pacchetto: verificato leggendo il bytecode di Fabric, non
+        supponendolo. Più un tasto, <span class="mono">'</span>, che lo nasconde e lo rimette — e che
+        quando lo nasconde dice con che tasto torna.</p>
+    </div>
+
+    <p><strong>E la Zona di Penalità è stata tolta.</strong> Era completa: un deserto sigillato senza
+      cielo, ondate di creature, un cronometro, e la regola — su cui era stata costruita tutta — che
+      non togliesse niente a nessuno. Alla prima ora di gioco vera la risposta è stata «non mi piace
+      come meccanica», ed è quella giusta.</p>
+
+    <p>La ragione non è la taratura. Otto minuti erano troppi, ma novantanove secondi non erano la
+      soluzione: erano un'interruzione più breve. Una penalità che <em>sposta</em> non è una
+      conseguenza — è un'interruzione, e l'interruzione arriva sempre nel momento sbagliato, perché
+      il momento non lo sceglie chi gioca. Nessuna durata risolve quello.</p>
+
+    <div class="notice">
+      <span class="tag">Cosa resta</span>
+      <p>La metà che funzionava: il Sistema chiede quattro cose ogni alba, e paga chi le fa. Chi non
+        le fa non prende il punto, e domani il Sistema richiede. Un premio mancato si sente quanto
+        basta, e non toglie a nessuno la serata.</p>
+      <p>Sparita per intero: <span class="mono">PenaltyZone</span>, la Sopravvivenza, le ondate, la
+        gestione della morte, tre voci di configurazione, due effetti e nove chiavi di traduzione.
+        Cancellare pulito è metà del lavoro di toglier via qualcosa.</p>
+    </div>
+
+    <p>È il primo scope negativo di questo progetto scritto <em>dopo</em> il gioco invece che prima,
+      e vale più dei sette scritti prima messi insieme. Gli altri erano previsioni; questo è un
+      referto.</p>
+  </section>
+
+  <hr>
+
   <footer>
     <p>Progetto Arise · Minecraft 26.2 · Fabric 0.19.3 · il piano è
       <span class="mono">PRD-arise.md</span>, la guida per chi collauda è

@@ -10,6 +10,7 @@ import com.luca.arise.gem.GemManager;
 import com.luca.arise.gem.GemType;
 import com.luca.arise.gear.GearManager;
 import com.luca.arise.progress.ProgressManager;
+import com.luca.arise.registry.ModAttachments;
 import com.luca.arise.quest.Objective;
 import com.luca.arise.quest.QuestManager;
 import com.luca.arise.quest.Unlock;
@@ -117,11 +118,18 @@ public final class ProgressEvents {
 			GearManager.enforce(player);
 			ProgressManager.applyAttributes(player);
 			GateManager.onPlayerJoin(player);
+			ModAttachments.resync(player);
 		});
 		// Cambiare dimensione richiama l'esercito. Senza, le ombre restavano nel mondo di prima e
 		// diventavano copie: vedi ShadowManager.onLevelChange.
-		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) ->
-				ShadowManager.onLevelChange(player, origin));
+		//
+		// E rimanda al client tutto quello che sa il server: dall'altra parte del viaggio c'e'
+		// un'entita' nuova, che nasce senza niente addosso. Vedi ModAttachments.resync — e' la
+		// causa dell'HUD che spariva e non tornava.
+		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) -> {
+			ShadowManager.onLevelChange(player, origin);
+			ModAttachments.resync(player);
+		});
 
 		ServerPlayerEvents.LEAVE.register(player -> {
 			ShadowManager.onPlayerLeave(player);
@@ -170,6 +178,11 @@ public final class ProgressEvents {
 		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
 			ProgressManager.applyAttributes(newPlayer);
 			GateManager.closeInstance(newPlayer);
+
+			// Morire costruisce un ServerPlayer nuovo, e sul client ne nasce uno nuovo pure li'.
+			// Senza questa riga il giocatore risorge senza HUD, e l'HUD non torna finche' il
+			// server non riscrive gli incarichi — cioe' potenzialmente mai.
+			ModAttachments.resync(newPlayer);
 		});
 	}
 

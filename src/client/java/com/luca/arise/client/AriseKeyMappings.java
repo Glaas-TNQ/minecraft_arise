@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import com.luca.arise.client.screen.AbyssShopScreen;
 import com.luca.arise.client.screen.ArmyScreen;
 import com.luca.arise.client.screen.StatusScreen;
+import com.luca.arise.client.hud.SystemHudElement;
 import com.luca.arise.client.screen.QuestScreen;
 import com.luca.arise.network.AriseActionPayload;
 import com.luca.arise.network.ShopActionPayload;
@@ -75,6 +76,26 @@ public final class AriseKeyMappings {
 	public static final KeyMapping ORDER_HOLD = register("order_hold", GLFW.GLFW_KEY_U);
 
 	/** Le quattro abilità. Z X C V: vicine fra loro e libere in vanilla. */
+	/**
+	 * Nasconde e rimette il riquadro del Sistema.
+	 *
+	 * <p>Serve a due cose diverse. La prima e' voluta: chi vuole uno screenshot pulito, o chi trova
+	 * l'angolo troppo affollato, deve poter spegnere il pannello — e ogni mod che disegna sull'HUD
+	 * deve dare questo tasto.
+	 *
+	 * <p>La seconda e' una rete. Il difetto per cui l'HUD spariva da solo e' curato alla radice
+	 * (vedi {@code ModAttachments.resync}), ma un pannello che si puo' solo <em>subire</em> e' un
+	 * pannello che il giorno che sbaglia non si puo' rimettere a posto. Questo tasto e' la maniglia
+	 * dall'interno.
+	 *
+	 * <p><strong>F6 e non un carattere.</strong> Tutti gli altri tasti della mod sono lettere, che
+	 * stanno nello stesso posto ovunque; i segni di interpunzione no — l'apostrofo su una tastiera
+	 * italiana non e' dove GLFW crede che sia. Per l'unico tasto la cui ragione d'essere e' «funziona
+	 * anche quando qualcosa e' andato storto», un tasto che dipende dal layout sarebbe una beffa. F6
+	 * e' libero in vanilla e identico su ogni tastiera.
+	 */
+	public static final KeyMapping TOGGLE_HUD = register("toggle_hud", GLFW.GLFW_KEY_F6);
+
 	public static final KeyMapping ABILITY_1 = register("ability_1", GLFW.GLFW_KEY_Z);
 	public static final KeyMapping ABILITY_2 = register("ability_2", GLFW.GLFW_KEY_X);
 	public static final KeyMapping ABILITY_3 = register("ability_3", GLFW.GLFW_KEY_C);
@@ -134,6 +155,19 @@ public final class AriseKeyMappings {
 				ClientPlayNetworking.send(new AriseActionPayload(client.player.isShiftKeyDown()
 						? AriseActionPayload.Action.SURVEY
 						: AriseActionPayload.Action.EXTRACT));
+			}
+
+			// Il pannello si spegne e si riaccende. Quando si spegne lo dice, e dice con che tasto
+			// torna: e' l'unico modo di non trasformare una comodita' in un vicolo cieco — chi
+			// nasconde l'HUD per uno screenshot e poi non ricorda il tasto non ha nessun altro
+			// posto dove guardare.
+			while (TOGGLE_HUD.consumeClick()) {
+				boolean shown = SystemHudElement.toggle();
+
+				if (!shown) {
+					client.player.sendSystemMessage(Component.translatable("arise.msg.hud.hidden",
+							Component.keybind("key.arise.toggle_hud")));
+				}
 			}
 
 			sendOnPress(SUMMON, AriseActionPayload.Action.SUMMON);

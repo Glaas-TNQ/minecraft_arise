@@ -220,8 +220,7 @@ public final class AriseCommands {
 									player -> GateManager.descend(player,
 											IntegerArgumentType.getInteger(context, "profondita"))))));
 
-			// La giornaliera: leggerla, chiuderla, o farsi mandare subito nella Zona. Aspettare un
-			// tramonto per provare la penalita' costa dieci minuti di gioco fermo.
+			// La giornaliera, in chat: quattro contatori.
 			// Rileggere arise.json senza riavviare. Non e' una comodita': e' l'unico modo di tarare
 			// un numero — quanto morde il gelo, ogni quanto cede un varco, quanti blocchi chiede la
 			// giornaliera — provandolo, invece di riavviare il mondo a ogni tentativo.
@@ -231,10 +230,7 @@ public final class AriseCommands {
 							.executes(context -> reloadConfig(context.getSource()))));
 
 			root.then(Commands.literal("daily")
-					.executes(context -> showDaily(context.getSource()))
-					.then(Commands.literal("penalty")
-							.requires(AriseCommands::canCheat)
-							.executes(context -> playerAction(context.getSource(), DailyManager::force))));
+					.executes(context -> showDaily(context.getSource())));
 
 			root.then(Commands.literal("compass")
 					.executes(context -> playerAction(context.getSource(), AbyssCompassItem::locate)));
@@ -708,7 +704,7 @@ public final class AriseCommands {
 		com.luca.arise.daily.DailyQuest daily = DailyManager.get(player);
 
 		if (!config.enabled()) {
-			source.sendFailure(Component.translatable("arise.msg.daily.off"));
+			source.sendFailure(Component.translatable("arise.msg.daily.header", 0));
 			return 0;
 		}
 

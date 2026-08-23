@@ -417,27 +417,6 @@ public final class AriseFx {
 		play(level, position, ModSounds.SHOP_DEAL, 0.9F, 1.2F);
 	}
 
-	/**
-	 * Il Sistema ti sposta: la colonna rossa della Zona di Penalità.
-	 *
-	 * <p>Rosso e grave, come il cedimento di un varco, perché è la stessa categoria di cosa — una
-	 * conseguenza che arriva senza che tu l'abbia chiesta. È l'unico effetto della mod che il
-	 * giocatore preferirebbe non vedere mai, e deve sembrarlo.
-	 */
-	public static void penalty(ServerLevel level, Vec3 position) {
-		FxConfig fx = config();
-		column(level, position, 6.0, fx.scaled(48), dust(0xE86A6A, 1.6F));
-		ring(level, position, 3.0, fx.scaled(32), dust(0xE86A6A, 1.3F), -0.4);
-		play(level, position, ModSounds.GATE_BREACH, 1.2F, 0.5F);
-	}
-
-	/** Un'ondata di millepiedi: sabbia che si muove attorno, e niente di piu'. */
-	public static void penaltyWave(ServerLevel level, Vec3 position) {
-		FxConfig fx = config();
-		ring(level, position, 10.0, fx.scaled(30), dust(0x8FA0B5, 1.1F), 0.15);
-		play(level, position, ModSounds.GATE_AMBIENCE, 0.8F, 1.5F);
-	}
-
 	/** Il boss entra in scena: si sente da tutta la stanza. */
 	public static void gateBoss(ServerLevel level, Vec3 position, Rank rank) {
 		FxConfig fx = config();

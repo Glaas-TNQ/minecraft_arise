@@ -1,5 +1,7 @@
 package com.luca.arise.registry;
 
+import java.util.List;
+
 import com.luca.arise.AriseMod;
 import com.luca.arise.ability.AbilityCooldowns;
 import com.luca.arise.daily.DailyQuest;
@@ -22,6 +24,8 @@ import com.luca.arise.shadow.SummonedShadows;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+
+import net.minecraft.server.level.ServerPlayer;
 
 public final class ModAttachments {
 
@@ -243,7 +247,49 @@ public final class ModAttachments {
 			.syncWith(DailyQuest.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
 			.buildAndRegister(AriseMod.id("daily"));
 
+	/**
+	 * I tredici attachment che il client deve conoscere, in un elenco solo.
+	 *
+	 * <p>Esiste per {@link #resync}: un elenco scritto a mano si dimentica del tredicesimo, e la
+	 * dimenticanza si vede come una schermata vuota sei mesi dopo.
+	 */
+	private static final List<AttachmentType<?>> SYNCED = List.of(
+			PROGRESS, ARMY, QUESTS, GEAR, SHOP, SUMMONED, DOWNTIME, SQUAD, ORDERS, STANCE,
+			COOLDOWNS, ABYSS, DAILY);
+
 	private ModAttachments() {
+	}
+
+	/**
+	 * Rimanda al client tutto quello che gia' sa il server.
+	 *
+	 * <p>Questo metodo esiste per un difetto visto giocando: <strong>ogni tanto l'HUD spariva e non
+	 * tornava piu'</strong>. La causa e' che la sincronizzazione parte quando qualcuno scrive un
+	 * attachment, e il client tiene i valori <em>sull'entita'</em>. Morire e cambiare dimensione
+	 * costruiscono un'entita' nuova sul client: quella nasce senza niente, e ci resta finche' il
+	 * server non riscrive qualcosa.
+	 *
+	 * <p>Per la progressione «qualcosa» arriva al primo mob ucciso. Per gli incarichi puo' non
+	 * arrivare per ore — e l'HUD non si disegna senza gli incarichi, perche' e' da li' che sa se il
+	 * Sistema e' stato concesso. Ecco perche' spariva «ogni tanto» e sembrava definitivo: lo era.
+	 *
+	 * <p>La cura e' riscrivere ogni valore con se stesso nei tre momenti in cui l'entita' del client
+	 * e' nuova. Riscrivere lo stesso valore non cambia niente sul server — sono tutti record
+	 * immutabili — e sul client rimette tutto a posto.
+	 */
+	public static void resync(ServerPlayer player) {
+		for (AttachmentType<?> type : SYNCED) {
+			resyncOne(player, type);
+		}
+	}
+
+	/** Il generico serve solo a convincere il compilatore che il valore riletto e' del tipo giusto. */
+	private static <A> void resyncOne(ServerPlayer player, AttachmentType<A> type) {
+		A value = player.getAttached(type);
+
+		if (value != null) {
+			player.setAttached(type, value);
+		}
 	}
 
 	/** Forza il caricamento della classe, e con essa la registrazione. */

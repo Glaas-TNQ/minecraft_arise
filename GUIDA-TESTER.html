@@ -383,7 +383,8 @@ guardi una cosa sola, guarda queste.</p>
     <li><b>Il Cubo dell'Abisso</b> — ogni varco ne lascia uno, e si apre in due modi. → <a href="#cubo">qui sotto</a></li>
     <li><b>L'Abisso</b> — la discesa che non finisce. È quello che mancava dopo l'ultimo incarico. → <a href="#abisso">qui sotto</a></li>
     <li><b>Dodici traguardi</b> nella schermata degli avanzamenti di Minecraft — con i toast.</li>
-    <li><b>La Quest Giornaliera e la Zona di Penalità</b> — il Sistema chiede ogni mattina, e se la sera non hai fatto ti <em>sposta</em>. → <a href="#giornaliera">qui sotto</a></li>
+    <li><b>La Quest Giornaliera</b> — il Sistema chiede quattro cose ogni mattina, e paga chi le fa. → <a href="#giornaliera">qui sotto</a></li>
+    <li><b>Il pannello si nasconde e torna</b> con <kbd>F6</kbd>, e non sparisce più da solo. → <a href="#pannello">qui sotto</a></li>
     <li><b><code>/arise config reload</code></b> — taratura dei numeri senza riavviare.</li>
     <li><b>La Pergamena del Rimpianto</b> — il respec. → <a href="#roba">roba</a></li>
     <li><b>Shift + <kbd>R</kbd></b> — guarda il cadavere prima di bruciarlo. → <a href="#esercito">l'esercito</a></li>
@@ -516,20 +517,46 @@ dieci chilometri del canone, tradotti nelle sole quattro cose che Minecraft cont
 <p>Sono tarati per essere <b>un promemoria di giocare</b>, non un secondo lavoro: chi passa una
 giornata a scavare, combattere e camminare li fa senza accorgersene. Il pannello in alto a sinistra
 mostra una riga «Giornaliera n/4» finché è aperta, e sparisce quando la chiudi.</p>
-<p>Chiusa: <b>un punto statistica e le forze indietro</b>.</p>
+<p>Chiusa: <b>un punto statistica e le forze indietro</b>. A tre quarti di giornata, se manca
+ancora qualcosa, il Sistema te lo ricorda una volta sola.</p>
 
-<div class="panel warn">
-  <p class="callout-title">Aperta al tramonto: il Sistema ti sposta</p>
-  <p>Ti ritrovi nella <b>Zona di Penalità</b> — una piana di sabbia delle anime senza cielo,
-  illuminata da sotto, con un muro che non si scavalca. Una sola quest: <em>sopravvivi otto
-  minuti</em>, mentre arrivano ondate di millepiedi che crescono.</p>
-  <p><b>La penalità non ti toglie niente.</b> Non leva livelli, non brucia l'inventario, non
-  cancella l'esercito, e <b>lì dentro non si può morire</b>: se arrivi a zero riparti dal centro a
-  metà vita col cronometro azzerato. Costa otto minuti e la faccia. Se una di queste cose non è
-  vera, è il difetto più importante da segnalare di tutta la build.</p>
+<div class="panel">
+  <p class="callout-title">Non c'è nessuna penalità, e prima c'era</p>
+  <p>Il canone prevede una <b>Zona di Penalità</b> in cui il Sistema ti sposta se la sera non hai
+  fatto, e in questa mod era stata costruita per intero — un deserto sigillato, ondate di creature,
+  un cronometro. <b>È stata tolta dopo averla provata</b>, e non per la taratura.</p>
+  <p>Una penalità che <em>sposta</em> non è una conseguenza: è un'interruzione, e l'interruzione
+  arriva sempre nel momento sbagliato perché il momento non lo sceglie chi gioca. Accorciarla la
+  rendeva solo un'interruzione più breve.</p>
+  <p>Resta la metà che funzionava: il Sistema chiede, e se fai quello che chiede paga. Chi non lo fa
+  non prende il punto, e domani il Sistema richiede. <b>Se ti ritrovi teletrasportato in un deserto,
+  è un difetto</b> — non dovrebbe esistere più niente che possa portarti lì.</p>
 </div>
 <p style="color: var(--muted); font-size: 14.5px;"><code>/arise daily</code> per leggere i quattro
-contatori, <code>/arise daily penalty</code> per farti prendere subito senza aspettare un tramonto.</p>
+contatori.</p>
+
+<h3 id="pannello">Il pannello che spariva</h3>
+
+<p>Il difetto peggiore trovato in questa tornata, e l'hai visto tu: <b>ogni tanto il riquadro in
+alto a sinistra spariva e non tornava più</b>. Non era casuale. Il client tiene i dati del Sistema
+<em>sull'entità del giocatore</em>, e morire o cambiare dimensione ne costruisce una nuova, che nasce
+vuota. Il server rimanda i dati solo quando qualcosa li riscrive: per il livello basta uccidere un
+mob, ma il pannello ha bisogno anche degli <em>incarichi</em>, e quelli possono non cambiare per ore.
+Ecco perché sembrava definitivo — spesso lo era.</p>
+
+<p>Adesso il server rimanda tutto e tredici volte, nei tre momenti in cui il client si ricostruisce:
+<b>entrata nel mondo, risveglio dopo la morte, cambio di dimensione</b>. E c'è un tasto:</p>
+
+<div class="panel">
+  <p class="callout-title"><kbd>F6</kbd> — mostra e nasconde il pannello</p>
+  <p>Serve per gli screenshot puliti, e serve come maniglia dall'interno: quando lo nascondi, il
+  gioco ti dice in chat con che tasto torna. Il tasto si rimappa dalle opzioni come tutti gli altri,
+  e quel messaggio nomina il tasto che hai davvero configurato.</p>
+</div>
+
+<p><b>Da provare:</b> muori apposta e guarda se il pannello c'è al risveglio. Poi entra in un varco
+ed esci. Poi viaggia in una città. In tutti e tre i casi deve restare al suo posto. Se sparisce
+ancora, è la segnalazione più importante che puoi mandarmi — e allega <code>/arise doctor</code>.</p>
 
 <h3 id="abisso">L'Abisso</h3>
 <p>Era il buco più grande della mod: finita la catena dei diciotto incarichi il Sistema diceva «da
@@ -675,6 +702,7 @@ Sistema conceda quel sistema risponde con una riga in chat invece di aprire una 
   <div class="key"><span class="k"><kbd>N</kbd></span><span class="d">Equipaggiamento<small>le caselle del Cacciatore, lo zaino, lo spazio dimensionale</small></span></div>
   <div class="key"><span class="k"><kbd>O</kbd></span><span class="d">Abyss Shop<small>si apre ovunque: è una finestra del Sistema</small></span></div>
   <div class="key"><span class="k"><kbd>M</kbd></span><span class="d">Mappa del mondo<small>città, varchi aperti, tu</small></span></div>
+  <div class="key"><span class="k"><kbd>F6</kbd></span><span class="d">Mostra/nascondi il pannello<small>per uno screenshot pulito, o se qualcosa va storto</small></span></div>
 </div>
 
 <h3>Comandare</h3>
@@ -1268,7 +1296,6 @@ attivi.</p>
 /arise city go &lt;città&gt;            viaggia
 /arise city npcs                  ripopola i banconi della città più vicina
 /arise daily                      i quattro contatori della giornata
-/arise daily penalty              ti manda subito nella Zona di Penalità
 /arise config reload              rilegge arise.json senza riavviare
 /arise doctor                     la scheda: tutto il tuo stato in undici righe
 /arise fx &lt;effetto&gt;               riproduce uno dei 15 effetti
@@ -1314,9 +1341,8 @@ che ti serviamo.</p>
   <li><b>I traguardi</b>: apri la schermata degli avanzamenti (<kbd>L</kbd>) e cerca la scheda di
   Arise. Dodici voci, e una è nascosta finché non ci arrivi. Il toast deve comparire al momento
   giusto — se lo vedi arrivare per la cosa sbagliata, segnalalo.</li>
-  <li><b>La penalità</b>: <code>/arise daily penalty</code>, poi fatti uccidere apposta. Devi
-  ripartire dal centro a metà vita, e il cronometro deve ricominciare da capo — <em>non</em> devi
-  morire, né perdere niente.</li>
+  <li><b>Il pannello</b>: muori apposta, poi entra e esci da un varco, poi viaggia in una città.
+  Deve esserci tutte e tre le volte. Poi premi <kbd>F6</kbd> due volte: deve sparire e tornare.</li>
   <li><b>Il rango</b>: <code>/arise level 20</code>. Devi vedere il titolo, sentire il suono, e
   leggere in chat quali caselle si sono aperte. Poi <code>/arise level 1</code>: <em>non</em> deve
   dire niente. Poi <code>/arise level 60</code> per il rango S — quel messaggio va a tutti.</li>
@@ -1347,7 +1373,7 @@ verificata leggendo il codice che la legge</b>, non la documentazione.</p>
       <td><code>0.0</code></td>
     </tr>
     <tr>
-      <td><b>La Quest Giornaliera</b> e con lei la Zona di Penalità</td>
+      <td><b>La Quest Giornaliera</b> — il Sistema smette di chiedere ogni mattina</td>
       <td><code>daily.enabled</code></td>
       <td><code>false</code></td>
     </tr>
@@ -1368,24 +1394,6 @@ verificata leggendo il codice che la legge</b>, non la documentazione.</p>
     </tr>
   </tbody>
 </table>
-</div>
-
-<div class="panel">
-  <p class="callout-title">Spegnere la giornaliera non ti lascia dentro</p>
-  <p>Era un difetto vero, trovato stasera rileggendo il codice invece che giocandoci: la Zona di
-  Penalità non ha porte, e il battito che ti fa uscire è lo stesso che il sistema spento non esegue
-  più. Chi spegneva la giornaliera mentre scontava restava murato.</p>
-  <p>Peggio: l'elenco di chi sta scontando vive in memoria, il mondo no — quindi <em>bastava un
-  riavvio del server</em>. Adesso la regola è una sola: chi si trova nella Zona senza risultare fra
-  quelli che la stanno scontando torna a casa al battito dopo. Vale per lo spegnimento, per il
-  riavvio, e per chiunque ci arrivi con un teletrasporto.</p>
-  <p><b>Vale la pena provarlo:</b> <code>/arise daily penalty</code>, poi esci dal mondo e rientra.
-  Devi ritrovarti dove eri prima, non nel deserto.</p>
-  <p style="color: var(--muted);"><b>Il rovescio, dichiarato:</b> questo vuol dire che uscire dal
-  gioco durante la penalità è anche un modo di finirla. La giornata è già saldata quando la penalità
-  parte, quindi non si ripete — e chi chiude il gioco per evitare otto minuti li ha comunque
-  interrotti. Renderla davvero inevitabile vuol dire salvare la scadenza su disco, che è un lavoro
-  per la prossima volta.</p>
 </div>
 
 <div class="panel gold">

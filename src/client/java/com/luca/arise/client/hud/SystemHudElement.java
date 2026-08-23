@@ -62,15 +62,31 @@ public class SystemHudElement implements HudElement {
 	/** Durata del lampo di salita di livello. */
 	private static final long FLASH_MILLIS = 2500L;
 
+	/**
+	 * Se il pannello si disegna.
+	 *
+	 * <p>Statico e non d'istanza perche' il tasto non ha in mano l'elemento: l'HUD e' registrato una
+	 * volta sola all'avvio e nessuno ne tiene il riferimento. Vale per tutta la sessione e non si
+	 * salva — riaprire il gioco lo rimette, che e' la scelta giusta per un interruttore che si puo'
+	 * premere per sbaglio.
+	 */
+	private static boolean shown = true;
+
 	private int lastLevel = -1;
 	private long flashUntil = 0L;
+
+	/** Accende o spegne il pannello. Torna lo stato nuovo, per poterlo dire. */
+	public static boolean toggle() {
+		shown = !shown;
+		return shown;
+	}
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
 		Minecraft minecraft = Minecraft.getInstance();
 		LocalPlayer player = minecraft.player;
 
-		if (player == null) {
+		if (!shown || player == null) {
 			lastLevel = -1;
 			return;
 		}
