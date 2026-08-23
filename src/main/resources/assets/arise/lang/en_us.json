@@ -212,6 +212,7 @@
   "arise.msg.city.setup_done": "All five Associations are already there.",
   "arise.msg.compass.found": "The needle settles: a rank %1$s gate, about %2$s blocks to %3$s.",
   "arise.msg.compass.none": "The needle spins loose. No gate calls to it from here.",
+  "arise.msg.config.reloaded": "Config reloaded from disk. Everyone's attributes rewritten.",
   "arise.msg.cube.blessed": "The rank %s cube opens clean.",
   "arise.msg.cube.cursed": "The rank %s cube opens the other way. What comes out is not for now.",
   "arise.msg.cube.found": "The gate leaves a rank %s Abyss Cube. How you open it is up to you.",

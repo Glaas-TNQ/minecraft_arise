@@ -210,6 +210,14 @@ public final class AriseCommands {
 
 			// La giornaliera: leggerla, chiuderla, o farsi mandare subito nella Zona. Aspettare un
 			// tramonto per provare la penalita' costa dieci minuti di gioco fermo.
+			// Rileggere arise.json senza riavviare. Non e' una comodita': e' l'unico modo di tarare
+			// un numero — quanto morde il gelo, ogni quanto cede un varco, quanti blocchi chiede la
+			// giornaliera — provandolo, invece di riavviare il mondo a ogni tentativo.
+			root.then(Commands.literal("config")
+					.requires(AriseCommands::canCheat)
+					.then(Commands.literal("reload")
+							.executes(context -> reloadConfig(context.getSource()))));
+
 			root.then(Commands.literal("daily")
 					.executes(context -> showDaily(context.getSource()))
 					.then(Commands.literal("penalty")
@@ -532,6 +540,26 @@ public final class AriseCommands {
 
 		GateBreach.breach(level, nearest.position(), nearest.offer());
 		nearest.discard();
+		return 1;
+	}
+
+	/**
+	 * Rilegge la config dal disco e rimette in riga chi e' collegato.
+	 *
+	 * <p>La rilettura da sola non basta: le statistiche del giocatore sono modificatori scritti sui
+	 * suoi attributi, calcolati con i valori di config di quando sono stati applicati. Cambiare
+	 * «quanto vale un punto di Forza» senza riscriverli lascerebbe tutti col vecchio numero addosso
+	 * fino al prossimo punto speso — e il file direbbe una cosa e il gioco un'altra, che e'
+	 * esattamente il genere di divergenza che un comando di ricarica esiste per non produrre.
+	 */
+	private static int reloadConfig(CommandSourceStack source) {
+		AriseConfig.load();
+
+		for (ServerPlayer player : source.getServer().getPlayerList().getPlayers()) {
+			ProgressManager.applyAttributes(player);
+		}
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.config.reloaded"), true);
 		return 1;
 	}
 

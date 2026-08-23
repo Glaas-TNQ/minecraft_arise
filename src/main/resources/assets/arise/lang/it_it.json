@@ -212,6 +212,7 @@
   "arise.msg.city.setup_done": "Le cinque Associazioni ci sono gia' tutte.",
   "arise.msg.compass.found": "L'ago si ferma: un varco di rango %1$s, a circa %2$s blocchi a %3$s.",
   "arise.msg.compass.none": "L'ago gira a vuoto. Nessun varco lo chiama da qui.",
+  "arise.msg.config.reloaded": "Config riletta dal disco. Gli attributi di tutti sono stati riscritti.",
   "arise.msg.cube.blessed": "Il cubo di rango %s si apre pulito.",
   "arise.msg.cube.cursed": "Il cubo di rango %s si apre dall'altra parte. Quello che ne esce non è per adesso.",
   "arise.msg.cube.found": "Il varco lascia un Cubo dell'Abisso di rango %s. Come aprirlo sta a te.",

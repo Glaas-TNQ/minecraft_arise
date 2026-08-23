@@ -142,8 +142,28 @@ public final class ShadowManager {
 
 	// ---------------------------------------------------------------- estrazione
 
+	/**
+	 * Creature da cui non si estrae niente.
+	 *
+	 * <p>Un tag e non un elenco nel codice, ed e' la prima cosa dell'esercito che si estende da
+	 * datapack: un pack che aggiunge un NPC amichevole non deve aspettare una versione della mod per
+	 * impedire che qualcuno lo trasformi in un soldato. Dentro ci sono i tre casi che erano gia'
+	 * sbagliati — i villager, i golem di ferro dei villaggi, e le ombre stesse — piu' i supporti da
+	 * armatura, che non hanno un'ombra perche' non hanno mai avuto niente.
+	 */
+	private static final net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>>
+			NOT_EXTRACTABLE = net.minecraft.tags.TagKey.create(
+					net.minecraft.core.registries.Registries.ENTITY_TYPE,
+					com.luca.arise.AriseMod.id("not_extractable"));
+
 	/** Registra un cadavere come estraibile per qualche secondo. */
 	public static void recordKill(ServerPlayer killer, LivingEntity victim) {
+		// EntityType non ha un `is(tag)`: la domanda si fa all'holder del registro, che e' lo stesso
+		// oggetto a cui il datapack attacca il tag.
+		if (victim.getType().builtInRegistryHolder().is(NOT_EXTRACTABLE)) {
+			return;
+		}
+
 		ShadowConfig config = AriseConfig.get().shadows();
 		Identifier type = BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType());
 
