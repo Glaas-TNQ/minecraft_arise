@@ -359,7 +359,7 @@
 
   <header class="masthead">
     <p class="eyebrow">Arise · la prima ondata del PRD</p>
-    <h1>Dieci blocchi contro il silenzio</h1>
+    <h1>Undici blocchi contro il silenzio</h1>
     <p class="lede">Arise aveva finito di costruire i suoi sistemi e non aveva ancora cominciato a
       costruire il suo <strong>gioco</strong>. La catena degli incarichi si chiudeva intorno al
       livello venti con la frase «da qui in avanti il Sistema tace e guarda», e da lì il gioco
@@ -367,25 +367,25 @@
       motivo per aprire il varco numero cinquanta dopo aver aperto il quarantanovesimo.</p>
     <p class="lede">Prima un <strong>PRD</strong> — dodici lacune con l'evidenza nel codice, sette
       principi, diciassette blocchi ordinati per valore diviso costo, e uno scope negativo scritto.
-      Poi dieci di quei diciassette.</p>
+      Poi undici di quei diciassette.</p>
 
     <p class="facts">
-      <span>blocchi <b>10 / 17</b></span>
-      <span>file nuovi <b>10</b></span>
-      <span>prove <b>87</b> (+18)</span>
-      <span>chiavi di lingua <b>795</b> (+91)</span>
+      <span>blocchi <b>11 / 17</b></span>
+      <span>file nuovi <b>13</b></span>
+      <span>prove <b>89</b> (+20)</span>
+      <span>chiavi di lingua <b>801</b> (+97)</span>
       <span>collaudo statico <b>pulito</b></span>
       <span>server dedicato <b>mondo nuovo ×2</b></span>
-      <span>difetti trovati <b>5</b></span>
+      <span>difetti trovati <b>8</b></span>
     </p>
   </header>
 
   <div class="notice hot">
     <span class="tag">Cosa è verificato, e cosa no</span>
-    <p>Tutti e dieci i blocchi compilano, passano le ottantasette prove, escono puliti dal collaudo
-      statico e fanno partire un server dedicato su un mondo vergine — due volte, all'inizio e alla
-      fine. <strong>Nessuno dei dieci è ancora stato visto girare in gioco</strong>, e secondo la
-      regola 3 del progetto questo vuol dire che nessuno dei dieci è finito.</p>
+    <p>Tutti e undici i blocchi compilano, passano le ottantanove prove, escono puliti dal collaudo
+      statico e fanno partire un server dedicato su un mondo vergine — tre volte, all'inizio, a metà
+      e alla fine. <strong>Nessuno degli undici è ancora stato visto girare in gioco</strong>, e
+      secondo la regola 3 del progetto questo vuol dire che nessuno degli undici è finito.</p>
     <p>La guida per chi collauda è <span class="mono">GUIDA-TESTER.html</span>, nella root. In fondo
       ha sei prove mirate: sono le cose che un difetto romperebbe in silenzio.</p>
   </div>
@@ -606,6 +606,21 @@
       succede — arrivare a quattrocento in Vitalità non è un traguardo, è la fine della statistica.
       Adesso punta alla prossima soglia, con scritto quanto manca e cosa dà.</p>
 
+    <h3>B14 — il cubo, benedetto o maledetto</h3>
+    <p>Ogni varco chiuso ne lascia uno. Clic destro lo apre <strong>benedetto</strong> — una gemma,
+      un catalizzatore, delle monete: serve stasera. Shift e clic destro lo apre
+      <strong>maledetto</strong> — due pezzi di un rango sopra, che il Cacciatore non può ancora
+      indossare e che restano nello spazio dimensionale finché non cresce.</p>
+    <p>Il maledetto non è peggiore: è peggiore <em>adesso</em> e migliore dopo. Chi conosce la mod lo
+      prende quasi sempre; chi è al primo mondo prende il benedetto, e ha ragione lui. Entrambe le
+      scelte sono giuste in momenti diversi, che è la definizione di una buona scelta ricorrente.</p>
+    <p>Il sigillo non è un meccanismo nuovo: è quello che l'equipaggiamento fa già. Un pezzo sopra il
+      proprio rango non entra in nessuna casella e resta visibile con scritto quale rango serve —
+      «sigillato, non ancora», scritto con codice che c'era.</p>
+    <p>E la scelta passa da un tasto, non da una schermata. Sarebbe stata la dodicesima finestra di
+      una mod che ne ha undici; lo shift che inverte il verso è la convenzione che il Quartiere del
+      Mercato ha già stabilito, e una convenzione già imparata vale più di un'interfaccia nuova.</p>
+
     <h3>B10 — e la Pergamena del Rimpianto</h3>
     <p>Non c'era modo di tornare indietro da una spesa, ed è la lacuna che nelle mod RPG i giocatori
       segnalano più di qualunque altra. Trenta Monete d'Anima alla Cartoleria — tremila soul coin,
@@ -643,18 +658,34 @@
       <li>Il collaudo statico ha beccato tre nomi di file di suono vanilla inventati
         (<span class="mono">entity/generic/explode1</span> non esiste,
         <span class="mono">random/explode3</span> sì) prima che il gioco li suonasse a vuoto.</li>
+      <li><strong>La Caccia scaduta regalava lo stesso il premio della fretta.</strong> Il timer, allo
+        scadere, si toglieva dalla mappa delle scadenze — sembrava pulito. Ma è quella stessa mappa
+        che il completamento legge per decidere se il giocatore è stato in tempo, e una voce assente
+        vale «nessuna scadenza», cioè sempre in tempo: chi lasciava scadere la caccia e poi
+        ammazzava il Sovrano con calma prendeva il cinquanta per cento in più.</li>
+      <li>Il bersaglio della Raccolta d'Essenza <strong>rigenerava la pianta del varco a ogni mob
+        ucciso</strong>. Si conta una volta sola, all'ingresso.</li>
+      <li>Gli obiettivi variabili uscivano a qualunque rango, e il settimo incarico dice «chiudi un
+        Gate abbattendone il custode»: un varco che al terzo livello chiedeva di ripulire le stanze
+        rendeva falsa quella frase. Sotto il rango C esce solo il Sovrano — la stessa soglia degli
+        affissi, e per la stessa ragione.</li>
     </ul>
+
+    <p>Gli ultimi quattro li ho trovati <strong>rileggendo il codice che avevo appena scritto</strong>,
+      e tre su quattro sono la stessa forma di errore: una scorciatoia che sembra pulita — togliere
+      una voce da una mappa, chiedere un numero a chi lo sa calcolare — e che smette di esserlo
+      appena qualcun altro legge la stessa cosa per rispondere a una domanda diversa.</p>
   </section>
 
   <section>
     <h2><span class="step">5</span> Cosa resta fuori</h2>
 
-    <p>Sette blocchi su diciassette. Quattro sono contenuto nuovo — <strong>l'Abisso</strong> a
+    <p>Sei blocchi su diciassette. Quattro sono contenuto nuovo — <strong>l'Abisso</strong> a
       profondità infinita con cronometro e record, <strong>i Monarchi</strong> come catena finale,
       <strong>l'esame di rango</strong>, <strong>la Quest Giornaliera</strong> con la Zona di
       Penalità — e due sono infrastruttura: il <strong>Registro del Sistema</strong> (una guida
       in-game agganciata a oggetti e schermate) e l'<strong>adottabilità</strong> (tag, interruttori
-      per sistema, meno keybind di default). Più il <strong>cubo benedetto o maledetto</strong>.</p>
+      per sistema, meno keybind di default).</p>
 
     <p>La lacuna <strong>L1</strong> — dopo il diciottesimo incarico non c'è niente — è stata solo
       <em>ammorbidita</em>: il cinquantesimo varco non è più identico al quarantanovesimo, ma un

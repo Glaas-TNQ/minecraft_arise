@@ -68,8 +68,19 @@ public final class GateBoss {
 	/** Quanto lontano arriva la spazzata che fa cadere le ombre, in seconda fase. */
 	private static final double SWEEP_RADIUS = 6.0;
 
-	/** Quale quota della vita di un'ombra si porta via la spazzata. */
-	private static final float SWEEP_SHARE = 0.5F;
+	/**
+	 * Quale quota della vita di un'ombra si porta via la spazzata.
+	 *
+	 * <p>Un terzo, non la meta'. A meta' bastavano due martellate — sei secondi in seconda fase —
+	 * per svuotare il campo, e dopo quelle il giocatore restava senza esercito per un minuto intero
+	 * di recupero: non un cuscinetto che si consuma, un esercito cancellato. A un terzo servono tre
+	 * colpi, ed e' il tempo perche' la perdita si veda arrivare e si possa decidere di richiamarle.
+	 *
+	 * <p>Il raggio invece resta stretto apposta: chi combatte in mischia lo prende, un Mago a sedici
+	 * blocchi no. La spazzata non e' una tassa sull'esercito — e' una tassa su <em>quel modo</em> di
+	 * schierarlo, ed e' cosi' che diventa una scelta di squadra.
+	 */
+	private static final float SWEEP_SHARE = 0.35F;
 
 	/** giocatore → a che fase e' arrivato il suo Sovrano. Si azzera con l'istanza. */
 	private static final Map<UUID, Integer> PHASE = new HashMap<>();
