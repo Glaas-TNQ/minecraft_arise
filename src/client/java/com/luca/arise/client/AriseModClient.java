@@ -14,6 +14,7 @@ import com.luca.arise.registry.ModEntities;
 import com.luca.arise.registry.ModMenus;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -44,6 +45,12 @@ public class AriseModClient implements ClientModInitializer {
 
 		// Una schermata sola per tutti e quattro i macchinari: quale sia lo dice il menu.
 		MenuScreens.register(ModMenus.MACHINE, MachineScreen::new);
+
+		// Uscire da un mondo butta il terreno della mappa. Un mondo diverso e' un terreno diverso, e
+		// un riquadro tenuto attraverso quel confine mostrerebbe il posto sbagliato senza dirlo —
+		// in singleplayer si passa da un mondo all'altro senza mai chiudere il gioco.
+		ClientPlayConnectionEvents.DISCONNECT.register(
+				(handler, client) -> com.luca.arise.client.map.TerrainTiles.clear());
 
 		AriseKeyMappings.register();
 		HunterButton.register();

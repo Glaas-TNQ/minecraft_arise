@@ -177,6 +177,19 @@ public final class AriseCommands {
 									.executes(context -> setMana(context.getSource(),
 											IntegerArgumentType.getInteger(context, "quantita"))))));
 
+			// La misura del terreno della mappa. Senza giocatore: si prova dalla console di un
+			// server, che e' il posto dove si scopre se un sistema costa troppo.
+			root.then(Commands.literal("map")
+					.then(Commands.literal("bench")
+							.requires(AriseCommands::canCheat)
+							.then(Commands.argument("livello", IntegerArgumentType.integer(0, 4))
+									.executes(context -> benchMap(context.getSource(),
+											IntegerArgumentType.getInteger(context, "livello"), 4))
+									.then(Commands.argument("riquadri", IntegerArgumentType.integer(1, 64))
+											.executes(context -> benchMap(context.getSource(),
+													IntegerArgumentType.getInteger(context, "livello"),
+													IntegerArgumentType.getInteger(context, "riquadri")))))));
+
 			LiteralArgumentBuilder<CommandSourceStack> gate = Commands.literal("gate");
 			for (Rank rank : Rank.values()) {
 				gate.then(Commands.literal(rank.getSerializedName())
@@ -799,6 +812,18 @@ public final class AriseCommands {
 		long souls = ProgressManager.souls(player);
 		source.sendSuccess(() -> Component.translatable("arise.msg.souls.balance", souls), false);
 		return (int) Math.min(Integer.MAX_VALUE, souls);
+	}
+
+	private static int benchMap(CommandSourceStack source, int lod, int tiles) {
+		com.luca.arise.map.TerrainAtlas.bench(source.getServer().overworld(), lod, tiles);
+
+		// La risposta finisce nel log e non qui: la misura gira su un thread suo, e quando finisce
+		// questo comando e' concluso da un pezzo. Vedi TerrainAtlas.bench per il perche' non puo'
+		// girare in linea.
+		source.sendSuccess(() -> Component.translatable("arise.msg.map.bench",
+				tiles, lod, com.luca.arise.map.MapTiles.span(lod)), false);
+
+		return tiles;
 	}
 
 	private static int showMana(CommandSourceStack source)

@@ -36,7 +36,14 @@ public final class CityEvents {
 
 		// Le costruzioni a metà vivono in memoria: a server fermo non hanno più senso, e tenerle
 		// significherebbe ripartire da uno stato che non corrisponde più a nessun mondo.
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> CityManager.clear());
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+			CityManager.clear();
+
+			// Il terreno gia' dipinto per la mappa appartiene al seme di questo mondo. In
+			// singleplayer si esce da un mondo e se ne apre un altro senza chiudere il gioco: senza
+			// questa riga la mappa del secondo mostrerebbe il paesaggio del primo.
+			com.luca.arise.map.TerrainAtlas.clear();
+		});
 
 		// Il terminale non è un'entità né un blocco nostro: è la pietra al centro
 		// dell'Associazione. Un blocco in meno da registrare, e niente che possa sparire quando

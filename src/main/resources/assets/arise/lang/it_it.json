@@ -316,6 +316,7 @@
   "arise.msg.loot.scroll": "Pergamena del Sistema: +%s punti statistica.",
   "arise.msg.mana.balance": "MP: %s/%s.",
   "arise.msg.mana.filled": "MP ripristinati: %s.",
+  "arise.msg.map.bench": "Misuro %s riquadri di mappa al livello %s (%s blocchi l'uno). Il risultato finisce nel log del server.",
   "arise.msg.map.gate_asleep": "dorme (chunk scaricato)",
   "arise.msg.map.gate_awake": "sveglio",
   "arise.msg.map.gate_line": "Varco %1$s (%2$s) a %3$s %4$s %5$s — a %6$s blocchi, restano %7$ss, %8$s",

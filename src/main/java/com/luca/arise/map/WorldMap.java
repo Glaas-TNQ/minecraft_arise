@@ -80,6 +80,6 @@ public final class WorldMap {
 					GateRegistry.awake(server, record)));
 		}
 
-		return new MapPayload(cities, gates);
+		return new MapPayload(cities, gates, config.size());
 	}
 }

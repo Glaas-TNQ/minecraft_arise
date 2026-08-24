@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.luca.arise.client.map.MapCanvas;
+import com.luca.arise.client.map.TerrainTiles;
 import com.luca.arise.client.ui.AriseScreen;
 import com.luca.arise.client.ui.AriseTheme;
 import com.luca.arise.client.ui.Glyphs;
 import com.luca.arise.map.MapProjection;
+import com.luca.arise.map.MapTiles;
 import com.luca.arise.network.MapPayload;
 import com.luca.arise.network.MapPayload.CityMark;
 import com.luca.arise.network.MapPayload.GateMark;
@@ -27,7 +30,19 @@ import net.minecraft.network.chat.Component;
  * resta sul bordo come una freccia con la distanza. Rotella per allontanarsi, trascinare per
  * spostarsi, e un bottone che inquadra tutto per chi vuole vedere il mondo intero.
  *
- * <p>Non disegna il terreno. Sarebbe un'altra mod: qui contano i punti, non il paesaggio.
+ * <h2>Il terreno</h2>
+ *
+ * <p>Per molti blocchi di sviluppo questa mappa <em>non</em> disegnava il terreno, e nel commento
+ * qui sopra c'era scritto che era voluto — «sarebbe un'altra mod: qui contano i punti, non il
+ * paesaggio». Provandola si e' visto che era sbagliato: senza il paesaggio i punti non hanno niente
+ * a cui appartenere, e quello che restava era un rettangolo nero con dentro un reticolo. Il terreno
+ * adesso c'e', dipinto dal server interrogando il rumore del generatore invece dei chunk — vedi
+ * {@code TerrainAtlas} per il come, e {@code MapCanvas} per il perche' e' una texture e non
+ * centomila rettangoli.
+ *
+ * <p>Arriva a riquadri, e i riquadri arrivano quando sono pronti: aprire la mappa in un posto mai
+ * visto vuol dire vederla riempirsi per un secondo o due. E' voluto — l'alternativa sarebbe stata
+ * una schermata che si apre in ritardo.
  */
 public class MapScreen extends AriseScreen {
 
@@ -61,9 +76,18 @@ public class MapScreen extends AriseScreen {
 	private double lastMouseX;
 	private double lastMouseY;
 
+	/** La tela del terreno. Nasce alla prima apertura e muore alla chiusura: vedi {@link #removed}. */
+	private final MapCanvas canvas = new MapCanvas(AriseTheme.PANEL_SOFT);
+
 	public MapScreen(MapPayload data) {
 		super(Component.translatable("arise.screen.map.title"), PANEL_W, PANEL_H);
 		this.data = data;
+
+		// Le richieste rimaste in volo dall'ultima volta si dimenticano. I riquadri no: quelli
+		// restano buoni. Serve per il caso in cui una risposta si sia persa — senza, quel riquadro
+		// resterebbe marcato «gia' chiesto» per tutta la sessione, cioe' un buco nero permanente
+		// nella mappa che nessun gesto sa riempire.
+		TerrainTiles.retryPending();
 	}
 
 	// ---------------------------------------------------------------- impianto
@@ -157,6 +181,10 @@ public class MapScreen extends AriseScreen {
 	@Override
 	protected void content(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		graphics.fill(viewX, viewY, viewX + viewW, viewY + viewH, AriseTheme.PANEL_SOFT);
+
+		int lod = MapTiles.lodFor(projection.scale());
+		terrain(graphics, lod);
+
 		graphics.enableScissor(viewX, viewY, viewX + viewW, viewY + viewH);
 
 		grid(graphics);
@@ -169,6 +197,83 @@ public class MapScreen extends AriseScreen {
 		graphics.outline(viewX, viewY, viewW, viewH, AriseTheme.LINE);
 
 		hover(graphics, mouseX, mouseY);
+	}
+
+	/**
+	 * Il terreno: si disegna, e si chiede quello che manca.
+	 *
+	 * <p>Le due cose stanno insieme di proposito. Cio' che serve chiedere e' esattamente cio' che si
+	 * sta per disegnare, e qualunque altro posto da cui farlo — un battito, un evento di
+	 * trascinamento — dovrebbe rifare gli stessi conti sperando di ottenere gli stessi numeri.
+	 *
+	 * <p>Sopra l'ultimo livello di dettaglio non si disegna niente: alla scala in cui il mondo
+	 * intero sta in una finestra, il terreno sarebbe una tinta uniforme pagata con migliaia di
+	 * riquadri. Vedi {@code MapTiles#lodFor}.
+	 */
+	private void terrain(GuiGraphicsExtractor graphics, int lod) {
+		if (lod < 0) {
+			return;
+		}
+
+		canvas.draw(graphics, projection, lod, viewX, viewY, viewW, viewH);
+		TerrainTiles.askFor(lod, needed(lod));
+	}
+
+	/**
+	 * Gli indici dei riquadri che coprono la finestra, dal centro verso fuori.
+	 *
+	 * <p>L'ordine conta: il server ne dipinge pochi alla volta, quindi i primi della lista sono
+	 * quelli che si vedono davvero prima. Dal centro verso fuori e' l'ordine giusto perche' e' dove
+	 * si sta guardando — riempire da un angolo darebbe una mappa che si completa dalla parte
+	 * sbagliata.
+	 */
+	private List<Integer> needed(int lod) {
+		int minX = MapTiles.tileOf(projection.toWorldX(0), lod);
+		int maxX = MapTiles.tileOf(projection.toWorldX(viewW), lod);
+		int minZ = MapTiles.tileOf(projection.toWorldZ(0), lod);
+		int maxZ = MapTiles.tileOf(projection.toWorldZ(viewH), lod);
+
+		int centreTileX = MapTiles.tileOf(projection.centreX(), lod);
+		int centreTileZ = MapTiles.tileOf(projection.centreZ(), lod);
+
+		record Wanted(int x, int z, int distance) {
+		}
+
+		List<Wanted> found = new ArrayList<>();
+
+		for (int tz = minZ; tz <= maxZ; tz++) {
+			for (int tx = minX; tx <= maxX; tx++) {
+				if (TerrainTiles.get(lod, tx, tz) != null) {
+					continue;
+				}
+
+				found.add(new Wanted(tx, tz,
+						Math.abs(tx - centreTileX) + Math.abs(tz - centreTileZ)));
+			}
+		}
+
+		found.sort(java.util.Comparator.comparingInt(Wanted::distance));
+
+		List<Integer> flat = new ArrayList<>(found.size() * 2);
+		for (Wanted wanted : found) {
+			flat.add(wanted.x());
+			flat.add(wanted.z());
+		}
+
+		return flat;
+	}
+
+	/**
+	 * Alla chiusura si libera la texture.
+	 *
+	 * <p>E' l'unica risorsa di tutta la mod che sta fuori dalla memoria di Java, quindi e' l'unica
+	 * che il raccoglitore non recupera da solo. Una mappa aperta e chiusa cinquanta volte in un
+	 * pomeriggio lascerebbe cinquanta texture sulla scheda video.
+	 */
+	@Override
+	public void removed() {
+		canvas.close();
+		super.removed();
 	}
 
 	/** Il reticolo, con le coordinate sul bordo e gli assi dello spawn un po' più chiari. */
@@ -234,6 +339,31 @@ public class MapScreen extends AriseScreen {
 	 * nomi scritti al volo si sarebbero scritti l'uno sopra l'altro. Si raccolgono le etichette e
 	 * si piazzano tutte insieme in {@link #placeLabels}, che le impila quando si toccano.
 	 */
+	/**
+	 * L'ingombro vero della citta', quando c'e' abbastanza scala per vederlo.
+	 *
+	 * <p>Un pip da quattro pixel dice «qui c'e' una citta'» e non dice quanto e' grande: su una mappa
+	 * che copre sessantamila blocchi, cinquecentododici blocchi di lato <em>sono</em> quattro pixel,
+	 * e le cinque citta' sembravano cinque puntini identici — che e' esattamente cio' che si e'
+	 * notato provandola. Avvicinandosi, il quadrato si apre e la citta' diventa un posto con dei
+	 * confini.
+	 *
+	 * <p>Sotto gli otto pixel non si disegna: un rettangolo di due pixel per due sovrapposto al pip
+	 * non aggiunge niente e lo sporca soltanto.
+	 */
+	private void footprint(GuiGraphicsExtractor graphics, int centreX, int centreY, int color) {
+		int side = (int) Math.round(data.citySize() / projection.scale());
+
+		if (side < 8) {
+			return;
+		}
+
+		int half = side / 2;
+		graphics.fill(centreX - half, centreY - half, centreX + half, centreY + half,
+				AriseTheme.alpha(color, 0x22));
+		graphics.outline(centreX - half, centreY - half, side, side, AriseTheme.alpha(color, 0x88));
+	}
+
 	private void cities(GuiGraphicsExtractor graphics) {
 		List<Label> labels = new ArrayList<>();
 
@@ -246,6 +376,7 @@ public class MapScreen extends AriseScreen {
 			if (projection.onScreen(sx, sy, 0)) {
 				int x = viewX + (int) Math.round(sx);
 				int y = viewY + (int) Math.round(sy);
+				footprint(graphics, x, y, color);
 				square(graphics, x, y, 4, color, city.built());
 				labels.add(new Label(x - font.width(name) / 2, y + 6, font.width(name), name, AriseTheme.TEXT));
 				continue;

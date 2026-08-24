@@ -19,12 +19,28 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
  * cambiato un numero solo qui.
  */
 public record CityConfig(
-		/** Coordinata X della prima città. Lontano dallo spawn: nessuno costruisce laggiù. */
+		/**
+		 * Coordinata X del <strong>centro dell'anello</strong> su cui stanno le cinque città.
+		 *
+		 * <p>Lontano dallo spawn: nessuno costruisce laggiù.
+		 */
 		int originX,
-		/** Coordinata Z di tutte le città: stanno in fila. */
+		/** Coordinata Z del centro dell'anello. */
 		int originZ,
-		/** Distanza fra una città e la successiva. */
-		int spacing,
+		/**
+		 * Raggio dell'anello: quanto ogni città dista dal centro della costellazione.
+		 *
+		 * <p>Prima le città stavano <strong>in fila</strong>: stessa Z, X a distanza fissa. Nessuno
+		 * se ne era accorto finché non è esistita una mappa da guardare, e sulla mappa erano cinque
+		 * punti allineati come i buchi di una scheda perforata — che è l'aspetto di una cosa
+		 * generata, non di un mondo. Su un anello ogni città ha una direzione sua, le distanze fra
+		 * l'una e l'altra non sono più tutte uguali, e il viaggio fra due Associazioni comincia ad
+		 * avere una geografia.
+		 *
+		 * <p>Ventimila blocchi: le città adiacenti restano a circa ventitremila l'una dall'altra,
+		 * poco più di prima, e le opposte a quarantamila.
+		 */
+		int ringRadius,
 		/**
 		 * Lato della città, in blocchi.
 		 *
@@ -67,21 +83,21 @@ public record CityConfig(
 		/**
 		 * Quanto si aspetta fra due usi del Sigillo dell'Associazione.
 		 *
-		 * <p>Cinque minuti. Le citta' stanno a duecentomila blocchi dallo spawn e a quindicimila
-		 * l'una dall'altra: senza un modo di raggiungerle il viaggio fra Associazioni e' una rete
+		 * <p>Cinque minuti. Le citta' stanno a duecentomila blocchi dallo spawn e a decine di
+		 * migliaia l'una dall'altra sull'anello: senza un modo di raggiungerle il viaggio fra Associazioni e' una rete
 		 * il cui primo nodo non si raggiunge, e con un modo <em>istantaneo</em> il mondo smette di
 		 * avere distanze. L'attesa e' cio' che tiene in piedi tutte e due le cose.
 		 */
 		int sealCooldownTicks) {
 
 	public static final CityConfig DEFAULT =
-			new CityConfig(200000, 200000, 15000, 512, 32, 6, 60000, 8, true, MarketConfig.DEFAULT,
+			new CityConfig(200000, 200000, 20000, 512, 32, 6, 60000, 8, true, MarketConfig.DEFAULT,
 					6000);
 
 	public static final Codec<CityConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.INT.fieldOf("origin_x").forGetter(CityConfig::originX),
 			Codec.INT.fieldOf("origin_z").forGetter(CityConfig::originZ),
-			Codec.INT.fieldOf("spacing").forGetter(CityConfig::spacing),
+			Codec.INT.fieldOf("ring_radius").forGetter(CityConfig::ringRadius),
 			Codec.INT.fieldOf("size").forGetter(CityConfig::size),
 			Codec.INT.fieldOf("block_size").forGetter(CityConfig::blockSize),
 			Codec.INT.fieldOf("road_width").forGetter(CityConfig::roadWidth),
@@ -92,22 +108,42 @@ public record CityConfig(
 			Codec.INT.fieldOf("seal_cooldown_ticks").forGetter(CityConfig::sealCooldownTicks)
 	).apply(instance, CityConfig::new));
 
-	/** L'angolo nord-ovest della città. */
-	public int cityX(City city) {
-		return originX + city.index() * spacing;
-	}
+	/**
+	 * Di quanto è ruotata la costellazione.
+	 *
+	 * <p>Venticinque gradi, ed è un numero scelto per esclusione. Le città sono cinque, quindi
+	 * stanno a settantadue gradi l'una dall'altra: con lo sfasamento a zero la prima cade
+	 * esattamente a est del centro, con diciotto la seconda cade esattamente a nord. Una
+	 * costellazione con anche un solo punto perfettamente su un asse è la cosa che fa sembrare tutto
+	 * disegnato con un righello — che è il difetto da cui l'anello è nato. Venticinque non allinea
+	 * nessuna delle cinque.
+	 *
+	 * <p>C'è una prova che lo verifica, e non è pedanteria: è esattamente il genere di dettaglio che
+	 * un giorno qualcuno arrotonda a zero per farlo sembrare più pulito.
+	 */
+	private static final double RING_PHASE = Math.toRadians(25.0);
 
-	public int cityZ(City city) {
-		return originZ;
+	/** Dove sta una città sull'anello, in radianti. */
+	private double angle(City city) {
+		return RING_PHASE + city.index() * (2.0 * Math.PI / City.values().length);
 	}
 
 	/** Il centro della città: dove sta la piazza, e quindi l'Associazione. */
 	public int centreX(City city) {
-		return cityX(city) + size / 2;
+		return originX + (int) Math.round(Math.cos(angle(city)) * ringRadius);
 	}
 
 	public int centreZ(City city) {
-		return cityZ(city) + size / 2;
+		return originZ + (int) Math.round(Math.sin(angle(city)) * ringRadius);
+	}
+
+	/** L'angolo nord-ovest della città: il centro, meno mezzo lato. */
+	public int cityX(City city) {
+		return centreX(city) - size / 2;
+	}
+
+	public int cityZ(City city) {
+		return centreZ(city) - size / 2;
 	}
 
 	/** Lato interno di un isolato, strada esclusa. */

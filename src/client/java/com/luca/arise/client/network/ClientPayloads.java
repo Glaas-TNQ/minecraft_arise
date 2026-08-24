@@ -41,6 +41,13 @@ public final class ClientPayloads {
 				context.client().execute(() -> Minecraft.getInstance().setScreenAndShow(
 						new MapScreen(payload))));
 
+		// I riquadri di terreno arrivano quando sono pronti, uno per volta, e non aprono niente:
+		// la mappa e' gia' aperta e si accorge da sola che c'e' qualcosa di nuovo da dipingere.
+		ClientPlayNetworking.registerGlobalReceiver(com.luca.arise.network.MapTilePayload.TYPE,
+				(payload, context) -> context.client().execute(() ->
+						com.luca.arise.client.map.TerrainTiles.put(payload.lod(), payload.tileX(),
+								payload.tileZ(), payload.colours())));
+
 		// Il Quartiere del Mercato: dietro un bancone c'e' una persona, e cliccarla deve aprire la
 		// schermata giusta senza che nessuno debba ricordarsi quale tasto fosse.
 		ClientPlayNetworking.registerGlobalReceiver(OpenScreenPayload.TYPE, (payload, context) ->

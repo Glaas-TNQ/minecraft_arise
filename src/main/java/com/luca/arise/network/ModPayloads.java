@@ -1,5 +1,7 @@
 package com.luca.arise.network;
 
+import java.util.List;
+
 import com.luca.arise.ability.AbilityManager;
 import com.luca.arise.city.CityManager;
 import com.luca.arise.gate.GateEntity;
@@ -33,10 +35,13 @@ public final class ModPayloads {
 		PayloadTypeRegistry.serverboundPlay().register(CityTravelPayload.TYPE, CityTravelPayload.STREAM_CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(ShopActionPayload.TYPE, ShopActionPayload.STREAM_CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(GemActionPayload.TYPE, GemActionPayload.STREAM_CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(MapTileRequestPayload.TYPE,
+				MapTileRequestPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(GateOfferPayload.TYPE, GateOfferPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(CityListPayload.TYPE, CityListPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(OpenScreenPayload.TYPE, OpenScreenPayload.STREAM_CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(MapPayload.TYPE, MapPayload.STREAM_CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(MapTilePayload.TYPE, MapTilePayload.STREAM_CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(SpendPointPayload.TYPE, (payload, context) -> {
 			// Esecuzione esplicita sul thread del server: tocchiamo attributi e attachment, che
@@ -162,6 +167,28 @@ public final class ModPayloads {
 				}
 			});
 		});
+
+		// I riquadri di terreno. Il gestore non fa niente di pesante: mette in coda e torna. Il
+		// calcolo vero sta su un thread suo, vedi TerrainAtlas.
+		ServerPlayNetworking.registerGlobalReceiver(MapTileRequestPayload.TYPE, (payload, context) ->
+				context.server().execute(() -> {
+					ServerPlayer player = context.player();
+
+					// La mappa si apre con i Gate, e i riquadri sono la mappa: senza questa riga un
+					// client modificato potrebbe far dipingere il mondo al server prima ancora del
+					// risveglio, che e' l'unica cosa cara di tutto il sistema.
+					if (!com.luca.arise.quest.QuestManager.has(player,
+							com.luca.arise.quest.Unlock.GATES)) {
+						return;
+					}
+
+					List<Integer> tiles = payload.tiles();
+
+					for (int i = 0; i + 1 < tiles.size(); i += 2) {
+						com.luca.arise.map.TerrainAtlas.request(player, payload.lod(),
+								tiles.get(i), tiles.get(i + 1));
+					}
+				}));
 
 		ServerPlayNetworking.registerGlobalReceiver(CityTravelPayload.TYPE, (payload, context) ->
 				context.server().execute(() -> {

@@ -316,6 +316,7 @@
   "arise.msg.loot.scroll": "System scroll: +%s stat points.",
   "arise.msg.mana.balance": "MP: %s/%s.",
   "arise.msg.mana.filled": "MP restored: %s.",
+  "arise.msg.map.bench": "Measuring %s map tiles at level %s (%s blocks each). The result goes to the server log.",
   "arise.msg.map.gate_asleep": "dormant (chunk unloaded)",
   "arise.msg.map.gate_awake": "awake",
   "arise.msg.map.gate_line": "Gate %1$s (%2$s) at %3$s %4$s %5$s — %6$s blocks away, %7$ss left, %8$s",

@@ -21,7 +21,19 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
  * riconciliato, quando si preme il tasto — non si tiene sincronizzato di continuo, perché una
  * mappa aperta dieci secondi al giorno non vale un pacchetto al secondo.
  */
-public record MapPayload(List<CityMark> cities, List<GateMark> gates) implements CustomPacketPayload {
+public record MapPayload(
+		List<CityMark> cities,
+		List<GateMark> gates,
+		/**
+		 * Il lato di una citta', in blocchi.
+		 *
+		 * <p>Viaggia in rete invece di essere letto dalla config del client, per una ragione che
+		 * vale per tutta la mod: la config che conta e' quella del server. Su un server con le
+		 * citta' ingrandite, un client con i valori di serie disegnerebbe cinque quadrati della
+		 * misura sbagliata — e li disegnerebbe con la stessa sicurezza di quelli giusti. Un intero
+		 * in piu' nel pacchetto costa un byte.
+		 */
+		int citySize) implements CustomPacketPayload {
 
 	/** Una città sulla mappa: dov'è il centro, e se è già sorta. */
 	public record CityMark(City city, int x, int z, boolean built) {
@@ -62,6 +74,7 @@ public record MapPayload(List<CityMark> cities, List<GateMark> gates) implements
 			StreamCodec.composite(
 					CityMark.STREAM_CODEC.apply(ByteBufCodecs.list()), MapPayload::cities,
 					GateMark.STREAM_CODEC.apply(ByteBufCodecs.list()), MapPayload::gates,
+					ByteBufCodecs.VAR_INT, MapPayload::citySize,
 					MapPayload::new);
 
 	public MapPayload {
