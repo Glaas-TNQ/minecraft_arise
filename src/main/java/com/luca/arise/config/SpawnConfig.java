@@ -33,6 +33,14 @@ public record SpawnConfig(
 		double rankDownChance,
 		/** Quanti tentativi di posizionamento prima di rinunciare a questo giro. */
 		int placementAttempts,
+		/**
+		 * Quanto si aspetta fra due usi della Chiave del Varco.
+		 *
+		 * <p>Mezzo minuto. Non e' un razionamento — la Chiave sparisce da sola quando il primo varco
+		 * e' chiuso — ma un freno: senza, il tasto destro tenuto premuto aprirebbe un varco a ogni
+		 * clic, e dodici porte in un prato non insegnano niente a nessuno.
+		 */
+		int keyCooldownTicks,
 		/** Cosa succede a un varco che nessuno chiude, e quali varchi si sigillano. */
 		Hazard hazard) {
 
@@ -48,6 +56,7 @@ public record SpawnConfig(
 			Codec.DOUBLE.fieldOf("rank_up_chance").forGetter(SpawnConfig::rankUpChance),
 			Codec.DOUBLE.fieldOf("rank_down_chance").forGetter(SpawnConfig::rankDownChance),
 			Codec.INT.fieldOf("placement_attempts").forGetter(SpawnConfig::placementAttempts),
+			Codec.INT.fieldOf("key_cooldown_ticks").forGetter(SpawnConfig::keyCooldownTicks),
 			Hazard.CODEC.fieldOf("hazard").forGetter(SpawnConfig::hazard)
 	).apply(instance, SpawnConfig::new));
 
@@ -59,7 +68,8 @@ public record SpawnConfig(
 	 * una sessione lunga in un posto solo diventi un campo di varchi.
 	 */
 	public static final SpawnConfig DEFAULT =
-			new SpawnConfig(true, 600, 0.06, 2, 200, 48, 160, 6000, 0.15, 0.35, 12, Hazard.DEFAULT);
+			new SpawnConfig(true, 600, 0.06, 2, 200, 48, 160, 6000, 0.15, 0.35, 12, 600,
+					Hazard.DEFAULT);
 
 	/**
 	 * Le due cose che possono andare storte con un varco: ignorarlo, e attraversarlo.

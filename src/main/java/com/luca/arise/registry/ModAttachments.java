@@ -10,6 +10,7 @@ import com.luca.arise.gate.GateRegistry;
 import com.luca.arise.gate.MobAffix;
 import com.luca.arise.gate.ReturnPoint;
 import com.luca.arise.gear.PlayerGear;
+import com.luca.arise.mana.Mana;
 import com.luca.arise.shop.ShopStock;
 import com.luca.arise.tutorial.PlayerTutorial;
 import com.luca.arise.progress.PlayerProgress;
@@ -191,6 +192,23 @@ public final class ModAttachments {
 			.buildAndRegister(AriseMod.id("cooldowns"));
 
 	/**
+	 * La riserva di Mana.
+	 *
+	 * <p>Persistente, {@code copyOnDeath} e sincronizzata: tutte e tre servono. Persistente perche'
+	 * una riserva che si riempie da sola a ogni riavvio non e' una risorsa; {@code copyOnDeath}
+	 * perche' morire ha gia' il suo prezzo e non deve averne uno nascosto; sincronizzata perche'
+	 * la barra e' sull'HUD, e una barra che non sa quanto Mana c'e' non serve a niente.
+	 *
+	 * <p>Il massimo non sta qui dentro: si ricava dal livello. Vedi {@link Mana}.
+	 */
+	public static final AttachmentType<Mana> MANA = AttachmentRegistry.<Mana>builder()
+			.initializer(() -> Mana.INITIAL)
+			.persistent(Mana.CODEC)
+			.copyOnDeath()
+			.syncWith(Mana.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+			.buildAndRegister(AriseMod.id("mana"));
+
+	/**
 	 * A che punto e' il giocatore con la prima ora: il saluto e il discorso dell'Araldo.
 	 *
 	 * <p>Persiste e sopravvive alla morte, come tutto il resto — un tutorial che ricomincia perche'
@@ -255,7 +273,7 @@ public final class ModAttachments {
 	 */
 	private static final List<AttachmentType<?>> SYNCED = List.of(
 			PROGRESS, ARMY, QUESTS, GEAR, SHOP, SUMMONED, DOWNTIME, SQUAD, ORDERS, STANCE,
-			COOLDOWNS, ABYSS, DAILY);
+			COOLDOWNS, ABYSS, DAILY, MANA);
 
 	private ModAttachments() {
 	}

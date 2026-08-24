@@ -76,6 +76,16 @@ public final class ModItems {
 			register("association_seal", Rarity.RARE, 1, AssociationSealItem::new);
 
 	/**
+	 * La Chiave del Varco: apre un Gate di rango E dove sei.
+	 *
+	 * <p>In copia unica e non impilabile, come il Sigillo: non e' una scorta, e' un attrezzo. Arriva
+	 * con l'incarico che concede i Gate e la catena se la riprende quando il primo varco e' chiuso —
+	 * per il perche' di quel prestito, vedi {@link com.luca.arise.gate.GateKeyItem}.
+	 */
+	public static final Item GATE_KEY =
+			register("gate_key", Rarity.UNCOMMON, 1, com.luca.arise.gate.GateKeyItem::new);
+
+	/**
 	 * La Pergamena del Rimpianto: restituisce i punti statistica spesi.
 	 *
 	 * <p>Impilabile fino a quattro, a differenza del Sigillo e della Bussola, perche' non e' una

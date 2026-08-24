@@ -6,6 +6,7 @@ import com.luca.arise.config.AbilityConfig;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.DailyConfig;
 import com.luca.arise.daily.DailyQuest;
+import com.luca.arise.mana.Mana;
 import com.luca.arise.progress.PlayerProgress;
 import com.luca.arise.quest.PlayerQuests;
 import com.luca.arise.quest.Quest;
@@ -43,6 +44,10 @@ public class SystemHudElement implements HudElement {
 	private static final int COLOR_TEXT = 0xFFE8F2FF;
 	private static final int COLOR_XP_TRACK = 0xFF1B2838;
 	private static final int COLOR_XP_FILL = 0xFF4FC3F7;
+
+	/** Il Mana: viola, che in questa mod e' gia' il colore di tutto cio' che e' potere del Monarca. */
+	private static final int COLOR_MANA_FILL = 0xFF8E7CFF;
+	private static final int COLOR_MANA_LOW = 0xFFE86A6A;
 	private static final int COLOR_POINTS = 0xFFFFD54F;
 	private static final int COLOR_SOULS = 0xFFFFD54F;
 	private static final int COLOR_STANCE = 0xFF9BA8B8;
@@ -78,6 +83,17 @@ public class SystemHudElement implements HudElement {
 	/** Accende o spegne il pannello. Torna lo stato nuovo, per poterlo dire. */
 	public static boolean toggle() {
 		shown = !shown;
+		return shown;
+	}
+
+	/**
+	 * Vero se l'HUD della mod si sta disegnando.
+	 *
+	 * <p>La leggono gli altri elementi: F6 deve spegnere <strong>tutto</strong> cio' che questa mod
+	 * mette sullo schermo, non solo il riquadro di sinistra. Chi preme quel tasto per uno screenshot
+	 * pulito non vuole tenersi il tracciato degli incarichi.
+	 */
+	public static boolean visible() {
 		return shown;
 	}
 
@@ -163,11 +179,18 @@ public class SystemHudElement implements HudElement {
 		// il pannello.
 		int daysOpen = openTasks();
 
+		// Il Mana compare con l'esercito e non prima: e' il primo momento in cui c'e' qualcosa da
+		// pagarci. Una barra che scende senza che nulla la faccia scendere e' un enigma.
+		boolean showMana = quests.has(Unlock.ARMY);
+		int manaMax = AriseConfig.get().abilities().mana().max(progress.level());
+		int manaNow = manaNow(manaMax);
+
 		// Righe: livello, soul coin, postura, più i punti da spendere, l'ordine in corso,
 		// l'incarico e la giornaliera, ciascuno solo quando c'è.
 		int lines = 3 + (progress.unspentPoints() > 0 ? 1 : 0) + (order == null ? 0 : 1)
 				+ (quest == null ? 0 : 1) + (daysOpen > 0 ? 1 : 0);
-		int height = PADDING * 2 + font.lineHeight * lines + PADDING + BAR_HEIGHT;
+		int height = PADDING * 2 + font.lineHeight * lines + PADDING + BAR_HEIGHT
+				+ (showMana ? font.lineHeight + BAR_HEIGHT + 2 : 0);
 
 		graphics.fill(MARGIN, MARGIN, MARGIN + PANEL_WIDTH, MARGIN + height, COLOR_PANEL);
 		graphics.horizontalLine(MARGIN, MARGIN + PANEL_WIDTH - 1, MARGIN, COLOR_BORDER);
@@ -219,6 +242,48 @@ public class SystemHudElement implements HudElement {
 		int filled = (int) ((barRight - barLeft) * fraction);
 		if (filled > 0) {
 			graphics.fill(barLeft, y, barLeft + filled, y + BAR_HEIGHT, COLOR_XP_FILL);
+		}
+
+		if (showMana) {
+			drawMana(graphics, font, y + BAR_HEIGHT + 2, barLeft, barRight, manaNow, manaMax);
+		}
+	}
+
+	/**
+	 * Quanto Mana ha adesso il client.
+	 *
+	 * <p>Il massimo lo calcola il client dalla config e dal livello, come gia' fa per la soglia
+	 * dell'esperienza e per i tempi di ricarica: non e' un dato che viaggia in rete. Il valore
+	 * corrente si', perche' quello nessuno puo' indovinarlo.
+	 *
+	 * <p>Finche' il primo battito del server non ha riempito la riserva, la barra si disegna piena:
+	 * e' cio' che sta per essere vero, e vedere una barra a zero per un quarto di secondo all'ingresso
+	 * sarebbe una bugia piu' grossa.
+	 */
+	private int manaNow(int max) {
+		LocalPlayer player = Minecraft.getInstance().player;
+		Mana mana = player == null ? null : player.getAttached(ModAttachments.MANA);
+
+		if (mana == null || mana.unset()) {
+			return max;
+		}
+
+		return Math.clamp(mana.current(), 0, max);
+	}
+
+	/** La barra del Mana, sotto quella dell'esperienza, col numero sopra. */
+	private void drawMana(GuiGraphicsExtractor graphics, Font font, int y, int left, int right,
+			int current, int max) {
+		graphics.text(font, Component.translatable("arise.hud.mana", current, max), left, y,
+				current * 4 < max ? COLOR_MANA_LOW : COLOR_TEXT);
+
+		int barY = y + font.lineHeight;
+		graphics.fill(left, barY, right, barY + BAR_HEIGHT, COLOR_XP_TRACK);
+
+		int filled = max <= 0 ? 0 : (int) ((long) (right - left) * current / max);
+		if (filled > 0) {
+			graphics.fill(left, barY, left + filled, barY + BAR_HEIGHT,
+					current * 4 < max ? COLOR_MANA_LOW : COLOR_MANA_FILL);
 		}
 	}
 

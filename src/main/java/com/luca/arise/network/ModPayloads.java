@@ -76,7 +76,7 @@ public final class ModPayloads {
 					case STANCE -> ShadowManager.cycleStance(player);
 					case ORDER_FOCUS -> ShadowManager.focus(player);
 					case ORDER_HOLD -> ShadowManager.hold(player);
-					case ABILITY_1, ABILITY_2, ABILITY_3, ABILITY_4 ->
+					case ABILITY_1, ABILITY_2, ABILITY_3, ABILITY_4, ABILITY_5 ->
 							AbilityManager.use(player, payload.action().ability());
 					case OPEN_GEAR -> null;
 					// La risposta e' la mappa; un messaggio arriva solo se non si puo' avere.

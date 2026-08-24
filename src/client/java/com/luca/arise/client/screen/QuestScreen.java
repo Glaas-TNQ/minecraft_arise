@@ -182,6 +182,36 @@ public class QuestScreen extends AriseScreen {
 		return y + lines * 11 + 6;
 	}
 
+	/**
+	 * I passi concreti, numerati.
+	 *
+	 * <p>Al posto del paragrafo del {@code brief}, che diceva le stesse cose in una frase sola: qui
+	 * c'e' spazio per l'elenco, e un elenco si scorre con gli occhi mentre un paragrafo si legge. Il
+	 * {@code brief} resta dov'e' la sua forma giusta, cioe' in chat.
+	 *
+	 * <p>Si ferma quando lo spazio finisce invece di scrivere sopra ai bottoni — e' la stessa
+	 * regola di {@link #paragraph}. Un passo che manca sta comunque nel tracciato sull'HUD.
+	 */
+	private int steps(GuiGraphicsExtractor graphics, Quest quest, int left, int right, int y) {
+		int number = 1;
+
+		for (Component step : quest.steps()) {
+			int lines = font.split(step, right - left - 10).size();
+
+			if (y + lines * 10 > bodyBottom() - 40) {
+				return y;
+			}
+
+			graphics.text(font, Component.literal(number + "."), left, y, AriseTheme.ACCENT);
+			graphics.textWithWordWrap(font, step, left + 10, y, right - left - 10, AriseTheme.TEXT);
+
+			y += lines * 10 + 2;
+			number++;
+		}
+
+		return y + 4;
+	}
+
 	private void drawDetail(GuiGraphicsExtractor graphics) {
 		int left = bodyLeft() + LIST_W + 12;
 		int right = bodyRight();
@@ -213,7 +243,7 @@ public class QuestScreen extends AriseScreen {
 
 		// Il perche' e il come, sotto al cosa. In chat scorrono via; qui restano.
 		y = paragraph(graphics, quest.lore(), left, right, y, AriseTheme.DISABLED);
-		y = paragraph(graphics, quest.brief(), left, right, y, AriseTheme.ACCENT);
+		y = steps(graphics, quest, left, right, y);
 
 		if (now) {
 			bar(graphics, left, y, right - left, 3,

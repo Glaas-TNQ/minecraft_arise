@@ -14,6 +14,7 @@ import java.util.function.UnaryOperator;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.config.ShadowConfig;
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.mana.ManaManager;
 import com.luca.arise.fx.Overlay;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.AriseAdvancements;
@@ -436,9 +437,11 @@ public final class ShadowManager {
 
 		ShadowDowntime downtime = downtime(player);
 		long now = player.level().getGameTime();
+		int manaCost = AriseConfig.get().abilities().mana().summonCost();
 
 		int spawned = 0;
 		int resting = 0;
+		boolean unpaid = false;
 
 		for (ShadowData shadow : callUp(player, army, config)) {
 			if (summoned.containsKey(shadow.id())) {
@@ -457,10 +460,26 @@ public final class ShadowManager {
 				continue;
 			}
 
+			// Il prezzo si paga per <em>ombra</em>, e si paga qui: prima dell'evocazione e non
+			// prima del giro, perche' quante ne partiranno davvero non si sa finche' non si e'
+			// tolto di mezzo chi e' gia' in campo e chi si sta riprendendo. Chi resta senza Mana a
+			// meta' schieramento manda in campo quelle che ha pagato, e lo sa.
+			if (!ManaManager.spend(player, manaCost)) {
+				unpaid = true;
+				continue;
+			}
+
 			if (spawn(player, shadow, summoned)) {
 				spawned++;
 				slots--;
+			} else {
+				ManaManager.refund(player, manaCost);
 			}
+		}
+
+		if (spawned == 0 && unpaid) {
+			return Component.translatable("arise.msg.shadow.no_mana", manaCost,
+					ManaManager.current(player));
 		}
 
 		if (spawned == 0) {
@@ -472,6 +491,10 @@ public final class ShadowManager {
 		playSummonSound(player);
 		syncSummoned(player, summoned);
 		refreshLegion(player);
+
+		if (unpaid) {
+			return Component.translatable("arise.msg.shadow.summoned_no_mana", spawned);
+		}
 
 		return resting > 0
 				? Component.translatable("arise.msg.shadow.summoned_partial", spawned, resting)
@@ -548,7 +571,17 @@ public final class ShadowManager {
 					shadow.get().displayName(), Math.max(1L, remaining / 20L));
 		}
 
+		// Stesso prezzo del tasto: chiamare una per volta dalla schermata non deve essere il modo
+		// di aggirare il Mana. E' l'unica ragione per cui questo controllo e' duplicato qui.
+		int manaCost = AriseConfig.get().abilities().mana().summonCost();
+
+		if (!ManaManager.spend(player, manaCost)) {
+			return Component.translatable("arise.msg.shadow.no_mana", manaCost,
+					ManaManager.current(player));
+		}
+
 		if (!spawn(player, shadow.get(), summoned)) {
+			ManaManager.refund(player, manaCost);
 			return Component.translatable("arise.msg.shadow.summon_failed");
 		}
 

@@ -1,5 +1,7 @@
 package com.luca.arise.quest;
 
+import java.util.List;
+
 import com.mojang.serialization.Codec;
 
 import net.minecraft.network.chat.Component;
@@ -53,8 +55,16 @@ public enum Quest implements StringRepresentable {
 	 */
 	THE_POWER("the_power", Objective.USE_ABILITY, 3, Unlock.GEAR, 200L, null, null,
 			"eye_of_darkness"),
-	/** Qualcosa addosso. */
-	EQUIPPED("equipped", Objective.EQUIP, 1, Unlock.GATES, 250L, null),
+	/**
+	 * Qualcosa addosso.
+	 *
+	 * <p>Il regalo e' la <strong>Chiave del Varco</strong>, e arriva qui perche' qui si ricevono i
+	 * Gate: l'incarico successivo chiede di chiuderne uno, e senza la Chiave quel compito non
+	 * dipende dal giocatore ma dal caso — i varchi si aprono da soli, ogni tanto. Vedi
+	 * {@code GateKeyItem} per il perche' non si consuma, e {@link #revokes()} per il perche'
+	 * sparisce.
+	 */
+	EQUIPPED("equipped", Objective.EQUIP, 1, Unlock.GATES, 250L, null, "gate_key"),
 	/** Il primo varco chiuso. */
 	FIRST_GATE("first_gate", Objective.CLEAR_GATE, 1, Unlock.SHOP, 400L, null),
 	/**
@@ -177,6 +187,22 @@ public enum Quest implements StringRepresentable {
 		return unique;
 	}
 
+	/**
+	 * L'oggetto che questo incarico <em>si riprende</em> completandosi, o {@code null}.
+	 *
+	 * <p>E' l'altra meta' di {@link #reward()}, e serve per una sola cosa: gli oggetti prestati per
+	 * insegnare. La Chiave del Varco esiste perche' il primo Gate non debba essere aspettato, e non
+	 * ha nessuna ragione di restare quando il primo Gate e' stato chiuso — da li' in poi i varchi
+	 * si trovano, si comprano o si aprono col Cubo, e ognuna di quelle strade costa qualcosa.
+	 *
+	 * <p>Un {@code switch} e non un campo del costruttore, come {@link #brief()}: un caso solo non
+	 * vale un nono argomento su diciotto righe di enum, e il giorno che ne servisse un secondo
+	 * questa e' la riga da guardare.
+	 */
+	public String revokes() {
+		return this == FIRST_GATE ? "gate_key" : null;
+	}
+
 	public Component title() {
 		return Component.translatable("arise.quest." + name);
 	}
@@ -214,6 +240,47 @@ public enum Quest implements StringRepresentable {
 			case THE_TRADE -> Component.translatable(briefKey(), key("shop"));
 			default -> Component.translatable(briefKey());
 		};
+	}
+
+	/**
+	 * I passi concreti, uno per riga, nell'ordine in cui vanno fatti.
+	 *
+	 * <p>E' la risposta al difetto piu' vecchio della catena, e non era la mancanza di parole:
+	 * {@link #brief()} le parole ce le aveva gia'. Era la <strong>forma</strong>. Un paragrafo dice
+	 * cinque cose in una frase, e chi lo legge a meta' non sa quale sia il prossimo gesto; un elenco
+	 * numerato dice cinque cose in cinque righe, e la prossima e' quella che si sta guardando.
+	 *
+	 * <p>Sono le stesse informazioni del {@code brief}, spezzate: il {@code brief} resta perche' e'
+	 * la forma giusta per la chat, dove un elenco di tre righe scorre via come una sola.
+	 *
+	 * <p>Gli argomenti sono {@link Component#keybind} dove si nomina un tasto, come nel
+	 * {@code brief}: un passo che dicesse «premi R» sarebbe falso per chiunque abbia rimappato.
+	 */
+	public List<Component> steps() {
+		return switch (this) {
+			case AWAKENING -> List.of(step(1), step(2));
+			case FIRST_STEPS -> List.of(step(1), step(2));
+			case THE_ARMY -> List.of(step(1), step(2));
+			case FIRST_SHADOW -> List.of(step(1), step(2, key("extract")), step(3, key("extract")));
+			case THE_POWER -> List.of(step(1), step(2, key("ability_1"), key("ability_4")), step(3));
+			case EQUIPPED -> List.of(step(1, key("gear")), step(2));
+			case FIRST_GATE -> List.of(step(1), step(2), step(3));
+			case THE_TRADE -> List.of(step(1, key("shop")), step(2));
+			case THE_ASSOCIATION -> List.of(step(1), step(2));
+			case THE_MARKET -> List.of(step(1), step(2));
+			case THE_MINT -> List.of(step(1), step(2));
+			case THE_SURPLUS -> List.of(step(1), step(2));
+			case THE_LURE -> List.of(step(1), step(2), step(3));
+			case THE_FUSION -> List.of(step(1), step(2));
+			case THE_FORGE -> List.of(step(1), step(2));
+			case THE_WELL -> List.of(step(1), step(2));
+			case THE_RECRUIT -> List.of(step(1, key("army")), step(2));
+			case THE_BROKER -> List.of(step(1), step(2));
+		};
+	}
+
+	private Component step(int number, Object... args) {
+		return Component.translatable("arise.quest." + name + ".step" + number, args);
 	}
 
 	private String briefKey() {

@@ -139,6 +139,8 @@ public final class QuestManager {
 			GearManager.grant(player, piece);
 		}
 
+		revoke(player, quest);
+
 		player.sendSystemMessage(Component.translatable("arise.msg.quest.completed", quest.title())
 				.withStyle(ChatFormatting.AQUA));
 		player.sendSystemMessage(Component.translatable("arise.msg.quest.unlocked",
@@ -293,6 +295,38 @@ public final class QuestManager {
 	 * gia' cosi' che i due si chiamano: {@code blueprint_soul_lure} apre {@code soul_lure}. Una
 	 * tabella in piu' sarebbe una tabella da tenere allineata a mano.
 	 */
+	/**
+	 * Si riprende l'oggetto prestato da un incarico, se ne aveva prestato uno.
+	 *
+	 * <p>Toglie <em>tutte</em> le copie e lo dice. Dirlo non e' cortesia: un oggetto che sparisce
+	 * dall'inventario senza una riga e' indistinguibile da un difetto, e il Cacciatore passerebbe
+	 * la sera a cercare la Chiave invece di andare a cercare un varco.
+	 *
+	 * <p>Il conto delle copie viene da {@code clearOrCountMatchingItems}, che e' lo stesso metodo
+	 * che usa {@code /clear}: guarda l'inventario intero, la griglia di lavorazione compresa —
+	 * dove un oggetto lasciato aperto un menu sarebbe altrimenti sopravvissuto.
+	 */
+	private static void revoke(ServerPlayer player, Quest quest) {
+		if (quest.revokes() == null) {
+			return;
+		}
+
+		net.minecraft.world.item.Item item = com.luca.arise.registry.ModItems.byPath(quest.revokes());
+
+		if (item == null) {
+			return;
+		}
+
+		int taken = player.getInventory().clearOrCountMatchingItems(
+				stack -> stack.is(item), Integer.MAX_VALUE, player.inventoryMenu.getCraftSlots());
+
+		if (taken > 0) {
+			player.sendSystemMessage(Component.translatable("arise.msg.quest.revoked",
+					item.getName(new net.minecraft.world.item.ItemStack(item)))
+					.withStyle(ChatFormatting.GRAY));
+		}
+	}
+
 	private static void unlockRecipe(ServerPlayer player, String reward) {
 		if (!reward.startsWith("blueprint_")) {
 			return;

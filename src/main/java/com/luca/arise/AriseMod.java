@@ -6,6 +6,7 @@ import com.luca.arise.event.CityEvents;
 import com.luca.arise.event.DailyEvents;
 import com.luca.arise.event.GearEvents;
 import com.luca.arise.event.GemEvents;
+import com.luca.arise.event.ManaEvents;
 import com.luca.arise.event.ProgressEvents;
 import com.luca.arise.event.QuestEvents;
 import com.luca.arise.event.ThresholdEvents;
@@ -58,6 +59,7 @@ public class AriseMod implements ModInitializer {
 		WorkshopEvents.register();
 		ThresholdEvents.register();
 		DailyEvents.register();
+		ManaEvents.register();
 		GateSpawner.register();
 		AriseCommands.register();
 

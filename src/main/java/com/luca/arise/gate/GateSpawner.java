@@ -86,7 +86,7 @@ public final class GateSpawner {
 			return;
 		}
 
-		trySpawn(level, player, spawn);
+		trySpawn(level, player, spawn, null);
 	}
 
 	/**
@@ -101,9 +101,29 @@ public final class GateSpawner {
 		}
 
 		SpawnConfig spawn = AriseConfig.get().gates().spawn();
-		return trySpawn(level, player, spawn)
+		return trySpawn(level, player, spawn, null)
 				? Component.translatable("arise.msg.gate.spawn_forced")
 				: Component.translatable("arise.msg.gate.spawn_failed");
+	}
+
+	/**
+	 * Apre un varco di un rango <em>preciso</em>, senza tirare nulla. E' quello che fa la Chiave.
+	 *
+	 * <p>Separata da {@link #spawnNow} perche' la differenza e' esattamente il tiro del rango: un
+	 * varco spontaneo si adegua al Cacciatore, uno aperto da un oggetto e' quello che l'oggetto
+	 * dice. Confonderle vorrebbe dire una Chiave del Varco di rango E che a volte apre un rango D.
+	 *
+	 * @return il messaggio da mostrare, o {@code null} se non c'era posto
+	 */
+	public static Component spawnRank(ServerPlayer player, Rank rank) {
+		if (!(player.level() instanceof ServerLevel level)) {
+			return null;
+		}
+
+		SpawnConfig spawn = AriseConfig.get().gates().spawn();
+		return trySpawn(level, player, spawn, rank)
+				? Component.translatable("arise.msg.gate.key_opened", rank.label())
+				: null;
 	}
 
 	/** Un giocatore idoneo: nell'Overworld, vivo, e senza gia' troppi varchi attorno. */
@@ -129,7 +149,8 @@ public final class GateSpawner {
 		return found.size();
 	}
 
-	private static boolean trySpawn(ServerLevel level, ServerPlayer player, SpawnConfig spawn) {
+	private static boolean trySpawn(ServerLevel level, ServerPlayer player, SpawnConfig spawn,
+			Rank forced) {
 		GateConfig gates = AriseConfig.get().gates();
 		RandomSource random = level.getRandom();
 
@@ -138,7 +159,7 @@ public final class GateSpawner {
 			return false;
 		}
 
-		Rank rank = rollRank(GearManager.hunterRank(player), random, spawn);
+		Rank rank = forced != null ? forced : rollRank(GearManager.hunterRank(player), random, spawn);
 		GateOffer offer = GateOffer.roll(gates, rank, random.nextLong());
 
 		GateEntity varco = ModEntities.GATE.create(level, EntitySpawnReason.EVENT);

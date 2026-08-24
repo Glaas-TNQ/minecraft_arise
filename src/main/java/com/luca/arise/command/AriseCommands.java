@@ -164,6 +164,19 @@ public final class AriseCommands {
 									.executes(context -> addSouls(context.getSource(),
 											IntegerArgumentType.getInteger(context, "quantita"))))));
 
+			// Il Mana. Senza il ramo "fill" ogni prova del volo comincia con dieci minuti di attesa,
+			// e ogni prova dell'esaurimento con un volo in tondo finche' non finisce.
+			root.then(Commands.literal("mana")
+					.executes(context -> showMana(context.getSource()))
+					.then(Commands.literal("fill")
+							.requires(AriseCommands::canCheat)
+							.executes(context -> fillMana(context.getSource())))
+					.then(Commands.literal("set")
+							.requires(AriseCommands::canCheat)
+							.then(Commands.argument("quantita", IntegerArgumentType.integer(0))
+									.executes(context -> setMana(context.getSource(),
+											IntegerArgumentType.getInteger(context, "quantita"))))));
+
 			LiteralArgumentBuilder<CommandSourceStack> gate = Commands.literal("gate");
 			for (Rank rank : Rank.values()) {
 				gate.then(Commands.literal(rank.getSerializedName())
@@ -786,6 +799,40 @@ public final class AriseCommands {
 		long souls = ProgressManager.souls(player);
 		source.sendSuccess(() -> Component.translatable("arise.msg.souls.balance", souls), false);
 		return (int) Math.min(Integer.MAX_VALUE, souls);
+	}
+
+	private static int showMana(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		int current = com.luca.arise.mana.ManaManager.current(player);
+		int max = com.luca.arise.mana.ManaManager.max(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.mana.balance", current, max), false);
+		return current;
+	}
+
+	private static int fillMana(CommandSourceStack source)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		com.luca.arise.mana.ManaManager.refill(player);
+		int max = com.luca.arise.mana.ManaManager.max(player);
+		source.sendSuccess(() -> Component.translatable("arise.msg.mana.filled", max), true);
+		return max;
+	}
+
+	private static int setMana(CommandSourceStack source, int amount)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		ServerPlayer player = source.getPlayerOrException();
+		int max = com.luca.arise.mana.ManaManager.max(player);
+		int wanted = Math.min(amount, max);
+
+		// Passando dal rimborso invece che scrivendo il valore: e' l'unico metodo che tiene conto
+		// del tetto e del respiro dopo la spesa, e un comando che scrivesse a mano un campo
+		// sarebbe la prima cosa a non accorgersi il giorno che quelle regole cambiano.
+		com.luca.arise.mana.ManaManager.spend(player, com.luca.arise.mana.ManaManager.current(player));
+		com.luca.arise.mana.ManaManager.refund(player, wanted);
+
+		source.sendSuccess(() -> Component.translatable("arise.msg.mana.balance", wanted, max), true);
+		return wanted;
 	}
 
 	private static int addSouls(CommandSourceStack source, int amount)

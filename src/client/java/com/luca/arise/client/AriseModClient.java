@@ -1,6 +1,7 @@
 package com.luca.arise.client;
 
 import com.luca.arise.AriseMod;
+import com.luca.arise.client.hud.QuestTrackerElement;
 import com.luca.arise.client.hud.SystemHudElement;
 import com.luca.arise.client.network.ClientPayloads;
 import com.luca.arise.client.render.MarkerRenderer;
@@ -27,6 +28,11 @@ public class AriseModClient implements ClientModInitializer {
 		// prevedibile anche se altre mod aggiungono elementi.
 		HudElementRegistry.attachElementAfter(VanillaHudElements.EXPERIENCE_LEVEL,
 				AriseMod.id("system_hud"), new SystemHudElement());
+
+		// Il tracciato dell'incarico, sul bordo destro. Dopo il riquadro del Sistema perche' lo
+		// interroga: F6 spegne tutti e due.
+		HudElementRegistry.attachElementAfter(VanillaHudElements.EXPERIENCE_LEVEL,
+				AriseMod.id("quest_tracker"), new QuestTrackerElement());
 
 		ModModelLayers.register();
 		EntityRendererRegistry.register(ModEntities.SHADOW, ShadowRenderer::new);

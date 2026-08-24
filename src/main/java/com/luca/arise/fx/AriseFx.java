@@ -184,6 +184,24 @@ public final class AriseFx {
 		play(level, position, ModSounds.SYSTEM_LEVEL_UP, 1.0F, 1.0F);
 	}
 
+	/**
+	 * Il volo si accende: un anello sotto i piedi, che e' l'unico posto dove si vede volando.
+	 *
+	 * <p>Sotto e non attorno di proposito. Chi vola guarda in basso; un effetto all'altezza della
+	 * testa sarebbe fuori dallo schermo nel momento esatto in cui deve dire «e' partito».
+	 */
+	public static void flightOn(ServerPlayer player) {
+		ServerLevel level = player.level();
+		Vec3 position = player.position();
+		FxConfig fx = config();
+
+		ring(level, position, 1.2, fx.scaled(28), dust(0x8E7CFF, 1.1F), 0.2);
+		level.sendParticles(ParticleTypes.END_ROD, position.x(), position.y() + 0.2, position.z(),
+				fx.scaled(12), 0.3, 0.1, 0.3, 0.02);
+
+		play(level, position, ModSounds.ABILITY_CAST, 0.7F, 1.5F);
+	}
+
 	/** Un'ombra cambia rango: l'anello prende il colore del rango nuovo. */
 	public static void rankUp(ServerLevel level, Vec3 position, Rank rank) {
 		FxConfig fx = config();

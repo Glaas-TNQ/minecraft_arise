@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import com.luca.arise.client.screen.AbyssShopScreen;
 import com.luca.arise.client.screen.ArmyScreen;
 import com.luca.arise.client.screen.StatusScreen;
+import com.luca.arise.client.hud.QuestTrackerElement;
 import com.luca.arise.client.hud.SystemHudElement;
 import com.luca.arise.client.screen.QuestScreen;
 import com.luca.arise.network.AriseActionPayload;
@@ -96,10 +97,27 @@ public final class AriseKeyMappings {
 	 */
 	public static final KeyMapping TOGGLE_HUD = register("toggle_hud", GLFW.GLFW_KEY_F6);
 
+	/**
+	 * Il tracciato dell'incarico: disteso, stretto, spento.
+	 *
+	 * <p>F7 accanto a F6 per la stessa ragione per cui F6 e' F6 — i due tasti che governano cio'
+	 * che si vede sullo schermo stanno insieme, e nessuno dei due dipende dal layout della tastiera.
+	 */
+	public static final KeyMapping TRACKER = register("tracker", GLFW.GLFW_KEY_F7);
+
 	public static final KeyMapping ABILITY_1 = register("ability_1", GLFW.GLFW_KEY_Z);
 	public static final KeyMapping ABILITY_2 = register("ability_2", GLFW.GLFW_KEY_X);
 	public static final KeyMapping ABILITY_3 = register("ability_3", GLFW.GLFW_KEY_C);
 	public static final KeyMapping ABILITY_4 = register("ability_4", GLFW.GLFW_KEY_V);
+
+	/**
+	 * Il volo. L, che vanilla lascia libero e che sta lontano da Z X C V.
+	 *
+	 * <p>Lontano di proposito: le altre quattro si premono in mischia, questa e' un interruttore
+	 * che si accende e si spegne. Un volo acceso per sbaglio mentre si combatte e' un Cacciatore
+	 * che si stacca da terra nel momento peggiore — e che paga Mana per farlo.
+	 */
+	public static final KeyMapping ABILITY_5 = register("ability_5", GLFW.GLFW_KEY_L);
 
 	private AriseKeyMappings() {
 	}
@@ -170,6 +188,14 @@ public final class AriseKeyMappings {
 				}
 			}
 
+			// Tre stati su un tasto solo: ogni pressione dice a voce quale si e' scelto, perche'
+			// «stretto» e «spento» si distinguono a colpo d'occhio ma «disteso» e «stretto» no —
+			// quando l'incarico corrente e' uno di quelli senza passi da elencare.
+			while (TRACKER.consumeClick()) {
+				client.player.sendSystemMessage(
+						QuestTrackerElement.announce(QuestTrackerElement.cycle()));
+			}
+
 			sendOnPress(SUMMON, AriseActionPayload.Action.SUMMON);
 			sendOnPress(RECALL, AriseActionPayload.Action.RECALL);
 			sendOnPress(STANCE, AriseActionPayload.Action.STANCE);
@@ -179,6 +205,7 @@ public final class AriseKeyMappings {
 			sendOnPress(ABILITY_2, AriseActionPayload.Action.ABILITY_2);
 			sendOnPress(ABILITY_3, AriseActionPayload.Action.ABILITY_3);
 			sendOnPress(ABILITY_4, AriseActionPayload.Action.ABILITY_4);
+			sendOnPress(ABILITY_5, AriseActionPayload.Action.ABILITY_5);
 		});
 	}
 

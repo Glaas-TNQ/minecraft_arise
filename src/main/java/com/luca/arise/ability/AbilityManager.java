@@ -6,6 +6,7 @@ import java.util.Map;
 import com.luca.arise.config.AbilityConfig;
 import com.luca.arise.config.AriseConfig;
 import com.luca.arise.fx.AriseFx;
+import com.luca.arise.mana.ManaManager;
 import com.luca.arise.progress.ProgressManager;
 import com.luca.arise.progress.StatThreshold;
 import com.luca.arise.quest.Objective;
@@ -81,11 +82,41 @@ public final class AbilityManager {
 		}
 
 		AbilityConfig config = AriseConfig.get().abilities();
+
+		// Il volo si paga da solo, dentro il suo gestore: e' l'unica abilita' che non e' un momento
+		// ma uno stato, e il suo costo continua dopo che questo metodo e' finito da un pezzo.
+		if (ability == Ability.SHADOW_FLIGHT) {
+			Component toggled = FlightManager.toggle(player);
+
+			if (toggled != null) {
+				player.setAttached(ModAttachments.COOLDOWNS,
+						cooldowns.with(ability, now + cooldownFor(player, ability, config)));
+			}
+
+			return toggled;
+		}
+
+		// Il Mana si spende prima dell'effetto e si rende se l'effetto non c'e' stato, come i soul
+		// coin. Prima dei soul coin no: quelli sono gia' stati tolti sopra, e un rifiuto per Mana
+		// dopo aver preso le anime sarebbe un prelievo per niente — per questo il rimborso delle
+		// anime sta anche su questo ramo.
+		int manaCost = config.mana().cost(ability);
+
+		if (!ManaManager.spend(player, manaCost)) {
+			if (ability.soulCost() > 0) {
+				ProgressManager.addSouls(player, ability.soulCost());
+			}
+
+			return Component.translatable("arise.msg.ability.no_mana", ability.label(), manaCost,
+					ManaManager.current(player));
+		}
+
 		Component result = switch (ability) {
 			case SHADOW_STEP -> shadowStep(player, config);
 			case SHADOW_EXCHANGE -> shadowExchange(player);
 			case MONARCH_DOMAIN -> monarchDomain(player, config);
 			case SOVEREIGN_AUTHORITY -> sovereignAuthority(player, config);
+			case SHADOW_FLIGHT -> null;   // gia' gestito sopra: qui non ci si arriva
 		};
 
 		// Il tempo di ricarica parte solo se l'abilità ha davvero fatto qualcosa: uno scambio
@@ -101,6 +132,8 @@ public final class AbilityManager {
 		if (ability.soulCost() > 0) {
 			ProgressManager.addSouls(player, ability.soulCost());
 		}
+
+		ManaManager.refund(player, manaCost);
 
 		return Component.translatable("arise.msg.ability.failed", ability.label());
 	}

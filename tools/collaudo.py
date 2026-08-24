@@ -233,6 +233,52 @@ for prefix, enum_path, suffixes in DYNAMIC:
                      "%s  (composta da %s)" % (key, os.path.basename(enum_path)))
 
 
+# ---------------------------------------------------------------- i passi degli incarichi
+# I passi non stanno nella tabella qui sopra perche' non sono un suffisso fisso: un incarico ne ha
+# due e un altro tre, e un elenco di suffissi uguale per tutti direbbe che ne mancano cinque o che
+# non ne manca nessuno. Qui si legge quanti ne dichiara davvero lo switch di Quest.steps(), e per
+# ciascuno si verificano <em>due</em> cose: che la stringa esista, e che il numero di argomenti che
+# il codice passa sia quello che la stringa aspetta. Un passo che nomina un tasto e ne passa uno solo
+# quando la stringa ne vuole due mostra "%2$s" in gioco, e non lo dice nessuno.
+quest_src = os.path.join(ROOT, "src/main/java/com/luca/arise/quest/Quest.java")
+
+if not os.path.exists(quest_src):
+    note("collaudo da aggiornare", "Quest.java non trovato")
+else:
+    quest_text = io.open(quest_src, encoding="utf-8").read()
+
+    serialized = dict(re.findall(r'^	([A-Z][A-Z_0-9]*)\("([a-z_0-9]+)"', quest_text, re.M))
+    cases = re.findall(r'^			case ([A-Z_0-9]+) -> List\.of\((.*)\);$', quest_text, re.M)
+
+    if not cases:
+        note("collaudo da aggiornare", "nessun passo estratto da Quest.steps()")
+
+    for constant, body in cases:
+        name = serialized.get(constant)
+
+        if name is None:
+            note("collaudo da aggiornare", "passo per %s, che non e' un incarico" % constant)
+            continue
+
+        for call in re.findall(r'step\(([^()]*(?:\([^()]*\))?[^()]*)\)', body):
+            parts = call.split(",", 1)
+            number = parts[0].strip()
+            passed = 0 if len(parts) == 1 else parts[1].count("key(")
+
+            key = "arise.quest.%s.step%s" % (name, number)
+
+            if key not in en:
+                note("traduzione mancante", "%s  (passo di %s)" % (key, constant))
+                continue
+
+            slots = en[key].count("%s") + len(re.findall(r"%\d\$s", en[key]))
+
+            if slots != passed:
+                note("argomenti che non tornano",
+                     "%s: il codice ne passa %s, la stringa ne aspetta %s  (Quest.steps)"
+                     % (key, passed, slots))
+
+
 # ---------------------------------------------------------------- suoni
 vanilla_sounds = vanilla_sound_files()
 sounds = read_json(os.path.join(A, "sounds.json"))

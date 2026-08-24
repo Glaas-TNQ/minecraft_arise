@@ -62,7 +62,8 @@ public record AriseActionPayload(Action action) implements CustomPacketPayload {
 		ABILITY_1("ability_1"),
 		ABILITY_2("ability_2"),
 		ABILITY_3("ability_3"),
-		ABILITY_4("ability_4");
+		ABILITY_4("ability_4"),
+		ABILITY_5("ability_5");
 
 		/** L'abilità legata a questa azione, oppure {@code null} se non è un'abilità. */
 		public com.luca.arise.ability.Ability ability() {
@@ -71,6 +72,7 @@ public record AriseActionPayload(Action action) implements CustomPacketPayload {
 				case ABILITY_2 -> com.luca.arise.ability.Ability.SHADOW_EXCHANGE;
 				case ABILITY_3 -> com.luca.arise.ability.Ability.MONARCH_DOMAIN;
 				case ABILITY_4 -> com.luca.arise.ability.Ability.SOVEREIGN_AUTHORITY;
+				case ABILITY_5 -> com.luca.arise.ability.Ability.SHADOW_FLIGHT;
 				default -> null;
 			};
 		}
