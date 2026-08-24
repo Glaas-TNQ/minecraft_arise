@@ -300,10 +300,33 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
    - **`damageSources().magic()` sta nel tag `bypasses_armor`**. Un colpo ad area scritto con quello
      ignora l'armatura, e con lei la Resistenza: `generic()` per un danno che l'armatura deve
      attutire, `mobAttack(chi)` quando c'e' un colpevole;
-   - **leggere l'altezza del terreno senza generarlo**: `level.getHeight(...)` pretende il chunk;
-     `level.getChunkSource().getGenerator().getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG,
-     level, randomState())` interroga il rumore e risponde subito. Venticinque campioni sparsi su
-     mezzo chilometro erano tredici secondi di server fermo.
+   - **leggere l'altezza del terreno senza generarlo**: `level.getHeight(...)` pretende il chunk —
+     venticinque campioni sparsi su mezzo chilometro erano tredici secondi di server fermo.
+     `getGenerator().getBaseHeight(x, z, Heightmap.Types.WORLD_SURFACE_WG, level, randomState())`
+     non genera niente, **ma non e' economico**: costa circa **7 ms a colonna**, perche' costruisce
+     una colonna di rumore intera con falde e interpolazione per restituire un numero. Va bene per
+     piazzare una struttura ogni tanto; per campionare a migliaia (una mappa, un'anteprima) sono
+     otto secondi ogni quattromila punti, cioe' il watchdog;
+   - **campionare il terreno a migliaia**: si scende di un piano, a
+     `level.getChunkSource().randomState().sampler().sample(quartX, quartY, quartZ)` — i sei rumori
+     del clima in una chiamata, **29 µs**. Da li' il bioma si ottiene senza ricampionare con
+     `((MultiNoiseBiomeSource) biomeSource).getNoiseBiome(targetPoint)`, la profondita' del mare
+     dalla continentalita', e il rilievo dal **dislivello** della `depth()` fra campioni vicini —
+     letta a quota fissa, perche' e' una funzione di quanto si e' sotto la superficie e a quota
+     variabile darebbe lo stesso numero dappertutto. Il confronto misurato: 7867 ms contro 118 ms
+     per lo stesso riquadro da 4096 campioni;
+   - `ServerLevel.getSharedSpawnPos()` **non esiste piu'**: e' `getRespawnData().pos()`;
+   - **`GuiGraphicsExtractor.blit(Identifier, ...)` a nove argomenti vuole gli angoli**, non la
+     misura: `(id, x0, y0, x1, y1, u0, u1, v0, v1)`. Le altre sovrapposizioni ne vogliono quattro
+     con larghezza e altezza, e scambiarle non da' nessun errore — da' una texture disegnata fin
+     dove capita;
+   - **`TextureManager.release(id)` chiude gia' la texture**. Chiuderla anche a mano libera due
+     volte lo stesso puntatore nativo: non un'eccezione di Java, un processo che se ne va;
+   - `NativeImage.setPixelABGR(x, y, abgr)` pretende il formato RGBA, e vuole i byte in
+     quell'ordine — da un ARGB si scambiano rosso e blu;
+   - **`Climate.TargetPoint` sono `long` decimillesimi**, non `float`: `continentalness()` a
+     `-10000` e' mare aperto, e un dislivello vero di `depth()` fra due campioni vicini sta nelle
+     centinaia;
 3. **La compilazione non è una verifica.** Un sistema è "fatto" quando lo si è visto
    funzionare in `runClient`. Vale soprattutto per AI delle ombre, generazione dungeon e HUD.
 
@@ -450,6 +473,19 @@ Il jar finale finisce in `build/libs/arise-<versione>.jar` (ignora quello con su
 - [ ] **M2** — La mappa del mondo (tasto **M**): città, varchi aperti, tu; trascina/zoom, frecce
       sul bordo per ciò che sta fuori. Indice dei varchi `GateRegistry` riconciliato; `/arise map`,
       `/arise gate list` — *compilato, da verificare in gioco*
+
+- [ ] **G1** — Cinque cose trovate giocando, tutte e cinque chieste da Luca:
+      **il Mana** (riserva dal livello, rigenerazione contata sul tempo e non sui battiti, prezzo per
+      ogni evocazione e ogni abilità — prima chiamare l'esercito non costava niente e il tetto delle
+      evocazioni non serviva a nulla), il **Volo del Monarca** al livello 10 (tasto <kbd>L</kbd>,
+      otto MP al secondo, si cade quando finisce), la **Chiave del Varco** (l'incarico «chiudi un
+      varco» era un'attesa, non un compito: adesso il varco lo apri tu, e la catena si riprende la
+      chiave quando hai finito), i **passi degli incarichi** (ogni incarico dichiara cosa fare in
+      due o tre righe numerate, in un riquadro sul bordo destro — <kbd>F7</kbd>: disteso, stretto,
+      spento) e la **mappa vera**: terreno dipinto dal rumore del generatore senza toccare un chunk,
+      118 ms a riquadro dopo che la prima versione ne costava 7867, e le cinque città su un anello
+      invece che in fila. `/arise mana`, `/arise map bench` — *compilato, 115 prove verdi, collaudo
+      pulito, server verde su mondo nuovo; **da verificare in gioco***
 
 - [ ] **B-PRD** — la prima ondata del `PRD-arise.md`: **tredici blocchi e due meta' su diciassette** contro il
       silenzio dopo il diciottesimo incarico. **B0** le tre istruzioni che mentivano a chi rimappa,

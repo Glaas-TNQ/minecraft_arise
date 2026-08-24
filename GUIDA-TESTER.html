@@ -360,15 +360,135 @@
   <a href="#officina"><b>L'Officina</b>anime al lavoro</a>
   <a href="#incarichi"><b>I 18 incarichi</b>la catena completa</a>
   <a href="#comandi"><b>Comandi</b>per barare in collaudo</a>
-  <a href="#novita"><b>Nuovo stasera</b>otto cose mai provate</a>
+  <a href="#adesso"><b>Nuovo adesso</b>MP, volo, mappa vera</a>
+  <a href="#novita"><b>Dal giro scorso</b>quello che non hai ancora provato</a>
   <a href="#collaudo"><b>Cosa guardare</b>e come segnalare</a>
 </nav>
 
+<!-- ══════════════════════════════════════════════════════════════ NUOVO ADESSO -->
+
+<h2 id="adesso">Nuovo adesso</h2>
+<p class="lede">Cinque cose, e le hai chieste tutte e cinque tu, giocando. Nessuna è ancora stata
+vista girare: sono la prima cosa da guardare.</p>
+
+<div class="panel warn">
+  <p class="callout-title">Le cinque</p>
+  <ol class="tight" style="margin-bottom: 0;">
+    <li><b>Il Mana</b> — evocare adesso costa. → <a href="#mana">qui sotto</a></li>
+    <li><b>Il Volo del Monarca</b>, al livello 10, tasto <kbd>L</kbd>. → <a href="#volo">qui sotto</a></li>
+    <li><b>La mappa mostra il mondo</b> — terreno vero, e le città non sono più in fila.
+    → <a href="#mappa">qui sotto</a></li>
+    <li><b>Gli incarichi dicono cosa fare</b>, passo per passo, in un riquadro sempre presente
+    (<kbd>F7</kbd>). → <a href="#passi">qui sotto</a></li>
+    <li><b>La Chiave del Varco</b> — il primo varco non si aspetta più. → <a href="#chiave">qui sotto</a></li>
+  </ol>
+</div>
+
+<h3 id="mana">Il Mana</h3>
+<p>Prima chiamare l'esercito era <b>gratis</b>. C'era un tetto a quante ombre stessero in campo
+insieme, ma niente impediva di richiamarle e rievocarle all'infinito — e finché evocare non costa
+niente, nessun'altra decisione conta.</p>
+<ul class="tight">
+  <li><b>Quanto ne hai:</b> 100 al primo livello, +10 per ogni livello. A 20 sono 290.</li>
+  <li><b>Quanto torna:</b> 6 al secondo, ma la rigenerazione si <b>ferma per due secondi</b> dopo
+  ogni spesa. È quello che rende il Mana una risorsa invece di un ritardo.</li>
+  <li><b>Quanto costa:</b> 25 a ombra evocata; 10 il Passo d'ombra, 20 lo Scambio, 45 il Dominio,
+  60 l'Autorità.</li>
+  <li><b>Dove si vede:</b> la barra viola nel riquadro in alto a sinistra, sotto quella
+  dell'esperienza. Diventa rossa sotto un quarto. Compare da quando ricevi l'esercito, non prima:
+  prima non c'è niente da pagarci.</li>
+</ul>
+<p>Se il Mana finisce a metà schieramento, le ombre che hai pagato escono lo stesso e il gioco te
+lo dice. <code>/arise mana</code> per il saldo, <code>/arise mana fill</code> per riempire.</p>
+
+<div class="panel">
+  <p class="callout-title">Cosa guardare</p>
+  <p>La taratura è un tiro al buio: 25 a ombra e 6 al secondo sono numeri scritti a tavolino.
+  Dimmi se evocare la squadra ti lascia a secco troppo spesso, o se non te ne accorgi mai — sono
+  due difetti diversi e tutti e due possibili. Stanno in <code>arise.json</code> sotto
+  <code>abilities → mana</code>, e <code>/arise config reload</code> li rilegge senza riavviare.</p>
+</div>
+
+<h3 id="volo">Il Volo del Monarca</h3>
+<p>Quinta abilità, <b>livello 10</b>, tasto <kbd>L</kbd>. Non è l'elytra e non è la creativa: è il
+volo della creativa <em>affittato</em>. Si accende pagando 20 MP, costa <b>8 MP al secondo</b>, e
+nell'istante in cui la riserva non basta più si spegne — dove ti trovi, che quasi sempre vuol dire
+in caduta.</p>
+<p>La caduta è voluta: è quello che rende il volo una decisione invece di uno stato. A livello 10
+hai 190 MP, cioè circa <b>venti secondi</b> di volo se parti pieno.</p>
+<p>Si spegne da solo quando muori, quando cambi dimensione e quando esci dal gioco. In creativa non
+tocca niente — lì voli già per conto tuo.</p>
+
+<div class="panel warn">
+  <p class="callout-title">Cosa guardare, e con attenzione</p>
+  <p>Questa è la cosa più facile da rompere di tutto il giro. Il permesso di volare è scritto sul
+  giocatore e <b>nessuno lo toglie da solo</b>: se resti in volo dopo essere morto, dopo essere
+  entrato in un varco, dopo un viaggio in città, o se ti ritrovi a volare senza aver premuto niente,
+  è un difetto serio e va segnalato subito. Prova apposta a morire mentre voli.</p>
+</div>
+
+<h3 id="mappa">La mappa, che adesso mostra il mondo</h3>
+<p>Prima era un rettangolo nero con un reticolo. Adesso <kbd>M</kbd> mostra il <b>terreno vero</b>:
+mari, coste, foreste, deserti, montagne, con il rilievo ombreggiato.</p>
+<p>Arriva a riquadri, e i riquadri il server li dipinge quando glieli chiedi: aprire la mappa in un
+posto mai visto vuol dire vederla <b>riempirsi per un secondo o due</b>, dal centro verso fuori. È
+voluto — l'alternativa era una schermata che si apre in ritardo.</p>
+<p>Sopra una certa distanza il terreno smette di disegnarsi e restano il reticolo e i segni: a quella
+scala sarebbe una tinta uniforme pagata con migliaia di riquadri.</p>
+<p><b>Le città non stanno più in fila.</b> Ci stavano davvero — stessa Z, in riga, come i buchi di
+una scheda perforata — e nessuno se n'era accorto finché non c'è stata una mappa da guardare. Adesso
+sono su un anello, e sulla mappa si vede la loro <b>impronta vera</b>: 512 blocchi di lato, non un
+puntino.</p>
+
+<div class="panel">
+  <p class="callout-title">Cosa guardare</p>
+  <ul class="tight" style="margin-bottom: 0;">
+    <li>Il terreno che vedi sulla mappa <b>corrisponde</b> a quello che hai attorno? Il mare è dove
+    c'è il mare?</li>
+    <li>Trascinando e zoomando, restano buchi che non si riempiono mai? (Chiudi e riapri: se si
+    riempiono, è un pacchetto perso e va detto.)</li>
+    <li>Il gioco scatta mentre la mappa si riempie?</li>
+    <li>Le cinque città formano un anello attorno al centro, non una riga.</li>
+  </ul>
+</div>
+
+<h3 id="passi">Gli incarichi dicono cosa fare</h3>
+<p>Le spiegazioni c'erano già ed erano giuste — ma le vedevi <b>una volta sola</b>, in chat, nel
+momento in cui l'incarico ti veniva assegnato. Il giorno dopo restava
+<code>Fai girare un macchinario 0/1</code>, che è un compito su cui ci si può fermare mezz'ora.</p>
+<p>Adesso ogni incarico dichiara i suoi <b>passi concreti</b>, numerati, e stanno in due posti: nel
+riquadro sul <b>bordo destro</b> dello schermo, e nella schermata <kbd>P</kbd>.</p>
+<p><kbd>F7</kbd> gira fra tre stati — <b>disteso</b> (titolo, barra, passi), <b>stretto</b> (titolo e
+barra), <b>spento</b> — e ogni pressione dice a voce quale hai scelto. <kbd>F6</kbd> spegne tutto
+quello che la mod disegna, tracciato compreso.</p>
+
+<div class="panel">
+  <p class="callout-title">Cosa guardare</p>
+  <p>I passi sono scritti leggendo il codice, come tutta questa guida. <b>Se un passo dice di fare
+  una cosa e in gioco quella cosa non funziona così, uno dei due ha un difetto</b> — ed è la
+  segnalazione più utile che tu possa mandare.</p>
+</div>
+
+<h3 id="chiave">La Chiave del Varco</h3>
+<p>Il settimo incarico dice «chiudi un varco», e i varchi si aprono da soli, ogni tanto, vicino a
+chi gioca. Non era un compito: era un'<b>attesa</b>. Potevi solo camminare finché il caso non
+decideva.</p>
+<p>Adesso l'incarico prima — quello che ti concede i Gate — ti consegna la <b>Chiave del Varco</b>.
+Clic destro e si apre un varco di rango E lì vicino. Mezzo minuto di ricarica fra un uso e
+l'altro.</p>
+<ul class="tight">
+  <li><b>Non si consuma all'uso.</b> Il primo varco è anche il primo posto dove puoi morire, e una
+  chiave a uso singolo trasformerebbe un tentativo andato male in un vicolo cieco.</li>
+  <li><b>Sparisce quando chiudi il primo varco</b>, e te lo dice in chat. Da lì in poi i varchi si
+  trovano nel mondo, si comprano dal Sensale o si aprono col Cubo dell'Abisso — tre strade che
+  costano qualcosa.</li>
+</ul>
+
 <!-- ══════════════════════════════════════════════════════════════ NOVITÀ -->
 
-<h2 id="novita">Nuovo stasera</h2>
-<p class="lede">Quindici blocchi aggiunti oggi. Nessuno di questi è mai stato visto girare in gioco: se
-guardi una cosa sola, guarda queste.</p>
+<h2 id="novita">Dal giro scorso</h2>
+<p class="lede">Quindici blocchi, e quasi niente di tutto questo è ancora stato visto girare in
+gioco. Se hai già guardato le cinque qui sopra, guarda queste.</p>
 
 <div class="panel warn">
   <p class="callout-title">In ordine di quanto vale provarli</p>
@@ -702,7 +822,8 @@ Sistema conceda quel sistema risponde con una riga in chat invece di aprire una 
   <div class="key"><span class="k"><kbd>N</kbd></span><span class="d">Equipaggiamento<small>le caselle del Cacciatore, lo zaino, lo spazio dimensionale</small></span></div>
   <div class="key"><span class="k"><kbd>O</kbd></span><span class="d">Abyss Shop<small>si apre ovunque: è una finestra del Sistema</small></span></div>
   <div class="key"><span class="k"><kbd>M</kbd></span><span class="d">Mappa del mondo<small>città, varchi aperti, tu</small></span></div>
-  <div class="key"><span class="k"><kbd>F6</kbd></span><span class="d">Mostra/nascondi il pannello<small>per uno screenshot pulito, o se qualcosa va storto</small></span></div>
+  <div class="key"><span class="k"><kbd>F6</kbd></span><span class="d">Mostra/nascondi tutto<small>il pannello e il tracciato: per uno screenshot pulito, o se qualcosa va storto</small></span></div>
+  <div class="key"><span class="k"><kbd>F7</kbd></span><span class="d">Tracciato incarico<small>disteso → stretto → spento; il riquadro sul bordo destro</small></span></div>
 </div>
 
 <h3>Comandare</h3>
@@ -717,21 +838,23 @@ Sistema conceda quel sistema risponde con una riga in chat invece di aprire una 
 
 <h3>Abilità</h3>
 <p style="color: var(--muted); font-size: 14.5px; margin-top: -4px;">Non si equipaggiano e non si
-scelgono: sono quattro, sempre queste, e si accendono da sole al livello scritto. <b>Nessuna
-infligge danno</b> — sono movimento, potenziamento e controllo.</p>
+scelgono: sono cinque, sempre queste, e si accendono da sole al livello scritto. <b>Nessuna
+infligge danno</b> — sono movimento, potenziamento e controllo. Tutte costano <b>MP</b>, e il
+Dominio e l'Autorità costano anche soul coin.</p>
 <div class="scroll">
 <table>
-  <thead><tr><th>Tasto</th><th>Abilità</th><th>Cosa fa</th><th>Livello</th><th>Costo</th><th>Ricarica</th></tr></thead>
+  <thead><tr><th>Tasto</th><th>Abilità</th><th>Cosa fa</th><th>Livello</th><th>MP</th><th>Anime</th><th>Ricarica</th></tr></thead>
   <tbody>
-    <tr><td><kbd>Z</kbd></td><td class="q">Passo d'ombra</td><td>Scatto di 8 blocchi nella direzione dello sguardo. Si ferma sui muri: non li attraversa.</td><td class="n">5</td><td class="n">—</td><td class="n">3 s</td></tr>
-    <tr><td><kbd>X</kbd></td><td class="q">Scambio d'ombra</td><td>Prendi il posto della tua ombra evocata più lontana. Una via di fuga, o un modo di aprirsi la strada.</td><td class="n">10</td><td class="n">—</td><td class="n">10 s</td></tr>
-    <tr><td><kbd>C</kbd></td><td class="q">Dominio del Monarca</td><td>Per 20 s tu <em>e tutte le ombre evocate</em> avete Velocità II e Forza I.</td><td class="n">20</td><td class="n">40</td><td class="n">30 s</td></tr>
-    <tr><td><kbd>V</kbd></td><td class="q">Autorità del Sovrano</td><td>Gli ostili entro 12 blocchi prendono Lentezza III, Debolezza II e Bagliore per 10 s.</td><td class="n">30</td><td class="n">60</td><td class="n">45 s</td></tr>
+    <tr><td><kbd>Z</kbd></td><td class="q">Passo d'ombra</td><td>Scatto di 8 blocchi nella direzione dello sguardo. Si ferma sui muri: non li attraversa.</td><td class="n">5</td><td class="n">10</td><td class="n">—</td><td class="n">3 s</td></tr>
+    <tr><td><kbd>X</kbd></td><td class="q">Scambio d'ombra</td><td>Prendi il posto della tua ombra evocata più lontana. Una via di fuga, o un modo di aprirsi la strada.</td><td class="n">10</td><td class="n">20</td><td class="n">—</td><td class="n">10 s</td></tr>
+    <tr><td><kbd>L</kbd></td><td class="q">Volo del Monarca</td><td>Voli finché hai MP, e cadi quando finiscono. Si accende e si spegne con lo stesso tasto. → <a href="#volo">dettagli</a></td><td class="n">10</td><td class="n">20 + 8/s</td><td class="n">—</td><td class="n">1 s</td></tr>
+    <tr><td><kbd>C</kbd></td><td class="q">Dominio del Monarca</td><td>Per 20 s tu <em>e tutte le ombre evocate</em> avete Velocità II e Forza I.</td><td class="n">20</td><td class="n">45</td><td class="n">40</td><td class="n">30 s</td></tr>
+    <tr><td><kbd>V</kbd></td><td class="q">Autorità del Sovrano</td><td>Gli ostili entro 12 blocchi prendono Lentezza III, Debolezza II e Bagliore per 10 s.</td><td class="n">30</td><td class="n">60</td><td class="n">60</td><td class="n">45 s</td></tr>
   </tbody>
 </table>
 </div>
 <p style="color: var(--muted); font-size: 14.5px;">Un'abilità che non fa niente (uno scambio senza
-ombre, un'autorità senza bersagli) <b>non parte e non costa</b>: niente ricarica, soul coin
+ombre, un'autorità senza bersagli) <b>non parte e non costa</b>: niente ricarica, MP e soul coin
 rimborsati.</p>
 
 <!-- ══════════════════════════════════════════════════════════════ SISTEMA -->
@@ -1253,7 +1376,10 @@ attivi.</p>
 /arise souls                      il saldo
 /arise souls add &lt;n&gt;              regala soul coin
 /arise respec                     restituisce tutti i punti spesi
-/arise reset                      azzera la progressione</code></pre>
+/arise reset                      azzera la progressione
+/arise mana                       quanto Mana hai
+/arise mana fill                  riempie la riserva
+/arise mana set &lt;n&gt;               la porta a un valore preciso</code></pre>
 
 <h3>Incarichi e tutorial</h3>
 <pre><code>/arise quest                      l'incarico in corso e il progresso
@@ -1273,7 +1399,9 @@ attivi.</p>
 /arise gate list                  l'indice dei varchi aperti
 /arise compass                    dov'è il varco più vicino
 /arise leave                      uscita d'emergenza
-/arise map                        apre la mappa</code></pre>
+/arise map                        apre la mappa
+/arise map bench &lt;0-4&gt; [n]        misura quanto costa dipingere il terreno
+                                  (la risposta finisce nel log del server)</code></pre>
 
 <h3>Ombre</h3>
 <pre><code>/arise arise                      estrai dal cadavere più vicino
@@ -1324,7 +1452,33 @@ che ti serviamo.</p>
   Dungeon Break appena scoppiato (sono trenta mob insieme).</li>
 </ul>
 
-<h3>E in particolare, delle cose di stasera</h3>
+<h3>Delle cinque cose nuove — queste per prime</h3>
+<ul class="tight">
+  <li><b>Il volo, e le sue uscite.</b> Sali al 10, premi <kbd>L</kbd>, stacca da terra. Poi, in
+  quest'ordine: <em>muori mentre voli</em>; entra in un varco mentre voli; viaggia in una città
+  mentre voli. Dopo ognuna delle tre <b>non devi più poter volare</b> senza ripremere <kbd>L</kbd>.
+  Se voli ancora, è il difetto peggiore di tutto il giro.</li>
+  <li><b>Il volo che finisce.</b> <code>/arise mana set 40</code>, poi vola. Deve spegnersi da solo
+  dopo pochi secondi, dirtelo in rosso, e lasciarti cadere.</li>
+  <li><b>Il Mana che si esaurisce.</b> Evoca la squadra, richiamala, rievocala subito. Alla seconda
+  o terza volta deve rifiutare e dire quanto manca. Guarda che la barra viola non risalga durante i
+  due secondi dopo una spesa.</li>
+  <li><b>La mappa contro il mondo.</b> Apri <kbd>M</kbd> dove ti trovi e confronta: il mare, la
+  costa, il bosco devono stare dove li vedi. Poi trascina verso una città e guarda l'anello.</li>
+  <li><b>La mappa che si riempie.</b> Apri la mappa in un posto mai visto e resta fermo: deve
+  completarsi in un secondo o due, dal centro verso fuori. Se resta un buco per sempre, chiudi e
+  riapri — se così si riempie, dimmelo, vuol dire che un pacchetto si perde.</li>
+  <li><b>La Chiave del Varco.</b> Arriva con l'incarico «Equipaggiato». Aprine uno, entra, esci senza
+  chiuderlo, aprine un altro. Poi chiudi il primo varco davvero: la Chiave deve sparire, e il gioco
+  deve dirtelo.</li>
+  <li><b>I passi degli incarichi.</b> <kbd>F7</kbd> tre volte: disteso, stretto, spento, e ogni
+  pressione lo dice. Poi <kbd>F6</kbd>: deve sparire anche il tracciato, non solo il pannello a
+  sinistra.</li>
+  <li><b>I passi contro il gioco.</b> Segui alla lettera i passi di un incarico dell'Officina. Se un
+  passo dice una cosa e il gioco ne fa un'altra, è la segnalazione più utile che puoi mandare.</li>
+</ul>
+
+<h3>E delle cose del giro scorso</h3>
 <ul class="tight">
   <li><b>Il gelo del Gate Rosso</b>: un falò piantato lì per lì deve bastare a fermarlo. Se muori
   di freddo con un falò addosso, o se non muori mai anche stando al centro di una stanza vuota,

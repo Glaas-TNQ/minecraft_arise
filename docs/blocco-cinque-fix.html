@@ -1,0 +1,631 @@
+<title>Cinque richieste trovate giocando</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --ground: #0A0D16;
+    --panel: #121A2A;
+    --panel-soft: #0E1522;
+    --line: #1F2C42;
+    --line-soft: #172133;
+    --accent: #4FC3F7;
+    --accent-deep: #3C8BD9;
+    --gold: #FFD54F;
+    --violet: #8E6BFF;
+    --good: #7FD97F;
+    --warn: #E8A64F;
+    --bad: #E86A6A;
+    --text: #E8F2FF;
+    --muted: #8FA0B5;
+
+    --display: "Chakra Petch", "Segoe UI", sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", "Cascadia Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  a { color: var(--accent); }
+
+  /* ---------------------------------------------------------------- masthead */
+
+  .masthead {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--violet);
+    background: linear-gradient(180deg, rgba(142,107,255,0.10), transparent 60%), var(--panel-soft);
+    padding: 28px 28px 24px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .lede { margin: 0; color: var(--muted); max-width: 62ch; }
+  .lede strong { color: var(--text); font-weight: 600; }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* ---------------------------------------------------------------- avvisi */
+
+  .notice {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--warn);
+    background: var(--panel-soft);
+    padding: 16px 20px;
+  }
+  .notice.hot { border-top-color: var(--bad); }
+  .notice p { margin: 0; font-size: 15px; }
+  .notice p + p { margin-top: 10px; }
+  .notice .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .notice.hot .tag { color: var(--bad); }
+
+  /* ---------------------------------------------------------------- sezioni */
+
+  section { margin-top: 52px; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .step {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    flex: none;
+  }
+  .step.violet { color: var(--violet); }
+  .step.gold { color: var(--gold); }
+  .step.good { color: var(--good); }
+
+  .kicker {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+    padding-left: 2px;
+  }
+
+  section p { max-width: 66ch; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    margin: 28px 0 10px;
+    color: var(--text);
+  }
+
+  /* ---------------------------------------------------------------- pannelli */
+
+  .panel {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 18px;
+  }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .why {
+    border-top: 2px solid var(--accent-deep);
+    background: var(--panel);
+  }
+
+  /* Un elenco stretto, per le liste che stanno dentro un pannello. */
+  ul.tight { margin-top: 10px; }
+  ul.tight li { margin-bottom: 4px; }
+  .why .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* Il pannello di cio' che e' andato storto: lo stesso di .why, ma rosso. Va dopo, per vincere. */
+  .bad-panel { border-top-color: var(--bad); }
+  .bad-panel .tag { color: var(--bad); }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .compare > div { background: var(--panel-soft); padding: 16px 18px; }
+  .compare .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .compare .before .tag { color: var(--muted); }
+  .compare .after .tag { color: var(--good); }
+  .compare p { margin: 0; font-size: 14.5px; color: var(--muted); }
+  .compare .after p { color: var(--text); }
+
+  /* ---------------------------------------------------------------- tabelle */
+
+  .scroll { overflow-x: auto; margin-top: 18px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+    min-width: 620px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 9px 16px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom-color: var(--line);
+  }
+
+  td.num, th.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  td b { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  tr.service td:first-child b { color: var(--gold); }
+
+  /* ---------------------------------------------------------------- codice */
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    color: var(--accent);
+    background: rgba(79,195,247,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--gold); }
+
+  .map {
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: 0.06em;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    padding: 20px;
+    overflow-x: auto;
+    margin: 18px 0 0;
+    white-space: pre;
+  }
+  .caption {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 0;
+  }
+
+  /* ---------------------------------------------------------------- la catena */
+
+  .chain { margin-top: 20px; border: 1px solid var(--line); background: var(--panel); padding: 10px; }
+  .chain svg { display: block; width: 100%; height: auto; }
+  .chain .n { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: #8FA0B5; }
+  .chain .t { font-family: "Chakra Petch", sans-serif; font-size: 12px; font-weight: 600; fill: #E8F2FF; }
+  .chain .g { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; fill: #FFD54F; }
+  .chain .box { fill: #0E1522; stroke: #1F2C42; }
+
+  /* ---------------------------------------------------------------- liste */
+
+  ul { padding-left: 0; list-style: none; margin: 14px 0 0; }
+  ul li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    max-width: 64ch;
+  }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    width: 6px;
+    height: 1px;
+    background: var(--accent-deep);
+  }
+
+  .check { margin-top: 14px; }
+  .check li { padding-left: 26px; }
+  .check li::before {
+    content: "";
+    left: 0;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: none;
+    border: 1px solid var(--line);
+  }
+
+  .verify {
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--good);
+    background: var(--panel-soft);
+    padding: 18px 22px;
+    margin-top: 22px;
+  }
+  .verify .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--good);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ---------------------------------------------------------------- chiusura */
+
+  hr { border: 0; border-top: 1px solid var(--line); margin: 52px 0 0; }
+
+  footer { margin-top: 26px; color: var(--muted); font-size: 14px; }
+  footer p { max-width: 66ch; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    h2 { flex-direction: column; gap: 8px; }
+    .step { align-self: flex-start; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Arise · blocco G1 · le cose trovate giocando</p>
+    <h1>Cinque richieste, e un numero che era sbagliato di sessanta volte</h1>
+    <p class="lede">Cinque cose chieste dopo una serata di gioco vero: <strong>un prezzo per
+      evocare</strong>, <strong>il volo</strong>, <strong>una mappa che mostri il mondo</strong>,
+      <strong>incarichi che dicano cosa fare</strong> e <strong>un modo di aprire il primo varco
+      invece di aspettarlo</strong>. Sono tutte fatte. La più interessante non è nessuna delle
+      cinque: è la misura che ha buttato via la prima versione della mappa.</p>
+
+    <p class="facts">
+      <span>file nuovi <b>10</b></span>
+      <span>file toccati <b>22</b></span>
+      <span>prove <b>115</b> (+19)</span>
+      <span>collaudo statico <b>pulito</b></span>
+      <span>server dedicato <b>mondo nuovo ×3</b></span>
+      <span>7867 ms → <b>118 ms</b></span>
+    </p>
+  </header>
+
+  <div class="notice">
+    <span class="tag">Cosa è verificato e cosa no</span>
+    <p>Verificato davvero: la <strong>geometria</strong> (115 prove, fra cui il Mana che non perde i
+      decimi e le città che non stanno più in fila), il <strong>server su mondo nuovo</strong> tre
+      volte, e la <strong>misura del terreno</strong> — che è l'unica cosa di questo blocco che
+      poteva essere sbagliata di ordini di grandezza, ed era.</p>
+    <p>Non verificato: <strong>tutto quello che si vede</strong>. La barra del Mana, il volo, il
+      riquadro degli incarichi e la mappa disegnata sono client, e il client si guarda con gli occhi.
+      Due punti in particolare sono stati chiusi leggendo il bytecode invece che provandoli — l'ordine
+      dei parametri di <span class="mono">blit</span> e la doppia liberazione della texture — e
+      leggere non è vedere.</p>
+  </div>
+
+  <section>
+    <h2><span class="step">1</span> Il Mana: il prezzo che non c'era</h2>
+    <p class="kicker">Prima: chiamare l'esercito era gratis, e il tetto delle evocazioni non serviva
+      a niente.</p>
+
+    <p>C'era un limite a quante ombre stessero in campo <em>insieme</em>, e nessun limite a quante
+      volte le si potesse chiamare. Richiamare e rievocare all'infinito costava zero, e finché
+      evocare non costa niente nessun'altra decisione dell'esercito conta — non la squadra, non i
+      gradi, non le posture.</p>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Voce</th><th>Valore</th><th>Perché</th></tr></thead>
+        <tbody>
+          <tr><td>Riserva</td><td>100 + 10 per livello</td><td>Quattro ombre all'esordio, nove a livello venti</td></tr>
+          <tr><td>Rigenerazione</td><td>6 al secondo</td><td>Un'ombra ogni quattro secondi, stando fermi</td></tr>
+          <tr><td>Pausa dopo una spesa</td><td>2 secondi</td><td>È questo che lo rende una risorsa e non un ritardo</td></tr>
+          <tr><td>Costo di un'ombra</td><td>25</td><td>Vale per il tasto <b>G</b> e per la schermata: erano due strade e adesso costano uguale</td></tr>
+          <tr><td>Abilità</td><td>10 / 20 / 45 / 60</td><td>La mobilità resta quasi gratuita</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel why">
+      <span class="tag">La riga che sarebbe stata sbagliata in silenzio</span>
+      <p>La rigenerazione si conta sul <strong>tempo passato</strong>, non sommando un pezzetto a
+        ogni battito. La via ovvia — battito ogni quarto di secondo, aggiungi
+        <span class="mono">6 / 4</span> — perde mezzo punto per battito, perché un intero non tiene
+        1,5. Sono <strong>due punti al secondo su sei</strong>: un terzo della rigenerazione che
+        sparisce senza nessun errore, e un numero in config che smette di voler dire quello che c'è
+        scritto.</p>
+      <p>C'è una prova apposta (<span class="mono">ManaTest.regenLosesNothing</span>), ed è il genere
+        di difetto per cui le prove esistono: nessuno lo troverebbe giocando, si troverebbe solo
+        pensando «mi sembra lenta».</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">2</span> Il volo, e le sue quattro uscite</h2>
+    <p class="kicker">Livello 10, tasto <b>L</b>. Otto MP al secondo, e quando finiscono si cade.</p>
+
+    <p>Non è l'elytra e non è la creativa: è il volo della creativa <em>affittato</em>. La caduta è
+      voluta — è quello che rende il volo una decisione invece di uno stato, e senza di lei le
+      distanze di questo mondo (duecentomila blocchi fino alle città) smetterebbero di contare.</p>
+
+    <div class="panel why">
+      <span class="tag">La cosa che poteva andare peggio</span>
+      <p><span class="mono">mayfly</span> è un <strong>permesso scritto sul giocatore</strong>, non
+        un effetto a tempo: nessuno lo toglie da solo. Morire mentre si vola costruisce un
+        <span class="mono">ServerPlayer</span> nuovo, e quel permesso lo segue nel salvataggio. Sarebbe
+        stato un volo creativo permanente ottenuto morendo — e non un difetto sottile: il primo
+        giocatore che muore in aria lo trova.</p>
+      <p>Per questo il volo si spegne da <strong>ognuna</strong> delle quattro uscite: morte,
+        risveglio, cambio di dimensione, disconnessione. Più una quinta regola all'incontrario: su
+        chi è in creativa o spettatore questo gestore non tocca niente, né per accendere né —
+        soprattutto — per spegnere.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">3</span> La mappa, e la misura che ha buttato via la prima versione</h2>
+    <p class="kicker">«Si vede solo una mappa nera che non ha niente a che vedere con il mondo di
+      gioco.»</p>
+
+    <p>Non era un difetto: era una scelta, ed era sbagliata. Nel commento di
+      <span class="mono">MapScreen</span> c'era scritto <em>«non disegna il terreno, sarebbe un'altra
+      mod: qui contano i punti, non il paesaggio»</em>. Ma un rettangolo nero con sopra dei segni non
+      è una mappa, è una legenda senza la mappa.</p>
+
+    <p>Il motivo per cui non c'era però è vero: leggere il terreno vuol dire leggere i chunk, e le
+      città stanno a duecentomila blocchi da chiunque. La via d'uscita è che il generatore sa
+      rispondere <strong>senza generare</strong>.</p>
+
+    <div class="panel why bad-panel">
+      <span class="tag">Prima versione: 7867 ms a riquadro</span>
+      <p>Le quote venivano da <span class="mono">ChunkGenerator.getBaseHeight</span>. Sulla carta era
+        la risposta giusta — interroga il rumore, non tocca un chunk — e nel commento avevo scritto
+        che costava «un battito di ciglia». Misurata: <strong>sette millesimi di secondo per
+        colonna</strong>, perché quel metodo costruisce una colonna di rumore intera, con falde e
+        interpolazione, per restituire un numero. È fatto per piazzare una struttura ogni tanto.</p>
+      <p>Il primo comando di prova ha fatto scattare il watchdog: <em>«a single server tick took 60.00
+        seconds, considering it to be crashed»</em>.</p>
+    </div>
+
+    <div class="panel">
+      <span class="tag">Seconda versione: 118 ms</span>
+      <p>Un piano più sotto c'è <span class="mono">Climate.Sampler.sample</span>: i sei rumori del
+        clima in una chiamata. Sono gli stessi numeri con cui il gioco decide quale bioma mettere
+        dove, e da soli bastano a disegnare una mappa.</p>
+      <ul class="tight">
+        <li>il <b>bioma</b> esce dai sei valori senza ricampionare, e dà la tinta;</li>
+        <li>la <b>continentalità</b> dice quanto è fondo il mare;</li>
+        <li>la <b>profondità</b>, letta a quota <em>fissa</em>, cresce dove il terreno è più alto: non
+          è una quota in blocchi, ma il suo dislivello fra campioni vicini è esattamente ciò che serve
+          per ombreggiare un rilievo. A quota variabile darebbe lo stesso numero dappertutto, e una
+          mappa perfettamente piatta.</li>
+      </ul>
+      <p>Sessanta volte meno. Nove riquadri in un secondo, su un thread solo.</p>
+    </div>
+
+    <p>Da qui <code>/arise map bench &lt;livello&gt; [riquadri]</code>: gira su un thread suo e scrive
+      la misura nel log. L'affermazione «interrogare il rumore è economico» o si misura o è una
+      speranza — ed è stata una speranza per un'ora.</p>
+
+    <div class="panel why">
+      <span class="tag">Due cose lette nel bytecode invece che provate</span>
+      <p><span class="mono">GuiGraphicsExtractor.blit</span> a nove argomenti vuole gli
+        <strong>angoli</strong>, non la misura: <span class="mono">(id, x0, y0, x1, y1, u0, u1, v0,
+        v1)</span>. Le altre sovrapposizioni ne vogliono quattro con larghezza e altezza, e scambiarle
+        non dà nessun errore — dà una texture disegnata fin dove capita.</p>
+      <p><span class="mono">TextureManager.release(id)</span> <strong>chiude già</strong> la texture
+        che gli si toglie. Chiuderla anche a mano libera due volte lo stesso puntatore nativo: non
+        un'eccezione di Java, un processo che se ne va.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step">4</span> Le città smettono di stare in fila</h2>
+    <p class="kicker">Ci stavano davvero: <span class="mono">cityZ</span> restituiva sempre
+      <span class="mono">originZ</span>.</p>
+
+    <p>Cinque quadrati sulla stessa Z, a quindicimila blocchi l'uno dall'altro. Nessuno se n'era
+      accorto perché non c'era niente da cui accorgersene: leggendo il codice quella riga sembrava
+      intenzionale, e in gioco non si vedono mai due città insieme. È bastata una mappa.</p>
+
+    <p>Adesso stanno su un <strong>anello</strong> di ventimila blocchi, ruotato di venticinque gradi.
+      I venticinque gradi non sono decorativi: con lo sfasamento a zero la prima città cade esattamente
+      a est del centro, con diciotto la seconda cade esattamente a nord, e una costellazione con anche
+      un solo punto su un asse è la cosa che fa sembrare tutto disegnato con un righello. C'è una prova
+      anche per quello — è esattamente il dettaglio che un giorno qualcuno arrotonda a zero per farlo
+      sembrare più pulito.</p>
+
+    <p>E sulla mappa si vede la loro <strong>impronta vera</strong>: 512 blocchi di lato, disegnati in
+      scala, invece di un pip da quattro pixel identico agli altri quattro.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">5</span> Gli incarichi dicono cosa fare</h2>
+    <p class="kicker">Le parole c'erano già. Sbagliata era la forma, e il momento.</p>
+
+    <p>Ogni incarico aveva un <span class="mono">brief()</span> che spiegava come si fa, ed erano
+      spiegazioni giuste. Le vedevi <strong>una volta sola</strong>, in chat, nel momento in cui
+      l'incarico ti veniva assegnato. Il giorno dopo restava
+      <span class="mono">Fai girare un macchinario 0/1</span> — un contatore solo, per un compito che
+      sono tre passi: costruisci il macchinario, caricalo, aspetta un giro. Nessuno dei tre era scritto
+      da nessuna parte che si potesse riaprire.</p>
+
+    <p>Adesso ogni incarico dichiara i suoi <strong>passi</strong>, due o tre, numerati, e stanno in
+      due posti: il riquadro sul bordo destro dello schermo e la schermata <b>P</b>. Un paragrafo dice
+      cinque cose in una frase e chi lo legge a metà non sa quale sia il prossimo gesto; un elenco dice
+      cinque cose in cinque righe, e la prossima è quella che stai guardando.</p>
+
+    <p><b>F7</b> gira fra disteso, stretto e spento. Il collaudo statico ha imparato a leggere lo
+      <span class="mono">switch</span> di <span class="mono">Quest.steps()</span>: verifica che ogni
+      passo dichiarato abbia la sua stringa in tutte e due le lingue e che gli argomenti tornino — un
+      passo che nomina un tasto e ne passa uno solo quando la stringa ne vuole due mostrerebbe
+      <span class="mono">%2$s</span> in gioco, e non lo direbbe nessuno.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">6</span> La Chiave del Varco</h2>
+    <p class="kicker">Il settimo incarico non era un compito: era un'attesa.</p>
+
+    <p>«Chiudi un varco», e i varchi si aprono da soli, ogni tanto, vicino a chi gioca. Un Cacciatore
+      che ha appena ricevuto i Gate poteva solo camminare finché il caso non decideva, con la catena
+      ferma su un incarico che non dipendeva da lui.</p>
+
+    <p>La Chiave arriva con l'incarico prima — quello che concede i Gate — e apre un varco di rango E
+      dove sei. <strong>Non si consuma all'uso</strong>: il primo varco è anche il primo posto dove si
+      può morire, e una chiave a uso singolo trasformerebbe un tentativo andato male in un vicolo
+      cieco, stavolta per colpa tua. Sparisce invece quando il primo varco è chiuso, e a toglierla è
+      la catena stessa — è la sola cosa che impedisce a un oggetto nato per insegnare di diventare un
+      rubinetto di varchi.</p>
+  </section>
+
+  <section>
+    <h2><span class="step">7</span> Cosa c'è nei due commit</h2>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>File</th><th>Cosa</th></tr></thead>
+        <tbody>
+          <tr><td><span class="mono">mana/Mana.java</span>, <span class="mono">mana/ManaManager.java</span> <em>nuovi</em></td><td>La riserva, la rigenerazione contata sul tempo, spesa e rimborso</td></tr>
+          <tr><td><span class="mono">config/ManaConfig.java</span> <em>nuovo</em></td><td>Annidata sotto <span class="mono">abilities</span>: la radice è già ai sedici campi del codec</td></tr>
+          <tr><td><span class="mono">ability/FlightManager.java</span> <em>nuovo</em></td><td>Il volo, le quattro uscite, la regola che non tocca la creativa</td></tr>
+          <tr><td><span class="mono">event/ManaEvents.java</span> <em>nuovo</em></td><td>Il battito a 4 Hz e i quattro agganci che spengono il volo</td></tr>
+          <tr><td><span class="mono">gate/GateKeyItem.java</span> <em>nuovo</em></td><td>La Chiave, più la sua texture disegnata dal codice</td></tr>
+          <tr><td><span class="mono">map/MapTiles.java</span> <em>nuovo</em></td><td>La geometria dei riquadri: passo, livelli, chiavi. Aritmetica, quindi provata</td></tr>
+          <tr><td><span class="mono">map/TerrainAtlas.java</span> <em>nuovo</em></td><td>Il terreno dipinto dal rumore, fuori dal thread del server, con cache</td></tr>
+          <tr><td><span class="mono">client/map/MapCanvas.java</span>, <span class="mono">TerrainTiles.java</span> <em>nuovi</em></td><td>La texture e la cache dei riquadri ricevuti</td></tr>
+          <tr><td><span class="mono">network/MapTilePayload.java</span>, <span class="mono">MapTileRequestPayload.java</span> <em>nuovi</em></td><td>Tre byte per campione, e un tetto ai riquadri per richiesta</td></tr>
+          <tr><td><span class="mono">client/hud/QuestTrackerElement.java</span> <em>nuovo</em></td><td>Il riquadro sul bordo destro, tre stati</td></tr>
+          <tr><td><span class="mono">quest/Quest.java</span>, <span class="mono">QuestManager.java</span></td><td><span class="mono">steps()</span>, <span class="mono">revokes()</span>, e la restituzione dell'oggetto prestato</td></tr>
+          <tr><td><span class="mono">config/CityConfig.java</span></td><td>L'anello: <span class="mono">ring_radius</span> al posto di <span class="mono">spacing</span></td></tr>
+          <tr><td><span class="mono">tools/collaudo.py</span></td><td>Legge lo switch dei passi e ne verifica stringhe e argomenti</td></tr>
+          <tr><td><span class="mono">src/test/…/ManaTest.java</span>, <span class="mono">MapTilesTest.java</span> <em>nuovi</em></td><td>19 prove nuove: la rigenerazione, i riquadri, l'anello</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="verify">
+    <span class="tag">Le prove che contano, quando ti siedi a giocare</span>
+    <ul class="check">
+      <li><b>Il volo e le sue uscite.</b> Sali al 10, vola, e poi: muori in aria; entra in un varco in
+        volo; viaggia in città in volo. Dopo ognuna delle tre non devi più poter volare senza
+        ripremere <b>L</b>. È la cosa più facile da rompere di tutto il blocco</li>
+      <li><code>/arise mana set 40</code> e vola: deve spegnersi da solo, dirlo in rosso, e farti cadere</li>
+      <li>Evoca, richiama, rievoca subito: alla seconda o terza deve rifiutare. La barra viola non deve
+        risalire nei due secondi dopo una spesa</li>
+      <li><b>M</b>: il terreno deve corrispondere a quello che hai attorno. Trascina verso una città e
+        guarda l'anello, e l'impronta quadrata quando ti avvicini</li>
+      <li>Apri la mappa in un posto mai visto: deve riempirsi in un secondo o due, dal centro verso
+        fuori. Un buco che non si riempie mai è un pacchetto perso, e va detto</li>
+      <li><b>F7</b> tre volte, poi <b>F6</b>: deve sparire anche il tracciato</li>
+      <li>Segui alla lettera i passi di un incarico dell'Officina. Se un passo dice una cosa e il gioco
+        ne fa un'altra, uno dei due ha un difetto</li>
+      <li>La Chiave del Varco: aprine uno, entra, esci, aprine un altro; poi chiudi il primo varco
+        davvero e verifica che la Chiave sparisca dicendolo</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <footer>
+    <p>Progetto Arise · Minecraft 26.2 · Fabric 0.19.3 · <span class="mono">tools/collaudo.py</span>
+      e <span class="mono">src/test</span>.</p>
+    <p>Il ciclo precedente: <span class="mono">docs/blocco-collaudo.html</span>. La guida per chi
+      collauda: <span class="mono">GUIDA-TESTER.html</span>.</p>
+  </footer>
+
+</div>
